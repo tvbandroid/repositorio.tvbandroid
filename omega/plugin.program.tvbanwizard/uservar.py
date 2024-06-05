@@ -15,22 +15,22 @@ ART = os.path.join(PATH, 'resources', 'media')
 #        User Edit Variables                            #
 #########################################################
 ADDONTITLE = '[COLOR azure][B]Tvban[/B][/COLOR] [COLOR tan][B]Wizard[/B][/COLOR]'
-BUILDERNAME = 'JoseAndTEBA & AndTVban'
-EXCLUDES = [ADDON_ID, 'repository.andTVban']
+BUILDERNAME = 'JoseAndTEB & tvband'
+EXCLUDES = [ADDON_ID, 'repository.andtvban']
 # Text File with build info in it.
-BUILDFILE = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/buildfiles/builds.txt'
+BUILDFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/buildfiles/builds.txt'
 # How often you would like it to check for build updates in days
 # 0 being every startup of kodi
 UPDATECHECK = 0
 # Text File with apk info in it.  Leave as 'http://' to ignore
-APKFILE = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/buildfiles/apks.txt'
+APKFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/buildfiles/apks.txt'
 # Text File with Youtube Videos urls.  Leave as 'http://' to ignore
 YOUTUBETITLE = '[B][COLOR red]Conciertos[/COLOR] TVBAN [/B]'
-YOUTUBEFILE = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/buildfiles/youtube.txt'
+YOUTUBEFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/buildfiles/youtube.txt'
 # Text File for addon installer.  Leave as 'http://' to ignore
 ADDONFILE = 'http://'
 # Text File for advanced settings.  Leave as 'http://' to ignore
-ADVANCEDFILE = 'https://raw.githubusercontent.com/andtvban/andtvban.github.io/master/tvban/wizard/json/advanced.json'
+ADVANCEDFILE = 'https://raw.githubusercontent.com/tvbandroid/tvbandroid.github.io/master/tvband/wizard/json/advanced.json'
 #########################################################
 
 #########################################################
@@ -103,7 +103,7 @@ CONTACTFANART = 'http://'
 # Enable Auto Update 'Yes' or 'No'
 AUTOUPDATE = 'Yes'
 # Url to wizard version
-BUILDFILE = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/buildfiles/builds.txt' 
+BUILDFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/buildfiles/builds.txt' 
 #########################################################
 
 #########################################################
@@ -112,11 +112,11 @@ BUILDFILE = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/mas
 # Enable Auto Install 'Yes' or 'No'
 AUTOINSTALL = 'Yes'
 # Addon ID for the repository
-REPOID = 'repository.andTVban'
+REPOID = 'repository.andtvban'
 # Url to Addons.xml file in your repo folder(this is so we can get the latest version)
-REPOADDONXML = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/omega/zips/addons.xml'
+REPOADDONXML = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/omega/zips/addons.xml'
 # Url to folder zip is located in
-REPOZIPURL = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/omega/zips/repository.andTVban/'
+REPOZIPURL = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/omega/zips/repository.andtvban/'
 #########################################################
 
 #########################################################
@@ -125,14 +125,14 @@ REPOZIPURL = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/ma
 # Enable Notification screen Yes or No
 ENABLE = 'Yes'
 # Url to notification file
-NOTIFICATION = 'https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/buildfiles/andtv/Notify.txt'
+NOTIFICATION = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/buildfiles/tvban/Notify.txt'
 # Use either 'Text' or 'Image'
 HEADERTYPE = 'Image'
 # Font size of header
 FONTHEADER = ''
 HEADERMESSAGE = '[COLOR azure][B]TVBAN[/B][/COLOR] [COLOR tan][B]WIZARD[/B][/COLOR]'
 # url to image if using Image 424x180
-HEADERIMAGE = 'https://i.imgur.com/WbE8N7K.png'
+HEADERIMAGE = 'https://i.imgur.com/u9Jzrxi.png'
 # Font for Notification Window
 FONTSETTINGS = ''
 # Background for Notification Window

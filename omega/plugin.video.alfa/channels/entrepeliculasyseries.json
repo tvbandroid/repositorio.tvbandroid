@@ -1,0 +1,40 @@
+{
+  "id": "entrepeliculasyseries",
+  "name": "EntrePeliculasySeries",
+  "active": true,
+  "adult": false,
+  "language": ["lat", "cast"],
+  "thumbnail": "https://i.postimg.cc/BjkjNy2D/Entrepeliculasyseries-logo.png",
+  "banner": "",
+  "fanart": "",
+  "categories": [
+    "movie",
+    "tvshow",
+    "vos"
+  ],
+  "force_unify": true,
+  "settings": [
+    {
+      "id": "include_in_global_search",
+      "type": "bool",
+      "label": "Incluir en busqueda global",
+      "default": false,
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "filter_languages",
+      "type": "list",
+      "label": "Mostrar enlaces en idioma...",
+      "default": 1,
+      "enabled": true,
+      "visible": true,
+      "lvalues": [
+        "No filtrar",
+        "LAT",
+        "CAST",
+        "VOSE"
+      ]
+    }
+  ]
+}

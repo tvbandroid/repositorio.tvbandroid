@@ -1,0 +1,41 @@
+24
+|||
+
+[COLOR greenyellow][B]¡¡¡BIENVENIDOS A LA BUILD TVBAN NEXUS !!![B][/COLOR]
+
+[COLOR aquamarine][B]INSTALACIÓN:[B][/COLOR]
+
+[COLOR deepskyblue]* Para HACER la instalación correctamente deberás pulsar en la opción [COLOR white][B]"Build Menu"[/B][/COLOR] en la ventana que aparece después de instalar el [COLOR azure]plugin.program.Andtv-Nexus[/COLOR] (Wizard).
+
+En ésta ventana de Notificación, damos a [COLOR white][B]"Cerrar"[/B][/COLOR]
+Seleccionamos la Build que deseas instalar, por ejemplo [COLOR azure][B]Tvban[/COLOR] [COLOR lime]Nvidia[/COLOR] - [COLOR white]INSTALAR TVBAN[/B][/COLOR] 
+Cuando termine de instalar, nos saldrá una ventana [COLOR white][B]"Necesita Forzar el Cierre de Kodi"[/B][/COLOR]. Pulsaremos en [COLOR white][B]"OK"[/B][/COLOR]
+Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, darle unos minutos para que cargue el Menú correctamente.[/COLOR]
+
+[COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE BUILD TVBAN[COLOR gold]!!![/B][/COLOR]
+[B][COLOR white]Tvban ARM [COLOR lime]Nvidia [COLOR dodgerblue]Windows [COLOR gold]07.5.24[/B][/COLOR]
+
+[COLOR lime][B]*  Nuevos cambios[/B][/COLOR]
+
+[COLOR lime][B]*  Corregido Destacados de Series[/B][/COLOR]
+[COLOR lime][B]*  Corregido los whitgets de Series y añadido nuevo whitget skySHOWTIME e icono[/B][/COLOR]
+[COLOR orange][B]*  Cambio de fondo en Videoteca[/B][/COLOR]
+[COLOR orange][B]*  Añadido Atajo para Palantir3: Peliculas, Series y Buscador[/B][/COLOR]
+[COLOR orange][B]*  Corrección Atajos, Atajo para Palantir3:Peliculas, Series y Buscador, Destacados: Peliculas, Series[/B][/COLOR]
+[COLOR orange][B]*  Nuevos Fondos[/B][/COLOR] 
+[COLOR orange][B]*  Corrección de sonido 2.0. Actualizaciones de addons/repositorios, Nuevos repositorios, Nuevo atajo, Arreglo Gismeteo, Otros[/B][/COLOR] 
+ 
+
+[COLOR aquamarine][B]INSTALACIÓN DEL PARCHE:[/B][/COLOR]
+
+[COLOR tan]Para instalar un parche, deberemos seleccionar la Build que tengamos instalada, por ejemplo [COLOR azure][B]Tvban[/COLOR] [COLOR lime]Nvidia[/COLOR], [COLOR tan]dentro veremos el/os PARCHE/S, por ejemplo [COLOR azure][B]Tvban[/COLOR] [COLOR lime]Nvidia[/COLOR] [COLOR gold]07.5.24[/B][/COLOR] y damos a instalar.[/COLOR]
+
+
+[COLOR orange]                   ****** JOSEATEBA, ANDTVBAN******                 [/COLOR] 
+  
+[COLOR dodgerblue]https://t.me/+lC4ECITUPH43NTE0[/COLOR]
+
+[COLOR white][B]GRACIAS POR UTILIZAR [COLOR dodgerblue]TVBAN [COLOR blueviolet]NEXUS![/B][/COLOR]
+
+BACKGROUND = 'https://i.imgur.com/0ciyvn4.png'
+

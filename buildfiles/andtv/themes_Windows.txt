@@ -1,0 +1,37 @@
+name="[B][COLOR white]Tvban [COLOR dodgerblue]Windows [COLOR gold]20.1.24[/COLOR][/B]"
+url="https://github.com/andtvban/andtvban.github.io/releases/download/1.1/B.Tvban_Windows20E.zip"
+icon="https://andtvban.github.io/tvban/wizard/wizardFI/ICParche.jpg"
+fanart="https://andtvban.github.io/tvban/wizard/wizardFI/FABuild.jpg"
+adult="no"
+description="[COLOR azure][B]Andtv[/COLOR] [COLOR darkviolet]Nexus[/B][/COLOR] para [COLOR teal][B]KODI: 20 Nexus[/B][/COLOR]"
+
+name="[B][COLOR white]Tvban [COLOR dodgerblue]Windows [COLOR gold]10.4.24[/COLOR][/B]"
+url="https://github.com/andtvban/andtvban.github.io/releases/download/1.1/B.Tvban_Windows10Ab.zip"
+icon="https://andtvban.github.io/tvban/wizard/wizardFI/ICParche.jpg"
+fanart="https://andtvban.github.io/tvban/wizard/wizardFI/FABuild.jpg"
+adult="no"
+description="[COLOR azure][B]Andtv[/COLOR] [COLOR darkviolet]Nexus[/B][/COLOR] para [COLOR teal][B]KODI: 20 Nexus[/B][/COLOR]"
+
+name="[B][COLOR white]Tvban [COLOR dodgerblue]Windows [COLOR gold]13.4.24[/COLOR][/B]"
+url="https://github.com/andtvban/andtvban.github.io/releases/download/1.1/B.Tvban_Windows13Ab.zip"
+icon="https://andtvban.github.io/tvban/wizard/wizardFI/ICParche.jpg"
+fanart="https://andtvban.github.io/tvban/wizard/wizardFI/FABuild.jpg"
+adult="no"
+description="[COLOR azure][B]Andtv[/COLOR] [COLOR darkviolet]Nexus[/B][/COLOR] para [COLOR teal][B]KODI: 20 Nexus[/B][/COLOR]"
+
+name="[B][COLOR white]Tvban [COLOR dodgerblue]Windows [COLOR gold]22.4.24[/COLOR][/B]"
+url="https://github.com/andtvban/andtvban.github.io/releases/download/1.1/B.Tvban_Windows22Ab.zip"
+icon="https://andtvban.github.io/tvban/wizard/wizardFI/ICParche.jpg"
+fanart="https://andtvban.github.io/tvban/wizard/wizardFI/FABuild.jpg"
+adult="no"
+description="[COLOR azure][B]Andtv[/COLOR] [COLOR darkviolet]Nexus[/B][/COLOR] para [COLOR teal][B]KODI: 20 Nexus[/B][/COLOR]"
+
+name="[B][COLOR white]Tvban [COLOR dodgerblue]Windows [COLOR gold]07.5.24[/COLOR][/B]"
+url="https://github.com/andtvban/andtvban.github.io/releases/download/1.1/B.Tvban_Windows7May.zip"
+icon="https://andtvban.github.io/tvban/wizard/wizardFI/ICParche.jpg"
+fanart="https://andtvban.github.io/tvban/wizard/wizardFI/FABuild.jpg"
+adult="no"
+description="[COLOR azure][B]Andtv[/COLOR] [COLOR darkviolet]Nexus[/B][/COLOR] para [COLOR teal][B]KODI: 20 Nexus[/B][/COLOR]"
+
+
+

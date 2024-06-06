@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="31.5.24" provider-name="[B][COLOR azure]andTVban, JoseAnd[/COLOR][/B]">
+<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="31.5.24" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
     <requires>
         <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" />
@@ -19,10 +19,10 @@
 	    </summary>
     	<description lang="en">
 [COLOR lime][B]CREDITOS:[/COLOR][/B] 
-[COLOR white][B]• Developers:[/B]      [COLOR darkorange]JoseaTEB[/COLOR]
+[COLOR white][B]• Developers:[/B]      [COLOR darkorange]JoseaTeb[/COLOR]
 [COLOR white][B]• Testers:[/B]             [COLOR darkorange]JoseaTeb, [COLOR moccasin]Amillans[/COLOR]
-[COLOR white][B]• Telegram:[/B]         [COLOR dodgerblue]t.me/+andTvban[/COLOR]</description>
-        <disclaimer>[COLOR tan][B]Está Prohibida su distribución, cedido por su autor, editado por AndTVban y Protegidos por los Derechos del Autor y Editor.[/B][/COLOR]</disclaimer>
+[COLOR white][B]• Telegram:[/B]         [COLOR dodgerblue]t.me/+andtvban[/COLOR]</description>
+        <disclaimer>[COLOR tan][B]Está Prohibida su distribución, cedido por su autor, editado por [COLOR azure]JoseaTeb [COLOR tan]y Protegidos por los Derechos del Autor y Editor.[/B][/COLOR]</disclaimer>
 		<platform>all</platform>
 		<reuselanguageinvoker>false</reuselanguageinvoker>
         <source>https://andtvban.github.io/tvban/</source>

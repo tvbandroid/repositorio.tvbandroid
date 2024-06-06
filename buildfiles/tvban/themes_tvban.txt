@@ -1,5 +1,5 @@
-name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1[/COLOR][/B]"
-url="https://github.com/andtvban/andtvban.github.io/releases/download/21/P_matnexom2May.zip"
+name="[B][COLOR red]No Hay [COLOR yellowgreen]TVban matnexom [COLOR khaki]v1[/COLOR][/B]"
+url="https://"
 icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
 fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
 adult="no"

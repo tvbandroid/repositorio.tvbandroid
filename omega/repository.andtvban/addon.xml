@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.andtvban" name="[B][COLOR azure]Repo [COLOR cyan]and[COLOR white]tv[COLOR deepskyblue]ban[/COLOR][/B]" version="31.5.24" provider-name="andTVban, JoseaTeb">
+<addon id="repository.andtvban" name="[B][COLOR azure]Repo [COLOR cyan]and[COLOR white]tv[COLOR deepskyblue]ban[/COLOR][/B]" version="1.6.24" provider-name="andtvban, JoseaTeb">
     <extension point="xbmc.addon.repository" name="[B][COLOR azure]Repo [COLOR cyan]and[COLOR white]tv[COLOR deepskyblue]ban[/COLOR][/B]">
 		<dir minversion="19.9.9" maxversion="20.9.9">
             <info compressed="false">https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/nexus/zips/addons.xml</info>

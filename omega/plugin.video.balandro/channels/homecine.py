@@ -518,10 +518,12 @@ def list_all(item):
         if thumb.startswith('//'): thumb = 'https:' + thumb
         elif thumb.startswith('/'): thumb = host + thumb
 
-        title = title.replace('&amp;', '&').replace('&#8211;', '')
+        title = title.replace('&amp;', '&').replace('&#8211;', '').replace('&#8217;', "'")
 
         year = scrapertools.find_single_match(info, 'rel="tag">(\d{4})<')
         if not year: year = '-'
+
+        if '/release-year/' in item.url: year = scrapertools.find_single_match(item.url, "/release-year/(.*?)/")
 
         qlty = scrapertools.find_single_match(info, '-quality">(.*?)</div>')
 
@@ -862,8 +864,13 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
         if servidor and servidor != 'directo':
             url = servertools.normalize_url(servidor, url)
+
             itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist

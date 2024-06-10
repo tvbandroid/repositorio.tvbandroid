@@ -15,6 +15,8 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://4144-don.mirror.pm/'
 
+# ~ 7/6/24 last domain  'https://dontorrent.sbs/'
+
 
 try:
     data_tor_proxy = httptools.downloadpage('https://donproxies.com/').data
@@ -67,7 +69,10 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.wales/', 'https://dontorrent.nagoya/', 'https://dontorrent.contact/',
              'https://dontorrent.cymru/', 'https://dontorrent.capetown/', 'https://dontorrent.yokohama/',
              'https://dontorrent.makeup/', 'https://dontorrent.band/', 'https://dontorrent.center/',
-             'https://dontorrent.cooking/', 'https://dontorrent.cyou/', 'https://dontorrent.agency/']
+             'https://dontorrent.cooking/', 'https://dontorrent.cyou/', 'https://dontorrent.agency/',
+             'https://dontorrent.skin/', 'https://dontorrent.directory/', 'https://dontorrent.boutique/',
+             'https://dontorrent.miami/', 'https://dontorrent.business/', 'https://dontorrent.clothing/',
+             'https://dontorrent.icu/', 'https://dontorrent.fyi/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -425,8 +430,9 @@ def list_post(item):
     matches = re.compile(patron).findall(data)
 
     for url, title, info, thumb in matches:
-        if "(" in title: titulo = title.split("(")[0]
-        else: titulo = title
+        titulo = title
+        if "[4K]" in title: titulo = title.split("[4K]")[0]
+        elif "(" in title: titulo = title.split("(")[0]
 
         itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb if "http" in thumb else "https:" + thumb,
                                             contentType=item.contentType, contentTitle=titulo, infoLabels={'year': "-", 'plot': info} ))

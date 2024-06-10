@@ -18,6 +18,8 @@ import os, re, time, xbmcaddon, glob
 
 import xbmc, xbmcgui, platform
 
+from datetime import datetime
+
 from platformcode import config, logger, platformtools, updater
 from core.item import Item
 from core import channeltools, filetools, servertools, httptools, scrapertools, trackingtools
@@ -445,6 +447,8 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='', title= title, context=context_temas, text_color='lightyellow', folder=False ))
 
+    itemlist.append(item.clone( action='', title= ' - [B]Fecha [COLOR powderblue][I]' + str(datetime.today()) + '[/I][/B]', text_color='aquamarine' ))
+
     itemlist.append(item.clone( action='submnu_contacto', title= ' - [B]Contacto[/B]', text_color='limegreen', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='submnu_fuente', title= ' - [B]Fuentes [COLOR powderblue][I]Add-Ons[/I][/B]', text_color='coral', thumbnail=config.get_thumb('pencil') ))
     itemlist.append(item.clone( action='show_help_miscelanea', title= ' - [B]Miscelánea[/B]', text_color='goldenrod', thumbnail=config.get_thumb('booklet') ))
@@ -468,7 +472,7 @@ def mainlist(item):
             matches = bloque.count('[COLOR lime]')
 
             if matches:
-                itemlist.append(item.clone( channel='actions', action='show_latest_domains', title=' - [COLOR tomato][B]ÚLTIMOS CAMBIOS DOMINIOS[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+                itemlist.append(item.clone( channel='actions', action='show_latest_domains', title=' - [B]Últimos Cambios Dominios[/B]', text_color='tomato', thumbnail=config.get_thumb('stack') ))
 
     if not config.get_setting('mnu_simple', default=False): tit_mnu = '[B][I]Menú Ayuda:[/I][/B]'
     else: tit_mnu = '[B][I]Menú Ayuda Simplificado:[/I][/B]'
@@ -711,7 +715,7 @@ def submnu_canales(item):
     itemlist.append(item.clone( action='show_channels_parameters', title=' - Qué [COLOR chocolate][B]Ajustes[/B][/COLOR] tiene en preferencias para Mostrar los Canales', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están [COLOR gold][B]Disponibles[/B][/COLOR] (Activos)' ))
-    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están [COLOR aquamarine][B]Sugeridos[/B][/COLOR]', suggesteds = True ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están [COLOR aquamarine][B]Sugeridos[/B][/COLOR]', suggesteds = True, thumbnail=config.get_thumb('suggested') ))
 
     itemlist.append(item.clone( action='', title= '[B][I]CANALES PERSONALIZACIÓN:[/I][/B]', text_color='goldenrod', folder=False ))
     itemlist.append(item.clone( action='channels_prefered', title= '    - Qué canales tiene marcados como [COLOR gold][B]Preferidos[/B][/COLOR]' ))
@@ -723,9 +727,38 @@ def submnu_canales(item):
     itemlist.append(item.clone( action='show_help_register', title= '    - [COLOR green][B]Información[/B][/COLOR] webs que requieren [COLOR gold][B]Registrarse[/B][/COLOR] (Cuenta)', thumbnail=config.get_thumb('news') ))
     itemlist.append(item.clone( action='show_channels_list', title= '    - Qué canales requieren [COLOR teal][B]Cuenta[/B][/COLOR]', cta_register = True ))
 
-    itemlist.append(item.clone( action='', title= '[B][I]CANALES SITUACIÖN:[/I][/B]', text_color='goldenrod', folder=False ))
+    itemlist.append(item.clone( action='', title= '[B][I]CANALES SITUACIÓN:[/I][/B]', text_color='goldenrod', folder=False ))
+
+    txt_status = ''
+
+    try:
+       with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+    except:
+       try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+       except: pass
+
+    if txt_status:
+        bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+        if not '[COLOR moccasin]' in str(matches): matches = ''
+
+        if matches:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title= '    - Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]' ))
+
+        bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+        matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+        if not '[COLOR moccasin]' in str(matches): matches = ''
+
+        if matches:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= '    - Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='submnu_avisinfo_channels', title= '    - [COLOR aquamarine][B]Avisos[/COLOR] [COLOR green]Información[/B][/COLOR] canales' ))
+
+    itemlist.append(item.clone( action='show_help_resto', title= ' - ¿ Qué significa el Aviso [COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR] ?' ))
 
     itemlist.append(item.clone( action='channels_with_notice', title= '    - Qué canales tienen [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]' ))
 
@@ -1589,7 +1622,7 @@ def show_help_miscelanea(item):
 
     txt = '[COLOR gold][B]KODI MEDIA CENTER:[/B][/COLOR][CR]'
     txt += '  [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B][CR]'
-    txt += '  [COLOR darkorange][B]21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia y  17.x Krypton[/B][/COLOR][CR][CR]'
+    txt += '  [COLOR darkorange][B]22.x (P...),  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR][CR][CR]'
 
     txt += '  Kodi [COLOR yellow]Oficial[/COLOR]:  [COLOR plum][B]kodi.tv/download/[/B][/COLOR][CR]'
     txt += '  para obtener la [COLOR yellowgreen]Última versión[/COLOR] de este Media Center[CR][CR]'
@@ -1687,11 +1720,13 @@ def show_help_register(item):
 
     txt += '[CR][CR]*) Para ello desde otro equipo debeis accecder a la web en cuestión y registraros (darse de alta)'
 
-    txt += '[CR][CR]  Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]twitter[/COLOR][/B]'
+    txt += '[CR][CR]  Si desconoceis el dominio actual de esa web, mediante un navegador localizar su [B][COLOR gold]telegram ó twitter[/COLOR][/B]'
 
-    txt += '[CR][CR]  Por ejemplo [B][COLOR yellow]HdFull[/COLOR][/B] twitter oficial ó [B][COLOR yellow]PlayDede[/COLOR][/B] twitter oficial'
+    txt += '[CR][CR]  Por ejemplo [B][COLOR yellow]HdFull[/COLOR][/B] twitter oficial ó [B][COLOR yellow]NextDede[/COLOR][/B] twitter oficial ó [B][COLOR yellow]PlayDede[/COLOR][/B] twitter oficial'
 
-    txt += '[CR][CR]  ó bien acceder para [COLOR yellow]HdFull[/COLOR] a [B][COLOR cyan]dominioshdfull.com[/COLOR][/B] y para [COLOR yellow]PlayDede[/COLOR] [B][COLOR cyan]dominiosplaydede.com[/COLOR][/B]'
+    txt += '[CR][CR]  acceder para [COLOR yellow][B]HdFull[/B][/COLOR] a [B][COLOR cyan]https://dominioshdfull.com[/COLOR][/B][CR]'
+    txt += '  ó bien para [COLOR yellow][B]NextDede[/B][/COLOR] acceder a [B][COLOR cyan]https://dominiosnextdede.com[/COLOR][/B][CR]'
+    txt += '  y para [COLOR yellow][B]PlayDede[/B][/COLOR] acceder a [B][COLOR cyan]https://dominiosplaydede.com[/COLOR][/B] ó su[COLOR yellow][B] Telegram[/B] [B][COLOR cyan] t.me/playdedeinformacion[/COLOR][/B]'
 
     txt += '[CR][CR]*) Imprescindible tomar buena nota de vuestro [B][COLOR gold]Usuario y Contraseña[/COLOR][/B] para cada web.'
 
@@ -1699,7 +1734,7 @@ def show_help_register(item):
 
     txt += '[CR][CR]*) Mientras mantengáis las sesiones abiertas via navegador en estos dominios, no tendreis que volver a informar vuestras credenciales.'
 
-    txt += '[CR][CR]*) [B][COLOR gold]Atención[/COLOR][/B]: las [COLOR chartreuse]Sesiones Abiertas[/COLOR] en vuestro Media Center [B][COLOR greenyellow]No son In Eternum[/COLOR][/B], por ello es conveniente, que procedaís a [COLOR chartreuse]Cerrar vuestra Sesión[/COLOR] cada cierto tiempo, porque podría provocar que no se presentaran resultados.'
+    txt += '[CR][CR]*) [B][COLOR gold]Atención[/COLOR][/B]: las [COLOR chartreuse][B]Sesiones Abiertas[/B][/COLOR] en vuestro Media Center [B][COLOR greenyellow]No son In Eternum[/COLOR][/B], por ello es conveniente, que procedaís a [COLOR chartreuse][B]Cerrar vuestra Sesión[/B][/COLOR] cada cierto tiempo, porque podría provocar que no se presentaran resultados.'
 
     platformtools.dialog_textviewer('Información dominios que requieren Registrarse', txt)
 
@@ -1712,12 +1747,20 @@ def show_help_animeonline(item):
     item.notice = 'animeonline'
     show_help_canales(item)
 
+def show_help_cine24h(item):
+    item.notice = 'cine24h'
+    show_help_canales(item)
+
 def show_help_cinecalidad(item):
     item.notice = 'cinecalidad'
     show_help_canales(item)
 
 def show_help_cinecalidadlol(item):
     item.notice = 'cinecalidadlol'
+    show_help_canales(item)
+
+def show_help_cuevana3pro(item):
+    item.notice = 'cuevana3pro'
     show_help_canales(item)
 
 def show_help_cuevana3video(item):
@@ -1756,12 +1799,12 @@ def show_help_jkanime(item):
     item.notice = 'jkanime'
     show_help_canales(item)
 
-def show_help_megaserie(item):
-    item.notice = 'megaserie'
+def show_help_latanime(item):
+    item.notice = 'latanime'
     show_help_canales(item)
 
-def show_help_mirapeliculas(item):
-    item.notice = 'mirapeliculas'
+def show_help_megaserie(item):
+    item.notice = 'megaserie'
     show_help_canales(item)
 
 def show_help_nextdede(item):
@@ -1812,8 +1855,8 @@ def show_help_seriespapayato(item):
     item.notice = 'seriespapayato'
     show_help_canales(item)
 
-def show_help_sinpeli(item):
-    item.notice = 'sinpeli'
+def show_help_seriesretro(item):
+    item.notice = 'seriesretro'
     show_help_canales(item)
 
 def show_help_srnovelas(item):
@@ -1845,12 +1888,24 @@ def show_help_canales(item):
     if item.notice: txt = '[B][COLOR cyan]El webmaster de [COLOR yellow]' + item.notice.capitalize() + '[/COLOR] ha activado un nivel más de protección con [COLOR orangered]CloudFlare[/COLOR][/B][CR]'
     else: txt = '[B][COLOR cyan]El webmaster del [COLOR yellow]Canal[/COLOR] ha activado un nivel más de protección con [COLOR orangered]CloudFlare[/COLOR][/B][CR]'
 
-    if item.notice == 'hdfull' or item.notice == 'hdfullse' or item.notice == 'playdede' or item.notice == 'nextdede' or item.notice == 'entrepeliculasyseries' or item.notice == 'zonaleros':
+    if item.notice == 'hdfull' or item.notice == 'hdfullse' or item.notice == 'playdede' or item.notice == 'nextdede' or item.notice == 'entrepeliculasyseries' or item.notice == 'cine24h' or item.notice == 'animeonline' or item.notice == 'zonaleros':
        txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
 
-       if item.notice == 'hdfull': txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominioshdfull.com[/COLOR][/B][CR]'
-       elif item.notice == 'hdfullse': txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]hdfull.pm[/COLOR][/B][CR]'
-       elif item.notice == 'playdede': txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominiosplaydede.com[/COLOR][CR]'
+       if item.notice == 'hdfull': txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominioshdfull.com[/COLOR][/B][CR]'
+
+       elif item.notice == 'hdfullse': txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://hdfull.pm[/COLOR][/B] [COLOR yellow]ó bien a [/COLOR][B][COLOR greenyellow]https://www.hdfull.it[/COLOR][/B][CR]'
+
+       elif item.notice == 'NextDede':
+          txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosnextdede.com[/COLOR][/B][CR]'
+          txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [/COLOR] [B][COLOR greenyellow]t.me/NextdedeOficial[/COLOR][/B][CR][CR]'
+
+       elif item.notice == 'playdede':
+          txt += '[CR][COLOR yellow]  Para conocer el dominio actual acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosplaydede.com[/COLOR][/B][CR]'
+          txt += '[COLOR yellow]  ó su[COLOR yellow][B] Telegram[/B] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR]'
+
+    elif item.notice == 'cuevana3pro':
+       txt += '[COLOR greenyellow][B][CR]También ha añadido un control contra robots [COLOR red]reCAPTCHA[/COLOR] oculto.[/COLOR][/B][CR]'
+       txt += '[COLOR yellow][B][CR]Además efectuan control de acceso que puede [COLOR indianred]Bloquear[/COLOR] la Web incluso con el uso [COLOR red]Proxies[/COLOR].[/COLOR][/B][CR]'
 
     txt += '[CR][COLOR goldenrod][B]  Desconocemos si será Temporal ó Definitivo.[/B][/COLOR][CR]'
 
@@ -1954,7 +2009,7 @@ def show_help_uptobox(item):
 
     txt += '[CR][CR]*) Una vez tengáis vuestros datos, se os solicitará al acceder a ese servidor determinado.'
 
-    txt += '[CR][CR]*) Acceder desde otro equipo via navegador a [B][COLOR gold]uptobox.com/pin[/COLOR][/B], solo se gestionan las cuentas [B][COLOR yellow]Free[/COLOR][/B]'
+    txt += '[CR][CR]*) Acceder desde otro equipo via navegador a [B][COLOR gold]https://uptobox.com/pin[/COLOR][/B], solo se gestionan las cuentas [B][COLOR yellow]Free[/COLOR][/B]'
 
     txt += '[CR][CR]*) En el caso de no estar registrados proceder a ello (darse de alta)'
 
@@ -3895,11 +3950,21 @@ def show_help_domains(item):
 
     txt = ''
 
-    if item.category == 'DonTorrents': txt += '[COLOR lime]Puede acceder a su Telegram ó bien través de un navegador web a[/COLOR] [B][COLOR greenyellow]t.me/DonTorrent[/COLOR][/B][CR][CR]'
-    elif item.category == 'HdFull': txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominioshdfull.com[/COLOR][/B][CR][CR]'
-    elif item.category == 'HdFullSe': txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]hdfull.pm[/COLOR][/B][CR][CR]'
-    elif item.category == 'NextDede': txt += '[COLOR lime]Puede acceder a su Telegram ó bien través de un navegador web a[/COLOR] [B][COLOR greenyellow]t.me/NextdedeOficial[/COLOR][/B][CR][CR]'
-    elif item.category == 'PlayDede': txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]dominiosplaydede.com[/COLOR][/B][CR][CR]'
+    if item.category == 'DonTorrents':
+        txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://donproxies.com[/B][/COLOR][CR]'
+        txt += '[COLOR lime]ó bien acceder a su Telegram[/COLOR] [B][COLOR greenyellow]t.me/DonTorrent[/COLOR][/B][CR][CR]'
+
+    elif item.category == 'HdFull': txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominioshdfull.com[/COLOR][/B][CR][CR]'
+
+    elif item.category == 'HdFullSe': txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://hdfull.pm[/COLOR][/B] [COLOR lime]ó bien a[/COLOR] [B][COLOR greenyellow]https://www.hdfull.it[/COLOR][/B][CR][CR]'
+
+    elif item.category == 'NextDede':
+         txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosnextdede.com[/COLOR][/B][CR]'
+         txt += '[COLOR lime]ó bien acceder a su Telegram [/COLOR] [B][COLOR greenyellow]t.me/NextdedeOficial[/COLOR][/B][CR][CR]'
+
+    elif item.category == 'PlayDede':
+         txt += '[COLOR lime]Puede acceder a través de un navegador web a[/COLOR] [B][COLOR greenyellow]https://dominiosplaydede.com[/COLOR][/B][CR]'
+         txt += '[COLOR lime]ó bien acceder a su Telegram [/COLOR] [B][COLOR greenyellow] t.me/playdedeinformacion[/COLOR][/B][CR][CR]'
 
     txt += '*) Determinadas webs Cambian constantemente de Dominio y es necesario modificarlo para permitir su acceso.'
 
@@ -3917,7 +3982,7 @@ def show_help_domains(item):
     txt += '[CR][CR]*) Una vez tengáis ese Dominio, podéis informarlo en los Ajustes [B][COLOR cyan]categoría [COLOR moccasin]Dominios[/COLOR][/B],'
     txt += '[CR]    ó bien al acceder a ese canal determinado a través de su opción [B][COLOR yellow]Acciones[/COLOR][/B].'
 
-    platformtools.dialog_textviewer('Gestión Dominios', txt)
+    platformtools.dialog_textviewer('Gestión Dominios ' + item.category, txt)
 
 
 def show_help_torrents(item):
@@ -4396,12 +4461,12 @@ def show_test(item):
            if tex_dom: tex_dom = tex_dom + '   Cuevana2Esp: ' + cuevana2esp_dominio + '[CR]'
            else: tex_dom = '[CR]   Cuevana2Esp: ' + cuevana2esp_dominio + '[CR]'
 
-    datos = channeltools.get_channel_parameters('cuevana3lw')
+    datos = channeltools.get_channel_parameters('cuevana3pro')
     if datos['active']:
-        cuevana3lw_dominio = config.get_setting('channel_cuevana3lw_dominio', default='')
-        if cuevana3lw_dominio:
-           if tex_dom: tex_dom = tex_dom + '   Cuevana3Lw: ' + cuevana3lw_dominio + '[CR]'
-           else: tex_dom = '[CR]   CuevanaLw: ' + cuevana3lw_dominio + '[CR]'
+        cuevana3pro_dominio = config.get_setting('channel_cuevana3pro_dominio', default='')
+        if cuevana3pro_dominio:
+           if tex_dom: tex_dom = tex_dom + '   Cuevana3Pro: ' + cuevana3pro_dominio + '[CR]'
+           else: tex_dom = '[CR]   CuevanaPro: ' + cuevana3pro_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('cuevana3video')
     if datos['active']:
@@ -4472,13 +4537,6 @@ def show_test(item):
         if ennovelas_dominio:
            if tex_dom: tex_dom = tex_dom + '   EnNovelas: ' + ennovelas_dominio + '[CR]'
            else: tex_dom = '[CR]   EnNovelas: ' + ennovelas_dominio + '[CR]'
-
-    datos = channeltools.get_channel_parameters('ennovelasonline')
-    if datos['active']:
-        ennovelasonline_dominio = config.get_setting('channel_ennovelasonline_dominio', default='')
-        if ennovelasonline_dominio:
-           if tex_dom: tex_dom = tex_dom + '   EnNovelasOnline: ' + ennovelasonline_dominio + '[CR]'
-           else: tex_dom = '[CR]   EnNovelasOnline: ' + ennovelasonline_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('ennovelastv')
     if datos['active']:
@@ -5123,6 +5181,8 @@ def get_plataforma(txt):
 
     txt += '[CR][CR][COLOR fuchsia]PLATAFORMA[/COLOR][CR]'
 
+    txt += ' - [COLOR yellow][B]Fecha:[/B][/COLOR]  [COLOR aquamarine]' + str(datetime.today()) + '[/COLOR][CR][CR]'
+
     kver = str(xbmc.getInfoLabel('System.BuildVersion'))
 
     txt += ' - [COLOR gold]Media center:[/COLOR]  [COLOR coral]%s[/COLOR][CR][CR]' % kver
@@ -5135,9 +5195,11 @@ def get_plataforma(txt):
     elif kver.startswith('19.'): ver = '19 - Matrix'
     elif kver.startswith('20.'): ver = '20 - Nexus'
     elif kver.startswith('21.'): ver = '21 - Omega'
+    elif kver.startswith('22.'): ver = '21 - (P...)'
+
     else: ver = 'Desconocido'
 
-    txt += ' - [COLOR gold]Versión:[/COLOR]  ' + ver + '[CR][CR]'
+    txt += ' - [COLOR gold][B]Versión:[/B][/COLOR]  ' + ver + '[CR][CR]'
 
     try:
        if xbmc.getCondVisibility("System.Platform.Android"): plat = 'Android'
@@ -5155,15 +5217,15 @@ def get_plataforma(txt):
     except:
         plat = '?'
 
-    txt += ' - [COLOR gold]Plataforma:[/COLOR]  ' + plat + '[CR][CR]'
+    txt += ' - [COLOR gold][B]Plataforma:[/B][/COLOR]  ' + plat + '[CR][CR]'
 
-    txt += ' - [COLOR gold]Release:[/COLOR]  ' + str(platform.release()) + '[CR][CR]'
+    txt += ' - [COLOR gold]Release:[/COLOR]  ' + str(platform.release()) + '[CR]'
 
-    txt += ' - [COLOR gold]Procesador:[/COLOR]  ' + str(platform.machine()) + '[CR][CR]'
+    txt += ' - [COLOR gold]Procesador:[/COLOR]  ' + str(platform.machine()) + '[CR]'
 
-    txt += ' - [COLOR gold]Language:[/COLOR]  ' + str(xbmc.getInfoLabel('System.Language')) + '[CR][CR]'
+    txt += ' - [COLOR gold]Language:[/COLOR]  ' + str(xbmc.getInfoLabel('System.Language')) + '[CR]'
 
-    txt += ' - [COLOR gold]Uso CPU:[/COLOR]  ' + str(xbmc.getInfoLabel('System.CpuUsage')) + '[CR][CR]'
+    txt += ' - [COLOR gold]Uso CPU:[/COLOR]  ' + str(xbmc.getInfoLabel('System.CpuUsage')) + '[CR]'
 
     plataforma = platform.uname()
 

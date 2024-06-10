@@ -224,7 +224,7 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(bloque, '(.*?)</div></div></a>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
         title = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 
         if not url or not title: continue
@@ -237,6 +237,8 @@ def list_all(item):
 
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
+
+        if '/year/' in item.url: year = scrapertools.find_single_match(item.url, "/year/(.*?)/")
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -434,6 +436,7 @@ def findvideos(item):
 
             if other == '1fichier': continue
             elif other == 'plusclick': continue
+            elif other == 'plustream': continue
 
             other = servertools.corregir_servidor(other)
 
@@ -500,6 +503,10 @@ def play(item):
     url = servertools.normalize_url(servidor, url)
 
     if servidor == 'zplayer': url = url + '|' + host
+
+    if servidor == 'directo':
+        new_server = servertools.corregir_other(url).lower()
+        if not new_server.startswith("http"): servidor = new_server
 
     itemlist.append(item.clone(url = url, server = servidor))
 

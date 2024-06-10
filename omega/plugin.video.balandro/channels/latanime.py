@@ -10,10 +10,87 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://latanime.org/'
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_latanime_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar[/B] ...', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    hay_proxies = False
+    if config.get_setting('channel_latanime_proxies', default=''): hay_proxies = True
+
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('latanime', url, post=post, headers=headers, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+        if not data:
+            if not 'buscar?p=1&q=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('LatAnime', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('latanime', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not 'buscar?p=1&q=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='latanime', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_latanime', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -30,6 +107,8 @@ def mainlist_animes(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes?p=1', search_type = 'tvshow' ))
@@ -38,13 +117,26 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'emision?p=1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'generos', group = 'idiomas', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por categorías', action = 'categorias', group = 'cats', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def idiomas(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'animes?fecha=false&genero=false&letra=false&categoria=castellano', search_type = 'tvshow', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'Catalán', action = 'list_all', url = host + 'animes?fecha=false&genero=false&letra=false&categoria=catalan', search_type = 'tvshow', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'animes?fecha=false&genero=false&letra=false&categoria=latino', search_type = 'tvshow', text_color='moccasin' ))
 
     return itemlist
 
@@ -60,7 +152,7 @@ def categorias(item):
 
     bloque = scrapertools.find_single_match(data, 'name="categoria"(.*?)>Categoria<')
 
-    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
+    matches = re.compile('<optionvalue="(.*?)">(.*?)</option>').findall(bloque)
 
     for categoria, title in matches:
         if title == "Seleccionar": continue
@@ -72,7 +164,7 @@ def categorias(item):
 
         url = url_cat + '?fecha=false&genero=false&letra=false&categoria=' + categoria
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -81,39 +173,26 @@ def generos(item):
     logger.info()
     itemlist = []
 
-    if item.group == 'idiomas': text_color = 'moccasin'
-    else: text_color = 'springgreen'
-
     url_genre = host + 'animes'
 
     data = do_downloadpage(url_genre)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'name="genero"(.*?)>Géneros<')
+    bloque = scrapertools.find_single_match(data, 'name="genero"(.*?)</select>')
 
-    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
+    matches = re.compile('<optionvalue="(.*?)">(.*?)</option>').findall(bloque)
 
     for genre, title in matches:
         title = title.strip()
 
         if title == 'Seleccionar': continue
 
-        if item.group == 'idiomas':
-            if title == 'Castellano': pass
-            elif title == 'Latino': pass
-            else: continue
-        else:
-            if title == 'Castellano': continue
-            elif title == 'Latino': continue
+        if title == 'Castellano': continue
+        elif title == 'Latino': continue
 
         url = url_genre + '?fecha=false&genero=' + genre + '&letra=false&categoria=false'
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = text_color ))
-
-    if item.group == 'idiomas':
-        url = url_genre + '?fecha=false&genero=false&letra=false&categoria=catalan'
-
-        itemlist.append(item.clone( title = 'Catalán', action = 'list_all', url = url, text_color = text_color ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='springgreen' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -182,6 +261,8 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
+        title = title.replace('&#039;s', "'s").replace('&quot;', '').strip()
+
         SerieName = title
 
         if 'Película' in SerieName: SerieName = SerieName.split("Película")[0]
@@ -234,6 +315,8 @@ def list_last(item):
     matches = scrapertools.find_multiple_matches(bloque, '<div class="col-6 col-md-6 col-lg-3 mb-3">.*?<a href="(.*?)".*?data-src="(.*?)".*?alt="(.*?)"')
 
     for url, thumb, title in matches:
+        title = title.replace('&#039;s', "'s")
+
         SerieName = title
 
         if 'Película' in SerieName: SerieName = SerieName.split("Película")[0]
@@ -254,7 +337,10 @@ def list_last(item):
 
         SerieName = SerieName.strip()
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+        title = title.replace('capitulo ', '[COLOR goldenrod]capitulo [/COLOR]')
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 

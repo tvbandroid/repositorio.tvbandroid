@@ -7,11 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools, servertools, tmdb
 
 
-host = 'https://www25.estrenosdoramas.net/'
+host = 'https://www26.estrenosdoramas.net/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www23.estrenosdoramas.net/', 'https://www24.estrenosdoramas.net/']
+ant_hosts = ['https://www23.estrenosdoramas.net/', 'https://www24.estrenosdoramas.net/', 'https://www25.estrenosdoramas.net/']
 
 
 domain = config.get_setting('dominio', 'estrenosdoramas', default='')
@@ -84,7 +84,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Últimas', action = 'last_pelis', url = host, search_type = 'movie', text_color = 'cyan' ))
 
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'movie', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -105,9 +105,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Capítulos recientes', action = 'last_news', url = host, search_type = 'tvshow', text_color = 'olivedrab' ))
 
-    itemlist.append(item.clone( title = 'Últimos doramas', action = 'last_series', url = host, search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Últimos doramas', action = 'last_series', url = host, search_type = 'tvshow', text_color = 'yellowgreen' ))
 
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'category/latino/', doblado=True, search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -681,7 +681,6 @@ def play(item):
 
     if url:
         if '.estrenosdoramas.' in url: url = ''
-        elif '/rumble.' in url: url = ''
 
         if url:
             if not 'https:' in str(url): url = 'https:' + str(url)
@@ -691,9 +690,13 @@ def play(item):
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
+            url = servertools.normalize_url(servidor, url)
+
             if '/vk.com/' in url: servidor = 'vk'
 
-            url = servertools.normalize_url(servidor, url)
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
 
             itemlist.append(item.clone(server = servidor, url = url))
 

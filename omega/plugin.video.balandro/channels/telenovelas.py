@@ -45,7 +45,7 @@ def generos(item):
        ('accion', 'Acción'),
        ('action-adventure', 'Acción & Aventura'),
        ('animacion', 'Animación'),
-       ('avemtura', 'Avemtura'),
+       ('avemtura', 'Aventura'),
        ('ciencia-ficcion', 'Ciencia Ficción'),
        ('comedia', 'Comedia'),
        ('comedy', 'Comedy'),
@@ -405,6 +405,7 @@ def findvideos(item):
         data1 = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
 
         url = scrapertools.find_single_match(data1, "<iframe.*?src='(.*?)'")
+        if not url: url = scrapertools.find_single_match(datal, '<IFRAME.*?SRC="(.*?)"')
 
         if url:
             if url.startswith('//'): url = 'https:' + url

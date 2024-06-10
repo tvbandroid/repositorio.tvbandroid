@@ -100,8 +100,6 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if not headers: headers = {'Referer': host}
-
     hay_proxies = False
     if config.get_setting('channel_henaojara_proxies', default=''): hay_proxies = True
 
@@ -201,23 +199,23 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'all', text_color='springgreen' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'ver/category/categorias/?tr_post_type=2', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'veronline/category/categorias/', search_type = 'all' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Últimos animes', action = 'list_last', url = host, search_type = 'all', text_color = 'olivedrab' ))
 
-    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'ver/category/emision/', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'veronline/category/emision/', search_type = 'all' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'ver/category/estrenos/', search_type = 'all', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'veronline/category/estrenos/', search_type = 'all', text_color = 'greenyellow' ))
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'ver/category/categorias/espanol-castellano/', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + 'veronline/category/categorias/espanol-castellano/', search_type = 'all', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'ver/category/categorias/latino/', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + 'veronline/category/categorias/latino/', search_type = 'all', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'ver/category/categorias/subtitulos/', search_type = 'all' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'veronline/category/categorias/subtitulos/', search_type = 'all', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'ver/category/pelicula/?tr_post_type=1', search_type = 'all', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + 'veronline/category/pelicula/', search_type = 'all', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos',  search_type = 'all' ))
 
@@ -291,7 +289,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
-        tipo = 'movie' if '>PELICULA<' in match else 'tvshow'
+        tipo = 'movie' if '>Pelicula' in match or '-movie-' in url else 'tvshow'
         sufijo = '' if item.search_type == 'movie' else tipo
 
         if tipo == 'tvshow':
@@ -445,7 +443,7 @@ def temporadas(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
-    if '>PELICULA<' in data:
+    if '>Pelicula' in data or '-movie-' in item.url:
         peli = scrapertools.find_single_match(data, '<span class="Num">.*?<a href="(.*?)"')
 
         itemlist.append(item.clone( action='findvideos', url = peli, title = '[COLOR yellow]Servidores[/COLOR] ' + item.title,
@@ -455,10 +453,9 @@ def temporadas(item):
 
     elif '<div class="TPlayer">' in data:
         itemlist.append(item.clone( action='findvideos', url = item.url, title = '[COLOR yellow]Servidores[/COLOR] ' + item.title,
-                                    thumbnail = item.thumbnail, contentType='movie', contentTitle=item.title, text_color='tan' ))
+                                    thumbnail = item.thumbnail, contentType='tvshow', contentTitle=item.title, text_color='tan' ))
 
         return itemlist
-
 
     if '<div class="snslst">' in data:
         bloque = scrapertools.find_single_match(data, '<div class="snslst">(.*?)</tbody>')
@@ -514,11 +511,13 @@ def episodios(item):
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     if 'data-tab="' in data:
-        bloque = scrapertools.find_single_match(data, 'data-tab="' + str(item.contentSeason) + '.*?</table>')
+        bloque = scrapertools.find_single_match(data, 'data-tab="' + str(item.contentSeason) + '".*?</table>')
     else:
         bloque = data
 
-    matches = re.compile('<span class="Num">(.*?)</span>.*?><a href="(.*?)".*?<img src="(.*?)".*?<td class="MvTbTtl">.*?">(.*?)</a>', re.DOTALL).findall(bloque)
+    bloque = bloque.replace('&quot;', '"')
+
+    matches = re.compile('<span class="Num">(.*?)</span>.*?><a href="(.*?)".*?src="(.*?)".*?<td class="MvTbTtl">.*?">(.*?)</a>', re.DOTALL).findall(bloque)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -568,6 +567,8 @@ def episodios(item):
             next_cap = scrapertools.find_single_match(str(title), '.*?">(.*?)</b>')
             title = scrapertools.find_single_match(title, "(.*?)- <b").strip()
 
+        if '</b>' in title: title = scrapertools.find_single_match(title, "</b>(.*?)$").strip()
+
         titulo = '%sx%s - %s' % (str(item.contentSeason), epis, title)
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
@@ -593,11 +594,12 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
-    if '>PELICULA<' in data:
+    if '>Pelicula' in data or '-movie-' in item.url:
         peli = scrapertools.find_single_match(data, '<span class="Num">.*?<a href="(.*?)"')
 
-        data = do_downloadpage(peli)
+        if not '/disqus.' in peli: data = do_downloadpage(peli)
 
     lang = scrapertools.find_single_match(data, '<h1 class="Title">(.*?)<span>')
 
@@ -645,6 +647,8 @@ def findvideos(item):
                 for player, srv in matches3:
                     srv = srv.strip().lower()
 
+                    servidor = srv
+
                     player = player.replace('.henaojara2.', '.henaojara.')
 
                     if srv == 'fembed': continue
@@ -657,13 +661,15 @@ def findvideos(item):
                     elif srv == 'filelions': servidor = 'various'
                     elif srv == 'filemoon': servidor = 'various'
                     elif srv == 'streamvid': servidor = 'various'
+                    elif srv == 'vidhide': servidor = 'various'
+                    elif srv == 'lulustream': servidor = 'various'
 
                     elif srv == 'ok': servidor = 'okru'
+                    elif srv == 'dood': servidor = 'doodstream'
 
                     else:
-                       if servertools.is_server_available(srv):
-                           if not servertools.is_server_enabled(srv): continue
-                           servidor = srv
+                       if servertools.is_server_available(servidor):
+                           if not servertools.is_server_enabled(servidor): continue
                        else:
                            if not config.get_setting('developer_mode', default=False): continue
                            servidor = 'directo'
@@ -675,6 +681,8 @@ def findvideos(item):
                     itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = player, language = lang, other = other ))
 
         else:
+            servidor = other
+
             if other == 'fembed': continue
             elif other == 'streamsb': continue
 
@@ -684,16 +692,18 @@ def findvideos(item):
             elif other == 'filelions': servidor = 'various'
             elif other == 'filemoon': servidor = 'various'
             elif other == 'streamvid': servidor = 'various'
+            elif other == 'vidhide': servidor = 'various'
+            elif other == 'lulustream': servidor = 'various'
 
             elif other == 'ok': servidor = 'okru'
+            elif other == 'dood': servidor = 'doodstream'
 
             else:
-               if servertools.is_server_available(other):
-                    if not servertools.is_server_enabled(other): continue
-                    servidor = other
+               if servertools.is_server_available(servidor):
+                   if not servertools.is_server_enabled(servidor): continue
                else:
-                    if not config.get_setting('developer_mode', default=False): continue
-                    servidor = 'directo'
+                   if not config.get_setting('developer_mode', default=False): continue
+                   servidor = 'directo'
 
             if servidor == 'various': other = servertools.corregir_other(other)
             elif not servidor == 'directo': other = ''
@@ -701,42 +711,57 @@ def findvideos(item):
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     # Descargas
-    matches = re.compile('<td><span class="Num">(.*?)</span>.*?href="(.*?)".*?alt="Descargar (.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<td><span class="Num">(.*?)</span>.*?href="(.*?)".*?alt="Descargar(.*?)"', re.DOTALL).findall(data)
 
     for nro, url, srv in matches:
         ses += 1
 
         srv = srv.strip().lower()
 
+        servidor = srv
+
         other = ''
 
         if srv == 'fembed': continue
         elif srv == 'streamsb': continue
 
-        if srv == 'netuplayer' or srv == 'netu' or srv == 'hqq': other = 'waaw'
+        if srv == 'netuplayer' or srv == 'netu' or srv == 'hqq': servidor = 'waaw'
 
-        elif srv == 'streamwish': other = 'various'
-        elif srv == 'filelions': other = 'various'
-        elif srv == 'filemoon': other = 'various'
-        elif srv == 'streamvid': other = 'various'
+        elif srv == 'streamwish': servidor = 'various'
+        elif srv == 'filelions': servidor = 'various'
+        elif srv == 'filemoon': servidor = 'various'
+        elif srv == 'streamvid': servidor = 'various'
+        elif srv == 'vidhide': servidor = 'various'
+        elif srv == 'lulustream': servidor = 'various'
 
-        elif srv == 'ok': other = 'okru'
+        elif srv == 'ok': servidor = 'okru'
+        elif srv == 'dood': servidor = 'doodstream'
 
         else:
-            if servertools.is_server_available(srv):
-                if not servertools.is_server_enabled(srv): continue
-                other = srv
-            else:
-                if not config.get_setting('developer_mode', default=False): continue
-                other = 'D' + str(nro)
+           if servertools.is_server_available(servidor):
+               if not servertools.is_server_enabled(servidor): continue
+           else:
+               if not config.get_setting('developer_mode', default=False): continue
 
-        if other == 'various': other = servertools.corregir_other(srv)
+               if srv == 'streamwish': servidor = 'various'
+               elif srv == 'filelions': servidor = 'various'
+               elif srv == 'filemoon': servidor = 'various'
+               elif srv == 'streamvid': servidor = 'various'
+               elif srv == 'vidhide': servidor = 'various'
+               elif srv == 'lulustream': servidor = 'various'
+
+               else:
+                  servidor = 'directo'
+                  other = 'D' + str(nro)
+
+        if servidor == 'various': other = servertools.corregir_other(srv)
         else:
-           if not other: other = other + ' D' + str(nro)
+           if servidor == 'directo':
+               if not other: other = other + ' D' + str(nro)
 
         url = url.replace('.henaojara2.', '.henaojara.')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -773,7 +798,8 @@ def play(item):
                else:
                    url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']
 
-           if '/multiplayer/' in url: url = ''
+           if '/multiplayer/' in url:
+               return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
         except:
            url = ''
 
@@ -813,24 +839,28 @@ def play(item):
                 if url.startswith('//'): url = 'https:' + url
 
     if '/streamium.xyz/' in url: url = ''
+    elif '/pelispng.' in url: url = ''
     elif '/pelistop.' in url: url = ''
     elif '/descargas/' in url: url = ''
 
     if url:
         if '.mystream.' in url:
             return 'Servidor [COLOR tan]Cerrado[/COLOR]'
+        elif '.fembed.' in url:
+            return 'Servidor [COLOR tan]Cerrado[/COLOR]'
+
+        url = url.replace('&amp;', '&')
 
         if '/player.streamhj.top/' in url: url = url.replace('/player.streamhj.top/', '/netu.to/')
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        other = servertools.corregir_other(url)
+        url = servertools.normalize_url(servidor, url)
 
-        if other == 'Streamwish': servidor = 'various'
-        elif other == 'Filelions': servidor = 'various'
-        elif other == 'Filemoon': servidor = 'various'
-        elif other == 'Streamvid': servidor = 'various'
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url=url, server=servidor))
 

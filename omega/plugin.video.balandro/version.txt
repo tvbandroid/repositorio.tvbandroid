@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.04[/COLOR] [COLOR chartreuse] 24 de Marzo de 2024[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.07[/COLOR] [COLOR chartreuse] 10 de Junio de 2024[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Novedades, Sugerencias, etc.
@@ -14,7 +14,7 @@
 
  [COLOR gold][B]MEDIA CENTERS:[/B][/COLOR]
     [B][COLOR tan]Kodi Versiones Oficiales Soportadas:[/COLOR][/B]
-       [COLOR darkorange][B]21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR]
+       [COLOR darkorange][B]22.x (P...),  21.x Omega,  20.x Nexus,  19.x Matrix,  18.x Leia  y  17.x Krypton[/B][/COLOR]
 
  [COLOR gold][B]ADD-ONS EXTERNOS:[/B][/COLOR]
     [B][COLOR mediumaquamarine]Motores Torrents Soportados:[/COLOR][/B]
@@ -32,8 +32,6 @@
        Errores detectados
        Revision generalizada
        Generos: Re-configurados
-       Canales: Anulados las webs cerradas o inoperativas
-       Servidores: Anulados las webs cerradas o inoperativas
 
     [COLOR moccasin][B]Novedades:[/B][/COLOR]
        Canales: Sin novedades
@@ -44,17 +42,16 @@
 
  [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR]
     [COLOR springgreen][B]Son en los que Predominan Sin enlaces Disponibles, Invalidos y/o Servidores No Soportados[/B][/COLOR]
-    CineDeAntes,  CinematteFlix,  RetroTv,
-    SeriesRetro,  SigloXX,  TuPeliculaTv
+    CineDeAntes,  CinematteFlix,  SeriesMovil,  RetroTv,  SigloXX
 
  [COLOR cyan][B]CANALES INESTABLES:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su evolucion, para decidir su Situacion Definitiva[/B][/COLOR]
-    MiraPeliculas
+    MegaSerie,  PPeliculas
 
  [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
     [COLOR springgreen][B]Son los pendientes de su situacion, para decidir su Re-activacion o Anulacion[/B][/COLOR]
-    DocumaniaTv [COLOR moccasin][B] www.documaniatv.com [/COLOR][COLOR olivedrab][I] Player [/I][/B][/COLOR]
-    NextDede [COLOR moccasin][B] nextdede.tv [/COLOR][COLOR greenyellow][I] Cambio Estructural [/I][/B][/COLOR]
+    DocumaniaTv [COLOR moccasin][B] www.documaniatv.com [/COLOR][COLOR olivedrab][I] No Player [/I][/B][/COLOR]
+    NextDede [COLOR moccasin][B] nextdede.us [/COLOR][COLOR greenyellow][I] No Login [/I][/B][/COLOR]
 
  [COLOR gold][B]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/B][/COLOR]
     plugin.video.youtube

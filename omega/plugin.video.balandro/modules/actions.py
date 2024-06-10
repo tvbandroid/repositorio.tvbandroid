@@ -234,8 +234,17 @@ def search_trailers(item):
             if len(video_urls) > 0:
                 xbmc.Player().play(video_urls[0][1])
                 xbmc.sleep(1000)
-                while not xbmc.Monitor().abortRequested() and xbmc.Player().isPlaying():
-                    xbmc.sleep(1000)
+
+                # ~ 5/4/24
+                # ~ while not xbmc.Monitor().abortRequested() and xbmc.Player().isPlaying():
+                # ~       xbmc.sleep(1000)
+
+                while not xbmc.Monitor().abortRequested():
+                      xbmc.sleep(1000)
+                      if xbmc.Player().isPlaying():
+                         if len(video_urls) == 1: break
+                         else: xbmc.sleep(1000)
+                      else: xbmc.sleep(1000)
             else:
                 la_notif = ('[B][COLOR %s]') % color_alert
                 la_notif += ('No se pudo reproducir el tráiler[/B][/COLOR]')
@@ -243,7 +252,6 @@ def search_trailers(item):
                 platformtools.dialog_notification(resultados[ret]['name'], la_notif, time=3000, sound=False)
 
             if len(resultados) == 1: break
-
 
 def global_proxies(item):
     logger.info()
@@ -348,7 +356,7 @@ def manto_params(item):
         config.set_setting('channel_cliversite_dominio', '')
         config.set_setting('channel_cuevana2_dominio', '')
         config.set_setting('channel_cuevana2esp_dominio', '')
-        config.set_setting('channel_cuevana3lw_dominio', '')
+        config.set_setting('channel_cuevana3pro_dominio', '')
         config.set_setting('channel_cuevana3video_dominio', '')
 
         config.set_setting('channel_divxtotal_dominio', '')
@@ -359,7 +367,6 @@ def manto_params(item):
         config.set_setting('channel_elitetorrent_dominio', '')
         config.set_setting('channel_elitetorrentnz_dominio', '')
         config.set_setting('channel_ennovelas_dominio', '')
-        config.set_setting('channel_ennovelasonline_dominio', '')
         config.set_setting('channel_ennovelastv_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
         config.set_setting('channel_estrenosdoramas_dominio', '')
@@ -482,7 +489,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '123.0.6312.58')
+        config.set_setting('chrome_last_version', '126.0.6478.36')
 
         config.set_setting('debug', '0')
 
@@ -1378,8 +1385,8 @@ def opciones_cuevana2esp(item):
     item.from_channel = 'cuevana2esp'
     opciones_domains_common(item)
 
-def opciones_cuevana3lw(item):
-    item.from_channel = 'cuevana3lw'
+def opciones_cuevana3pro(item):
+    item.from_channel = 'cuevana3pro'
     opciones_domains_common(item)
 
 def opciones_cuevana3video(item):
@@ -1412,10 +1419,6 @@ def opciones_elitetorrentnz(item):
 
 def opciones_ennovelas(item):
     item.from_channel = 'ennovelas'
-    opciones_domains_common(item)
-
-def opciones_ennovelasonline(item):
-    item.from_channel = 'ennovelasonline'
     opciones_domains_common(item)
 
 def opciones_ennovelastv(item):
@@ -1464,6 +1467,10 @@ def opciones_mejortorrentnz(item):
 
 def opciones_mitorrent(item):
     item.from_channel = 'mitorrent'
+    opciones_domains_common(item)
+
+def opciones_nextdede(item):
+    item.from_channel = 'nextdede'
     opciones_domains_common(item)
 
 def opciones_peliculaspro(item):
@@ -1630,7 +1637,7 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cuevana2esp': domains.manto_domain_cuevana2esp(item)
 
-            elif item.from_channel == 'cuevana3lw': domains.manto_domain_cuevana3lw(item)
+            elif item.from_channel == 'cuevana3pro': domains.manto_domain_cuevana3pro(item)
 
             elif item.from_channel == 'cuevana3video': domains.manto_domain_cuevana3video(item)
 
@@ -1647,8 +1654,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'elitetorrentnz': domains.manto_domain_elitetorrentnz(item)
 
             elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
-
-            elif item.from_channel == 'ennovelasonline': domains.manto_domain_ennovelasonline(item)
 
             elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
@@ -1746,7 +1751,7 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cuevana2esp': domains.test_domain_cuevana2esp(item)
 
-            elif item.from_channel == 'cuevana3lw': domains.test_domain_cuevana3lw(item)
+            elif item.from_channel == 'cuevana3pro': domains.test_domain_cuevana3pro(item)
 
             elif item.from_channel == 'cuevana3video': domains.test_domain_cuevana3video(item)
 
@@ -1763,8 +1768,6 @@ def opciones_domains_common(item):
             elif item.from_channel == 'elitetorrentnz': domains.test_domain_elitetorrentnz(item)
 
             elif item.from_channel == 'ennovelas': domains.test_domain_ennovelas(item)
-
-            elif item.from_channel == 'ennovelasonline': domains.test_domain_ennovelasonline(item)
 
             elif item.from_channel == 'ennovelastv': domains.test_domain_ennovelastv(item)
 
@@ -1849,6 +1852,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'animeonline': helper.show_help_animeonline(item)
 
             elif item.from_channel == 'cinecalidadlol': helper.show_help_cinecalidadlol(item)
+
+            elif item.from_channel == 'cuevana3pro': helper.show_help_cuevana3pro(item)
 
             elif item.from_channel == 'cuevana3video': helper.show_help_cuevana3video(item)
 

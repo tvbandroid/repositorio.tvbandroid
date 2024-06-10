@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import os, re, xbmcgui
+import re, xbmcgui
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -48,7 +48,7 @@ host = 'https://playdede.us/'
 
 
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ webs  0)-'https://dominiosplaydede.com/'
+# ~ webs  0)-'https://dominiosplaydede.com/' ó Telegram t.me/NextdedeOficial
 
 
 # ~ por si viene de enlaces guardados posteriores
@@ -822,8 +822,6 @@ def idiomas(item):
                     login(item)
                     data = do_downloadpage(url)
 
-    username = config.get_setting('playdede_username', 'playdede', default='')
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<ul class="Alenguajes Ageneros">(.*?)<ul class="Acalidades Ageneros">')
@@ -872,8 +870,6 @@ def calidades(item):
                     login(item)
                     data = do_downloadpage(url)
 
-    username = config.get_setting('playdede_username', 'playdede', default='')
-
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<ul class="Acalidades Ageneros">(.*?)<select id="countries"')
@@ -921,8 +917,6 @@ def paises(item):
                     logout(item)
                     login(item)
                     data = do_downloadpage(url)
-
-    username = config.get_setting('playdede_username', 'playdede', default='')
 
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
@@ -1522,6 +1516,7 @@ def findvideos(item):
         elif server == 'vembed': other = 'Vidguard'
         elif server == 'hexupload': other = 'Hexupload'
         elif server == 'userload': other = 'Userload'
+        elif server == 'streamruby': other = 'Streamruby'
         else: other = ''
 
         server = servertools.corregir_servidor(server)
@@ -1628,11 +1623,25 @@ def play(item):
             url_play = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
             if not url_play: url_play = scrapertools.find_single_match(data, "<iframe src='(.*?)'")
 
+            if not url_play: url_play = scrapertools.find_single_match(data, 'var url = "(.*?)"')
+            if not url_play: url_play = scrapertools.find_single_match(data, "var url = '(.*?)'")
+
     else:
         url_play = item.url
 
     if url_play:
-        itemlist.append(item.clone(url = url_play.replace("\\/", "/")))
+        url_play = url_play.replace("\\/", "/")
+
+        servidor = servertools.get_server_from_url(url_play)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url_play)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url_play).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        itemlist.append(item.clone(url = url_play, server = servidor))
 
     return itemlist
 

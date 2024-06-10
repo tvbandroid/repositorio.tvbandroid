@@ -82,9 +82,6 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    if url.startswith(host):
-        if not headers: headers = {'Referer': host}
-
     if '/release/' in url: raise_weberror = False
 
     hay_proxies = False
@@ -364,6 +361,8 @@ def temporadas(item):
 
     tmdb.set_infoLabels(itemlist)
 
+    return sorted(itemlist,key=lambda x: x.title)
+
     return itemlist
 
 
@@ -508,12 +507,17 @@ def findvideos(item):
                         if servidor != 'directo':
                             link = servertools.normalize_url(servidor, link)
 
-                            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = IDIOMAS.get(lang, lang)))
+                            other = ''
+                            if servidor == 'various': other = servertools.corregir_other(link)
+
+                            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                                  language = IDIOMAS.get(lang, lang, other = other )))
 
                     continue
 
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = IDIOMAS.get(lang, lang), other = srv ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url,
+                                  language = IDIOMAS.get(lang, lang), other = srv.capitalize() ))
 
     # ~ Descargar
     matches = scrapertools.find_multiple_matches(data, '<td><span class="num">.*?</span>(.*?)</td>.*?<td>(.*?)</td>.*?<td><span>(.*?)</span>.*?href="(.*?)"')
@@ -558,17 +562,46 @@ def findvideos(item):
                         if servidor != 'directo':
                             link = servertools.normalize_url(servidor, link)
 
+                            other = ''
+                            if servidor == 'various': other = servertools.corregir_other(link)
+
                             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
-                                                  language = IDIOMAS.get(lang, lang), quality = qlty ))
+                                                  language = IDIOMAS.get(lang, lang), quality = qlty, other = other ))
 
                     continue
 
         if url:
             lang = lang.strip()
 
-            other = 'D ' + srv
+            # ~ megapaste
+            new_url = url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = IDIOMAS.get(lang, lang), other = other ))
+            data3 = do_downloadpage(new_url)
+
+            matches3 = scrapertools.find_multiple_matches(data3, '<a target=".*?href="(.*?)"')
+
+            for link in matches3:
+                if 'https://player.megaxserie.me/f/' in link: link = link.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
+
+                servidor = servertools.get_server_from_url(link)
+                servidor = servertools.corregir_servidor(servidor)
+
+                if servidor != 'directo':
+                    link = servertools.normalize_url(servidor, link)
+
+                    other = ''
+                    if servidor == 'various': other = servertools.corregir_other(link)
+
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                          language = IDIOMAS.get(lang, lang), quality = qlty, other = other ))
+
+                    continue
+
+            if not srv == 'descargaonline':
+                other = 'D ' + srv.capitalize()
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url,
+                                      language = IDIOMAS.get(lang, lang), other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -584,6 +617,8 @@ def play(item):
 
     url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
+    url = url.replace(' class=', '').strip()
+
     if item.server != 'directo':
         itemlist.append(item.clone( url = url, server = item.server ))
 
@@ -592,7 +627,32 @@ def play(item):
     if url.startswith(host):
         data = do_downloadpage(url)
 
-        url = scrapertools.find_single_match(data, 'src="(.*?)"')
+        new_url = scrapertools.find_single_match(data, 'src="(.*?)"')
+
+        if new_url:
+            if not 'http' in new_url: new_url = ''
+
+        if new_url:
+            if 'https://player.megaxserie.me/f/' in new_url: new_url = new_url.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
+
+            servidor = servertools.get_server_from_url(new_url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, new_url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
+
+            if servidor != 'directo':
+                itemlist.append(item.clone( url = url, server = servidor ))
+
+            return itemlist
+
+        if config.get_setting('channel_megaserie_proxies', default=''):
+            url = httptools.downloadpage_proxy('megaserie', url, follow_redirects=False).headers.get('location', '')
+        else:
+            url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
 
         if url:
             if 'https://player.megaxserie.me/f/' in url: url = url.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
@@ -601,6 +661,10 @@ def play(item):
             servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
 
             if servidor != 'directo':
                 itemlist.append(item.clone( url = url, server = servidor ))
@@ -624,6 +688,10 @@ def play(item):
             servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
+
+            if servidor == 'directo':
+                new_server = servertools.corregir_other(url).lower()
+                if not new_server.startswith("http"): servidor = new_server
 
             if servidor != 'directo':
                 itemlist.append(item.clone( url = url, server = servidor ))

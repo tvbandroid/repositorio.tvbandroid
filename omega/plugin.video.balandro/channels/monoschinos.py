@@ -32,44 +32,17 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + '/animes?genero=emision', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + '/animes?categoria=false&genero=castellano', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + '/animes?categoria=false&genero=latino', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + '/animes?categoria=false&genero=castellano', search_type = 'tvshow', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'En latino', action = 'list_all', url = host + '/animes?categoria=false&genero=latino', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'En blu-ray', action = 'list_all', url = host + '/animes?categoria=false&genero=blu-ray', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host + '/animes?categoria=pelicula', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     return itemlist
-
-
-def categorias(item):
-    logger.info()
-    itemlist = []
-
-    url_cat = host + '/animes'
-
-    data = httptools.downloadpage(url_cat).data
-
-    bloque = scrapertools.find_single_match(data, '<select name="categoria">(.*?)</select>')
-
-    matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
-
-    for cat, title in matches:
-        title = title.strip()
-
-        if title == 'Categoría': continue
-        elif title == 'PREESTRENO': continue
-
-        url = host + '/animes?categoria=%s&genero=false&letra=false' % cat
-
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color='moccasin' ))
-
-    return sorted(itemlist,key=lambda x: x.title)
 
 
 def generos(item):
@@ -80,7 +53,7 @@ def generos(item):
 
     data = httptools.downloadpage(url_genre).data
 
-    bloque = scrapertools.find_single_match(data, '<select name="genero">(.*?)</select>')
+    bloque = scrapertools.find_single_match(data, '<div id="genero"(.*?)</select>')
 
     matches = re.compile('<option value="(.*?)">(.*?)</option>').findall(bloque)
 
@@ -107,7 +80,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1951, -1):
+    for x in range(current_year, 1967, -1):
         url = host + '/animes?categoria=false&genero=false&fecha=%s&letra=false' % str(x)
 
         itemlist.append(item.clone( title = str(x), url = url, action='list_all', text_color='springgreen' ))
@@ -122,7 +95,7 @@ def list_all(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<div class="col-(.*?)</a></div>').findall(data)
+    matches = re.compile('<li class="col mb-3 ficha_efecto">(.*?)</li>').findall(data)
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
@@ -153,10 +126,13 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '"page-item active".*?</li>.*?<a class="page-link" href="([^"]+)">')
+        next_page = scrapertools.find_single_match(data, '"page-item active".*?</li>.*?<a class="page-link.*?href="([^"]+)">')
 
         if next_page:
-            itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
+            next_page = next_page.replace('&amp;', '&')
+
+            if '?p=' in next_page or '&p=' in next_page:
+                itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_all', text_color = 'coral' ))
 
     return itemlist
 
@@ -168,9 +144,9 @@ def last_epis(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'Capítulos Recientes</h1>(.*?)</section>')
+    bloque = scrapertools.find_single_match(data, '>últimos capítulos<(.*?)>Series recientes<')
 
-    matches = re.compile('<div class="col col-md-6(.*?)</a></div>', re.DOTALL).findall(bloque)
+    matches = re.compile('<article>(.*?)</article>', re.DOTALL).findall(bloque)
 
     for match in matches:
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
@@ -218,7 +194,15 @@ def episodios(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = re.compile('data-episode="(.*?)".*?href="(.*?)".*?src="(.*?)".*?<p class="animetitles">(.*?)<', re.DOTALL).findall(data)
+    data_ajax = scrapertools.find_single_match(data, 'data-ajax="(.*?)"')
+    _token = scrapertools.find_single_match(data, '<meta name="csrf-token" content="(.*?)"')
+    _url = scrapertools.find_single_match(data, '<div class="d-flex gap-3 mt-3">.*?<a href="(.*?)"')
+
+    if not data_ajax or not _token or not _url: return itemlist
+
+    data = httptools.downloadpage(data_ajax, post = {'_token': _token}).data
+
+    matches = re.compile('{"num":(.*?)}', re.DOTALL).findall(str(data))
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -262,16 +246,17 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    i = 0
+    _url = scrapertools.find_single_match(_url, '(.*?)-episodio-')
 
-    for epis, url, thumb, title in matches[item.page * item.perpage:]:
-        i += 1
+    for match in matches[item.page * item.perpage:]:
+        url = _url + '-episodio-' + match
 
-        title = title.replace('Sub Español', '').strip()
+        title = 'Capítulo ' + match
 
         titulo = title + ' ' + item.contentSerieName
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=i ))
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+                                    contentType = 'episode', contentSeason = 1, contentEpisodeNumber=match ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -292,32 +277,32 @@ def findvideos(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('class="play-video".*?data-player="(.*?)">(.*?)</p>', re.DOTALL).findall(data)
+    matches = re.compile('<li id="play-video".*?data-player="(.*?)">(.*?)</button>', re.DOTALL).findall(data)
 
     ses = 0
 
-    for d_play, servidor in matches:
+    for d_play, srv in matches:
         ses += 1
 
-        servidor = servidor.lower()
+        srv = srv.lower()
 
         other = ''
 
-        if servidor == 'puj': continue
+        if srv == 'puj': continue
 
-        elif servidor == 'ok': servidor = 'okru'
-        elif servidor == 'zeus': servidor = 'directo'
-        elif servidor == 'anonfile': servidor = 'anonfiles'
-        elif servidor == 'zippy': servidor = 'zippyshare'
-        elif servidor == 'drive': servidor = 'gvideo'
-        elif servidor == 'pixel': servidor = 'pixeldrain'
-        elif servidor == 'senvid2': servidor = 'sendvid'
+        elif srv == 'ok': srv = 'okru'
+        elif srv == 'zeus': srv = 'directo'
+        elif srv == 'anonfile': srv = 'anonfiles'
+        elif srv == 'zippy': srv = 'zippyshare'
+        elif srv == 'drive': srv = 'gvideo'
+        elif srv == 'pixel': srv = 'pixeldrain'
+        elif srv == 'senvid2': srv = 'sendvid'
         else:
-             if servidor == 'vgembedcom': servidor = 'vembed'
+             if srv == 'vgembedcom': srv = 'vembed'
 
-             other = servertools.corregir_other(servidor)
+             other = servertools.corregir_other(srv)
 
-        servidor = servertools.corregir_servidor(servidor)
+        servidor = servertools.corregir_servidor(srv)
 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
@@ -385,6 +370,12 @@ def play(item):
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

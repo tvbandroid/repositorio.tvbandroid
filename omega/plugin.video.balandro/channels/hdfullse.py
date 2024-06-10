@@ -125,7 +125,7 @@ def do_downloadpage(url, post = None, referer = None):
             data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
         if not data:
-            if not '/search' in url:
+            if not '/search/' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
@@ -134,6 +134,11 @@ def do_downloadpage(url, post = None, referer = None):
                     data = httptools.downloadpage_proxy('hdfullse', url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/search/' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -154,7 +159,7 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfullse', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfullse', folder=False, text_color='chartreuse' ))
 
-    itemlist.append(Item( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigentes[/B]',
+    itemlist.append(Item( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigente[/B]',
                           desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
 
     itemlist.append(Item( channel='domains', action='last_domain_hdfullse', title='[B]Comprobar último dominio vigente[/B]',
@@ -393,7 +398,7 @@ def temporadas(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for url, title, thumb, retitle in matches:
-        numtempo = scrapertools.find_single_match(title, 'Temporadas (\d+)')
+        numtempo = scrapertools.find_single_match(retitle, 'Temporadas (\d+)$')
         if not numtempo: numtempo = scrapertools.find_single_match(url, '-(\d+)$')
 
         if not numtempo: continue
@@ -430,6 +435,10 @@ def temporadas(item):
             itemlist = episodios(item)
             return itemlist
 
+        if not ('/season-' + numtempo) in url:
+            new_url = scrapertools.find_single_match(url, '(.*?)/season-')
+            url = new_url + '/season-' + numtempo
+
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, referer = item.url, page = 0,
                                     contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
 
@@ -462,7 +471,7 @@ def episodios(item):
     patron += '"name">(.*?)<.*?'
     patron += '</b>(.*?)</h5>'
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile(patron, re.DOTALL).findall(bloque)
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -576,8 +585,9 @@ def findvideos(item):
            pass
 
     if not data_decrypt:
-        if config.get_setting('developer_mode', default=False):
-            if not str(data_decrypt) == '[]': platformtools.dialog_notification(config.__addon_name + ' HdFullSe', '[COLOR red][B]Faltan Decrypts[/B][/COLOR]')
+        if str(data_decrypt) == '':
+            if config.get_setting('developer_mode', default=False):
+                if not str(data_decrypt) == '[]': platformtools.dialog_notification(config.__addon_name + ' HdFullSe', '[COLOR red][B]Faltan Decrypts[/B][/COLOR]')
 
     matches = []
 

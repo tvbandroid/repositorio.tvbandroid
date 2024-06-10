@@ -10,11 +10,11 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ pelis No hay 24/12/2023
 
 
-host = 'https://d.ennovelas-tv.com/'
+host = 'https://e.ennovelas-tv.com/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://c.ennovelas-tv.com/']
+ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/']
 
 
 domain = config.get_setting('dominio', 'ennovelastv', default='')
@@ -30,6 +30,15 @@ def do_downloadpage(url, post=None, headers=None):
         url = url.replace(ant, host)
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if not data:
+        if not '/search/' in url:
+            if not '/temp/ajax/iframe.php?id=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('EnNovelasTv', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -137,7 +146,8 @@ def list_all(item):
             else:
                 title = title.replace('Temporada', '[COLOR tan]Temporada[/COLOR]')
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,  contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -397,6 +407,10 @@ def findvideos(item):
 
         matches = scrapertools.find_multiple_matches(data1, "<iframe.*?src='(.*?)'")
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<iframe.*?src="(.*?)"')
+
+        if not matches: matches = scrapertools.find_multiple_matches(data1, "<IFRAME.*?SRC='(.*?)'")
+        if not matches: matches = scrapertools.find_multiple_matches(data1, '<IFRAME.*?SRC="(.*?)"')
+
         if not matches: matches = scrapertools.find_multiple_matches(data1, '<td>Server.*?href="(.*?)"')
 
         for url in matches:
@@ -522,7 +536,10 @@ def findvideos(item):
         enlaces1 = scrapertools.find_multiple_matches(data, "<iframe.*?src='(.*?)'")
         enlaces2 = scrapertools.find_multiple_matches(data, '<iframe.*?src="(.*?)"')
 
-        enlaces = enlaces1 + enlaces2
+        enlaces3 = scrapertools.find_multiple_matches(data, "<IFRAME.*?SRC='(.*?)'")
+        enlaces4 = scrapertools.find_multiple_matches(data, '<IFRAME.*?SRC="(.*?)"')
+
+        enlaces = enlaces1 + enlaces2 + enlaces3 + enlaces4
 
         for enlace in enlaces:
             ses += 1

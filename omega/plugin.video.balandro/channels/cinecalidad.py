@@ -44,7 +44,7 @@ except:
    except: pass
 
 
-host = 'https://cinecalidad.fi/'
+host = 'https://www.cinecalidad.vg/'
 
 
 _players = ['https://cinecalidad.', '.cinecalidad.']
@@ -63,7 +63,9 @@ ant_hosts = ['https://www.cinecalidad.eu/', 'https://www.cinecalidad.im/', 'http
              'https://v2.cinecalidad.foo/', 'https://www.cinecalidad.so/', 'https://wvw.cinecalidad.so/',
              'https://vww.cinecalidad.so/', 'https://wwv.cinecalidad.so/', 'https://vvv.cinecalidad.so/',
              'https://ww.cinecalidad.so/', 'https://w.cinecalidad.so/', 'https://vvw.cinecalidad.so/',
-             'https://wv.cinecalidad.so/', 'https://vvvv.cinecalidad.so/', 'https://wvvv.cinecalidad.so/']
+             'https://wv.cinecalidad.so/', 'https://vvvv.cinecalidad.so/', 'https://wvvv.cinecalidad.so/',
+             'https://cinecalidad.fi/']
+
 
 domain = config.get_setting('dominio', 'cinecalidad', default='')
 
@@ -111,7 +113,7 @@ def do_downloadpage(url, post=None, headers=None):
         url = url.replace(ant, host)
 
     raise_weberror = True
-    if '/fecha/' in url: raise_weberror = False
+    if '/release/' in url: raise_weberror = False
 
     hay_proxies = False
     if config.get_setting('channel_cinecalidad_proxies', default=''): hay_proxies = True
@@ -125,7 +127,7 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
         if not data:
-            if '?s=' in url:
+            if not '?s=' in url:
                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineCalidad', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
@@ -214,6 +216,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En castellano:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'espana/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Por año', action='anios', search_type = 'movie', group = '?ref=es' ))
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='moccasin' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
@@ -294,8 +297,11 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1969, -1):
-        url = host + 'fecha/' + str(x) + '/'
+    top_year = 1939
+    if item.group == '?ref=es': top_year = 1999
+
+    for x in range(current_year, top_year, -1):
+        url = host + 'release/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
@@ -339,6 +345,8 @@ def list_all(item):
 
         if year == '-': year = scrapertools.find_single_match(match, '6px;">(.*?)</div>')
 
+        if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
+
         if not year: year = '-'
 
         title = title.replace('&#8211;', '').replace('&#8217;', '').replace('&#038;', '&')
@@ -366,7 +374,7 @@ def list_all(item):
                 if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': '-'} ))
+                                        contentType = 'tvshow', contentSerieName = title,  infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -586,6 +594,7 @@ def findvideos(item):
             elif servidor == 'drive': servidor = 'gvideo'
             elif servidor == 'google drive': servidor = 'gvideo'
             elif servidor == 'netu' or servidor == 'hqq': servidor = 'waaw'
+            elif servidor == 'd0o0d' or servidor == 'do0od' or servidor == 'd0000d' or servidor == 'd000d': servidor = 'doodstream'
 
             elif servidor == 'goodstream': servertools.corregir_other(servidor)
             elif servidor == 'streamwish': servertools.corregir_other(servidor)
@@ -632,6 +641,7 @@ def findvideos(item):
             elif servidor == 'bittorrent': servidor = 'torrent'
 
             elif 'bittorrent' in servidor: servidor = 'torrent'
+            elif 'spanishtracker' in servidor: servidor = 'torrent'
 
             elif 'voesx' in servidor: servidor = 'voe'
             elif servidor == 'maxplay': servidor = 'voe'
@@ -645,7 +655,8 @@ def findvideos(item):
             else:
                 if not config.get_setting('developer_mode', default=False): continue
 
-            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', data_url = data_url, data_lmt = data_lmt, quality = qlty, language = lang ))
+            itemlist.append(Item (channel = item.channel, action = 'play', server = servidor, title = '', data_url = data_url, data_lmt = data_lmt,
+                                  quality = qlty, language = lang ))
 
     # ~ es por las series
     if not hay_descargas:
@@ -806,7 +817,10 @@ def play(item):
 
             if '/okru.' in url: servidor = 'okru'
 
-        elif servidor == 'zplayer': url = url + '|' + host_player
+            new_server = servertools.corregir_other(url).lower()
+            if not new_server.startswith("http"): servidor = new_server
+
+        if servidor == 'zplayer': url = url + '|' + host_player
 
         itemlist.append(item.clone(url = url, server = servidor))
 

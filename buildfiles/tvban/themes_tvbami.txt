@@ -1,5 +1,5 @@
-name="[B][COLOR red]No Hay [COLOR yellowgreen]TVban amillans [COLOR khaki]v1[/COLOR][/B]"
-url="https://"
+name="[B][COLOR yellowgreen]ArcticF TVban Amillans [COLOR khaki]v1[/COLOR][/B]"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.0/P.ArcticF.Amillans.zip"
 icon="https://tvbandroid.github.io/tvband/wizard/wizardFI/iartic.jpg"
 fanart="https://tvbandroid.github.io/tvband/wizard/wizardFI/Farfus.jpg"
 adult="no"

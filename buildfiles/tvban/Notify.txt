@@ -12,11 +12,11 @@ Seleccionamos la Build que deseas instalar, por ejemplo [COLOR yellowgreen][B]TV
 Cuando termine de instalar, nos saldrá una ventana [COLOR white][B]"Necesita Forzar el Cierre de Kodi"[/B][/COLOR]. Pulsaremos en [COLOR white][B]"OK"[/B][/COLOR]
 Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, darle unos minutos para que cargue el menú correctamente.[/COLOR]
 
-[COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE BUILD TVBAN[COLOR gold]!!![/B][/COLOR]
-[COLOR yellowgreen][B]TVban matnexom [COLOR khaki]- v1[/B][/COLOR]
+[COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE ArcticF TVBAN AMILLAMS[COLOR gold]!!![/B][/COLOR]
+[COLOR yellowgreen][B]ArcticF TVban amillans [COLOR khaki]- v1[/B][/COLOR]
 
-[COLOR orange][B]*  Corrección de sonido 2.0, Actualizaciones de addons/repositorios, Nuevos repositorios[/B][/COLOR]
-[COLOR orange][B]*  Otras mejoras[/B][/COLOR]
+[COLOR orange][B]*  Desactivado temporanlmente Tacones y añadido Live Sport en Depeortes[/B][/COLOR]
+
 
 [COLOR aquamarine][B]INSTALACIÓN DEL PARCHE:[/B][/COLOR]
 

@@ -526,10 +526,10 @@ def enable_addons(all=False):
                 icon = os.path.join(folder, 'icon.png') if os.path.exists(os.path.join(folder, 'icon.png')) else CONFIG.ADDON_ICON
                 fanart = os.path.join(folder, 'fanart.jpg') if os.path.exists(os.path.join(folder, 'fanart.jpg')) else CONFIG.ADDON_FANART
                 if tools.get_addon_info(addonids[i], 'name'):
-                    state = "[COLOR cyan][Habilitado][/COLOR]"
+                    state = "[COLOR green][Habilitado][/COLOR]"
                     goto = "false"
                 else:
-                    state = "[COLOR red][Deshabilitado][/COLOR]"
+                    state = "[COLOR orange][Deshabilitado][/COLOR]"
                     goto = "true"
 
                 directory.add_file("{0} {1}".format(state, addonnames[i]), {'mode': 'toggleaddon', 'name': addonids[i], 'url': goto}, icon=icon, fanart=fanart)

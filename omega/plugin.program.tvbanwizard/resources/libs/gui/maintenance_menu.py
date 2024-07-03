@@ -166,7 +166,7 @@ class MaintenanceMenu:
     def addon_menu(self):
         directory.add_file('[B][COLOR red]Eliminar Addons[/COLOR][/B]', {'mode': 'removeaddons'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_dir('[B][COLOR red]Eliminar Addon Data[/COLOR][/B]', {'mode': 'removeaddondata'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
-        directory.add_dir('[B]Habilitar/Deshabilitar Addons[/B]', {'mode': 'enableaddons'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_dir('[B][COLOR green]Habilitar[COLOR cyan]/[COLOR orange]Deshabilitar[/COLOR] [COLOR cyan]Addons[/B]', {'mode': 'enableaddons'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         # directory.add_file('Enable/Disable Adult Addons', 'toggleadult', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('[B]Forzar Actualización de Todos los Repositorios[/B]', {'mode': 'forceupdate'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('[B]Forzar Actualización de Todos los Addons[/B]', {'mode': 'forceupdate', 'action': 'auto'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)

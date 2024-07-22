@@ -2,90 +2,82 @@ from functools import wraps
 import logging
 import os
 from threading import Thread
-from urllib.parse import quote
 import requests
 
-from lib.api.debrid_apis.premiumize_api import Premiumize
-from lib.api.debrid_apis.real_debrid_api import RealDebrid
-from lib.api.debrid_apis.tor_box_api import Torbox
+from lib.api.premiumize_api import Premiumize
+from lib.api.real_debrid_api import RealDebrid
 from lib.api.jacktorr_api import (
     TorrServer,
 )
 from lib.clients.search import search_client
-from lib.debrid import check_debrid_cached, get_debrid_pack_direct_url
+from lib.debrid import check_debrid_cached
 from lib.files_history import last_files
 from lib.indexer import indexer_show_results
 from lib.play import make_listing, play
 from lib.player import JacktookPlayer
-from lib.plex import plex_login, plex_logout, validate_server
+from lib.simkl import search_simkl_episodes
 from lib.titles_history import last_titles
 from lib.utils.kodi_formats import is_music, is_picture, is_text
-from lib.utils.pm_utils import get_pm_pack_info
-from lib.utils.rd_utils import get_rd_pack_info, get_rd_info
-from lib.utils.torbox_utils import (
-    get_torbox_pack_info,
-)
+from lib.utils.pm_utils import get_pm_link, get_pm_pack
+from lib.utils.rd_utils import get_rd_link, get_rd_pack, get_rd_pack_link
 from routing import Plugin
+
 from lib.api.tmdbv3api.tmdb import TMDb
 from lib.tmdb import (
     TMDB_POSTER_URL,
     tmdb_search,
     tmdb_show_results,
 )
-from lib.anilist import search_anilist, search_episodes
-from lib.db.bookmark_db import bookmark_db
-from lib.utils.general_utils import (
+from lib.anilist import search_anilist
+from lib.utils.utils import (
     DialogListener,
-    Players,
     clear,
     clear_all_cache,
+    clear_tmdb_cache,
     get_password,
-    get_random_color,
     get_service_host,
     get_username,
-    is_debrid_activated,
     post_process,
     pre_process,
-    get_fanart,
+    search_fanart_tv,
     get_port,
     is_video,
     list_item,
+    set_pack_art,
+    set_pack_item_pm,
+    set_pack_item_rd,
     set_video_info,
     set_video_infotag,
     set_watched_title,
     ssl_enabled,
     tmdb_get,
-    check_debrid_enabled,
-    Debrids,
 )
-from lib.utils.kodi_utils import (
+from lib.utils.kodi import (
     ADDON_PATH,
     EPISODES_TYPE,
     MOVIES_TYPE,
     SHOWS_TYPE,
     JACKTORR_ADDON,
-    Keyboard,
     action,
+    addon_settings,
     addon_status,
+    auto_play,
     buffer_and_play,
     burst_addon_settings,
     close_all_dialog,
     container_update,
+    dialogyesno,
     get_kodi_version,
     get_setting,
-    notification,
+    log,
+    notify,
     play_info_hash,
     play_media,
     refresh,
     set_view,
     show_picture,
     translation,
-    url_for,
 )
-
-from lib.utils.settings import is_auto_play
-from lib.utils.settings import addon_settings
-from lib.updater import updates_check_addon
 from xbmcgui import ListItem, Dialog
 from xbmc import getLanguage, ISO_639_1
 from xbmcplugin import (
@@ -105,7 +97,6 @@ if JACKTORR_ADDON:
 
 tmdb = TMDb()
 tmdb.api_key = get_setting("tmdb_apikey", "b70756b7083d9ee60f849d82d94a0d80")
-
 kodi_lang = getLanguage(ISO_639_1)
 if kodi_lang:
     tmdb.language = kodi_lang
@@ -118,7 +109,7 @@ def query_arg(name, required=True):
             if name not in kwargs:
                 query_list = plugin.args.get(name)
                 if query_list:
-                    if name in ["direct", "rescrape", "is_torrent", "is_plex"]:
+                    if name in ["rescrape", "is_torrent", "is_debrid"]:
                         kwargs[name] = eval(query_list[0])
                     else:
                         kwargs[name] = query_list[0]
@@ -190,14 +181,7 @@ def main_menu():
     addDirectoryItem(
         plugin.handle,
         plugin.url_for(torrents),
-        list_item("Torrents", "magnet2.png"),
-        isFolder=True,
-    )
-
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(cloud),
-        list_item("Cloud", "cloud.png"),
+        list_item("Torrents", "settings.png"),
         isFolder=True,
     )
 
@@ -228,19 +212,19 @@ def main_menu():
 def direct_menu():
     addDirectoryItem(
         plugin.handle,
-        plugin.url_for(search_direct, mode="multi"),
+        plugin.url_for(search, mode="multi"),
         list_item("Search", "search.png"),
         isFolder=True,
     )
     addDirectoryItem(
         plugin.handle,
-        plugin.url_for(search_direct, mode="tv"),
+        plugin.url_for(search, mode="tv"),
         list_item("TV Search", "tv.png"),
         isFolder=True,
     )
     addDirectoryItem(
         plugin.handle,
-        plugin.url_for(search_direct, mode="movie"),
+        plugin.url_for(search, mode="movie"),
         list_item("Movie Search", "movies.png"),
         isFolder=True,
     )
@@ -300,7 +284,7 @@ def search_tmdb(mode, genre_id, page):
     data = tmdb_search(mode, genre_id, page, search_tmdb, plugin)
     if data:
         if data.total_results == 0:
-            notification("No results found")
+            notify("No results found")
             return
         tmdb_show_results(
             data.results,
@@ -312,43 +296,17 @@ def search_tmdb(mode, genre_id, page):
         )
 
 
-@plugin.route("/search_direct/<mode>")
-def search_direct(mode):
-    text = Keyboard(id=30243)
-    if text:
-        text = quote(text)
-        list_item = ListItem(label=f"Search [I]{text}[/I]")
-        list_item.setArt(
-            {"icon": os.path.join(ADDON_PATH, "resources", "img", "search.png")}
-        )
-        addDirectoryItem(
-            plugin.handle,
-            plugin.url_for(
-                search,
-                mode=mode,
-                query=text,
-                direct=True
-            ),
-            list_item,
-            isFolder=True,
-        )
-        endOfDirectory(plugin.handle)
-
-
 @plugin.route("/search")
-@query_arg("query", required=False)
 @query_arg("mode", required=True)
 @query_arg("media_type", required=False)
+@query_arg("query", required=False)
 @query_arg("ids", required=False)
 @query_arg("tv_data", required=False)
-@query_arg("direct", required=False)
 @query_arg("rescrape", required=False)
-def search(
-    query="", mode="", media_type="", ids="", tv_data="", direct=False, rescrape=False
-):
+def search(mode="", media_type="", query="", ids="", tv_data="", rescrape=False):
     if mode == "movie" or media_type == "movie":
         setContent(plugin.handle, MOVIES_TYPE)
-    elif mode == "tv" or media_type == "tv" or mode == "anime":
+    elif mode == "tv" or media_type == "tv":
         setContent(plugin.handle, SHOWS_TYPE)
 
     set_watched_title(query, ids, mode)
@@ -357,8 +315,8 @@ def search(
     else:
         episode = season = 0
         ep_name = ""
-
-    client = get_setting("client_player")
+    
+    torr_client = get_setting("torrent_client")
 
     with DialogListener() as listener:
         p_dialog = listener.dialog
@@ -374,57 +332,44 @@ def search(
                 season,
             )
             if proc_results:
-                if client == Players.DEBRID:
-                    if is_debrid_activated():
-                        debrid_cached = check_debrid_cached(
-                            query,
-                            proc_results,
-                            mode,
-                            media_type,
-                            p_dialog,
-                            rescrape,
-                            episode,
-                        )
-                        if debrid_cached:
-                            final_results = post_process(debrid_cached, season)
-                            if is_auto_play():
-                                auto_play(final_results, ids, tv_data, mode, p_dialog)
-                                return
-                        else:
-                            notification("No cached results")
+                if torr_client == "Debrid" or torr_client == "All":
+                    deb_cached_results = check_debrid_cached(
+                        query,
+                        proc_results,
+                        mode,
+                        media_type,
+                        p_dialog,
+                        rescrape,
+                        episode,
+                    )
+                    if deb_cached_results:
+                        final_results = post_process(deb_cached_results)
+                        if auto_play():
+                            close_all_dialog()
+                            p_dialog.close()
+                            play_first_result(deb_cached_results, ids, tv_data, mode)
                             return
                     else:
-                        notification("No debrid client enabled")
+                        notify("No debrid results")
                         return
-                else:
+                elif torr_client in ["Torrest", "Elementum", "Jacktorr"]:
                     final_results = post_process(proc_results)
-
-                if final_results:
-                    indexer_show_results(
-                        final_results,
-                        mode,
-                        ids,
-                        tv_data,
-                        direct,
-                        plugin,
-                    )
-                    set_view("widelist")
-                    endOfDirectory(plugin.handle)
+                indexer_show_results(
+                    final_results,
+                    mode,
+                    query,
+                    ids,
+                    tv_data,
+                    plugin,
+                )
             else:
-                notification("No results found for episode")
+                notify("No results")
         else:
-            notification("No results found")
-
-
-def auto_play(results, ids, tv_data, mode, p_dialog):
-    close_all_dialog()
-    p_dialog.close()
-    play_first_result(results, ids, tv_data, mode)
-
+            notify("No results")
 
 def play_first_result(results, ids, tv_data, mode):
     for res in results:
-        if res["isDebridPack"]:
+        if res["debridPack"]:
             continue
         play_media(
             plugin,
@@ -433,9 +378,9 @@ def play_first_result(results, ids, tv_data, mode):
             ids=ids,
             tv_data=tv_data,
             info_hash=results[0]["infoHash"],
-            torrent_id=results[0]["torrentId"],
+            torrent_id=results[0]["debridId"],
             debrid_type=results[0]["debridType"],
-            is_torrent=False,
+            is_debrid=True,
             mode=mode,
         )
         break
@@ -445,130 +390,45 @@ def play_first_result(results, ids, tv_data, mode):
 @query_arg("title", required=True)
 @query_arg("url", required=False)
 @query_arg("magnet", required=False)
-@query_arg("info_hash", required=False)
 @query_arg("ids", required=False)
 @query_arg("tv_data", required=False)
+@query_arg("info_hash", required=False)
+@query_arg("torrent_id", required=False)
 @query_arg("is_torrent", required=False)
-@query_arg("is_plex", required=False)
+@query_arg("is_debrid", required=False)
 @query_arg("debrid_type", required=False)
-@query_arg("is_debrid_pack", required=False)
 @query_arg("mode", required=False)
 def play_torrent(
     title,
     url="",
     magnet="",
-    info_hash="",
     ids="",
     tv_data="",
+    torrent_id="",
+    info_hash="",
     mode="",
     debrid_type="",
-    is_debrid_pack=False,
     is_torrent=False,
-    is_plex=False,
+    is_debrid=False,
 ):
+
+    if torrent_id and debrid_type == "RD":
+        rd_client = RealDebrid(encoded_token=get_setting("real_debrid_token"))
+        url = get_rd_link(rd_client, torrent_id)
+    if info_hash and debrid_type == "PM":
+        pm_client = Premiumize(token=get_setting("premiumize_token"))
+        url = get_pm_link(pm_client, info_hash)
     play(
         url,
+        magnet,
         ids,
         tv_data,
         title,
         plugin,
-        magnet=magnet,
-        info_hash=info_hash,
-        debrid_type=debrid_type,
-        mode=mode,
-        is_torrent=is_torrent,
-        is_plex=is_plex,
-        is_debrid_pack=is_debrid_pack,
-    )
-
-
-@plugin.route("/cloud/details")
-@check_directory
-@query_arg("debrid_type", required=False)
-def cloud_details(debrid_type=""):
-    if debrid_type == Debrids.TB:
-        notification("Not yet implemented")
-        return
-
-    if debrid_type == Debrids.RD:
-        downloads_method = get_rd_downloads
-        info_method = rd_info
-    elif debrid_type == Debrids.PM:
-        downloads_method = None
-        info_method = None
-
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(downloads_method),
-        list_item("Downloads", "download.png"),
-        isFolder=True,
-    )
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(info_method),
-        list_item("Account Info", "download.png"),
-        isFolder=True,
-    )
-
-
-@plugin.route("/cloud")
-@check_directory
-def cloud():
-    activated_debrids = [
-        debrid for debrid in Debrids.values() if check_debrid_enabled(debrid)
-    ]
-    if activated_debrids:
-        for debrid_name in activated_debrids:
-            torrent_li = list_item(debrid_name, "download.png")
-            addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(
-                    cloud_details,
-                    debrid_type=debrid_name,
-                ),
-                torrent_li,
-                isFolder=True,
-            )
-    else:
-        notification("No debrid services activated")
-
-
-@plugin.route("/rd_info")
-def rd_info():
-    get_rd_info()
-
-
-@plugin.route("/rd_downloads")
-@query_arg("page", required=False)
-@check_directory
-def get_rd_downloads(page=1):
-    debrid_type = "RD"
-    debrid_color = get_random_color(debrid_type)
-    format_debrid_type = f"[B][COLOR {debrid_color}][{debrid_type}][/COLOR][/B]"
-
-    rd_client = RealDebrid(encoded_token=get_setting("real_debrid_token"))
-    downloads = rd_client.get_user_downloads_list(page=page)
-    for d in downloads:
-        torrent_li = list_item(f"{format_debrid_type}-{d['filename']}", "download.png")
-        torrent_li.setArt(
-            {
-                "icon": d["host_icon"],
-            }
-        )
-        addDirectoryItem(
-            plugin.handle,
-            plugin.url_for(play_url, url=d.get("download"), name=d["filename"]),
-            torrent_li,
-            isFolder=False,
-        )
-
-    next_page = int(page) + 1
-    next_item = list_item("Next", icon="nextpage.png")
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(get_rd_downloads, page=next_page),
-        next_item,
-        isFolder=True,
+        debrid_type,
+        mode,
+        is_debrid,
+        is_torrent,
     )
 
 
@@ -611,7 +471,7 @@ def torrents():
                 isFolder=True,
             )
     else:
-        notification(translation(30253))
+        notify("Addon Jacktorr not found")
 
 
 @plugin.route("/torrents/<info_hash>/<action_str>")
@@ -694,7 +554,7 @@ def play_url(url, name):
     make_listing(list_item, mode="multi", title=name)
 
     setResolvedUrl(plugin.handle, True, list_item)
-    player = JacktookPlayer(bookmark_db)
+    player = JacktookPlayer()
     player.set_constants(url)
     player.run(list_item)
 
@@ -729,7 +589,7 @@ def tv_seasons_details(ids, mode, media_type=None):
     set_watched_title(name, ids, mode=mode, media_type=media_type)
 
     show_poster = TMDB_POSTER_URL + details.get("poster_path", "")
-    fanart_data = get_fanart(tvdb_id)
+    fanart_data = search_fanart_tv(tvdb_id)
     fanart = fanart_data["fanart"] if fanart_data else ""
 
     for s in seasons:
@@ -791,7 +651,7 @@ def tv_episodes_details(tv_name, season, ids, mode, media_type):
     setContent(plugin.handle, EPISODES_TYPE)
     tmdb_id, tvdb_id, _ = ids.split(", ")
     season_details = tmdb_get("season_details", {"id": tmdb_id, "season": season})
-    fanart_data = get_fanart(tvdb_id)
+    fanart_data = search_fanart_tv(tvdb_id)
 
     for ep in season_details.episodes:
         ep_name = ep.name
@@ -874,96 +734,70 @@ def tv_episodes_details(tv_name, season, ids, mode, media_type):
     set_view("widelist")
 
 
-@plugin.route("/play_file_from_pack")
-@query_arg("title", required=False)
+@plugin.route("/get_rd_link_pack")
+@query_arg("args", required=False)
 @query_arg("ids", required=False)
 @query_arg("tv_data", required=False)
 @query_arg("mode", required=False)
-@query_arg("debrid_type", required=False)
-@query_arg("mode", required=False)
-@query_arg("file_id", required=False)
-@query_arg("torrent_id", required=False)
-def play_file_from_pack(ids, mode, debrid_type, title, tv_data, file_id, torrent_id):
-    url = get_debrid_pack_direct_url(file_id, torrent_id, debrid_type)
+def get_rd_link_pack(args, ids, mode, tv_data=""):
+    id, torrent_id, debrid_type, title = args.split(" ", 3)
+    url = get_rd_pack_link(id, torrent_id)
     play(
-        url,
-        ids,
-        tv_data,
-        title,
-        plugin,
+        url=url,
+        magnet="",
+        ids=ids,
+        tv_data=tv_data,
         mode=mode,
+        title=title,
+        is_debrid=True,
         debrid_type=debrid_type,
-        is_debrid_pack=True
+        plugin=plugin,
     )
 
 
-@plugin.route("/show_pack_info")
+@plugin.route("/show_pack")
 @query_arg("ids", required=False)
-@query_arg("info_hash", required=False)
-@query_arg("debrid_type", required=False)
+@query_arg("query", required=False)
 @query_arg("mode", required=False)
 @query_arg("tv_data", required=False)
-@check_directory
-def show_pack_info(ids, info_hash, debrid_type, mode, tv_data):
-    if mode == "movie":
-        setContent(plugin.handle, MOVIES_TYPE)
-    elif mode == "tv" or mode == "anime":
-        setContent(plugin.handle, SHOWS_TYPE)
-
-    if debrid_type == "PM":
-        info = get_pm_pack_info(info_hash)
+def show_pack(ids, query, mode, tv_data=""):
+    info_hash, torrent_id, debrid_type = query.split()
+    if debrid_type == "RD":
+        info = get_rd_pack(torrent_id)
         if info:
-            for url, title in info["files"]:
+            for id, title in info:
                 list_item = ListItem(label=f"{title}")
-                list_item.setArt(
-                    {
-                        "icon": os.path.join(
-                            ADDON_PATH, "resources", "img", "trending.png"
-                        )
-                    }
-                )
-                addDirectoryItem(
-                    plugin.handle,
-                    url_for(
-                        name="play_torrent",
-                        title=title,
-                        url=url,
-                        ids=ids,
-                        tv_data=tv_data,
-                        mode=mode,
-                        is_torrent=False,
-                        debrid_type=debrid_type,
-                    ),
+                set_pack_item_rd(
                     list_item,
-                    isFolder=False,
+                    mode,
+                    id,
+                    torrent_id,
+                    title,
+                    ids,
+                    tv_data,
+                    debrid_type,
+                    plugin=plugin,
                 )
-        return 
-    elif debrid_type == "RD":
-        info = get_rd_pack_info(info_hash)
-    elif debrid_type == "TB":
-        info = get_torbox_pack_info(info_hash)
+                set_pack_art(list_item)
+            endOfDirectory(plugin.handle)
+    elif debrid_type == "PM":
+        info = get_pm_pack(info_hash)
+        if info:
+            for url, title in info:
+                list_item = ListItem(label=f"{title}")
+                set_pack_item_pm(
+                    list_item,
+                    mode,
+                    url,
+                    title,
+                    ids,
+                    tv_data,
+                    debrid_type,
+                    plugin=plugin,
+                )
+                set_pack_art(list_item)
+            endOfDirectory(plugin.handle)
 
-    if info:
-        for file_id, title in info["files"]:
-            list_item = ListItem(label=title)
-            list_item.setArt(
-                {"icon": os.path.join(ADDON_PATH, "resources", "img", "trending.png")}
-            )
-            addDirectoryItem(
-                plugin.handle,
-                url_for(
-                    name="play_file_from_pack",
-                    file_id=file_id,
-                    torrent_id=info["id"],
-                    debrid_type=debrid_type,
-                    title=title,
-                    mode=mode,
-                    ids=ids,
-                    tv_data=tv_data,
-                ),
-                list_item,
-                isFolder=False,
-            )
 
 @plugin.route("/anilist/<category>")
 def anilist(category, page=1):
@@ -971,16 +805,16 @@ def anilist(category, page=1):
     search_anilist(category, page, plugin)
 
 
-@plugin.route("/anilist/next_page/<category>/<page>")
+@plugin.route("/next_page/anilist/<category>/<page>")
 def next_page_anilist(category, page):
     setContent(plugin.handle, MOVIES_TYPE)
     page = int(page) + 1
     search_anilist(category, page, plugin)
 
 
-@plugin.route("/anilist/episodes/<query>/<anilist_id>/<mal_id>")
-def search_anime_episodes(query, anilist_id, mal_id):
-    search_episodes(query, anilist_id, mal_id, plugin)
+@plugin.route("/anilist/episodes/<query>/<id>/<mal_id>")
+def get_anime_episodes(query, id, mal_id):
+    search_simkl_episodes(query, id, mal_id, plugin=plugin)
 
 
 @plugin.route("/next_page/<mode>/<page>/<genre_id>")
@@ -988,29 +822,24 @@ def next_page(mode, page, genre_id):
     search_tmdb(mode=mode, genre_id=int(genre_id), page=int(page))
 
 
-@plugin.route("/download_to_debrid")
-@query_arg("magnet", required=True)
-@query_arg("debrid_type", required=True)
-def download(magnet, debrid_type):
-    if debrid_type == "RD":
-        rd_client = RealDebrid(encoded_token=get_setting("real_debrid_token"))
-        thread = Thread(
-            target=rd_client.download, args=(magnet,), kwargs={"pack": False}
-        )
-    elif debrid_type == "TB":
-        tb_client = Torbox(token=get_setting("torbox_token"))
-        thread = Thread(target=tb_client.download, args=(magnet,))
-    elif debrid_type == "PM":
-        pm_client = Premiumize(token=get_setting("premiumize_token"))
-        thread = Thread(
-            target=pm_client.download, args=(magnet,), kwargs={"pack": False}
-        )
-    thread.start()
-
-
-@plugin.route("/addon_update")
-def addon_update():
-    updates_check_addon()
+@plugin.route("/download")
+@query_arg("query", required=True)
+def download(query):
+    magnet, debrid_type = query.split(" ")
+    response = dialogyesno(
+        "Kodi", "Do you want to transfer this file to your Debrid Cloud?"
+    )
+    if response:
+        if debrid_type == "RD":
+            rd_client = RealDebrid(encoded_token=get_setting("real_debrid_token"))
+            Thread(
+                target=rd_client.download, args=(magnet,), kwargs={"pack": False}
+            ).start()
+        else:
+            pm_client = Premiumize(token=get_setting("premiumize_token"))
+            Thread(
+                target=pm_client.download, args=(magnet,), kwargs={"pack": False}
+            ).start()
 
 
 @plugin.route("/status")
@@ -1056,10 +885,16 @@ def files():
     last_files(plugin)
 
 
+@plugin.route("/clear_cached_tmdb")
+def clear_cached_tmdb():
+    clear_tmdb_cache()
+    notify(translation(30240))
+
+
 @plugin.route("/clear_cached_all")
 def clear_cached_all():
     clear_all_cache()
-    notification(translation(30244))
+    notify(translation(30244))
 
 
 @plugin.route("/rd_auth")
@@ -1074,21 +909,6 @@ def pm_auth():
     pm_client.auth()
 
 
-@plugin.route("/plex_auth")
-def plex_auth():
-    plex_login()
-
-
-@plugin.route("/plex_logout")
-def logout():
-    plex_logout()
-
-
-@plugin.route("/plex_validate")
-def plex_validate():
-    validate_server()
-
-
 @plugin.route("/open_burst_config")
 def open_burst_config():
     burst_addon_settings()
@@ -1096,7 +916,7 @@ def open_burst_config():
 
 def torrent_status(info_hash):
     status = api.get_torrent_info(link=info_hash)
-    notification(
+    notify(
         "{}".format(status.get("stat_string")),
         status.get("name"),
         sound=False,
@@ -1108,4 +928,4 @@ def run():
         plugin.run()
     except Exception as e:
         logging.error("Caught exception:", exc_info=True)
-        notification(str(e))
+        notify(str(e))

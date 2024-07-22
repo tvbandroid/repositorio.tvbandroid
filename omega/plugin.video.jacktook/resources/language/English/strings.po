@@ -16,11 +16,11 @@ msgstr ""
 
 # Settings
 msgctxt "#30000"
-msgid "Players"
+msgid "Torrents"
 msgstr ""
 
 msgctxt "#30001"
-msgid "Clients:"
+msgid "Torrent Clients:"
 msgstr ""
 
 msgctxt "#30002"
@@ -112,7 +112,7 @@ msgid "Cache expiration hours"
 msgstr ""
 
 msgctxt "#30106"
-msgid "Clear cache"
+msgid "Clear all cache"
 msgstr ""
 
 msgctxt "#30107"
@@ -173,14 +173,6 @@ msgstr ""
 
 msgctxt "#30224"
 msgid "Prowlarr API key is invalid"
-msgstr ""
-
-msgctxt "#30225"
-msgid "You need to configure Elhosted/KnighCrawlerr first"
-msgstr ""
-
-msgctxt "#30226"
-msgid "You need to configure Plex first"
 msgstr ""
 
 msgctxt "#30227"

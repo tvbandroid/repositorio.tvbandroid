@@ -1,6 +1,6 @@
 import os
-from lib.db.pickle_db import pickle_db
-from lib.utils.kodi_utils import ADDON_PATH, url_for, url_for_path
+from lib.db.database import get_db
+from lib.utils.kodi import ADDON_PATH, url_for, url_for_path
 from xbmcgui import ListItem
 from xbmcplugin import (
     addDirectoryItem,
@@ -22,7 +22,7 @@ def last_files(plugin):
         list_item,
     )
 
-    for title, data in reversed(pickle_db.database["jt:lfh"].items()):
+    for title, data in reversed(get_db().database["jt:lfh"].items()):
         formatted_time = data["timestamp"].strftime("%a, %d %b %Y %I:%M %p")
         label = f"{title}—{formatted_time}"
         list_item = ListItem(label=label)
@@ -39,11 +39,9 @@ def last_files(plugin):
                 ids=data.get("ids"),
                 tv_data=data.get("tv_data"),
                 url=data.get("url"),
+                is_debrid=data.get("is_debrid"),
                 is_torrent=data.get("is_torrent"),
                 magnet=data.get("magnet"),
-                info_hash=data.get("info_hash"),
-                debrid_type=data.get("debrid_type"),
-                is_debrid_pack=data.get("is_debrid_pack"),
             ),
             list_item,
             False,

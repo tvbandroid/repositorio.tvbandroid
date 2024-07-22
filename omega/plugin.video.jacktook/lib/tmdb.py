@@ -1,18 +1,18 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
-from lib.db.pickle_db import pickle_db
+from lib.db.database import get_db
 from lib.api.tmdbv3api.objs.search import Search
 
-from lib.utils.kodi_utils import (
+from lib.utils.kodi import (
     ADDON_PATH,
     Keyboard,
     container_update,
     get_kodi_version,
     url_for,
 )
-from lib.utils.general_utils import (
-    get_tmdb_movie_data,
-    get_tmdb_tv_data,
+from lib.utils.utils import (
+    get_movie_data,
+    get_tv_data,
     set_video_info,
     set_video_infotag,
     tmdb_get,
@@ -74,11 +74,11 @@ def tmdb_search(mode, genre_id, page, func, plugin):
         if page == 1:
             text = Keyboard(id=30241)
             if text:
-                pickle_db.set_search_string("text", text)
+                get_db().set_search_string("text", text)
             else:
                 return
         else:
-            text = pickle_db.get_search_string("text")
+            text = get_db().get_search_string("text")
         return Search().multi(str(text), page=page)
     elif mode == "movie":
         if genre_id != -1:
@@ -128,29 +128,25 @@ def tmdb_show_items(res, plugin, mode):
 
     if mode == "movie":
         title = res.title
-        label_title = title
         release_date = res.release_date
-        imdb_id, tvdb_id, duration = get_tmdb_movie_data(tmdb_id)
+        imdb_id, tvdb_id, duration = get_movie_data(tmdb_id)
     elif mode == "tv":
         title = res.name
-        label_title = title
-        imdb_id, tvdb_id = get_tmdb_tv_data(tmdb_id)
+        imdb_id, tvdb_id = get_tv_data(tmdb_id)
         release_date = res.get("first_air_date", "")
     elif mode == "multi":
         if "name" in res:
             title = res.name
         elif "title" in res:
             title = res.title
-        
         if media_type == "movie":
             release_date = res.release_date
-            imdb_id, tvdb_id, duration = get_tmdb_movie_data(tmdb_id)
-            label_title = f"[B][MOVIE][/B]- {title}"
+            imdb_id, tvdb_id, duration = get_movie_data(tmdb_id)
+            title = f"[B][MOVIE][/B]- {title}"
         elif media_type == "tv":
             release_date = res.get("first_air_date", "")
-            imdb_id, tvdb_id = get_tmdb_tv_data(tmdb_id)
-            label_title = f"[B][TV][/B]- {title}"
-            
+            imdb_id, tvdb_id = get_tv_data(tmdb_id)
+            title = f"[B][TV][/B]- {title}"
 
     poster_path = res.get("poster_path", "")
     if poster_path:
@@ -163,7 +159,7 @@ def tmdb_show_items(res, plugin, mode):
     overview = res.get("overview", "")
     ids = f"{tmdb_id}, {tvdb_id}, {imdb_id}"
 
-    list_item = ListItem(label=label_title)
+    list_item = ListItem(label=title)
 
     if get_kodi_version() >= 20:
         set_video_infotag(

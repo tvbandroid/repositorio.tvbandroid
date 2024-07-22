@@ -22,7 +22,7 @@ class Burst:
 
     def parse_response(self, res):
         results = []
-        for _, r in res:
+        for p, r in res:
             results.append(
                 {
                     "title":r.title,
@@ -32,6 +32,9 @@ class Burst:
                     "size": r.size,
                     "seeders": r.seeders,
                     "peers": r.peers,
+                    "debridType": "",
+                    "debridCached": False,
+                    "debridPack": False,
                 }
             )
         return results

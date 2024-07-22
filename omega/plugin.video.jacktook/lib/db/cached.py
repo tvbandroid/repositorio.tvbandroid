@@ -23,7 +23,6 @@ ADDON_ID = xbmcaddon.Addon().getAddonInfo("id")
 
 if not PY3:
     ADDON_DATA = ADDON_DATA.decode("utf-8")
-    
 if not os.path.exists(ADDON_DATA):
     os.makedirs(ADDON_DATA)
 
@@ -242,7 +241,3 @@ def cached(expiry_time, ignore_self=False, identifier="", cache_type=Cache):
 # noinspection PyTypeChecker
 def memory_cached(expiry_time, instance_method=False, identifier=""):
     return cached(expiry_time, instance_method, identifier, MemoryCache)
-
-
-
-cache = Cache()

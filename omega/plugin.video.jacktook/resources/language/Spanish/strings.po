@@ -16,12 +16,12 @@ msgstr ""
 
 # Settings
 msgctxt "#30000"
-msgid "Torrents"
-msgstr "Torrents"
+msgid "Players"
+msgstr "Players"
 
 msgctxt "#30001"
-msgid "Torrent Clients:"
-msgstr "Clientes Torrents"
+msgid "Clients:"
+msgstr "Clientes"
 
 msgctxt "#30002"
 msgid "Client"
@@ -108,8 +108,8 @@ msgid "Cache expiration hours"
 msgstr "Expiracion de Cache"
 
 msgctxt "#30106"
-msgid "Clear all cache"
-msgstr "Borrar toda la cache"
+msgid "Clear cache"
+msgstr "Borrar la cache"
 
 msgctxt "#30107"
 msgid "Enable cache"
@@ -158,6 +158,14 @@ msgstr "Necesitas configuar Prowlarr primero"
 msgctxt "#30224"
 msgid "Prowlarr API key is invalid"
 msgstr "API de Prowlarr incorrecta"
+
+msgctxt "#30225"
+msgid "You need to configure Elhosted/KnighCrawlerr first"
+msgstr ""
+
+msgctxt "#30226"
+msgid "You need to configure Plex first"
+msgstr "Necesitas configuar Plex primero"
 
 msgctxt "#30227"
 msgid "You need to configure Torrentio first"

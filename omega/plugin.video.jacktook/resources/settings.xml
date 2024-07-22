@@ -2,17 +2,19 @@
 <settings>
     <category label="30000">
         <setting label="30001" type="lsep"/>
-        <setting id="torrent_client" type="labelenum" label="30002" values="All|Jacktorr|Torrest|Debrid|Elementum" default="Jacktorr"/>
+        <setting id="client_player" type="labelenum" label="30002" values="Jacktorr|Torrest|Elementum|Debrid|Plex" default="Jacktorr"/>
         <setting label="Playback" type="lsep"/>
         <setting id="auto_play" type="bool" label="Auto Play" default="false"/>
         <setting label="Cache" type="lsep"/>
         <setting id="cache_enabled" type="bool" label="30107" default="true"/>
         <setting id="cache_expiration" type="slider" label="30105" option="int" range="1,1,30" default="24"/>
         <setting type="action" label="30106" action="RunPlugin(plugin://plugin.video.jacktook/clear_cached_all)" />
-        <setting type="action" label="30104" action="RunPlugin(plugin://plugin.video.jacktook/clear_cached_tmdb)"/>
+        <setting label="Update" type="lsep"/>
+        <setting type="action" label="Update addon" action="RunPlugin(plugin://plugin.video.jacktook/addon_update)"/>
+        <setting id="clear_cache_update" type="bool" label="Clear cache when update" default="true"/>
     </category>
     <category label="30020">
-        <setting id="indexer" type="labelenum" label="30021" values="Jackett|Prowlarr|Torrentio|Elfhosted|Burst" default="Torrentio"/>
+        <setting id="indexer" type="labelenum" label="30021" values="Jackett|Prowlarr|Torrentio|Elfhosted|Burst|Plex|Zilean" default="Torrentio"/>
         <setting label="Torrentio Configuration" type="lsep"/>
         <setting id="torrentio_host" type="text" label="30025" default=""/>
         <setting id="torrentio_desc_length" type="number" label="30026" default="100"/>
@@ -24,6 +26,9 @@
         <setting id="elfhosted_desc_length" type="number" label="30026" default="100"/>
         <setting id="elfhosted_results_per_page" type="number" label="30029" default="25"/>
         <setting id="elfhosted_sort_by" type="labelenum" label="30028" values="Size|Cached|Quality" default="Seeds"/>
+        <setting label="Zilean Configuration" type="lsep"/>
+        <setting id="zilean_host" type="text" label="Zilean Host" default=""/>
+        <setting id="zilean_timeout" type="number" label="Zilean Timeout" default="5"/>
         <setting label="30022" type="lsep"/>
         <setting id="jackett_host" type="text" label="30025" default=""/>
         <setting id="jackett_apikey" type="text" label="30023" default=""/>
@@ -51,8 +56,26 @@
         <setting id="premiumize_enabled" type="bool" label="Enabled" default="false"/>
         <setting id="premiumize_token" type="text" label="Token:" default=""/>
         <setting type="action" label="Authorize" action="RunPlugin(plugin://plugin.video.jacktook/pm_auth)" />
+        <setting label="TorBox Configuration" type="lsep"/>
+        <setting id="torbox_enabled" type="bool" label="Enabled" default="false"/>
+        <setting id="torbox_token" type="text" label="Token:" default=""/>
         <setting label="" type="lsep"/>
         <setting id="show_uncached" type="bool" label="Show uncached torrents" default="true"/>
+    </category>
+    <category label="Plex">
+        <setting label="Plex Configuration" type="lsep"/>
+        <setting type="text" label="Login to your Plextv account to get your servers" enable="false" visible="true" />
+        <setting type="action" label="Login" action="RunPlugin(plugin://plugin.video.jacktook/plex_auth)" />
+        <setting id="plex_user" type="text" label="User" visible="true" default=""/>
+        <setting id="plex_token" type="text" label="Plex Token" visible="true" default=""/> 
+        <setting type="text" label="Select a server after login" enable="false" visible="true" />
+        <setting type="action" label="Select Server" action="RunPlugin(plugin://plugin.video.jacktook/plex_validate)" />
+        <setting type="action" label="Logout" action="RunPlugin(plugin://plugin.video.jacktook/plex_logout)" />
+        <setting label="Server Configuration" type="lsep"/>
+        <setting id="plex_server_name" type="text" label="Server Name" default=""/>
+        <setting id="plex_discovery_url" type="text" label="Server Discovery URL"  default=""/>
+        <setting id="plex_streaming_url" type="text" label="Server Streaming URL" default=""/>
+        <setting id="plex_server_token" type="text" label="Server Token" default=""/>
     </category>
     <category label="30100">
         <setting label="30102" type="lsep"/>

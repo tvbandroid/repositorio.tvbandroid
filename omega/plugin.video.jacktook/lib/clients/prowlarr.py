@@ -1,7 +1,7 @@
 import json
 import requests
-from lib.utils.kodi import get_prowlarr_timeout, notify, translation
-
+from lib.utils.kodi_utils import notification, translation
+from lib.utils.settings import get_prowlarr_timeout
 
 class Prowlarr:
     def __init__(self, host, apikey, notification) -> None:
@@ -41,16 +41,13 @@ class Prowlarr:
                 url = url + indexers_ids
             res = requests.get(url, timeout=get_prowlarr_timeout(), headers=headers)
             if res.status_code != 200:
-                notify(f"{translation(30230)} {res.status_code}")
+                notification(f"{translation(30230)} {res.status_code}")
                 return
             res = json.loads(res.text)
             for r in res:
                 r.update(
                     {
-                        "quality_title": "",
-                        "debridType": "",
-                        "debridCached": False,
-                        "debridPack": False,
+                        "qualityTitle": "",
                     }
                 )
             return res

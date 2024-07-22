@@ -1,7 +1,7 @@
 import requests
-from lib.utils.kodi import get_jackett_timeout, notify, translation, log
+from lib.utils.kodi_utils import notification, translation
 from lib import xmltodict
-
+from lib.utils.settings import get_jackett_timeout
 
 class Jackett:
     def __init__(self, host, apikey, notification) -> None:
@@ -19,7 +19,7 @@ class Jackett:
                 url = f"{self.host}/api/v2.0/indexers/all/results/torznab/api?apikey={self.apikey}&t=search&q={query}"
             res = requests.get(url, timeout=get_jackett_timeout())
             if res.status_code != 200:
-                notify(f"{translation(30229)} ({res.status_code})")
+                notification(f"{translation(30229)} ({res.status_code})")
                 return
             return self.parse_response(res)
         except Exception as e:
@@ -41,7 +41,7 @@ def extract_result(results, item):
     }
     results.append(
         {
-            "quality_title": "",
+            "qualityTitle": "",
             "title": item.get("title", ""),
             "indexer": item.get("jackettindexer", {}).get("#text", ""),
             "publishDate": item.get("pubDate", ""),
@@ -52,8 +52,5 @@ def extract_result(results, item):
             "seeders": attributes.get("seeders", ""),
             "peers": attributes.get("peers", ""),
             "infoHash": attributes.get("infohash", ""),
-            "debridType": "",
-            "debridCached": False,
-            "debridPack": False,
         }
     )

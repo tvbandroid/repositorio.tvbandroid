@@ -5,5 +5,11 @@ fanart="https://tvbandroid.github.io/tvband/wizard/wizardFI/Farfus.jpg"
 adult="no"
 description="[COLOR azure][B]TVBAN[/COLOR] [COLOR moccasin]AMILLANS[/B][/COLOR] para [COLOR teal][B]KODI: 21 Omega[/B][/COLOR]"
 
+name="[B][COLOR yellowgreen]ArcticF TVban Amillans [COLOR khaki]v1.5[/COLOR][/B]"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.0/P.ArcticF.AmillansAg21.zip"
+icon="https://tvbandroid.github.io/tvband/wizard/wizardFI/iartic.jpg"
+fanart="https://tvbandroid.github.io/tvband/wizard/wizardFI/Farfus.jpg"
+adult="no"
+description="[COLOR azure][B]TVBAN[/COLOR] [COLOR moccasin]AMILLANS[/B][/COLOR] para [COLOR teal][B]KODI: 21 Omega[/B][/COLOR]"
 
 

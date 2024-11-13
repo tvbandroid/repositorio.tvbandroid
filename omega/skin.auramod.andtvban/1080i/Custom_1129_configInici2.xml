@@ -63,7 +63,7 @@
                         </control>	
                        <control type="button" id="9003" description="Personalizar Menu de Incio">
                             <include>Dialog_Standard_ListButton</include>
-                            <label align="center">Continuar</label>
+                            <label align="center">[COLOR cyan]Continuar[/COLOR]</label>
                             <onclick condition="String.IsEmpty(Window(Home).Property(RunWizard))">ReloadSkin()</onclick>
                             <onclick condition="!String.IsEmpty(Window(Home).Property(RunWizard))">Close</onclick>
                             <onclick condition="!String.IsEmpty(Window(Home).Property(RunWizard))">ReplaceWindow(1142)</onclick>

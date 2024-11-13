@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<window>
-	<defaultcontrol always="true">50</defaultcontrol>
-	<views>50</views>
-	<menucontrol>9000</menucontrol>
-	<include>View_ViewIDs</include>
-	<controls>
-		<include>Global_Background</include>
-		<control type="group">
-			<include>View_List_Default</include>
-			<include content="Defs_PosterBack">
-                 <param name="pad" value="-10" />
-             </include>
-            <include content="Object_BigPoster">
-                <param name="discart" value="false" />
-            </include>
-		 </control>
+<!-- Foundation -->
+<window id="6">
+    <defaultcontrol always="true">50</defaultcontrol>
+    <menucontrol>300</menucontrol>
+
+    <include>View_ViewIDs</include>
+<!--    <onload condition="System.HasAddon(script.tv.show.next.aired)">RunScript(script.tv.show.next.aired,backend=True)</onload> -->
+  <onunload>ClearProperty(TMDBHelper.WidgetContainer)</onunload>
+
+    <controls>
+
+        <!-- Standard Furniture -->
+        <include condition="Skin.HasSetting(SkinHelper.EnableExtraFanart)">fanart_multi</include>
+        <include condition="Skin.HasSetting(SkinHelper.EnableExtraFanart)">fanart_multi_container</include>
+        <include condition="Skin.HasSetting(DisableNetflixView)">Global_Background</include>
+        <include>Object_PlotOverlay</include>
+        <include>View_Library</include>
+        <include>Topbar</include> 
+ 
+        <!-- Hidden Buttons -->
         <include>Defs_Options_StandardButtons</include>
         <control type="button" id="8">
             <label>137</label>
@@ -34,6 +38,12 @@
         <control type="button" id="20">
             <description>Library</description>
             <label>653</label>
+            <include>Defs_Hidden_Button</include>
+        </control>
+        <control type="button" id="6005">
+            <description>Extra fanart</description>
+            <label>$VAR[Label_ExtraFanart]</label>
+            <onclick>Skin.ToggleSetting(SkinHelper.EnableExtraFanart)</onclick>
             <include>Defs_Hidden_Button</include>
         </control>
     </controls>

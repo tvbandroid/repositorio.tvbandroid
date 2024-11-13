@@ -812,49 +812,6 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.cristalazul" name="[B][/B][COLOR aqua]CRISTAL AZUL 3.0.9[/COLOR]" version="3.0.9" provider-name="PICAPAU, LOURDES, SUPERTOPO, LUISMA, GEORGE">
-    <requires>
-        <import addon="script.module.simplecache"/>
-        <import addon="script.module.six"/>
-        <import addon="script.module.kodi-six"/>
-        <import addon="script.module.requests"/>
-        <import addon="script.module.youtube.dl" optional="true" />
-        <import addon="plugin.video.youtube" />
-		<import addon="plugin.video.duffyou" optional="true" />
-        <import addon="script.module.dateutil" optional="true" />
-        <import addon="script.module.resolveurl" optional="true" />
-        <import addon="script.module.cloudscraper" optional="true" />
-        <import addon="script.module.inputstreamhelper" />
-        <import addon="script.module.pycryptodome" optional="true" />
-    </requires>
-    <extension point="xbmc.python.pluginsource" library="default.py">
-        <provides>video</provides>
-    </extension>
-
-    <extension point="xbmc.service" library="autoexec.py" start="autoexec" />
-
-    <extension point="xbmc.addon.repository" name="Mi repositorio">
-       <dir minversion="18.9.0">
-            <info compressed="false">https://raw.githubusercontent.com/picapaujulen/repositorio/master/Repositorio/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/picapaujulen/repositorio/master/Repositorio/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/picapaujulen/repositorio/master/Repositorio/</datadir>
-       </dir>
-    </extension>
-
-
-    <extension point="xbmc.addon.metadata">
-        <summary>creado por picapau, lourdes, supertopo y luisma</summary>
-        <description>ESTE ADDON NO CONTIENE ENLACES PROPIOS,SON RECOPILACIONES DE LA RED, SOLO SE FACILITA EL ACESSO A ESAS WEBS, ESTAS WEBS SON LAS RESPONSABLES DE LOS CONTENIDOS
-        </description>
-		<disclaimer>Este es un software [COLOR red][B]gratuito[/B][/COLOR][CR][COLOR red][B]Pero no se permite[/B][/COLOR] su distribuición preinstalada en ningún tipo de dispositivo ni tampoco su inclusión total o parcial en cualquier paquete de software y/o hardware por el que el usuario final deba [COLOR red][B]pagar o hacer una donación[/B][/COLOR], por su adquisición, por su uso o por recibir asistencia.[CR]Si cree que alguna de estas normas no se está cumpliendo póngase en contacto con nosotros.</disclaimer>
-        <platform>all</platform>
-        <assets>
-            <icon>icon.gif</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-    </extension>
-</addon>
-
 <addon id="plugin.video.doqmental"
 	name="DOQMENTAL"
 	version="1.1"
@@ -1002,94 +959,6 @@
       <fanart>fanart.jpg</fanart>
     </assets>
   </extension>
-</addon>
-
-<addon id="plugin.video.kodispaintv" name="[COLOR red]Kodi[/COLOR][COLOR yellow]Spain[/COLOR][COLOR red]Tv[/COLOR]" version="3.4.0" provider-name="joheos11">
-	<requires>
-		<import addon="script.module.six" />
-		<import addon="script.module.kodi-six" />
-		<import addon="script.module.requests" />
-		<import addon="script.module.dateutil" />
-		<import addon="script.module.websocket" />
-		<import addon="script.module.inputstreamhelper" optional="true"/>
-		<import addon="script.module.youtube.dl" optional="true"/>
-		<import addon="plugin.video.youtube" optional="true" />
-		<import addon="plugin.video.duffyou" optional="true" />
-		<import addon="script.module.resolveurl" optional="true"/>
-		<import addon="script.module.urlresolver" optional="true"/>
-		<import addon="script.module.cloudscraper" optional="true"/>
-		<import addon="script.module.slproxy" optional="true"/>
-	</requires>
-	<extension point="xbmc.python.pluginsource" library="default.py">
-		<provides>video</provides>
-	</extension>
-
-	<extension point="xbmc.addon.repository" name="KodiSpain repository">
-		<dir>
-			<info compressed="false">https://raw.githubusercontent.com/joheos11/repository.kodispain/master/addons.xml</info>
-			<checksum>https://raw.githubusercontent.com/joheos11/repository.kodispain/master/addons.xml.md5</checksum>
-			<datadir zip="true">https://raw.githubusercontent.com/joheos11/repository.kodispain/master/</datadir>
-		</dir>
-    </extension>
-
-	<extension point="xbmc.addon.metadata">
-		<summary>Canales de Televisión, deportes y más...</summary>
-		<description>
-Puedes seguirme en https://t.me/kodispain_1 y http://konectas.es
-
-AVISO LEGAL:
-
-Este complemento no aloja ningun contenido mostrado.
-Todo el contenido se encuentra libremente en internet.
-No se acepta ninguna responsabilidad por el uso de este addon.
-
-¡Disfruta!
-		</description>
-		<platform>all</platform>
-		<assets>
-			<icon>icon.png</icon>
-			<fanart>fanart.jpg</fanart>
-			<screenshot>resources/media/screenshoot-1.jpg</screenshot>
-			<screenshot>resources/media/screenshoot-2.jpg</screenshot>
-			<screenshot>resources/media/screenshoot-3.jpg</screenshot>
-			<screenshot>resources/media/screenshoot-4.jpg</screenshot>
-		</assets>
-		<news>Primera versión basada en LSP Mod by Someone Like You</news>
-	</extension>
-</addon>
-
-<addon	id="plugin.video.KODIvertiDO" version="1.85" name="[B][COLOR white]KODI[COLOR gold]verti[COLOR yellow]DO[/COLOR][/B]" provider-name="equipo KODIvertiDO TEAM">
-<requires>
-    <import addon="script.module.requests" optional="true" />
-    <import addon="script.module.resolveurl" optional="true" />
-	<import addon="script.module.six" optional="true" />
-  </requires>
-	<extension point="xbmc.python.pluginsource" library="default.py">
-		<provides>video</provides>
-	</extension>
-   <extension point="xbmc.addon.repository" name="kodivertido">
-        <info>https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml</info>
-        <checksum>https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml.md5</checksum>
-        <datadir zip="true">https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/</datadir>
-    </extension>
-	<extension point="xbmc.addon.metadata">
-                <platform>all</platform>
-		<summary lang="en">KovertidoTeam</summary>
-		<summary lang="da">KovertidoTeam</summary>
-		<description lang="en">
-[COLOR white]Complemento gratuito que no aloja ningun contenido.               Todo el contenido se encuentra en internet.No se acepta ninguna responsabilidad por el uso de este addon.[/COLOR]</description>
-		<website></website>
-		<license>GPL 2.0</license>
-		<platform>all</platform>
-<assets>
-        <icon>icon.gif</icon>
-  <screenshot>resources/screenshots/screenshot1.gif</screenshot>
-  <screenshot>resources/screenshots/screenshot3.gif</screenshot>
-  <screenshot>resources/screenshots/screenshot2.jpg</screenshot>
-        <fanart>fanart.jpg</fanart>
-</assets>
-		<language>es</language>
-	</extension>
 </addon>
 
 <addon id="plugin.video.moestv" name="Moe's TV" version="0.2.1" provider-name="La Taberna">
@@ -1762,6 +1631,25 @@ provider-name="jurialmunkey">
     </extension>
 </addon>
 
+<addon id="repository.estupalant" name="Repositorio Palantir" version="1.0.1" provider-name="The Lords Of Flix">
+    <extension point="xbmc.addon.repository" name="Palantir 3 y Skin">
+    	<dir minversion="19.0.0">
+    	    <info compressed="false">https://palantir.5g.in/Repo/addons.xml</info>
+        	<checksum>https://palantir.5g.in/Repo/addons.xml.md5</checksum>
+        	<datadir zip="true">https://palantir.5g.in/Repo/</datadir>
+	    </dir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary></summary>
+   		<description lang="en">Repositorio oficial de Palantir y Estuary Palantir</description>
+		<platform>all</platform>
+		<assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+	</extension>
+</addon>
+
 <addon id="repository.github" name="GitHub Add-on repository" provider-name="i96751414" version="0.0.8">
     <requires>
         <!--<import addon="xbmc.python" version="3.0.0"/>-->
@@ -1856,45 +1744,6 @@ provider-name="jurialmunkey">
     </extension>
 </addon>
 
-<addon id="repository.KODIvertiDO_TEAM" name="[COLOR gold]REpOsiTOriO[/COLOR][COLOR lime] KODIvertiDO[COLOR gold] TEAM[/COLOR]" version="3.5.0" provider-name="KODIvertiDO">
-    <extension point="xbmc.addon.repository" name="KODIvertiDO_TEAM repo oficial del addon kodivertidoTeam TvCine">
-    	<dir minversion="18.9.0">
-		    <info compressed="false">https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml</info>
-		    <checksum>https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml.md5</checksum>
-		    <datadir zip="true">https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo</datadir>
-			<hashes>false</hashes>
-	    </dir>
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary>[COLOR gold]REpOsiTOriO[/COLOR][COLOR lime] KODIvertiDO[/COLOR][COLOR gold] TEAM[/COLOR] [COLOR green] Matrix[/COLOR]</summary>
-   		<description lang="en">[COLOR gold]Instala los Addons de KODIvertiDO_TEAM.[/COLOR]</description>
-		<platform>all</platform>
-		<assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-	</extension>
-</addon>
-
-<addon id="repository.luar" name="[COLOR lime]Repositorio Luar[/COLOR]" version="2.0.0" provider-name="The Dreamers">
-    <extension point="xbmc.addon.repository" name="Luar official Repo">
-    	<dir minversion="18.9.0">
-		    <info compressed="false">https://raw.githubusercontent.com/Masterwine/Luar/master/repor/addons.xml</info>
-		    <checksum>https://raw.githubusercontent.com/Masterwine/Luar/master/repor/addons.xml.md5</checksum>
-		    <datadir zip="true">https://raw.githubusercontent.com/Masterwine/Luar/master/repor/</datadir>
-	    </dir>
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary></summary>
-   		<description lang="en">[COLOR gold]Instala Luar[/COLOR]</description>
-		<platform>all</platform>
-		<assets>
-            <icon>icon.gif</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-	</extension>
-</addon>
-
 <addon id="repository.marcelveldt" version="1.0.3" name="Marcelveldt's BETA repository" provider-name="marcelveldt, finkleandeinhorn">
 	<requires>
 		<import addon="xbmc.addon" version="12.0.0"/>
@@ -1924,25 +1773,6 @@ provider-name="jurialmunkey">
 			<icon>icon.png</icon>
 			<fanart>fanart.jpg</fanart>
 		</assets>
-	</extension>
-</addon>
-
-<addon id="repository.palantir3" name="[COLOR gold]Repositorio Palantir 3[/COLOR]" version="2.0.3" provider-name="TierraMedia">
-    <extension point="xbmc.addon.repository" name="Palantir 3 official Repo">
-    	<dir minversion="18.9.0">
-    	    <info compressed="false">https://raw.githubusercontent.com/Palantiraddon/Repo/master/Palantir/addons.xml</info>
-		    <checksum>https://raw.githubusercontent.com/Palantiraddon/Repo/master/Palantir/addons.xml.md5</checksum>
-		    <datadir zip="true">https://raw.githubusercontent.com/Palantiraddon/repo/master/Palantir/</datadir>
-	    </dir>
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary></summary>
-   		<description lang="en">[COLOR gold]Instala Palantir 3[/COLOR]</description>
-		<platform>all</platform>
-		<assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.gif</fanart>
-        </assets>
 	</extension>
 </addon>
 
@@ -2049,34 +1879,6 @@ provider-name="jurialmunkey">
 		<description lang="en">White Weather Icons</description>
 		<platform>all</platform>
 	</extension>
-</addon>
-
-<addon id="script.luar"
-  version="0.9.10"
-  name="Luar"
-  provider-name="The Dreamers">
-  <requires>
-    <import addon="script.module.six" version="1.11.0"/>
-    <import addon="script.module.requests"/>
-    <import addon="resource.language.es_es"/>
-    <import addon="script.module.pycryptodome" optional="true"/>
-  </requires>
-  <extension point="xbmc.python.pluginsource" library="default.py">
-    <provides>executable</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <platform>all</platform>
-    <summary lang="es">Script instalador de complementos para Kodi.</summary>
-    <description lang="es">Selecciona, instala y disfruta.</description>
-    <disclaimer>Este es un software [COLOR red][B]gratuito[/B][/COLOR][CR]No obstante, [COLOR red][B]no se permite[/B][/COLOR] su distribuición preinstalada en ningún tipo de dispositivo ni tampoco su inclusión total o parcial en cualquier paquete de software y/o hardware por el que el usuario final deba [COLOR red][B]pagar o hacer una donación[/B][/COLOR], por su adquisición, uso o asistencia.[CR]Si cree que alguna de estas normas no se está cumpliendo póngase en contacto con nosotros.</disclaimer>
-    <assets>
-      <icon>icon.gif</icon>
-      <fanart>fanart.jpg</fanart>
-      <screenshot>resources/screenshot000.jpg</screenshot>
-      <screenshot>resources/screenshot001.jpg</screenshot>
-      <screenshot>resources/screenshot002.jpg</screenshot>
-    </assets>
-  </extension>
 </addon>
 
 <addon id="script.module.horus" name="Horus" version="1.1.9" provider-name="Caperucitaferoz">
@@ -2222,7 +2024,7 @@ provider-name="jurialmunkey">
     </extension>
 </addon>
 
-<addon id="skin.auramod.andtvban" version="1.1.11" name="[COLOR azure]Auramod[/COLOR][COLOR turquoise]TVBAN[/COLOR]" provider-name="Auramod, [COLOR azure]andTVban, JoseAnd[/COLOR]">
+<addon id="skin.auramod.andtvban" version="2.0.2" name="[COLOR azure]Auramod[/COLOR][COLOR turquoise]TVBAN[/COLOR]" provider-name="Auramod, [COLOR azure]andTVban, JoseAnd[/COLOR]">
     <requires>
         <import addon="xbmc.gui" version="5.17.0"/>
         <import addon="script.skin.helper.service" version="1.1.24"/>

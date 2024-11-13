@@ -8716,7 +8716,7 @@
             <thumb>special://skin/extras/icons/addons.png</thumb>            
           </item>
           <item>
-		    <label>Builds</label>
+		    <label>Builds - Parches</label>
             <onclick>ActivateWindow(Programs,"plugin://plugin.program.tvbanwizard/?mode=builds",return)</onclick>
             <thumb>special://skin/extras/icons/andtvbuil.png</thumb>
           </item>
@@ -8732,7 +8732,7 @@
           </item>		  
           <item>
            <label>Instalador Luar</label>
-            <onclick>ActivateWindow(Programs,"plugin://script.luar",return)</onclick>
+            <onclick>ActivateWindow(10001,&quot;plugin://script.luar/&quot;,return)</onclick>
             <thumb>special://skin/extras/icons/luarr.png</thumb> 
           </item>
           <!-- <item>

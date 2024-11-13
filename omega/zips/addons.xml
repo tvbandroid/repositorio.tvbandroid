@@ -961,6 +961,40 @@
   </extension>
 </addon>
 
+<addon	id="plugin.video.KODIvertiDO" version="1.85" name="[B][COLOR white]KODI[COLOR gold]verti[COLOR yellow]DO[/COLOR][/B]" provider-name="equipo KODIvertiDO TEAM">
+<requires>
+    <import addon="script.module.requests" optional="true" />
+    <import addon="script.module.resolveurl" optional="true" />
+	<import addon="script.module.six" optional="true" />
+  </requires>
+	<extension point="xbmc.python.pluginsource" library="default.py">
+		<provides>video</provides>
+	</extension>
+   <extension point="xbmc.addon.repository" name="kodivertido">
+        <info>https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml</info>
+        <checksum>https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml.md5</checksum>
+        <datadir zip="true">https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/</datadir>
+    </extension>
+	<extension point="xbmc.addon.metadata">
+                <platform>all</platform>
+		<summary lang="en">KovertidoTeam</summary>
+		<summary lang="da">KovertidoTeam</summary>
+		<description lang="en">
+[COLOR white]Complemento gratuito que no aloja ningun contenido.               Todo el contenido se encuentra en internet.No se acepta ninguna responsabilidad por el uso de este addon.[/COLOR]</description>
+		<website></website>
+		<license>GPL 2.0</license>
+		<platform>all</platform>
+<assets>
+        <icon>icon.gif</icon>
+  <screenshot>resources/screenshots/screenshot1.gif</screenshot>
+  <screenshot>resources/screenshots/screenshot3.gif</screenshot>
+  <screenshot>resources/screenshots/screenshot2.jpg</screenshot>
+        <fanart>fanart.jpg</fanart>
+</assets>
+		<language>es</language>
+	</extension>
+</addon>
+
 <addon id="plugin.video.moestv" name="Moe's TV" version="0.2.1" provider-name="La Taberna">
   <requires>
     <import addon="script.module.six" version="1.11.0"/>
@@ -998,6 +1032,44 @@
       * Otras reparaciones menores
       [CR]- Versión inicial 0.0.7
     </news>
+  </extension>
+</addon>
+
+<addon id="plugin.video.palantir3" name="[COLOR gold]Palantir 3[/COLOR]" version="3.2.0" provider-name="The Lords Of Flix">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.inputstreamhelper" version="0.5.0"/>
+    <import addon="script.module.pycryptodome" version="3.4.3"/>
+    <import addon="script.module.requests"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.python.library" library="default.py"/>
+
+  <extension point="kodi.context.item">
+      <menu id="kodi.core.main">
+        <item library="context.py">
+          <label>[COLOR gold]Menú Palantir 3...[/COLOR]</label>
+          <visible>String.Contains(ListItem.FolderPath,palantir3)</visible>
+        </item>
+      </menu>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <description>Visualiza el contenido de la nube, series, películas.[CR][COLOR red]Todo el contenido disponible en este Addon esta sacado de servidores gratuitos, disponible en la red para todos los usuarios.[/COLOR]</description>
+    <disclaimer>Este es un software [COLOR red][B]gratuito[/B][/COLOR][CR][COLOR red][B]Pero no se permite[/B][/COLOR] su distribuición preinstalada en ningún tipo de dispositivo ni tampoco su inclusión total o parcial en cualquier paquete de software y/o hardware por el que el usuario final deba [COLOR red][B]pagar o hacer una donación[/B][/COLOR], por su adquisición, por su uso o por recibir asistencia.[CR]Si cree que alguna de estas normas no se está cumpliendo póngase en contacto con nosotros.</disclaimer>
+    <platform>all</platform>
+    <assets>
+        <icon>icon.png</icon>
+        <fanart>fanart.gif</fanart>
+        <screenshot>resources/media/Captura1.png</screenshot>
+        <screenshot>resources/media/Captura2.png</screenshot>
+        <screenshot>resources/media/Captura3.png</screenshot>
+        <screenshot>resources/media/Captura4.png</screenshot>
+    </assets>
+    <forum>https://t.me/addon_palantir</forum>
   </extension>
 </addon>
 
@@ -1742,6 +1814,26 @@ provider-name="jurialmunkey">
             <icon>icon.png</icon>
         </assets>
     </extension>
+</addon>
+
+<addon id="repository.KODIvertiDO_TEAM" name="[COLOR gold]REpOsiTOriO[/COLOR][COLOR lime] KODIvertiDO[COLOR gold] TEAM[/COLOR]" version="3.5.0" provider-name="KODIvertiDO">
+    <extension point="xbmc.addon.repository" name="KODIvertiDO_TEAM repo oficial del addon kodivertidoTeam TvCine">
+    	<dir minversion="18.9.0">
+		    <info compressed="false">https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml</info>
+		    <checksum>https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo/addons.xml.md5</checksum>
+		    <datadir zip="true">https://raw.githubusercontent.com/mendelux/KODIvertiDO_TEAM/master/_repo</datadir>
+			<hashes>false</hashes>
+	    </dir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary>[COLOR gold]REpOsiTOriO[/COLOR][COLOR lime] KODIvertiDO[/COLOR][COLOR gold] TEAM[/COLOR] [COLOR green] Matrix[/COLOR]</summary>
+   		<description lang="en">[COLOR gold]Instala los Addons de KODIvertiDO_TEAM.[/COLOR]</description>
+		<platform>all</platform>
+		<assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+	</extension>
 </addon>
 
 <addon id="repository.marcelveldt" version="1.0.3" name="Marcelveldt's BETA repository" provider-name="marcelveldt, finkleandeinhorn">

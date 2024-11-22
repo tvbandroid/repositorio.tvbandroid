@@ -98,7 +98,7 @@ msgstr "Выбирать ссылку автоматически"
 
 msgctxt "#30025"
 msgid "Limit rates after initial buffering only"
-msgstr "Ограничить скорость после начала просмотра"
+msgstr "Ограничить скорость после начальной буферизации"
 
 msgctxt "#30026"
 msgid "Library path"
@@ -146,11 +146,7 @@ msgstr "Вид по умолчанию, Сезоны"
 
 msgctxt "#30037"
 msgid "Default view for Episodes"
-msgstr "Вид по умолчанию, Эпизоды"
-
-msgctxt "#30038"
-msgid "Prefer use of original title"
-msgstr "Предпочитать оригинальные названия"
+msgstr "Вид по умолчанию, Серии"
 
 msgctxt "#30039"
 msgid "TheMovieDB"
@@ -289,15 +285,15 @@ msgid "BitTorrent 7.5.0"
 msgstr ""
 
 msgctxt "#30078"
-msgid "BitTorrent 7.4.3"
+msgid "BitTorrent 7.9.9"
 msgstr ""
 
 msgctxt "#30079"
-msgid "µTorrent 3.4.9"
+msgid "µTorrent 3.5.5"
 msgstr ""
 
 msgctxt "#30080"
-msgid "µTorrent 3.2.0"
+msgid "µTorrent 3.6.0"
 msgstr ""
 
 msgctxt "#30081"
@@ -309,11 +305,11 @@ msgid "Transmission 2.92"
 msgstr ""
 
 msgctxt "#30083"
-msgid "Deluge 1.3.6.0"
+msgid "Deluge 1.3.6"
 msgstr ""
 
 msgctxt "#30084"
-msgid "Deluge 1.3.12.0"
+msgid "Deluge 2.1.1"
 msgstr ""
 
 msgctxt "#30085"
@@ -342,7 +338,7 @@ msgstr "Исходящие интерфейсы"
 
 msgctxt "#30092"
 msgid "Use fallback fanart if fanart wasn't found"
-msgstr "Использовать фанарт по умолчанию"
+msgstr "Использовать резервный фанарт, если фанарт не был найден"
 
 msgctxt "#30093"
 msgid "Disable notification sound"
@@ -416,6 +412,14 @@ msgstr "Проверка торрент-файлов..."
 msgctxt "#30118"
 msgid "Scraping trackers..."
 msgstr "Опрос трекеров..."
+
+msgctxt "#30119"
+msgid "ID of selected userlist for movies"
+msgstr "ID выбранного Мой Список, Фильмы"
+
+msgctxt "#30120"
+msgid "ID of selected userlist for shows"
+msgstr "ID выбранного Мой Список, Сериалы"
 
 msgctxt "#30141"
 msgid "Please support Elementum development by visiting[CR]https://elementum.surge.sh/donate/ or https://elementumorg.github.io/donate/"
@@ -580,7 +584,7 @@ msgstr "Новинки сериалов"
 
 msgctxt "#30238"
 msgid "Recent Episodes"
-msgstr "Новые эпизоды"
+msgstr "Новые серии"
 
 msgctxt "#30239"
 msgid "Providers"
@@ -728,7 +732,7 @@ msgstr "Показывать невышедшие сезоны"
 
 msgctxt "#30285"
 msgid "Show unaired episodes"
-msgstr "Показывать невышедшие эпизоды"
+msgstr "Показывать невышедшие серии"
 
 msgctxt "#30286"
 msgid "%s merged to library, do you want to rescan it?[CR]You can later use Kodi's 'Update library' feature instead."
@@ -976,7 +980,7 @@ msgstr "Синхронизировать Список просмотра из Tr
 
 msgctxt "#30365"
 msgid "Sync items from user lists into Kodi library"
-msgstr "Синхронизировать Мой Список из Trakt в библиотеку"
+msgstr "Синхронизировать Мои Списки из Trakt в библиотеку"
 
 msgctxt "#30366"
 msgid "Sync watched states from Trakt into Kodi library"
@@ -1160,11 +1164,11 @@ msgstr "Процент просмотра для отметки просмотр
 
 msgctxt "#30417"
 msgid "Use name of production company as Studio for shows"
-msgstr "Использовать имя продюсерской компании как имя студии для шоу"
+msgstr "Использовать имя продюсерской компании как имя студии для сериала"
 
 msgctxt "#30418"
-msgid "Show number of unwatched episodes in Shows/Seasons"
-msgstr "Показывать количество непросмотренных серий в Сериале/Сезоне"
+msgid "Calculate number of unwatched episodes in Shows/Seasons"
+msgstr "Вычислять количество непросмотренных серий в Сериале/Сезоне"
 
 msgctxt "#30421"
 msgid "Load torrents from torrents folder on startup"
@@ -1196,7 +1200,7 @@ msgstr "Цвет названия серии"
 
 msgctxt "#30428"
 msgid "Hide unaired episodes"
-msgstr "Скрыть невышедшие эпизоды"
+msgstr "Скрыть невышедшие серии"
 
 msgctxt "#30429"
 msgid "Sort shows in the list"
@@ -1383,7 +1387,7 @@ msgid "Select language"
 msgstr "Выбрать язык"
 
 msgctxt "#30477"
-msgid "Original"
+msgid "Original language"
 msgstr "Язык оригинала"
 
 msgctxt "#30478"
@@ -1440,7 +1444,7 @@ msgstr "Использовать fanart.tv для постеров/картин�
 
 msgctxt "#30492"
 msgid "Use Proxy for downloading .torrent files"
-msgstr "Использовать прокси для скачивания .torrent файлов"
+msgstr "Использовать прокси для качивания .torrent файлов"
 
 msgctxt "#30493"
 msgid "Use Proxy for trackers"
@@ -1455,8 +1459,8 @@ msgid "Use built-in DNS resolver"
 msgstr "Использовать встроенный DNS клиент"
 
 msgctxt "#30496"
-msgid "Turn off if you use Tor addresses, or you want to use DNS settings from OS"
-msgstr "Отключите, если используете адреса Tor или хотите использовать настройки DNS из ОС"
+msgid "Turn off if you use Tor addresses, or you want to use DNS settings [CR]from OS"
+msgstr "Отключите, если используете адреса Tor или хотите [CR]использовать настройки DNS из ОС"
 
 msgctxt "#30498"
 msgid "Reset this path to '/'"
@@ -1480,11 +1484,11 @@ msgstr "Использовать libtorrent.config для настроек дв�
 
 msgctxt "#30504"
 msgid "Located at USERDATA/plugin.video.elementum/libtorrent.config file[CR]Settings apply automatically. Visit https://libtorrent.org for info."
-msgstr "Находится в файле USERDATA/plugin.video.elementum/libtorrent.config[CR]Применяются автоматически. Смотри https://libtorrent.org"
+msgstr "Находится в USERDATA/plugin.video.elementum/libtorrent.config[CR]Применяются автоматически. Смотри https://libtorrent.org"
 
 msgctxt "#30505"
 msgid "Add episode number to the title"
-msgstr "Добавлять номер эпизода в название"
+msgstr "Добавлять номер серии в название"
 
 msgctxt "#30506"
 msgid "Enable libtorrent logging"
@@ -1550,10 +1554,6 @@ msgctxt "#30525"
 msgid "Automatically start downloading next episode"
 msgstr "Автоматически начинать загрузку следующей серии"
 
-msgctxt "#30526"
-msgid "Use english title as 'original' for Anime search"
-msgstr "Использовать английское название для поиска Аниме"
-
 msgctxt "#30527"
 msgid "Donate"
 msgstr "Пожертвовать"
@@ -1579,8 +1579,8 @@ msgid "Stop Downloading all files"
 msgstr "Остановить загрузку всех файлов"
 
 msgctxt "#30535"
-msgid "Continue playback from [COLOR gold][B]%s[/B][/COLOR]?"
-msgstr "Продолжить воспроизведение от [COLOR gold][B]%s[/B][/COLOR]?"
+msgid "Continue playback from [B]%s[/B]?"
+msgstr "Продолжить воспроизведение от [B]%s[/B]?"
 
 msgctxt "#30536"
 msgid "Skip IPv6 addresses resolving"
@@ -1779,8 +1779,8 @@ msgid "Enable library integration with Kodi"
 msgstr "Включить интеграцию с библиотекой Kodi"
 
 msgctxt "#30586"
-msgid "If disabled - Elementum will not get/insert items[CR]to Kodi library and skip[CR]watched management with Kodi."
-msgstr "Если выключено - Elementum не будет получать/добавлять[CR]в библиотеку Kodi и не будет управлять[CR]просмотренным в Kodi."
+msgid "If disabled - Elementum will not get/insert items to Kodi library [CR]and skip watched management with Kodi."
+msgstr "Если выключено - Elementum не будет получать/добавлять в [CR]библиотеку Kodi и не будет управлять просмотренным в Kodi."
 
 msgctxt "#30587"
 msgid "Show welcome message on start"
@@ -1824,7 +1824,7 @@ msgstr "Размер кеша, МБ"
 
 msgctxt "#30598"
 msgid "Enable caching if using File storage and have speed problems.[CR]Will use more memory, but can improve the speed."
-msgstr "Включайте кеширование если используете файлы[CR]и низкую скорость. Нужно больше памяти,[CR]но может улучшить скорость."
+msgstr "Включайте кеширование если используете файлы и низкую [CR]скорость. Нужно больше памяти, но может улучшить скорость."
 
 msgctxt "#30599"
 msgid "Enable Kodi library synchronization"
@@ -1860,7 +1860,7 @@ msgstr "Показывать статус просмотренного для ф
 
 msgctxt "#30607"
 msgid "Use earliest release date as basic for searching"
-msgstr "Использовать раннюю дату выпуска как базовую для поиска"
+msgstr "Использовать самую раннюю дату выпуска как базовую для поиска"
 
 msgctxt "#30608"
 msgid "Match found in your active torrents, play it?[CR]%s"
@@ -2084,7 +2084,7 @@ msgstr "Удалять оригинальные трекеры из торрен
 
 msgctxt "#30663"
 msgid "Show episodes on release day (w/o delay)"
-msgstr "Показывать эпизоды в день релиза (без задержки)"
+msgstr "Показывать серии в день релиза (без задержки)"
 
 msgctxt "#30664"
 msgid "Modify trackers in torrent"
@@ -2155,8 +2155,8 @@ msgid "Remove Elementum duplicates from library"
 msgstr "Удалить дубликаты Elementum из библиотеки"
 
 msgctxt "#30681"
-msgid "[B]Found duplicates in Kodi library:[/B][CR]Movies: [COLOR gold][B]%s[/B][/COLOR], Shows: [COLOR gold][B]%s[/B][/COLOR], Episodes: [COLOR gold][B]%s[/B][/COLOR][CR]Proceed?"
-msgstr "[B]Найдены дубликаты в библиотеке Kodi[/B][CR]Фильмы: [COLOR gold][B]%s[/B][/COLOR], Сериалы: [COLOR gold][B]%s[/B][/COLOR], Эпизоды: [COLOR gold][B]%s[/B][/COLOR][CR]Продолжить?"
+msgid "[B]Found duplicates in Kodi library:[/B][CR]Movies: [B]%s[/B], Shows: [B]%s[/B], Episodes: [B]%s[/B][CR]Proceed?"
+msgstr "[B]Найдены дубликаты в библиотеке Kodi[/B][CR]Фильмы: [B]%s[/B], Сериалы: [B]%s[/B], Серии: [B]%s[/B][CR]Продолжить?"
 
 msgctxt "#30682"
 msgid "No duplicates were found in Kodi library"
@@ -2168,7 +2168,7 @@ msgstr "Начинаем удаление дубликатов в библиот
 
 msgctxt "#30684"
 msgid "Removed Movies: %s, Shows: %s, Episodes: %s"
-msgstr "Удалено Фильмов: %s, Сериалов: %s, Эпизодов: %s"
+msgstr "Удалено Фильмов: %s, Сериалов: %s, Серий: %s"
 
 msgctxt "#30685"
 msgid "Remove movies from Elementum database"
@@ -2181,3 +2181,91 @@ msgstr "Удалить сериалы из базы Elementum"
 msgctxt "#30687"
 msgid "In Elementum library"
 msgstr "В библиотеке Elementum"
+
+msgctxt "#30688"
+msgid "Skip searching for installed Elementum repository"
+msgstr "Не спрашивать установку репозитория Elementum"
+
+msgctxt "#30689"
+msgid "Internal DNS client"
+msgstr "Встроенный DNS клиент"
+
+msgctxt "#30691"
+msgid "Hide watched"
+msgstr "Скрывать просмотренное"
+
+msgctxt "#30692"
+msgid "TMDB images quality (affects Kodi performance)"
+msgstr "Качество изображений TMDB (влияет на производительность Kodi)"
+
+msgctxt "#30693"
+msgid "Original"
+msgstr "Исходное"
+
+msgctxt "#30694"
+msgid "High"
+msgstr "Высокое"
+
+msgctxt "#30695"
+msgid "Medium"
+msgstr "Среднее"
+
+msgctxt "#30696"
+msgid "Low"
+msgstr "Низкое"
+
+msgctxt "#30697"
+msgid "Interface language"
+msgstr "Язык интерфейса"
+
+msgctxt "#30698"
+msgid "Kodi language"
+msgstr "Язык Kodi"
+
+msgctxt "#30699"
+msgid "Use earliest release date for progress and calendars"
+msgstr "Использовать самую раннюю дату выпуска для прогресса и календарей"
+
+msgctxt "#30700"
+msgid "Interface fallback language"
+msgstr "Вспомогательный язык интерфейса"
+
+msgctxt "#30701"
+msgid "English | en"
+msgstr "Английский | en"
+
+msgctxt "#30702"
+msgid "Reached daily limit for subtitles downloads"
+msgstr "Достигнут дневной лимит на загрузку субтитров"
+
+msgctxt "#30703"
+msgid "Can be used by search providers or for debugging"
+msgstr "Может исп. поисковыми провайдерами или для отладки"
+
+msgctxt "#30704"
+msgid "TMDB API Key check failed, cannot use TMDB service"
+msgstr "Не удалось проверить ключ API TMDB, невозможно использование сервиса TMDB"
+
+msgctxt "#30705"
+msgid "TMDB API accessibility check failed, cannot use TMDB service"
+msgstr "Не удалось проверить доступность API TMDB, невозможно использование сервиса TMDB"
+
+msgctxt "#30706"
+msgid "Transmission 4.05"
+msgstr ""
+
+msgctxt "#30707"
+msgid "qBittorrent 3.3.9"
+msgstr ""
+
+msgctxt "#30708"
+msgid "qBittorrent 4.6.4"
+msgstr ""
+
+msgctxt "#30709"
+msgid "Open [B]%s[/B]"
+msgstr "Открыть [B]%s[/B]"
+
+msgctxt "#30710"
+msgid "BitTorrent ports"
+msgstr "BitTorrent порты"

@@ -1,5 +1,5 @@
 
-[![Build Status](https://travis-ci.org/elgatito/plugin.video.elementum.svg?branch=master)](https://travis-ci.org/elgatito/plugin.video.elementum)
+[![Build Status](https://gitlab.com/elgatito/plugin.video.elementum/badges/master/pipeline.svg?ignore_skipped=true)](https://gitlab.com/elgatito/plugin.video.elementum/-/pipelines)
 [![Join the chat at https://gitter.im/ElementumApp/Lobby](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ElementumApp/Lobby)
 
 
@@ -40,13 +40,51 @@ Installation
 
 Build
 -----
-The entire build process of Elementum is automated using Travis CI, and that's a
-good thing because it's quite a complicated one with many dependencies and
-repositories. Here's the stack from top to bottom:
 
+`plugin.video.elementum` is distributed as a `zip` file, that includes:
+- [plugin.video.elementum](https://github.com/elgatito/plugin.video.elementum) - responsible for starting Elementum application and connecting application to Kodi Python API.
 - [elementum](https://github.com/elgatito/elementum) - The Elementum daemon itself, built on top of the cross-compiled libtorrent-go
 - [libtorrent-go](https://github.com/ElementumOrg/libtorrent-go) - The libtorrent library with Go bindings, built using cross-compiler
 - [cross-compiler](https://github.com/ElementumOrg/cross-compiler) - Builds the base images to, you guessed it, cross-compile Elementum
+
+To compile and make your own `zip` file, follow these steps:
+
+In [elementum](https://github.com/elgatito/elementum) folder:
+```sh
+# To pull all docker images, that contain all required compilers and libraries and come from https://github.com/ElementumOrg/libtorrent-go project
+make pull-all
+
+# To compile code for specific platform
+make android-arm64-shared # Make shared library for android-arm64 platform 
+make android-x86 # Make binary for android-arm64 platform
+
+# To compile for all platforms
+make all
+```
+
+It will compile binary files and place into `/build` folder.
+
+In [plugin.video.elementum](https://github.com/elgatito/plugin.video.elementum) folder:
+
+```sh
+
+# Run helper script that is taking existing binaries and Python part and make a zip file that can be used for installation in Kodi
+
+# To get help on existing options
+./bundle.sh --help 
+
+# To use existing binaries, use only specific platform, add custom suffix into zip file and place zip file on a custom folder
+./bundle.sh --binaries=/path/to/elementum/build --platform=android_arm64 --suffix=custom_suffix_to_add_into_zip --target=/destination/folder/
+
+# To use existing binaries, collect all platforms and make zip file in current folder
+./bundle.sh --binaries=/path/to/elementum/build 
+
+```
+
+Script will collect current `plugin.video.elementum` files (that you have on the disk) and binaries, that are stored in `/build` folder.
+
+Created zip file can be installed on top of installed addon. Make sure to restart Kodi after installation to make sure you run installed code, and not the mix between old and new.
+
 
 #### Build status of each project
 | elementum daemon |

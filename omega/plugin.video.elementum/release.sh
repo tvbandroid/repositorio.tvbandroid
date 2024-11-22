@@ -16,7 +16,7 @@ mv elementum-binaries-master/* resources/bin/ && \
 rm -rf elementum-binaries-master && \
 rm master.zip
 
-# Get platform_detect platform
+# Get platform_detect library
 wget https://github.com/ElementumOrg/platform_detect/archive/master.zip && \
 unzip master.zip && \
 cp -rf platform_detect-master/python resources/site-packages/platform_detect && \

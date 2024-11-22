@@ -12,6 +12,7 @@ ARCHS = \
 	darwin_x64 \
 	linux_armv6 \
 	linux_armv7 \
+	linux_armv7_softfp \
 	linux_arm64 \
 	linux_x64 \
 	linux_x86 \

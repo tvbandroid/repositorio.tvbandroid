@@ -151,10 +151,6 @@ msgctxt "#30037"
 msgid "Default view for Episodes"
 msgstr "Afișare implicită pentru Episoade"
 
-msgctxt "#30038"
-msgid "Prefer use of original title"
-msgstr "Preferă titlul original"
-
 msgctxt "#30039"
 msgid "TheMovieDB"
 msgstr "TheMovieDB"
@@ -292,16 +288,16 @@ msgid "BitTorrent 7.5.0"
 msgstr "BitTorrent 7.5.0"
 
 msgctxt "#30078"
-msgid "BitTorrent 7.4.3"
-msgstr "BitTorrent 7.4.3"
+msgid "BitTorrent 7.9.9"
+msgstr "BitTorrent 7.9.9"
 
 msgctxt "#30079"
-msgid "µTorrent 3.4.9"
-msgstr "µTorrent 3.4.9"
+msgid "µTorrent 3.5.5"
+msgstr "µTorrent 3.5.5"
 
 msgctxt "#30080"
-msgid "µTorrent 3.2.0"
-msgstr "µTorrent 3.2.0"
+msgid "µTorrent 3.6.0"
+msgstr "µTorrent 3.6.0"
 
 msgctxt "#30081"
 msgid "µTorrent 2.2.1"
@@ -312,12 +308,12 @@ msgid "Transmission 2.92"
 msgstr "Transmission 2.92"
 
 msgctxt "#30083"
-msgid "Deluge 1.3.6.0"
-msgstr "Deluge 1.3.6.0"
+msgid "Deluge 1.3.6"
+msgstr "Deluge 1.3.6"
 
 msgctxt "#30084"
-msgid "Deluge 1.3.12.0"
-msgstr "Deluge 1.3.12.0"
+msgid "Deluge 2.1.1"
+msgstr "Deluge 2.1.1"
 
 msgctxt "#30085"
 msgid "Vuze 5.7.3.0"
@@ -418,6 +414,14 @@ msgstr ""
 
 msgctxt "#30118"
 msgid "Scraping trackers..."
+msgstr ""
+
+msgctxt "#30119"
+msgid "ID of selected userlist for movies"
+msgstr ""
+
+msgctxt "#30120"
+msgid "ID of selected userlist for shows"
 msgstr ""
 
 msgctxt "#30141"
@@ -1166,7 +1170,7 @@ msgid "Use name of production company as Studio for shows"
 msgstr ""
 
 msgctxt "#30418"
-msgid "Show number of unwatched episodes in Shows/Seasons"
+msgid "Calculate number of unwatched episodes in Shows/Seasons"
 msgstr ""
 
 msgctxt "#30421"
@@ -1386,7 +1390,7 @@ msgid "Select language"
 msgstr ""
 
 msgctxt "#30477"
-msgid "Original"
+msgid "Original language"
 msgstr ""
 
 msgctxt "#30478"
@@ -1458,7 +1462,7 @@ msgid "Use built-in DNS resolver"
 msgstr ""
 
 msgctxt "#30496"
-msgid "Turn off if you use Tor addresses, or you want to use DNS settings from OS"
+msgid "Turn off if you use Tor addresses, or you want to use DNS settings [CR]from OS"
 msgstr ""
 
 msgctxt "#30498"
@@ -1553,10 +1557,6 @@ msgctxt "#30525"
 msgid "Automatically start downloading next episode"
 msgstr ""
 
-msgctxt "#30526"
-msgid "Use english title as 'original' for Anime search"
-msgstr ""
-
 msgctxt "#30527"
 msgid "Donate"
 msgstr ""
@@ -1582,7 +1582,7 @@ msgid "Stop Downloading all files"
 msgstr ""
 
 msgctxt "#30535"
-msgid "Continue playback from [COLOR gold][B]%s[/B][/COLOR]?"
+msgid "Continue playback from [B]%s[/B]?"
 msgstr ""
 
 msgctxt "#30536"
@@ -1782,7 +1782,7 @@ msgid "Enable library integration with Kodi"
 msgstr ""
 
 msgctxt "#30586"
-msgid "If disabled - Elementum will not get/insert items[CR]to Kodi library and skip[CR]watched management with Kodi."
+msgid "If disabled - Elementum will not get/insert items to Kodi library [CR]and skip watched management with Kodi."
 msgstr ""
 
 msgctxt "#30587"
@@ -2158,7 +2158,7 @@ msgid "Remove Elementum duplicates from library"
 msgstr ""
 
 msgctxt "#30681"
-msgid "[B]Found duplicates in Kodi library:[/B][CR]Movies: [COLOR gold][B]%s[/B][/COLOR], Shows: [COLOR gold][B]%s[/B][/COLOR], Episodes: [COLOR gold][B]%s[/B][/COLOR][CR]Proceed?"
+msgid "[B]Found duplicates in Kodi library:[/B][CR]Movies: [B]%s[/B], Shows: [B]%s[/B], Episodes: [B]%s[/B][CR]Proceed?"
 msgstr ""
 
 msgctxt "#30682"
@@ -2183,4 +2183,92 @@ msgstr ""
 
 msgctxt "#30687"
 msgid "In Elementum library"
+msgstr ""
+
+msgctxt "#30688"
+msgid "Skip searching for installed Elementum repository"
+msgstr ""
+
+msgctxt "#30689"
+msgid "Internal DNS client"
+msgstr ""
+
+msgctxt "#30691"
+msgid "Hide watched"
+msgstr ""
+
+msgctxt "#30692"
+msgid "TMDB images quality (affects Kodi performance)"
+msgstr ""
+
+msgctxt "#30693"
+msgid "Original"
+msgstr ""
+
+msgctxt "#30694"
+msgid "High"
+msgstr ""
+
+msgctxt "#30695"
+msgid "Medium"
+msgstr ""
+
+msgctxt "#30696"
+msgid "Low"
+msgstr ""
+
+msgctxt "#30697"
+msgid "Interface language"
+msgstr ""
+
+msgctxt "#30698"
+msgid "Kodi language"
+msgstr ""
+
+msgctxt "#30699"
+msgid "Use earliest release date for progress and calendars"
+msgstr ""
+
+msgctxt "#30700"
+msgid "Interface fallback language"
+msgstr ""
+
+msgctxt "#30701"
+msgid "English | en"
+msgstr ""
+
+msgctxt "#30702"
+msgid "Reached daily limit for subtitles downloads"
+msgstr ""
+
+msgctxt "#30703"
+msgid "Can be used by search providers or for debugging"
+msgstr ""
+
+msgctxt "#30704"
+msgid "TMDB API Key check failed, cannot use TMDB service"
+msgstr ""
+
+msgctxt "#30705"
+msgid "TMDB API accessibility check failed, cannot use TMDB service"
+msgstr ""
+
+msgctxt "#30706"
+msgid "Transmission 4.05"
+msgstr ""
+
+msgctxt "#30707"
+msgid "qBittorrent 3.3.9"
+msgstr ""
+
+msgctxt "#30708"
+msgid "qBittorrent 4.6.4"
+msgstr ""
+
+msgctxt "#30709"
+msgid "Open [B]%s[/B]"
+msgstr ""
+
+msgctxt "#30710"
+msgid "BitTorrent ports"
 msgstr ""

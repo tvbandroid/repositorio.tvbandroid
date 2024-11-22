@@ -860,7 +860,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.elementum" name="Elementum" version="0.1.96" provider-name="elgatito">
+<addon id="plugin.video.elementum" name="Elementum" version="0.1.106" provider-name="elgatito">
     <requires>
         <import addon="xbmc.addon" version="16.0.0" />
         <import addon="repository.elementumorg" optional="true" />
@@ -1063,6 +1063,32 @@
       <fanart>fanart.jpg</fanart>
     </assets>
   </extension>
+</addon>
+
+<addon id="plugin.video.sportscentral" name="Sports Central" version="0.1.2" provider-name="X">
+	<requires>
+		<import addon="xbmc.python" version="3.0.0"/>
+		<import addon="script.module.requests"/>
+		<import addon="script.module.beautifulsoup4"/>
+		<import addon="plugin.video.youtube"/>
+		<import addon="script.module.resolveurl"/>
+		<import addon="inputstream.ffmpegdirect"/>
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="default.py">
+		<provides>video</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">Sports</summary>
+		<description lang="en_GB">Sports</description>
+		<platform>all</platform>
+		<license>GPL-3.0-or-later</license>
+		<website></website>
+		<source></source>
+		<assets>
+			<icon>icon.png</icon>
+			<fanart>fanart.jpg</fanart>
+		</assets>
+	</extension>
 </addon>
 
 <addon id="plugin.video.tacones" name="[COLOR red]TACONES[/COLOR]" version="3.5.6" provider-name="La Mala de la Novela">
@@ -1677,6 +1703,30 @@ provider-name="jurialmunkey">
 		<summary></summary>
    		<description lang="en">Repositorio oficial de Palantir y Estuary Palantir</description>
 		<platform>all</platform>
+		<assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+	</extension>
+</addon>
+
+<addon id="repository.funstersplace" name="funstersplace Repository" version="0.3" provider-name="funstersplace">
+	<extension point="xbmc.addon.repository" name="funstersplace">
+		<dir>
+			<info compressed="false">http://funstersplace.net/19repo/addons.xml</info>
+			<checksum>http://funstersplace.net/19repo/addonsmd5.txt</checksum>
+			<datadir zip="true">http://funstersplace.net/19repo/</datadir>
+		</dir>
+		<dir>
+        <info compressed="false">https://raw.githubusercontent.com/Gujal00/smrzips/master/addons.xml</info>
+        <checksum>https://raw.githubusercontent.com/Gujal00/smrzips/master/addons.xml.md5</checksum>
+        <datadir zip="true">https://raw.githubusercontent.com/Gujal00/smrzips/master/zips/</datadir>
+	</dir>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en"/>
+		<description lang="en">funstersplace Repo</description>
+		<genre>fun</genre>
 		<assets>
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>

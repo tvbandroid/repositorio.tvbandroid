@@ -995,6 +995,144 @@ provider-name="[COLOR orange]Thks 2 stube Frkd[/COLOR] [COLOR yellow]by L.M.[/CO
     </extension>
 </addon>
 
+<addon id="plugin.video.discoveryplus" version="1.7.5+matrix.1" name="discovery+" provider-name="Dis90">
+<requires>
+  <import addon="xbmc.python" version="3.0.0"/>
+  <import addon="script.module.requests" version="2.9.1"/>
+  <import addon="script.module.inputstreamhelper" version="0.2.4"/>
+  <import addon="inputstream.adaptive" version="2.6.1"/>
+  <import addon="script.module.routing" version="0.2.0" />
+</requires>
+<extension point="xbmc.python.pluginsource" library="default.py">
+  <provides>video</provides>
+</extension>
+<extension point="xbmc.service" library="services.py"/>
+<extension point="xbmc.addon.metadata">
+  <reuselanguageinvoker>true</reuselanguageinvoker>
+  <summary lang="en">discovery+</summary>
+  <description lang="en"></description>
+  <disclaimer lang="en"></disclaimer>
+  <assets>
+    <icon>resources/icon.png</icon>
+    <fanart>resources/fanart.jpg</fanart>
+  </assets>
+  <news>
+    v1.7.5+matrix.1 (8.8.2024)
+    - Fix all sports category
+    v1.7.4+matrix.1 (22.11.2023)
+    - Fix sport categories
+    v1.7.3+matrix.1 (26.8.2023)
+    - Minor code changes
+    - New fanart
+    v1.7.2+matrix.1 (18.7.2023)
+    - Add new country infolabel
+    - New artwork (landscape, keyart)
+    - Minor fixes/changes
+    v1.7.1+matrix.1 (8.7.2023)
+    - Add new premiered infolabel to tvshows
+    - Limit used artwork quality to same as d+ website
+    v1.7.0+matrix.1 (4.7.2023)
+    - New feature: Automatic select for unwatched season and episode
+    - Fix: Hardcoded resolutions for UHD and HD
+    - Fix season markers when episode count is more than user is set to per page limit
+    - Fix displaying playback progress without d+ sync
+    - Load user data only once per listing (huge speed up for episode listings)
+    - Option to logout
+    v1.6.25+matrix.1 (26.6.2023)
+    - Fix empty genres in d+ US
+    - Show profile dialog after login (to prevent bypass PIN locked main profile)
+    - Fix empty search query (Kodi getting stuck)
+    v1.6.24+matrix.1 (21.7.2022)
+    - Fix login
+    v1.6.23+matrix.1 (1.7.2022)
+    - Fix playback progress update after fastforward or rewind
+    - Fix playback progress update when using Up Next
+    v1.6.22+matrix.1 (29.5.2022)
+    - Profiles and PIN code login for d+ India
+    - Other minor changes
+    v1.6.21+matrix.1 (28.4.2022)
+    - New profiles dialog
+    - PIN code login now checks code every 5 seconds (previously 10 sec)
+    - Age limit for profile is shown on profiles dialog if kids profile
+    - Other minor fixes
+    v1.6.20+matrix.1 (23.4.2022)
+    - Debug logging userdata and token request is now disabled
+    v1.6.19+matrix.1 (15.4.2022)
+    - Properly fixed PIN login
+    v1.6.18+matrix.1 (15.4.2022)
+    - Hotfix for PIN login
+    v1.6.17+matrix.1 (15.4.2022)
+    - Implement login with PIN code
+    - Other minor fixes and changes
+    v1.6.16+matrix.1 (21.2.2022)
+    - Cache is no longer used in seasons page when sync playback and season markers is turned on. Fixes updating watched status of the season when going back from episodes listing.
+    - Up Next now only recommends to watch episodes from same TV show
+    - Minor fixes
+    v1.6.15+matrix.1 (16.2.2022)
+    - Added setting for showing watched season markers (default is off). Can slown down listing seasons page.
+    - Code improvements
+    v1.6.14+matrix.1 (10.2.2022)
+    - Code improvements
+    - You can now also mark seasons as watched or unwatched
+    - Dutch translation (thanks to djdirty60)
+    - If you are using IPTV Manager you need to refresh channels from IPTV Manager settings also
+      if you are using Kodi favorites you need to re-add them after this update because of changes made to add-on internal urls
+    v1.6.13+matrix.1 (4.2.2022)
+    - You can now mark videos as watched or unwatched
+    - Minor fixes
+    v1.6.12+matrix.1 (1.2.2022)
+    - Fix sport genre artwork
+    - Add Home -> For You -> Continue Watching (US and EU)
+    - Change video aired date from airDate to earliestPlayableStart
+    - Code cleanup
+    - Other minor fixes
+    v1.6.11+matrix.1 (22.1.2022)
+    - Minor fixes
+    v1.6.10+matrix.1 (21.1.2022)
+    - Minor fixes
+    v1.6.9+matrix.1 (8.1.2022)
+    - Fix empty channels (IPTV Manager integration)
+    - Add reuselanguageinvoker to addon.xml (possible speed up for loading data)
+    v1.6.8+matrix.1 (23.12.2021)
+    - Enable or disable DRM from settings
+    v1.6.7+matrix.1 (19.12.2021)
+    - Playback progress updating is now blocked only for Live TV
+    - Fix realmservice on Kodi 18
+    v1.6.6+matrix.1 (19.12.2021)
+    - Fixes to realmservice in case folder or file is missing
+    v1.6.5+matrix.1 (18.12.2021)
+    - Fix channel pages with only livestream
+    - Country specific content rating system (mpaa)
+    - Rename favorites to My List (context menu add/remove from My List)
+    - Get country specific configs from discovery+ realm service. No more hard coded values (except d+ India)
+    - Fix for listing shows without seasons when seasonsonly setting is set to true
+    - Home -> For You -> Networks or Network Rail is now translated to Channels
+    v1.6.4+matrix.1 (15.12.2021)
+    - More fixes and improvements to EPG data (European countries)
+    - Option to set cookie in add-on settings
+    v1.6.3+matrix.1 (14.12.2021)
+    - Fix listing Shows page (UK)
+    v1.6.2+matrix.1 (14.12.2021)
+    - Support for switching profile (US and EU)
+    - Fix EPG for sport events (European countries)
+    v1.6.1+matrix.1 (14.12.2021)
+    - Fix IPTV Manager EPG (European countries)
+    v1.6.0+matrix.1 (13.12.2021)
+    - Support for new API in European countries. You need to get new cookies from browser.
+    - Updated player properties to same in all countries.
+    v1.5.24+matrix.1 (14.9.2021)
+    - Fixed season list when data contains empty collection
+    v1.5.23+matrix.1 (19.8.2021)
+    - New setting for only listing seasons in season listing (EU countries)
+    - If setting for hiding non season categories from seasons page is enabled, you can enable setting for flatten TV show seasons if only one season (EU countries)
+    v1.5.22+matrix.1 (14.8.2021)
+    - Promoted items are now displayed (rows with large banner but no title) - European countries
+    v1.5.21+matrix.1 (26.7.2021)
+    - Fixed season list displaying wrong metadata in some European countries
+  </news>
+</extension>
+</addon>
+
 <addon id="plugin.video.doqmental"
 	name="DOQMENTAL"
 	version="1.1"
@@ -1380,6 +1518,44 @@ No se acepta ninguna responsabilidad por el uso de este addon.
       * Otras reparaciones menores
       [CR]- Versión inicial 0.0.7
     </news>
+  </extension>
+</addon>
+
+<addon id="plugin.video.palantir3" name="[COLOR gold]Palantir 3[/COLOR]" version="3.2.1" provider-name="The Lords Of Flix">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.inputstreamhelper" version="0.5.0"/>
+    <import addon="script.module.pycryptodome" version="3.4.3"/>
+    <import addon="script.module.requests"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.python.library" library="default.py"/>
+
+  <extension point="kodi.context.item">
+      <menu id="kodi.core.main">
+        <item library="context.py">
+          <label>[COLOR gold]Menú Palantir 3...[/COLOR]</label>
+          <visible>String.Contains(ListItem.FolderPath,palantir3)</visible>
+        </item>
+      </menu>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <description>Visualiza el contenido de la nube, series, películas.[CR][COLOR red]Todo el contenido disponible en este Addon esta sacado de servidores gratuitos, disponible en la red para todos los usuarios.[/COLOR]</description>
+    <disclaimer>Este es un software [COLOR red][B]gratuito[/B][/COLOR][CR][COLOR red][B]Pero no se permite[/B][/COLOR] su distribuición preinstalada en ningún tipo de dispositivo ni tampoco su inclusión total o parcial en cualquier paquete de software y/o hardware por el que el usuario final deba [COLOR red][B]pagar o hacer una donación[/B][/COLOR], por su adquisición, por su uso o por recibir asistencia.[CR]Si cree que alguna de estas normas no se está cumpliendo póngase en contacto con nosotros.</disclaimer>
+    <platform>all</platform>
+    <assets>
+        <icon>icon.png</icon>
+        <fanart>fanart.gif</fanart>
+        <screenshot>resources/media/Captura1.png</screenshot>
+        <screenshot>resources/media/Captura2.png</screenshot>
+        <screenshot>resources/media/Captura3.png</screenshot>
+        <screenshot>resources/media/Captura4.png</screenshot>
+    </assets>
+    <forum>https://t.me/addon_palantir</forum>
   </extension>
 </addon>
 

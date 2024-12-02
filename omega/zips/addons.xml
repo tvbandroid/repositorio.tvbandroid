@@ -1436,6 +1436,40 @@ No se acepta ninguna responsabilidad por el uso de este addon.
 	</extension>
 </addon>
 
+<addon id="plugin.video.latinsports" name="Latin Sports" version="1.0.6" provider-name="Gigoro">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.dateutil" />
+    <import addon="script.module.codequick" version="0.9.10" />
+    <import addon="script.module.beautifulsoup4" version="4.0.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_ES">Addon de kodi simple para ver retrasmiciones en vivo de diferentes paginas de deportes</summary>
+    <description lang="es_ES">Addon para ver retrasmiciones en vivo de diferentes paginas de deportes</description>
+    <disclaimer lang="es_ES">The author does not host or distribute any of the content displayed by this addon. The author does not have any affiliation with the content provider. This addon acts merely as a browser for sites publically available on the internet which the author has no control of.</disclaimer>
+    <language>es</language> <!-- language of the content the add-on provides, omit if the add-on does not provide any content -->
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+    <source>https://github.com/gigoro33/plugin.video.LatinSports</source>
+    <assets>
+      <icon>resources/images/icon.png</icon>
+      <fanart>resources/images/fanart.jpg</fanart>
+      <screenshot>resources/images/screenshot-1.jpg</screenshot>
+      <screenshot>resources/images/screenshot-2.jpg</screenshot>
+    </assets>
+    <news>1.0.6 Se añade el canal Futbol libre HD</news>
+    <news>1.0.5 Se Se corrige la reprodución de algunos canales en la opción de agenda deportiva para tucanaldeportivo.org</news>
+    <news>1.0.4 Se añade opcion de agenda deportiva para tucanaldeportivo.org</news>
+    <news>1.0.3 Se añade opciones de reproduciion para teleXtrema y se corrige el charset</news>
+    <news>1.0.2 Se refactoriza el codigo y se simplifica se cambia el dominio tucanaldeportivo.com por tucanaldeportivo.org</news>
+    <news>1.0.1 Se añade la pagina tucanaldeportivo.com</news>
+    <news>1.0.0 Desplegada la version incial</news>
+  </extension>
+</addon>
+
 <addon
 	id="plugin.video.mitelechopo" version="14" name="[B][COLOR white]mitele[COLOR cornflowerblue] chopo[/COLOR][/B]" provider-name="equipo tvchopo">
 <requires>
@@ -1521,41 +1555,28 @@ No se acepta ninguna responsabilidad por el uso de este addon.
   </extension>
 </addon>
 
-<addon id="plugin.video.palantir3" name="[COLOR gold]Palantir 3[/COLOR]" version="3.2.1" provider-name="The Lords Of Flix">
+<addon id="plugin.video.playlistbee" name="[COLORorangered]Bee[/COLOR]" version="3.1" provider-name="Nux007, Publish3r, Silhouette2022,Bee,1X and Romy">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
-    <import addon="script.module.inputstreamhelper" version="0.5.0"/>
-    <import addon="script.module.pycryptodome" version="3.4.3"/>
-    <import addon="script.module.requests"/>
+    <import addon="script.module.requests" version="2.22.0"/>
+    <import addon="script.module.dateutil" version="2.8.1"/>
   </requires>
-
   <extension point="xbmc.python.pluginsource" library="default.py">
     <provides>video</provides>
   </extension>
-  <extension point="xbmc.python.library" library="default.py"/>
-
-  <extension point="kodi.context.item">
-      <menu id="kodi.core.main">
-        <item library="context.py">
-          <label>[COLOR gold]Menú Palantir 3...[/COLOR]</label>
-          <visible>String.Contains(ListItem.FolderPath,palantir3)</visible>
-        </item>
-      </menu>
-  </extension>
-
   <extension point="xbmc.addon.metadata">
-    <description>Visualiza el contenido de la nube, series, películas.[CR][COLOR red]Todo el contenido disponible en este Addon esta sacado de servidores gratuitos, disponible en la red para todos los usuarios.[/COLOR]</description>
-    <disclaimer>Este es un software [COLOR red][B]gratuito[/B][/COLOR][CR][COLOR red][B]Pero no se permite[/B][/COLOR] su distribuición preinstalada en ningún tipo de dispositivo ni tampoco su inclusión total o parcial en cualquier paquete de software y/o hardware por el que el usuario final deba [COLOR red][B]pagar o hacer una donación[/B][/COLOR], por su adquisición, por su uso o por recibir asistencia.[CR]Si cree que alguna de estas normas no se está cumpliendo póngase en contacto con nosotros.</disclaimer>
+    <summary lang="en_GB">Playlist Bee</summary>
+    <summary lang="de_DE">Playlist Bee</summary>
+    <description lang="en_GB">Nothing is guaranteed.The guarantee only offers you a subscription.This is an addon for free.</description>
+    <description lang="de_DE">Nichts ist garantiert.Die Garantie bietet Ihnen nur ein Abonnement.Dies ist ein kostenloses Add-on.</description>
+    <description lang="ru_RU">Ничего не гарантировано.Гарантия предлагает вам лишь подписку.Это бесплатный аддон.</description>
+    <language>en de</language>
     <platform>all</platform>
-    <assets>
-        <icon>icon.png</icon>
-        <fanart>fanart.gif</fanart>
-        <screenshot>resources/media/Captura1.png</screenshot>
-        <screenshot>resources/media/Captura2.png</screenshot>
-        <screenshot>resources/media/Captura3.png</screenshot>
-        <screenshot>resources/media/Captura4.png</screenshot>
-    </assets>
-    <forum>https://t.me/addon_palantir</forum>
+    <source>https://github.com/Publish3r/repository.kodi.matrix/tree/main/plugin.video.playlistloader</source>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
   </extension>
 </addon>
 

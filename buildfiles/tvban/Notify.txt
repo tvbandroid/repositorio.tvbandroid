@@ -1,4 +1,4 @@
-28
+29
 |||
 
 [COLOR yellowgreen][B]¡¡¡BIENVENIDOS A LA [COLOR azure]BUILD TVBAN [COLOR cyan]MATNEXON [COLOR tan]- ORIGINAL !!![B][/COLOR]
@@ -15,14 +15,14 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, darle unos minut
 [COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE ArcticF TVBAN AMILLAMS[COLOR gold]!!![/B][/COLOR]
 [COLOR yellowgreen][B]ArcticF TVban amillans [COLOR khaki]- v1[/B][/COLOR]
 
-[COLOR orange][B]*  Arreglado Error Tacones [/B][/COLOR]
+[COLOR orange][B]*  Nuevas incorporaciones [/B][/COLOR]
 
 
 [COLOR aquamarine][B]INSTALACIÓN DEL PARCHE:[/B][/COLOR]
 
 [COLOR tan]Para instalar un parche, deberemos seleccionar la Build que tengamos instalada, por ejemplo [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]- v1[COLOR tan], dentro veremos [B][COLOR white]el/os PARCHE/S[/B],[COLOR tan] por ejemplo: [B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1.1[/B] [COLOR tan]y damos a instalar.[/COLOR]
 
-[COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE [COLOR white]v14.1 [COLOR dodgerblue]del [COLOR white]14 de Enero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
+[COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE [COLOR white]v15.1 [COLOR dodgerblue]del [COLOR white]15 de Enero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
 
 [COLOR ten][B]-[/B] Arreglado JellYcon[/COLOR]
 

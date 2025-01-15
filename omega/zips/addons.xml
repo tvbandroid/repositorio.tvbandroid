@@ -542,7 +542,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="3.07.24" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
+<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="15.1.25" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
     <requires>
         <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" />

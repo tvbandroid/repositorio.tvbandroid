@@ -577,7 +577,7 @@ def remove_addon(addon, name, over=False, data=True):
         
         sqldb = sqlite3.connect(os.path.join(CONFIG.DATABASE, db.latest_db('Addons')))
         sqlexe = sqldb.cursor()
-        query = "BORRAR DE {0} DONDE addonID = '{1}'"
+        query = "DELETE FROM {0} WHERE addonID = '{1}'"
         
         for table in ['addons', 'installed', 'package']:
             sqlexe.execute(query.format(table, addon))

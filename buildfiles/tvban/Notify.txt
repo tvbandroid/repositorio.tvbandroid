@@ -24,7 +24,7 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, darle unos minut
 
 [COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE [COLOR white]v16.1 [COLOR dodgerblue]del [COLOR white]16 de Enero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
 
-[COLOR ten][B]* Nuevas incorporaciones [/B][/COLOR]
+[COLOR orange][B]* Nuevas incorporaciones [/B][/COLOR]
 
 [COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE [COLOR white]Julio 18 [COLOR dodgerblue]ArcticF TVBAN AMILLAMS[COLOR gold]!!![/B][/COLOR]
 

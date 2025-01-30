@@ -26,7 +26,7 @@ icon="https://i.ytimg.com/vi/w-mzkeKIqg0/maxresdefault.jpg"
 fanart="http://"
 description="Iron Maiden."
 
-name="[B][COLOR gray]Simple Minds[/COLOR] [COLOR white]- Palais Theatre Complete (4K) 13 Feb 2024[/COLOR][/B]"
+name="[B][COLOR cyan]Simple Minds[/COLOR] [COLOR white]- Palais Theatre Complete (4K) 13 Feb 2024[/COLOR][/B]"
 section="no"
 url="https://www.youtube.com/watch?v=yQas4xqSPGY"
 icon="https://i.ytimg.com/vi/yQas4xqSPGY/maxresdefault.jpg"

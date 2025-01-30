@@ -1,7 +1,7 @@
-name="[B][COLOR red]Scorpions[/COLOR] [COLOR white]Live in Munich 2012 HD[/COLOR][/B]"
+name="[B][COLOR red]Scorpions[/COLOR] [COLOR white]Live At Hellfest 2015 (Full Concert)[/COLOR][/B]"Scorpions - 
 section="no"
-url="https://www.youtube.com/watch?v=sLmJAJFNwsA"
-icon="https://i.ytimg.com/vi/sLmJAJFNwsA/maxresdefault.jpg"
+url="https://www.youtube.com/watch?v=bSDeAdSi31A"
+icon="https://i.ibb.co/xq23gsDC/Scorpions.jpg"
 fanart="http://"
 description="Scorpions."
 
@@ -18,6 +18,13 @@ url="https://www.youtube.com/watch?v=8uCi2vWq1Yw"
 icon="https://i.ytimg.com/vi/8uCi2vWq1Yw/maxresdefault.jpg"
 fanart="http://"
 description="80's Rare Mix."
+
+name="[B][COLOR gold]Iron Maiden[/COLOR] [COLOR white]- 2024-12-07 - Allianz Parque, São Paulo, Brazil MultiCam[/COLOR][/B]"
+section="no"
+url="https://www.youtube.com/watch?v=N0U-_V79kMM"
+icon="https://i.ytimg.com/vi/w-mzkeKIqg0/maxresdefault.jpg"
+fanart="http://"
+description="Iron Maiden."
 
 name="[B][COLOR gray]Rick Astley[/COLOR] [COLOR white]- Never Gonna Give You Up (Official Music Video)[/COLOR][/B]"
 section="no"

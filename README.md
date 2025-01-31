@@ -2,6 +2,7 @@
 <img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-yellogreen"> 
 <img src="https://img.shields.io/badge/Nexus-indigo">
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
+<img src="https://img.shields.io/badge/Piers-e22ba8">
 </p>
  
 # $\mathbb{Tu\ Repo\ {\color{dodgerblue}andtvban\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi.}}}}$
@@ -9,10 +10,9 @@
 
 
 ![img](https://)
-<h1 align="left"> Kodi 22 $\textbf{\color{khaki}Piers}$ </h1>
+<h1 align="left"> Kodi 22 $\textbf{\color{magenta}Piers}$ </h1>
 <p align="left">
-<img src="https://img.shields.io/badge/TVBAN-MATNEXOM-yellowgreen">
-<img src="https://img.shields.io/badge/FUNCIONANDO-dodgerblue">
+<img src="https://img.shields.io/badge/Piers-e22ba8">
 <p align="center">
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>

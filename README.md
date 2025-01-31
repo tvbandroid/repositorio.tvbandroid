@@ -9,6 +9,14 @@
 
 
 ![img](https://)
+<h1 align="left"> Kodi 22 $\textbf{\color{khaki}Piers}$ </h1>
+<p align="left">
+<img src="https://img.shields.io/badge/TVBAN-MATNEXOM-yellowgreen">
+<img src="https://img.shields.io/badge/FUNCIONANDO-dodgerblue">
+<p align="center">
+<img src="https://i.imgur.com/fbPNcPZ.jpg"> 
+</p>
+
 # `Kodi 19` $\textbf{\color{green}Matrix\ {\color{white}\ {\color{indigo}}}}$
 <p align="left">
 <img src="https://img.shields.io/badge/ANDTV-Matrix-yellogreen">

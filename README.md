@@ -5,7 +5,7 @@
 <img src="https://img.shields.io/badge/Piers-e22ba8">
 </p>
  
-# $\mathbb{Tu\ Repo\ {\color{dodgerblue}andtvban\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi.}}}}$
+# $\mathbb{Tu\ Repo\ {\color{dodgerblue}andtvban\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi{\color{white}.}}}}}$
 
 
 

@@ -9,8 +9,8 @@
 
 
 
-![img](https://)
-<h1 align="left"> Kodi 22 $\textbf{\color{magenta}Piers}$ </h1>
+![img](https://) 
+# `Kodi 22` $\textbf{\color{magenta}Piers}$ 
 <p align="left">
 <img src="https://img.shields.io/badge/Piers-e22ba8">
 <p align="center">

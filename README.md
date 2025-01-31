@@ -10,13 +10,6 @@
 
 
 ![img](https://) 
-# `Kodi 22` $\textbf{\color{magenta}Piers}$ 
-<p align="left">
-<img src="https://img.shields.io/badge/Piers-e22ba8">
-<p align="center">
-<img src="https://i.imgur.com/fbPNcPZ.jpg"> 
-</p>
-
 # `Kodi 19` $\textbf{\color{green}Matrix\ {\color{white}\ {\color{indigo}}}}$
 <p align="left">
 <img src="https://img.shields.io/badge/ANDTV-Matrix-yellogreen">
@@ -39,3 +32,9 @@
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>
 
+# `Kodi 22` $\textbf{\color{magenta}Piers}$ 
+<p align="left">
+<img src="https://img.shields.io/badge/Piers-e22ba8">
+<p align="center">
+<img src="https://i.imgur.com/fbPNcPZ.jpg"> 
+</p>

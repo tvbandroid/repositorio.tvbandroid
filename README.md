@@ -2,7 +2,7 @@
 <img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-yellogreen"> 
 <img src="https://img.shields.io/badge/Nexus-indigo">
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
-<img src="https://img.shields.io/badge/Piers-e22ba8">
+<img src="https://img.shields.io/badge/Piers-magenta">
 </p>
  
 # $\mathbb{Tu\ Repo\ {\color{dodgerblue}andtvban\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi{\color{white}.}}}}}$

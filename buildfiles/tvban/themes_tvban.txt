@@ -145,7 +145,7 @@ fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
 adult="no"
 description="[COLOR azure][B]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/B][/COLOR] para [COLOR teal][B]KODI: 21 Omega[/B][/COLOR]"
 
-name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1.2[/COLOR][/B]"
+name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1.f[/COLOR][/B]"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.MatnexomFeb1.zip"
 icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
 fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"

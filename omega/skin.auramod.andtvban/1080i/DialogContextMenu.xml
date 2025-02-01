@@ -58,7 +58,7 @@
                 <width>458</width>
                 <height>78</height>
                 <left>24</left>
-                <textcolor>dialog_fg_70</textcolor>
+                <textcolor>dialog_fg_45</textcolor>
                 <font>font_small_bold</font>
                 <label>$LOCALIZE[31059]</label>
                 <align>left</align>

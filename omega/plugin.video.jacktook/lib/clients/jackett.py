@@ -1,29 +1,35 @@
-import requests
-from lib.utils.kodi import get_jackett_timeout, notify, translation, log
+from lib.clients.base import BaseClient
+from lib.utils.kodi_utils import translation
 from lib import xmltodict
+from lib.utils.settings import get_jackett_timeout
 
 
-class Jackett:
-    def __init__(self, host, apikey, notification) -> None:
-        self.host = host.rstrip("/")
+class Jackett(BaseClient):
+    def __init__(self, host, apikey, notification):
+        super().__init__(host, notification)
         self.apikey = apikey
-        self._notification = notification
+        self.base_url = f"{self.host}/api/v2.0/indexers/all/results/torznab/api?apikey={self.apikey}"
 
     def search(self, query, mode, season, episode):
         try:
             if mode == "tv":
-                url = f"{self.host}/api/v2.0/indexers/all/results/torznab/api?apikey={self.apikey}&t=tvsearch&q={query}&season={season}&ep={episode}"
-            elif mode == "movie":
-                url = f"{self.host}/api/v2.0/indexers/all/results/torznab/api?apikey={self.apikey}&q={query}"
-            elif mode == "multi":
-                url = f"{self.host}/api/v2.0/indexers/all/results/torznab/api?apikey={self.apikey}&t=search&q={query}"
-            res = requests.get(url, timeout=get_jackett_timeout())
-            if res.status_code != 200:
-                notify(f"{translation(30229)} ({res.status_code})")
+                url = f"{self.base_url}&t=tvsearch&q={query}&season={season}&ep={episode}"
+            elif mode == "movies":
+                url = f"{self.base_url}&q={query}"
+            else:
+                url = f"{self.base_url}&t=search&q={query}"
+
+            response = self.session.get(
+                url,
+                timeout=get_jackett_timeout(),
+            )
+
+            if response.status_code != 200:
+                self.notification(f"{translation(30229)} ({response.status_code})")
                 return
-            return self.parse_response(res)
+            return self.parse_response(response)
         except Exception as e:
-            self._notification(f"{translation(30229)}: {str(e)}")
+            self.handle_exception(f"{translation(30229)}: {str(e)}")
 
     def parse_response(self, res):
         res = xmltodict.parse(res.content)
@@ -41,19 +47,17 @@ def extract_result(results, item):
     }
     results.append(
         {
-            "quality_title": "",
             "title": item.get("title", ""),
-            "indexer": item.get("jackettindexer", {}).get("#text", ""),
+            "type": "Torrent",
+            "indexer": "Jackett",
             "publishDate": item.get("pubDate", ""),
+            "provider": item.get("jackettindexer", {}).get("#text", ""),
             "guid": item.get("guid", ""),
             "downloadUrl": item.get("link", ""),
             "size": item.get("size", ""),
             "magnetUrl": attributes.get("magneturl", ""),
-            "seeders": attributes.get("seeders", ""),
-            "peers": attributes.get("peers", ""),
+            "seeders": int(attributes.get("seeders", 0)),
+            "peers": int(attributes.get("peers", 0)),
             "infoHash": attributes.get("infohash", ""),
-            "debridType": "",
-            "debridCached": False,
-            "debridPack": False,
         }
     )

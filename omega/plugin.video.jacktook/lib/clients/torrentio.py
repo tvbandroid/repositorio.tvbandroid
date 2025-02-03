@@ -1,106 +1,48 @@
 import json
 import re
-import requests
+from lib.api.jacktook.kodi import kodilog
+from lib.clients.base import BaseClient
 from lib.utils.countries import find_language_by_unicode
-from lib.utils.kodi import convert_size_to_bytes, translation
-from lib.utils.utils import unicode_flag_to_country_code
+from lib.utils.kodi_utils import convert_size_to_bytes, translation
+from lib.utils.utils import USER_AGENT_HEADER, unicode_flag_to_country_code
 
 
-class Elfhosted:
-    def __init__(self, host, notification) -> None:
-        self.host = host.rstrip("/")
-        self._notification = notification
+class Torrentio(BaseClient):
+    def __init__(self, host, notification):
+        super().__init__(host, notification)
 
     def search(self, imdb_id, mode, media_type, season, episode):
         try:
             if mode == "tv" or media_type == "tv":
                 url = f"{self.host}/stream/series/{imdb_id}:{season}:{episode}.json"
-            elif mode == "movie" or media_type == "movie":
+            elif mode == "movies" or media_type == "movies":
                 url = f"{self.host}/stream/{mode}/{imdb_id}.json"
-            res = requests.get(url, timeout=10)
+            res = self.session.get(url, headers=USER_AGENT_HEADER, timeout=10)
             if res.status_code != 200:
                 return
-            response = self.parse_response(res)
-            return response
+            return self.parse_response(res)
         except Exception as e:
-            self._notification(f"{translation(30231)}: {str(e)}")
+            self.handle_exception(f"{translation(30228)}: {str(e)}")
 
     def parse_response(self, res):
-        res = json.loads(res.text)
+        res = res.json()
         results = []
         for item in res["streams"]:
             parsed_item = self.parse_stream_title(item["title"])
             results.append(
                 {
                     "title": parsed_item["title"],
-                    "quality_title": "",
-                    "indexer": "Elfhosted",
-                    "guid": item["infoHash"],
-                    "infoHash": item["infoHash"],
-                    "size": parsed_item["size"],
-                    "seeders": 0,
-                    "publishDate": "",
-                    "peers": 0,
-                    "debridType": "",
-                    "debridCached": False,
-                    "debridPack": False,
-                }
-            )
-        return results
-
-    def parse_stream_title(self, title):
-        name = title.splitlines()[0]
-
-        size_match = re.search(r"💾 (\d+(?:\.\d+)?\s*(GB|MB))", title, re.IGNORECASE)
-        size = size_match.group(1) if size_match else ""
-        size = convert_size_to_bytes(size)
-
-        return {
-            "title": name,
-            "size": size,
-        }
-
-
-class Torrentio:
-    def __init__(self, host, notification) -> None:
-        self.host = host.rstrip("/")
-        self._notification = notification
-
-    def search(self, imdb_id, mode, media_type, season, episode):
-        try:
-            if mode == "tv" or media_type == "tv":
-                url = f"{self.host}/stream/series/{imdb_id}:{season}:{episode}.json"
-            elif mode == "movie" or media_type == "movie":
-                url = f"{self.host}/stream/{mode}/{imdb_id}.json"
-            res = requests.get(url, timeout=10)
-            if res.status_code != 200:
-                return
-            response = self.parse_response(res)
-            return response
-        except Exception as e:
-            self._notification(f"{translation(30228)}: {str(e)}")
-
-    def parse_response(self, res):
-        res = json.loads(res.text)
-        results = []
-        for item in res["streams"]:
-            parsed_item = self.parse_stream_title(item["title"])
-            results.append(
-                {
-                    "title": parsed_item["title"],
-                    "quality_title": "",
+                    "type": "Torrent",
                     "indexer": "Torrentio",
                     "guid": item["infoHash"],
                     "infoHash": item["infoHash"],
                     "size": parsed_item["size"],
                     "seeders": parsed_item["seeders"],
                     "languages": parsed_item["languages"],
-                    "full_languages": parsed_item["full_languages"],
+                    "fullLanguages": parsed_item["full_languages"],
+                    "provider": parsed_item["provider"],
                     "publishDate": "",
                     "peers": 0,
-                    "debridType": "",
-                    "debridCached": False,
-                    "debridPack": False,
                 }
             )
         return results
@@ -117,12 +59,15 @@ class Torrentio:
 
         languages, full_languages = self.extract_languages(title)
 
+        provider = self.extract_provider(title)
+
         return {
             "title": name,
             "size": size,
             "seeders": seeders,
             "languages": languages,
             "full_languages": full_languages,
+            "provider": provider,
         }
 
     def extract_languages(self, title):
@@ -137,3 +82,7 @@ class Torrentio:
                 if (full_lang != None) and (full_lang not in full_languages):
                     full_languages.append(full_lang)
         return languages, full_languages
+
+    def extract_provider(self, title):
+        match = re.search(r"⚙.* ([^ \n]+)", title)
+        return match.group(1) if match else ""

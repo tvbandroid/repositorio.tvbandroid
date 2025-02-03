@@ -1,5 +1,6 @@
 import logging
-from lib.utils.kodi import ADDON_NAME, log, notify
+from lib.api.jacktook.kodi import kodilog
+from lib.utils.kodi_utils import ADDON_NAME, notification
 from xbmcgui import DialogProgressBG
 from lib.api.jacktook.provider import (
     get_providers,
@@ -65,15 +66,13 @@ def get_providers_results(method, *args, **kwargs):
     data = run_providers_method(30, method, *args, **kwargs)
     for provider, provider_results in data.items():
         if not isinstance(provider_results, (tuple, list)):
-            logging.error(
-                "Expecting list or tuple as results for %s:%s", provider, method
-            )
+            kodilog("Expecting list or tuple as results for %s:%s", provider, method)
             continue
         for provider_result in provider_results:
             try:
                 _provider_result = ProviderResult(provider_result)
             except Exception as e:
-                logging.error(
+                kodilog(
                     "Invalid format on provider '%s' result (%s): %s",
                     provider,
                     provider_result,
@@ -92,51 +91,45 @@ def search(method, *args, **kwargs):
     if results:
         return results
     elif results is None:
-        notify("No providers available")
+        raise Exception("No providers available")
     else:
-        notify("No results found!")
+        raise Exception("No results found")
 
 
 def burst_search(query):
     return search("search", query)
 
 
-def burst_search_movie(movie_id, query, titles="", year=None):
+def burst_search_movie(movie_id, query):
     return search(
         "search_movie",
         movie_id,
         query,
-        titles,
-        year=year,
     )
 
 
-def burst_search_show(show_id, query, titles="", year=None):
+def burst_search_show(show_id, query):
     return search(
         "search_show",
         show_id,
         query,
-        titles,
-        year=year,
     )
 
 
-def burst_search_season(show_id, show_title, season_number, titles):
+def burst_search_season(show_id, show_title, season_number):
     return search(
         "search_season",
         show_id,
         show_title,
         int(season_number),
-        titles
     )
 
 
-def burst_search_episode(show_id, query, season_number, episode_number, titles=""):
+def burst_search_episode(show_id, query, season_number, episode_number):
     return search(
         "search_episode",
         show_id,
         query,
         int(season_number),
         int(episode_number),
-        titles,
     )

@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+import copy
 from datetime import datetime, timedelta
 import hashlib
 import os
@@ -5,44 +7,38 @@ import re
 import unicodedata
 import requests
 
-from lib.db.cached import Cache
-from lib.db.database import get_db
-from lib.api.tmdbv3api.objs.find import Find
-from lib.api.tmdbv3api.objs.genre import Genre
-from lib.api.tmdbv3api.objs.movie import Movie
-from lib.api.tmdbv3api.objs.search import Search
-from lib.api.tmdbv3api.objs.season import Season
-from lib.api.tmdbv3api.objs.tv import TV
+from lib.api.fanart.fanarttv import FanartTv
+from lib.api.jacktook.kodi import kodilog
+from lib.api.trakt.trakt_api import clear_cache
+from lib.db.bookmark_db import bookmark_db
+from lib.api.tvdbapi.tvdbapi import TVDBAPI
+from lib.db.cached import cache
+from lib.db.main_db import main_db
+
 
 from lib.torf._magnet import Magnet
-from lib.fanarttv import search_api_fanart_tv
-from lib.utils.kodi import (
+from lib.utils.kodi_utils import (
+    ADDON_HANDLE,
     ADDON_PATH,
+    MOVIES_TYPE,
+    SHOWS_TYPE,
+    build_url,
     container_refresh,
-    get_cache_expiration,
-    get_int_setting,
     get_jacktorr_setting,
-    get_kodi_version,
     get_setting,
-    is_cache_enabled,
     translation,
-    url_for,
 )
 
-from lib.api.tmdbv3api.objs.discover import Discover
-from lib.api.tmdbv3api.objs.trending import Trending
+from lib.utils.settings import get_cache_expiration, is_cache_enabled
 
 from xbmcgui import ListItem, Dialog
 from xbmcgui import DialogProgressBG
-from xbmcplugin import addDirectoryItem
+from xbmcplugin import addDirectoryItem, setContent, endOfDirectory
 from xbmc import getSupportedMedia
+from zipfile import ZipFile
 
 
-cache = Cache()
-
-db = get_db()
-
-PROVIDER_COLOR_MIN_BRIGHTNESS = 50
+PROVIDER_COLOR_MIN_BRIGHTNESS = 128
 
 URL_REGEX = r"^(?!\/)(rtmps?:\/\/|mms:\/\/|rtsp:\/\/|https?:\/\/|ftp:\/\/)?([^\/:]+:[^\/@]+@)?(www\.)?(?=[^\/:\s]+\.[^\/:\s]+)([^\/:\s]+\.[^\/:\s]+)(:\d+)?(\/[^#\s]*[\s\S]*)?(\?[^#\s]*)?(#.*)?$"
 
@@ -50,6 +46,12 @@ USER_AGENT_HEADER = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36"
 }
 
+TMDB_POSTER_URL = "http://image.tmdb.org/t/p/w780"
+TMDB_BACKDROP_URL = "http://image.tmdb.org/t/p/w1280"
+
+MEDIA_FUSION_DEFAULT_KEY = "eJwBYACf_4hAkZJe85krAoD5hN50-2M0YuyGmgswr-cis3uap4FNnLMvSfOc4e1IcejWJmykujTnWAlQKRi9cct5k3IRqhu-wFBnDoe_QmwMjJI3FnQtFNp2u3jDo23THEEgKXHYqTMrLos="
+
+dialog_update = {"count": -1, "percent": 50}
 
 video_extensions = (
     ".001",
@@ -122,12 +124,76 @@ class Enum:
         return [value for name, value in vars(cls).items() if not name.startswith("_")]
 
 
+class Debrids(Enum):
+    RD = "RealDebrid"
+    PM = "Premiumize"
+    TB = "Torbox"
+    ED = "EasyDebrid"
+
+
 class Indexer(Enum):
     PROWLARR = "Prowlarr"
     JACKETT = "Jackett"
     TORRENTIO = "Torrentio"
+    PEERFLIX = "Peerflix"
+    MEDIAFUSION = "MediaFusion"
+    JACKGRAM = "Jackgram"
+    TELEGRAM = "Telegram"
     ELHOSTED = "Elfhosted"
     BURST = "Burst"
+    ZILEAN = "Zilean"
+
+
+class IndexerType(Enum):
+    TORRENT = "Torrent"
+    DIRECT = "Direct"
+    DEBRID = "Debrid"
+    STREMIO_DEBRID = "Stremio"
+
+
+class Players(Enum):
+    JACKTORR = "Jacktorr"
+    TORREST = "Torrest"
+    ELEMENTUM = "Elementum"
+    JACKGRAM = "Jackgram"
+
+
+class Anime(Enum):
+    SEARCH = "Anime_Search"
+    POPULAR = "Anime_Popular"
+    POPULAR_RECENT = "Anime_Popular_Recent"
+    TRENDING = "Anime_Trending"
+    AIRING = "Anime_On_The_Air"
+    MOST_WATCHED = "Anime_Most_Watched"
+    YEARS = "Anime_Years"
+    GENRES = "Anime_Genres"
+
+
+class Animation(Enum):
+    POPULAR = "Animation_Popular"
+
+
+class Cartoons(Enum):
+    SEARCH = "Cartoons_Search"
+    POPULAR = "Cartoons_Popular"
+    POPULAR_RECENT = "Cartoons_Popular_Recent"
+    YEARS = "Cartoons_Years"
+
+
+torrent_clients = [
+    Players.JACKTORR,
+    Players.TORREST,
+    Players.ELEMENTUM,
+]
+
+torrent_indexers = [
+    Indexer.PROWLARR,
+    Indexer.JACKETT,
+    Indexer.TORRENTIO,
+    Indexer.PEERFLIX,
+    Indexer.ELHOSTED,
+    Indexer.BURST,
+]
 
 
 class DialogListener:
@@ -148,10 +214,47 @@ class DialogListener:
             pass
 
 
-def list_item(label, icon):
+def is_debrid_activated():
+    return (
+        get_setting("real_debrid_enabled")
+        or get_setting("premiumize_enabled")
+        or get_setting("torbox_enabled")
+        or get_setting("easydebrid_enabled")
+    )
+
+
+def check_debrid_enabled(type):
+    if type == Debrids.RD:
+        return is_rd_enabled()
+    elif type == Debrids.PM:
+        return is_pm_enabled()
+    elif type == Debrids.TB:
+        return is_tb_enabled()
+    elif type == Debrids.ED:
+        return is_ed_enabled()
+
+
+def is_rd_enabled():
+    return get_setting("real_debrid_enabled")
+
+
+def is_pm_enabled():
+    return get_setting("premiumize_enabled")
+
+
+def is_tb_enabled():
+    return get_setting("torbox_enabled")
+
+
+def is_ed_enabled():
+    return get_setting("easydebrid_enabled")
+
+
+def list_item(label, icon="", poster_path=""):
     item = ListItem(label)
     item.setArt(
         {
+            "poster": poster_path,
             "icon": os.path.join(ADDON_PATH, "resources", "img", icon),
             "thumb": os.path.join(ADDON_PATH, "resources", "img", icon),
             "fanart": os.path.join(ADDON_PATH, "fanart.png"),
@@ -160,109 +263,8 @@ def list_item(label, icon):
     return item
 
 
-def add_play_item(
-    list_item,
-    ids,
-    tv_data,
-    title,
-    url="",
-    magnet="",
-    torrent_id="",
-    info_hash="",
-    debrid_type="",
-    mode="",
-    is_torrent=False,
-    is_debrid=False,
-    plugin=None,
-):
-    addDirectoryItem(
-        plugin.handle,
-        url_for(
-            name="play_torrent",
-            title=title,
-            ids=ids,
-            tv_data=tv_data,
-            url=url,
-            magnet=magnet,
-            torrent_id=torrent_id,
-            info_hash=info_hash,
-            is_torrent=is_torrent,
-            is_debrid=is_debrid,
-            mode=mode,
-            debrid_type=debrid_type,
-        ),
-        list_item,
-        isFolder=False,
-    )
-
-
-def add_pack_item(
-    list_item, tv_data, ids, info_hash, torrent_id, debrid_type, mode, plugin
-):
-    addDirectoryItem(
-        plugin.handle,
-        url_for(
-            name="show_pack",
-            query=f"{info_hash} {torrent_id} {debrid_type}",
-            tv_data=tv_data,
-            mode=mode,
-            ids=ids,
-        ),
-        list_item,
-        isFolder=True,
-    )
-
-
-def set_pack_item_rd(
-    list_item, mode, id, torrent_id, title, ids, tv_data, debrid_type, plugin
-):
-    addDirectoryItem(
-        plugin.handle,
-        url_for(
-            name="get_rd_link_pack",
-            args=f"{id} {torrent_id} {debrid_type} {title}",
-            mode=mode,
-            ids=ids,
-            tv_data=tv_data,
-        ),
-        list_item,
-        isFolder=False,
-    )
-
-
-def set_pack_item_pm(list_item, mode, url, title, ids, tv_data, debrid_type, plugin):
-    addDirectoryItem(
-        plugin.handle,
-        url_for(
-            name="play_torrent",
-            title=title,
-            url=url,
-            ids=ids,
-            tv_data=tv_data,
-            mode=mode,
-            is_debrid=True,
-            debrid_type=debrid_type,
-        ),
-        list_item,
-        isFolder=False,
-    )
-
-
-def set_pack_art(list_item):
-    list_item.setArt(
-        {
-            "poster": "",
-            "thumb": os.path.join(ADDON_PATH, "resources", "img", "magnet.png"),
-            "icon": os.path.join(ADDON_PATH, "resources", "img", "magnet.png"),
-        }
-    )
-
-
 def set_video_properties(list_item, poster, mode, title, overview, ids):
-    if get_kodi_version() >= 20:
-        set_video_infotag(list_item, mode, title, overview, ids=ids)
-    else:
-        set_video_info(list_item, mode, title, overview, ids=ids)
+    set_media_infotag(list_item, mode, title, overview, ids=ids)
     list_item.setProperty("IsPlayable", "true")
     list_item.setArt(
         {
@@ -289,13 +291,13 @@ def set_video_info(
     info = {"plot": overview}
 
     if ids:
-        _, _, imdb_id = ids.split(", ")
+        _, _, imdb_id = [id.strip() for id in ids.split(",")]
         info["imdbnumber"] = imdb_id
 
     if duration:
         info["duration"] = int(duration)
 
-    if mode in ["movie", "multi"]:
+    if mode in ["movies", "multi"]:
         info.update({"mediatype": "movie", "title": name, "originaltitle": name})
     else:
         info.update({"mediatype": "tvshow", "tvshowtitle": name})
@@ -313,100 +315,144 @@ def set_video_info(
     list_item.setInfo("video", info)
 
 
-def set_video_infotag(
+def make_listing(metadata):
+    title = metadata.get("title")
+    ids = metadata.get("ids")
+    tv_data = metadata.get("tv_data", {})
+    mode = metadata.get("mode", "")
+
+    list_item = ListItem(label=title)
+    list_item.setLabel(title)
+    list_item.setContentLookup(False)
+
+    if tv_data:
+        ep_name, episode, season = tv_data.split("(^)")
+    else:
+        ep_name = episode = season = ""
+
+    set_media_infotag(
+        list_item,
+        mode,
+        title,
+        season=season,
+        episode=episode,
+        ep_name=ep_name,
+        ids=ids,
+    )
+
+    list_item.setProperty("IsPlayable", "true")
+    return list_item
+
+
+def set_media_infotag(
     list_item,
     mode,
     name,
     overview="",
     ids="",
-    season_number="",
+    season="",
     episode="",
     ep_name="",
     duration="",
     air_date="",
     url="",
+    original_name="",
 ):
     info_tag = list_item.getVideoInfoTag()
-    if mode == "movie":
+    info_tag.setPath(url)
+    info_tag.setTitle(name)
+    info_tag.setOriginalTitle(original_name if original_name else name)
+    if mode == "movies":
         info_tag.setMediaType("movie")
-        info_tag.setTitle(name)
-        info_tag.setOriginalTitle(name)
     elif mode == "multi":
         info_tag.setMediaType("video")
-        info_tag.setTitle(name)
+        info_tag.setFilenameAndPath(url)
     else:
-        info_tag.setMediaType("season")
-        if ep_name:
-            info_tag.setTitle(name)
-        info_tag.setTvShowTitle(name)
-        if url:
-            info_tag.setFilenameAndPath(url)
+        info_tag.setMediaType("episode")
+        info_tag.setFilenameAndPath(url)
         if air_date:
             info_tag.setFirstAired(air_date)
-        if season_number:
-            info_tag.setSeason(int(season_number))
+        if season:
+            info_tag.setSeason(int(season))
         if episode:
             info_tag.setEpisode(int(episode))
+        if ep_name:
+            info_tag.setTitle(ep_name)
+        else:
+            info_tag.setTitle(name)
+
     info_tag.setPlot(overview)
     if duration:
-        info_tag.setDuration(int(duration))
+        info_tag.setDuration(int(duration) * 60)
     if ids:
-        tmdb_id, tvdb_id, imdb_id = ids.split(", ")
+        tmdb_id, tvdb_id, imdb_id = [id.strip() for id in ids.split(",")]
         info_tag.setIMDBNumber(imdb_id)
         info_tag.setUniqueIDs(
             {"imdb": str(imdb_id), "tmdb": str(tmdb_id), "tvdb": str(tvdb_id)}
         )
 
 
-def set_watched_file(
-    title, ids, tv_data, magnet, url, debrid_type, is_debrid, is_torrent
-):
-    if title in db.database["jt:lfh"]:
+def set_watched_file(title, data, is_direct=False, is_torrent=False):
+    if title in main_db.database["jt:lfh"]:
         return
 
-    if is_debrid:
-        debrid_color = get_random_color(debrid_type)
-        title = f"[B][COLOR {debrid_color}][{debrid_type}][/COLOR][/B]-{title}"
+    if is_direct:
+        color = get_random_color("Direct")
+        title = f"[B][COLOR {color}][Direct][/COLOR][/B] - {title}"
+    elif is_torrent:
+        color = get_random_color("Torrent")
+        title = f"[B][COLOR {color}][Torrent][/COLOR][/B] - {title}"
     else:
-        title = f"[B][Uncached][/B]-{title}"
+        color = get_random_color("Cached")
+        title = f"[B][COLOR {color}][Cached][/COLOR][/B] - {title}"
 
-    if title not in db.database["jt:watch"]:
-        db.database["jt:watch"][title] = True
+    if title not in main_db.database["jt:watch"]:
+        main_db.database["jt:watch"][title] = True
 
-    db.database["jt:lfh"][title] = {
-        "timestamp": datetime.now(),
-        "ids": ids,
-        "tv_data": tv_data,
-        "url": url,
-        "is_debrid": is_debrid,
-        "is_torrent": is_torrent,
-        "magnet": magnet,
-    }
-    db.commit()
+    data["timestamp"] = datetime.now().strftime("%a, %d %b %Y %I:%M %p")
+    data["is_torrent"] = is_torrent
+
+    main_db.set_data(key="jt:lfh", subkey=title, value=data)
+    main_db.commit()
 
 
 def set_watched_title(title, ids, mode="", media_type=""):
     if mode == "multi":
         mode = media_type
     if title != "None":
-        db.database["jt:lth"][title] = {
-            "timestamp": datetime.now(),
-            "ids": ids,
-            "mode": mode,
-        }
-        db.commit()
+        current_time = datetime.now()
+        main_db.set_data(
+            key="jt:lth",
+            subkey=title,
+            value={
+                "timestamp": current_time.strftime("%a, %d %b %Y %I:%M %p"),
+                "ids": ids,
+                "mode": mode,
+            },
+        )
+        main_db.commit()
 
 
 def is_torrent_watched(title):
-    return db.database["jt:watch"].get(title, False)
+    return main_db.database["jt:watch"].get(title, False)
 
 
-def search_fanart_tv(tvdb_id, mode="tv"):
-    identifier = "{}|{}".format("fanarttv", tvdb_id)
+def get_fanart_details(tvdb_id="", tmdb_id="", mode="tv"):
+    identifier = "{}|{}".format(
+        "fanart.tv", tvdb_id if tvdb_id and tvdb_id != "None" else tmdb_id
+    )
     data = cache.get(identifier, hashed_key=True)
-    if not data:
-        fanart_data = search_api_fanart_tv(mode, "en", tvdb_id)
-        if fanart_data:
+    if data:
+        return data
+    else:
+        fanart = FanartTv(get_setting("fanart_tv_client_id"))
+        if mode == "tv":
+            results = fanart.get_show(tvdb_id)
+            data = get_fanart_data(results)
+        else:
+            results = fanart.get_movie(tmdb_id)
+            data = get_fanart_data(results)
+        if data:
             cache.set(
                 identifier,
                 data,
@@ -416,16 +462,36 @@ def search_fanart_tv(tvdb_id, mode="tv"):
     return data
 
 
+def get_fanart_data(fanart_details):
+    fanart_objec = fanart_details["fanart_object"]
+    fanart = clearlogo = poster = ""
+    if fanart_objec:
+        art = fanart_objec.get("art", {})
+        fanart_obj = art.get("fanart", {})
+        if fanart_obj:
+            fanart = fanart_obj[0]["url"]
+
+        clearlogo_obj = art.get("clearlogo", {})
+        if clearlogo_obj:
+            clearlogo = clearlogo_obj[0]["url"]
+
+        poster_obj = art.get("poster", {})
+        if poster_obj:
+            poster = poster_obj[0]["url"]
+
+    return {"fanart": fanart, "clearlogo": clearlogo, "poster": poster}
+
+
 def get_cached(path, params={}):
     identifier = "{}|{}".format(path, params)
     return cache.get(identifier, hashed_key=True)
 
 
-def set_cached(results, path, params={}):
+def set_cached(data, path, params={}):
     identifier = "{}|{}".format(path, params)
     cache.set(
         identifier,
-        results,
+        data,
         timedelta(hours=get_cache_expiration() if is_cache_enabled() else 0),
         hashed_key=True,
     )
@@ -446,62 +512,30 @@ def db_get(name, func, path, params):
     return data
 
 
-def tmdb_get(path, params={}):
+def tvdb_get(path, params={}):
     identifier = "{}|{}".format(path, params)
     data = cache.get(identifier, hashed_key=True)
-    if not data:
-        if path == "search_tv":
-            data = Search().tv_shows(params)
-        elif path == "search_movie":
-            data = Search().movies(params)
-        elif path == "movie_details":
-            data = Movie().details(params)
-        elif path == "tv_details":
-            data = TV().details(params)
-        elif path == "season_details":
-            data = Season().details(params["id"], params["season"])
-        elif path == "movie_genres":
-            data = Genre().movie_list()
-        elif path == "tv_genres":
-            data = Genre().tv_list()
-        elif path == "discover_movie":
-            discover = Discover()
-            data = discover.discover_movies(params)
-        elif path == "discover_tv":
-            discover = Discover()
-            data = discover.discover_tv_shows(params)
-        elif path == "trending_movie":
-            trending = Trending()
-            data = trending.movie_week(page=params)
-        elif path == "trending_tv":
-            trending = Trending()
-            data = trending.tv_day(page=params)
-        elif path == "find":
-            data = Find().find_by_tvdb_id(params)
-        cache.set(
-            identifier,
-            data,
-            timedelta(hours=get_cache_expiration() if is_cache_enabled() else 0),
-            hashed_key=True,
-        )
+    if data:
+        return data
+    if path == "get_imdb_id":
+        data = TVDBAPI().get_imdb_id(params)
+    cache.set(
+        identifier,
+        data,
+        timedelta(hours=get_cache_expiration() if is_cache_enabled() else 0),
+        hashed_key=True,
+    )
     return data
 
 
-def get_movie_data(id):
-    details = tmdb_get("movie_details", id)
-    imdb_id = details.external_ids.get("imdb_id")
-    runtime = details.runtime
-    return imdb_id, "", runtime
+def set_content_type(mode, media_type="movies"):
+    if mode == "tv" or media_type == "tv" or mode == "anime":
+        setContent(ADDON_HANDLE, SHOWS_TYPE)
+    elif mode == "movies" or media_type == "movies":
+        setContent(ADDON_HANDLE, MOVIES_TYPE)
 
 
-def get_tv_data(id):
-    details = tmdb_get("tv_details", id)
-    imdb_id = details.external_ids.get("imdb_id")
-    tvdb_id = details.external_ids.get("tvdb_id")
-    return imdb_id, tvdb_id
-
-
-# This method was taken from script.elementum.jackett
+# This method was taken from script.elementum.jackett addon
 def get_random_color(provider_name):
     hash = hashlib.sha256(provider_name.encode("utf")).hexdigest()
     colors = []
@@ -525,71 +559,65 @@ def get_random_color(provider_name):
 
 
 def get_colored_languages(languages):
-    if len(languages) > 0:
-        colored_languages = []
-        for lang in languages:
-            lang_color = get_random_color(lang)
-            colored_lang = f"[B][COLOR {lang_color}][{lang}][/COLOR][/B]"
-            colored_languages.append(colored_lang)
-        colored_languages = ", " + ", ".join(colored_languages)
-        return colored_languages
+    if not languages:
+        return ""
+    colored_languages = []
+    for lang in languages:
+        lang_color = get_random_color(lang)
+        colored_lang = f"[B][COLOR {lang_color}][{lang}][/COLOR][/B]"
+        colored_languages.append(colored_lang)
+    colored_languages = " ".join(colored_languages)
+    return colored_languages
 
 
-def clear_tmdb_cache():
-    db.database["jt:tmdb"] = {}
-    db.commit()
+def execute_thread_pool(results, func, *args, **kwargs):
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        [executor.submit(func, res, *args, **kwargs) for res in results]
+        executor.shutdown(wait=True)
+
+
+def paginate_list(data, page_size=10):
+    for i in range(0, len(data), page_size):
+        yield data[i : i + page_size]
+
+
+def clear_cache_on_update():
+    clear(update=True)
 
 
 def clear_all_cache():
     cache.clean_all()
-    db.database["jt:tmdb"] = {}
-    db.commit()
+    bookmark_db.clear_bookmarks()
+    clear_cache(cache_type="trakt")
+    clear_cache(cache_type="list")
 
 
-def clear(type=""):
+def clear(type="", update=False):
+    if update:
+        msg = "Do you want to clear your cached history?."
+    else:
+        msg = "Do you want to clear this history?."
     dialog = Dialog()
-    confirmed = dialog.yesno(
-        "Clear History",
-        "Do you want to clear this history list?.",
-    )
+    confirmed = dialog.yesno("Clear History", msg)
     if confirmed:
         if type == "lth":
-            db.database["jt:lth"] = {}
+            main_db.database["jt:lth"] = {}
+        elif type == "lfh":
+            main_db.database["jt:lfh"] = {}
         else:
-            db.database["jt:lfh"] = {}
-        db.commit()
+            main_db.database["jt:lth"] = {}
+            main_db.database["jt:lfh"] = {}
+        main_db.commit()
         container_refresh()
 
 
 def limit_results(results):
-    indexer = get_setting("indexer")
-    if indexer == Indexer.JACKETT:
-        limit = get_int_setting("jackett_results_per_page")
-    elif indexer == Indexer.PROWLARR:
-        limit = get_int_setting("prowlarr_results_per_page")
-    elif indexer == Indexer.TORRENTIO:
-        limit = get_int_setting("torrentio_results_per_page")
-    elif indexer == Indexer.ELHOSTED:
-        limit = get_int_setting("elfhosted_results_per_page")
-    else:
-        limit = 20
+    limit = int(get_setting("indexers_total_results"))
     return results[:limit]
 
 
 def get_description_length():
-    indexer = get_setting("indexer")
-    if indexer == Indexer.JACKETT:
-        desc_length = "jackett_desc_length"
-    elif indexer == Indexer.PROWLARR:
-        desc_length = "prowlarr_desc_length"
-    elif indexer == Indexer.TORRENTIO:
-        desc_length = "torrentio_desc_length"
-    elif indexer == Indexer.ELHOSTED:
-        desc_length = "elfhosted_desc_length"
-    else:
-        desc_length = 150
-        return desc_length
-    return int(get_setting(desc_length))
+    return int(get_setting("indexers_desc_length"))
 
 
 def remove_duplicate(results):
@@ -602,115 +630,145 @@ def remove_duplicate(results):
     return result_dict
 
 
-def post_process(res):
-    if (
-        get_setting("indexer") == Indexer.TORRENTIO
-        and get_setting("torrentio_priority_lang") != "None"
-    ):
-        res = sort_by_priority_language(res)
-    else:
-        res = sort_results(res)
-    return res
-
-
-def pre_process(res, mode, episode_name, episode, season):
-    res = remove_duplicate(res)
-    res = limit_results(res)
-    if mode == "tv":
-        res = filter_by_episode(res, episode_name, episode, season)
-    res = filter_by_quality(res)
-    return res
-
-
-def sort_by_priority_language(results):
-    priority_lang = get_setting("torrentio_priority_lang")
-    priority_lang_list = []
-    non_priority_lang_list = []
-    for res in results:
-        if "languages" in res and priority_lang in res["languages"]:
-            priority_lang_list.append(res)
+def unzip(zip_location, destination_location, destination_check):
+    try:
+        zipfile = ZipFile(zip_location)
+        zipfile.extractall(path=destination_location)
+        if os.path.exists(destination_check):
+            status = True
         else:
-            non_priority_lang_list.append(res)
-    return sort_results(priority_lang_list, non_priority_lang_list)
+            status = False
+    except:
+        status = False
+    return status
 
 
-def filter_by_priority_language(results):
-    indexer = get_setting("indexer")
-    if indexer == Indexer.TORRENTIO:
-        filtered_results = []
-        priority_lang = get_setting("torrentio_priority_lang")
-        for res in results:
-            if priority_lang in res["languages"]:
-                filtered_results.append(res)
-        return filtered_results
+def check_season_pack(results, season_num):
+    season_fill = f"{int(season_num):02}"
+
+    patterns = [
+        # Season as ".S{season_num}." or ".S{season_fill}."
+        r"\.S%s\." % season_num,
+        r"\.S%s\." % season_fill,
+        # Season as " S{season_num} " or " S{season_fill} "
+        r"\sS%s\s" % season_num,
+        r"\sS%s\s" % season_fill,
+        # Season as ".{season_num}.season" (like .1.season, .01.season)
+        r"\.%s\.season" % season_num,
+        # "total.season" or "season" or "the.complete"
+        r"total\.season",
+        r"season",
+        r"the\.complete",
+        r"complete",
+        # Pattern to detect episode ranges like S02E01-02
+        r"S(\d{2})E(\d{2})-(\d{2})",
+        # Season as ".season.{season_num}." or ".season.{season_fill}."
+        r"\.season\.%s\." % season_num,
+        r"\.season%s\." % season_num,
+        r"\.season\.%s\." % season_fill,
+        # Handle cases "s1 to {season_num}", "s1 thru {season_num}", etc.
+        r"s1 to %s" % season_num,
+        r"s1 to s%s" % season_num,
+        r"s01 to %s" % season_fill,
+        r"s01 to s%s" % season_fill,
+        r"s1 thru %s" % season_num,
+        r"s1 thru s%s" % season_num,
+        r"s01 thru %s" % season_fill,
+        r"s01 thru s%s" % season_fill,
+    ]
+
+    combined_pattern = "|".join(patterns)
+
+    for res in results:
+        match = re.search(combined_pattern, res["title"])
+        if match:
+            res["isPack"] = True
+        else:
+            res["isPack"] = False
 
 
-def sort_results(first_res, second_res=None):
-    indexer = get_setting("indexer")
-    if indexer == Indexer.JACKETT:
-        sort_by = get_setting("jackett_sort_by")
-    elif indexer == Indexer.PROWLARR:
-        sort_by = get_setting("prowlarr_sort_by")
-    elif indexer == Indexer.TORRENTIO:
-        sort_by = get_setting("torrentio_sort_by")
-    elif indexer == Indexer.ELHOSTED:
-        sort_by = get_setting("elfhosted_sort_by")
-    else:
-        sort_by = "None"
+def pre_process(results, mode, episode_name, episode, season):
+    results = remove_duplicate(results)
 
-    if sort_by == "None":
-        return first_res
-    elif sort_by == "Seeds":
-        first_sorted = sorted(first_res, key=lambda r: r["seeders"], reverse=True)
-        if second_res:
-            return sort_second_result(first_sorted, second_res, type="seeders")
-    elif sort_by == "Size":
-        first_sorted = sorted(first_res, key=lambda r: r["size"], reverse=True)
-        if second_res:
-            return sort_second_result(first_sorted, second_res, type="size")
-    elif sort_by == "Date":
-        first_sorted = sorted(first_res, key=lambda r: r["publishDate"], reverse=True)
-        if second_res:
-            return sort_second_result(first_sorted, second_res, type="publishDate")
-    elif sort_by == "Quality":
-        first_sorted = sorted(first_res, key=lambda r: r["Quality"], reverse=True)
-        if second_res:
-            return sort_second_result(first_sorted, second_res, type="Quality")
-    elif sort_by == "Cached":
-        first_sorted = sorted(first_res, key=lambda r: r["debridCached"], reverse=True)
-        if second_res:
-            return sort_second_result(first_sorted, second_res, type="debridCached")
+    if get_setting("stremio_enabled") and get_setting("torrent_enable"):
+        results = filter_torrent_sources(results)
 
-    return first_sorted
+    if mode == "tv" and get_setting("filter_by_episode"):
+        results = filter_by_episode(results, episode_name, episode, season)
+
+    results = filter_by_quality(results)
+
+    return results
 
 
-def sort_second_result(first_sorted, second_res, type):
-    second_sorted = sorted(second_res, key=lambda r: r[type], reverse=True)
-    first_sorted.extend(second_sorted)
-    return first_sorted
+def post_process(results, season=0):
+    if int(season) > 0:
+        check_season_pack(results, season)
+
+    results = sort_results(results)
+
+    results = limit_results(results)
+
+    return results
+
+
+def filter_torrent_sources(results):
+    filtered_results = []
+    for res in results:
+        if res["infoHash"] or res["guid"]:
+            filtered_results.append(res)
+    return filtered_results
+
+
+def sort_results(res):
+    sort_by = get_setting("indexers_sort_by")
+
+    field_to_sort = {
+        "Seeds": "seeders",
+        "Size": "size",
+        "Date": "publishDate",
+        "Quality": "quality",
+        "Cached": "isCached",
+    }
+
+    if sort_by in field_to_sort:
+        res = sorted(res, key=lambda r: r.get(field_to_sort[sort_by], 0), reverse=True)
+
+    priority_language = get_setting("priority_language").lower()
+    if priority_language and priority_language != "None":
+        res = sorted(
+            res, key=lambda r: priority_language in r.get("languages", []), reverse=True
+        )
+
+    return res
 
 
 def filter_by_episode(results, episode_name, episode_num, season_num):
-    episode_num = f"{int(episode_num):02}"
-    season_num = f"{int(season_num):02}"
+    episode_fill = f"{int(episode_num):02}"
+    season_fill = f"{int(season_num):02}"
+
+    patterns = [
+        r"S%sE%s" % (season_fill, episode_fill),  # SXXEXX format
+        r"%sx%s" % (season_fill, episode_fill),  # XXxXX format
+        r"\s%s\s" % season_fill,  # season surrounded by spaces
+        r"\.S%s" % season_fill,  # .SXX format
+        r"\.S%sE%s" % (season_fill, episode_fill),  # .SXXEXX format
+        r"\sS%sE%s\s"
+        % (season_fill, episode_fill),  # season and episode surrounded by spaces
+        r"Cap\.",  # match "Cap."
+    ]
+
+    if episode_name:
+        patterns.append(episode_name)
+
+    combined_pattern = "|".join(patterns)
 
     filtered_episodes = []
-    pattern1 = "S%sE%s" % (season_num, episode_num)
-    pattern2 = "%sx%s" % (season_num, episode_num)
-    pattern3 = "\s%s\s" % (episode_num)
-    pattern4 = "\.S%s" % (season_num)
-    pattern5 = "\.S%sE%s" % (season_num, episode_num)
-    pattern6 = "\sS%sE%s\s" % (season_num, episode_num)
-
-    pattern = "|".join(
-        [pattern1, pattern2, pattern3, pattern4, pattern5, pattern6, episode_name]
-    )
-
     for res in results:
-        title = res["title"]
-        match = re.search(f"r{pattern}", title)
+        match = re.search(combined_pattern, res["title"])
         if match:
             filtered_episodes.append(res)
+
     return filtered_episodes
 
 
@@ -723,34 +781,38 @@ def filter_by_quality(results):
     for res in results:
         title = res["title"]
         if "480p" in title:
-            res["quality_title"] = "[B][COLOR orange]480p - [/COLOR][/B]" + res["title"]
-            res["Quality"] = "480p"
+            res["quality"] = "[B][COLOR orange]480p[/COLOR][/B]"
             quality_720p.append(res)
         elif "720p" in title:
-            res["quality_title"] = "[B][COLOR orange]720p - [/COLOR][/B]" + res["title"]
-            res["Quality"] = "720p"
+            res["quality"] = "[B][COLOR orange]720p[/COLOR][/B]"
             quality_720p.append(res)
         elif "1080p" in title:
-            res["quality_title"] = "[B][COLOR blue]1080p - [/COLOR][/B]" + res["title"]
-            res["Quality"] = "1080p"
+            res["quality"] = "[B][COLOR blue]1080p[/COLOR][/B]"
             quality_1080p.append(res)
         elif "2160" in title:
-            res["quality_title"] = "[B][COLOR yellow]4k - [/COLOR][/B]" + res["title"]
-            res["Quality"] = "4k"
+            res["quality"] = "[B][COLOR yellow]4k[/COLOR][/B]"
             quality_4k.append(res)
         else:
-            res["quality_title"] = "[B][COLOR yellow]N/A - [/COLOR][/B]" + res["title"]
-            res["Quality"] = "N/A"
+            res["quality"] = "[B][COLOR yellow]N/A[/COLOR][/B]"
             no_quarlity.append(res)
 
     combined_list = quality_4k + quality_1080p + quality_720p + no_quarlity
     return combined_list
 
 
+def clean_auto_play_undesired(results):
+    undesired = ("SD", "CAM", "TELE", "SYNC", "480p")
+    for res in copy.deepcopy(results):
+        if res.get("isPack"):
+            results.remove(res)
+        else:
+            if any(u in res["title"] for u in undesired):
+                results.remove(res)
+    return results[0]
+
+
 def is_torrent_url(uri):
-    res = requests.get(
-        uri, allow_redirects=False, timeout=20, headers=USER_AGENT_HEADER
-    )
+    res = requests.head(uri, timeout=20, headers=USER_AGENT_HEADER)
     if (
         res.status_code == 200
         and res.headers.get("Content-Type") == "application/octet-stream"
@@ -763,6 +825,22 @@ def is_torrent_url(uri):
 def supported_video_extensions():
     media_types = getSupportedMedia("video")
     return media_types.split("|")
+
+
+def add_next_button(func_name, page=1, **kwargs):
+    list_item = ListItem(label="Next")
+    list_item.setArt(
+        {"icon": os.path.join(ADDON_PATH, "resources", "img", "nextpage.png")}
+    )
+
+    page += 1
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url(func_name, page=page, **kwargs),
+        list_item,
+        isFolder=True,
+    )
+    endOfDirectory(ADDON_HANDLE)
 
 
 def is_video(s):
@@ -825,3 +903,40 @@ def unicode_flag_to_country_code(unicode_flag):
 
     country_code = first_letter.lower() + second_letter.lower()
     return country_code
+
+
+def debrid_dialog_update(type, total, dialog, lock):
+    with lock:
+        dialog_update["count"] += 1
+        dialog_update["percent"] += 2
+
+        dialog.update(
+            dialog_update.get("percent"),
+            f"Jacktook [COLOR FFFF6B00]Debrid-{type}[/COLOR]",
+            f"Checking: {dialog_update.get('count')}/{total}",
+        )
+
+
+def get_public_ip():
+    public_ip = cache.get("public_ip")
+    if not public_ip:
+        try:
+            response = requests.get("https://ipconfig.io/ip", timeout=5)
+            response.raise_for_status()
+            public_ip = response.text.strip()
+            cache.set(
+                "public_ip",
+                public_ip,
+                timedelta(hours=get_cache_expiration() if is_cache_enabled() else 0),
+            )
+        except requests.RequestException as e:
+            kodilog(f"Error getting public ip: {e}")
+            return None
+    return public_ip
+
+
+def extract_publish_date(date):
+    if not date:
+        return ""
+    match = re.search(r"\d{4}-\d{2}-\d{2}", date)
+    return match.group() if match else ""

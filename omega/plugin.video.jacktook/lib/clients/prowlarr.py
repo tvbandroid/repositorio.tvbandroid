@@ -1,19 +1,18 @@
-import json
-import requests
-from lib.utils.kodi import get_prowlarr_timeout, notify, translation
+from lib.clients.base import BaseClient
+from lib.utils.kodi_utils import translation
+from lib.utils.settings import get_prowlarr_timeout
 
 
-class Prowlarr:
-    def __init__(self, host, apikey, notification) -> None:
-        self.host = host.rstrip("/")
+class Prowlarr(BaseClient):
+    def __init__(self, host, apikey, notification):
+        super().__init__(host, notification)
+        self.base_url = f"{self.host}/api/v1/search"
         self.apikey = apikey
-        self._notification = notification
 
     def search(
         self,
         query,
         mode,
-        imdb_id,
         season,
         episode,
         indexers,
@@ -23,39 +22,48 @@ class Prowlarr:
             "Content-Type": "application/json",
             "X-Api-Key": self.apikey,
         }
+
         try:
+            params = {"query": query}
+            params["type"] = "search"
+            
             if mode == "tv":
-                query = (
-                    f"{query}{{Season:{int(season):02}}}{{Episode:{int(episode):02}}}"
-                )
-                url = f"{self.host}/api/v1/search?query={query}&categories=5000&type=tvsearch"
-            elif mode == "movie":
-                url = f"{self.host}/api/v1/search?query={query}&categories=2000"
-            elif mode == "multi":
-                url = f"{self.host}/api/v1/search?query={query}"
+                params["categories"] = [5000, 8000]
+                query = f"{query} S{int(season):02d}E{int(episode):02d}"
+                params["query"] = query
+            elif mode == "movies":
+                params["categories"] = [2000, 8000]
+
             if indexers:
-                indexers_ids = indexers.split(",")
-                indexers_ids = "".join(
-                    [f"&indexerIds={index}" for index in indexers_ids]
-                )
-                url = url + indexers_ids
-            res = requests.get(url, timeout=get_prowlarr_timeout(), headers=headers)
-            if res.status_code != 200:
-                notify(f"{translation(30230)} {res.status_code}")
+                for indexer_id in indexers.split():
+                    params[f"indexerIds"] = indexer_id
+
+            response = self.session.get(
+                self.base_url,
+                params=params,
+                timeout=get_prowlarr_timeout(),
+                headers=headers,
+            )
+            if response.status_code != 200:
+                self.notification(f"{translation(30230)} {response.status_code}")
                 return
-            res = json.loads(res.text)
-            for r in res:
-                r.update(
-                    {
-                        "quality_title": "",
-                        "debridType": "",
-                        "debridCached": False,
-                        "debridPack": False,
-                    }
-                )
-            return res
+            return self.parse_response(response)
         except Exception as e:
-            self._notification(f"{translation(30230)}: {str(e)}")
+            self.handle_exception(f"{translation(30230)}: {str(e)}")
+
+    def parse_response(self, res):
+        response = res.json()
+        for res in response:
+            res.update(
+                {
+                    "type": "Torrent",
+                    "indexer": "Prowlarr",
+                    "provider": res.get("indexer"),
+                    "peers": int(res.get("peers", 0)),
+                    "seeders": int(res.get("seeders", 0)),
+                }
+            )
+        return response
 
 
 """ if anime_indexers:

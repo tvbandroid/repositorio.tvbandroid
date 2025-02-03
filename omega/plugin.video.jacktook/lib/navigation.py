@@ -1,85 +1,105 @@
-from functools import wraps
-import logging
+from ast import literal_eval
+from datetime import timedelta
 import os
 from threading import Thread
-import requests
+from urllib.parse import quote
 
-from lib.api.premiumize_api import Premiumize
-from lib.api.real_debrid_api import RealDebrid
-from lib.api.jacktorr_api import (
-    TorrServer,
+from lib.clients.debrid.premiumize import Premiumize
+from lib.clients.debrid.realdebrid import RealDebrid
+from lib.clients.debrid.torbox import Torbox
+from lib.api.jacktook.kodi import kodilog
+from lib.api.jacktorr_api import TorrServer
+from lib.api.tmdbv3api.tmdb import TMDb
+from lib.db.bookmark_db import bookmark_db
+from lib.gui.custom_dialogs import (
+    CustomDialog,
+    resume_dialog_mock,
+    run_next_mock,
+    source_select,
+    source_select_mock,
+)
+
+from lib.player import JacktookPLayer
+from lib.utils.seasons import show_episode_info, show_season_info
+from lib.utils.tmdb_utils import get_tmdb_media_details
+from lib.utils.torrentio_utils import open_providers_selection
+from lib.api.trakt.trakt_api import (
+    trakt_authenticate,
+    trakt_revoke_authentication,
 )
 from lib.clients.search import search_client
-from lib.debrid import check_debrid_cached
 from lib.files_history import last_files
-from lib.indexer import indexer_show_results
-from lib.play import make_listing, play
-from lib.player import JacktookPlayer
-from lib.simkl import search_simkl_episodes
+from lib.play import get_playback_info
 from lib.titles_history import last_titles
-from lib.utils.kodi_formats import is_music, is_picture, is_text
-from lib.utils.pm_utils import get_pm_link, get_pm_pack
-from lib.utils.rd_utils import get_rd_link, get_rd_pack, get_rd_pack_link
-from routing import Plugin
 
-from lib.api.tmdbv3api.tmdb import TMDb
-from lib.tmdb import (
-    TMDB_POSTER_URL,
-    tmdb_search,
-    tmdb_show_results,
+from lib.trakt import (
+    handle_trakt_query,
+    show_trakt_list_content,
+    show_list_trakt_page,
 )
-from lib.anilist import search_anilist
+
+from lib.utils.rd_utils import get_rd_info
+from lib.utils.items_menus import tv_items, movie_items, anime_items, animation_items
+from lib.utils.debrid_utils import check_debrid_cached
+
+from lib.tmdb import (
+    handle_tmdb_anime_query,
+    handle_tmdb_query,
+    tmdb_search_genres,
+    tmdb_search_year,
+)
+from lib.utils.tmdb_consts import LANGUAGES
+
+from lib.db.cached import cache
+
 from lib.utils.utils import (
+    TMDB_POSTER_URL,
     DialogListener,
+    clean_auto_play_undesired,
     clear,
     clear_all_cache,
-    clear_tmdb_cache,
+    get_fanart_details,
     get_password,
+    get_random_color,
     get_service_host,
     get_username,
+    make_listing,
     post_process,
     pre_process,
-    search_fanart_tv,
     get_port,
-    is_video,
     list_item,
-    set_pack_art,
-    set_pack_item_pm,
-    set_pack_item_rd,
-    set_video_info,
-    set_video_infotag,
+    set_content_type,
     set_watched_title,
     ssl_enabled,
-    tmdb_get,
+    check_debrid_enabled,
+    Debrids,
 )
-from lib.utils.kodi import (
+
+from lib.utils.kodi_utils import (
+    ADDON_HANDLE,
     ADDON_PATH,
     EPISODES_TYPE,
-    MOVIES_TYPE,
     SHOWS_TYPE,
     JACKTORR_ADDON,
-    action,
-    addon_settings,
-    addon_status,
-    auto_play,
-    buffer_and_play,
-    burst_addon_settings,
-    close_all_dialog,
+    action_url_run,
+    build_url,
+    cancel_playback,
     container_update,
-    dialogyesno,
-    get_kodi_version,
-    get_setting,
-    log,
-    notify,
-    play_info_hash,
     play_media,
-    refresh,
+    show_keyboard,
+    burst_addon_settings,
+    get_setting,
+    notification,
+    play_info_hash,
     set_view,
-    show_picture,
     translation,
 )
-from xbmcgui import ListItem, Dialog
-from xbmc import getLanguage, ISO_639_1
+
+from lib.utils.settings import get_cache_expiration, is_auto_play
+from lib.utils.settings import addon_settings
+from lib.updater import updates_check_addon
+
+from xbmcgui import ListItem
 from xbmcplugin import (
     addDirectoryItem,
     endOfDirectory,
@@ -88,7 +108,7 @@ from xbmcplugin import (
     setContent,
 )
 
-plugin = Plugin()
+paginator = None
 
 if JACKTORR_ADDON:
     api = TorrServer(
@@ -97,835 +117,877 @@ if JACKTORR_ADDON:
 
 tmdb = TMDb()
 tmdb.api_key = get_setting("tmdb_apikey", "b70756b7083d9ee60f849d82d94a0d80")
-kodi_lang = getLanguage(ISO_639_1)
-if kodi_lang:
-    tmdb.language = kodi_lang
+
+try:
+    language_index = get_setting("language")
+    tmdb.language = LANGUAGES[int(language_index)]
+except IndexError:
+    tmdb.language = "en-US"
+except ValueError:
+    tmdb.language = "en-US"
 
 
-def query_arg(name, required=True):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            if name not in kwargs:
-                query_list = plugin.args.get(name)
-                if query_list:
-                    if name in ["rescrape", "is_torrent", "is_debrid"]:
-                        kwargs[name] = eval(query_list[0])
-                    else:
-                        kwargs[name] = query_list[0]
-                elif required:
-                    raise AttributeError(
-                        "Missing {} required query argument".format(name)
-                    )
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-def check_directory(func):
-    def wrapper(*args, **kwargs):
-        succeeded = False
-        try:
-            ret = func(*args, **kwargs)
-            succeeded = True
-            return ret
-        finally:
-            endOfDirectory(plugin.handle, succeeded=succeeded)
-
-    return wrapper
-
-
-@plugin.route("/")
-@check_directory
-def main_menu():
-    setPluginCategory(plugin.handle, "Main Menu")
+def root_menu():
+    setPluginCategory(ADDON_HANDLE, "Main Menu")
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search_tmdb, mode="multi", genre_id=-1, page=1),
+        ADDON_HANDLE,
+        build_url("search_tmdb", mode="multi", page=1),
         list_item("Search", "search.png"),
         isFolder=True,
     )
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search_tmdb, mode="tv", genre_id=-1, page=1),
+        ADDON_HANDLE,
+        build_url("tv_shows_items"),
         list_item("TV Shows", "tv.png"),
         isFolder=True,
     )
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search_tmdb, mode="movie", genre_id=-1, page=1),
+        ADDON_HANDLE,
+        build_url("movies_items"),
         list_item("Movies", "movies.png"),
         isFolder=True,
     )
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(anime_menu),
+        ADDON_HANDLE,
+        build_url("anime_menu"),
         list_item("Anime", "anime.png"),
         isFolder=True,
     )
+
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(genre_menu),
-        list_item("By Genre", "movies.png"),
+        ADDON_HANDLE,
+        build_url("animation_menu"),
+        list_item("Animation", "anime.png"),
         isFolder=True,
     )
+
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(direct_menu),
+        ADDON_HANDLE,
+        build_url("direct_menu"),
         list_item("Direct Search", "search.png"),
         isFolder=True,
     )
 
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(torrents),
-        list_item("Torrents", "settings.png"),
+        ADDON_HANDLE,
+        build_url("torrents"),
+        list_item("Torrents", "magnet2.png"),
+        isFolder=True,
+    )
+
+    if get_setting("show_telegram_menu"):
+        addDirectoryItem(
+            ADDON_HANDLE,
+            build_url("telegram_menu"),
+            list_item("Telegram", "cloud.png"),
+            isFolder=True,
+        )
+
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("cloud"),
+        list_item("Cloud", "cloud.png"),
         isFolder=True,
     )
 
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(settings),
+        ADDON_HANDLE,
+        build_url("settings"),
         list_item("Settings", "settings.png"),
         isFolder=True,
     )
 
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(status),
-        list_item("Status", "status.png"),
-        isFolder=True,
-    )
-
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(history),
+        ADDON_HANDLE,
+        build_url("history"),
         list_item("History", "history.png"),
         isFolder=True,
     )
 
-
-@plugin.route("/direct")
-@check_directory
-def direct_menu():
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search, mode="multi"),
-        list_item("Search", "search.png"),
-        isFolder=True,
-    )
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search, mode="tv"),
-        list_item("TV Search", "tv.png"),
-        isFolder=True,
-    )
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search, mode="movie"),
-        list_item("Movie Search", "movies.png"),
+        ADDON_HANDLE,
+        build_url("donate"),
+        list_item("Donate", "donate.png"),
         isFolder=True,
     )
 
+    # addDirectoryItem(
+    #     ADDON_HANDLE,
+    #     build_url("test_resume_dialog"),
+    #     list_item("Test", ""),
+    #     isFolder=False,
+    # )
 
-@plugin.route("/anime")
-@check_directory
-def anime_menu():
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(anilist, category="search"),
-        list_item("Search", "search.png"),
-        isFolder=True,
-    )
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(
-            anilist,
-            category="Popular",
-        ),
-        list_item("Popular", "tv.png"),
-        isFolder=True,
-    )
-    addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(anilist, category="Trending"),
-        list_item("Trending", "movies.png"),
-        isFolder=True,
-    )
+    endOfDirectory(ADDON_HANDLE, cacheToDisc=False)
 
 
-@plugin.route("/genre")
-@check_directory
-def genre_menu():
+def animation_menu(params):
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search_tmdb, mode="tv_genres", genre_id=-1, page=1),
+        ADDON_HANDLE,
+        build_url("animation_item", mode="tv"),
         list_item("TV Shows", "tv.png"),
         isFolder=True,
     )
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(search_tmdb, mode="movie_genres", genre_id=-1, page=1),
+        ADDON_HANDLE,
+        build_url("animation_item", mode="movies"),
         list_item("Movies", "movies.png"),
         isFolder=True,
     )
+    endOfDirectory(ADDON_HANDLE)
 
 
-@plugin.route("/search_tmdb/<mode>/<genre_id>/<page>")
-def search_tmdb(mode, genre_id, page):
-    if mode in ["movie", "movie_genres"]:
-        setContent(plugin.handle, MOVIES_TYPE)
-    elif mode in ["tv", "tv_genres"]:
-        setContent(plugin.handle, SHOWS_TYPE)
-
-    page = int(page)
-    data = tmdb_search(mode, genre_id, page, search_tmdb, plugin)
-    if data:
-        if data.total_results == 0:
-            notify("No results found")
-            return
-        tmdb_show_results(
-            data.results,
-            next_func=next_page,
-            page=page,
-            plugin=plugin,
-            genre_id=genre_id,
-            mode=mode,
-        )
-
-
-@plugin.route("/search")
-@query_arg("mode", required=True)
-@query_arg("media_type", required=False)
-@query_arg("query", required=False)
-@query_arg("ids", required=False)
-@query_arg("tv_data", required=False)
-@query_arg("rescrape", required=False)
-def search(mode="", media_type="", query="", ids="", tv_data="", rescrape=False):
-    if mode == "movie" or media_type == "movie":
-        setContent(plugin.handle, MOVIES_TYPE)
-    elif mode == "tv" or media_type == "tv":
-        setContent(plugin.handle, SHOWS_TYPE)
-
-    set_watched_title(query, ids, mode)
-    if tv_data:
-        ep_name, episode, season = tv_data.split("(^)")
-    else:
-        episode = season = 0
-        ep_name = ""
-    
-    torr_client = get_setting("torrent_client")
-
-    with DialogListener() as listener:
-        p_dialog = listener.dialog
-        results = search_client(
-            query, ids, mode, media_type, p_dialog, rescrape, season, episode
-        )
-        if results:
-            proc_results = pre_process(
-                results,
-                mode,
-                ep_name,
-                episode,
-                season,
-            )
-            if proc_results:
-                if torr_client == "Debrid" or torr_client == "All":
-                    deb_cached_results = check_debrid_cached(
-                        query,
-                        proc_results,
-                        mode,
-                        media_type,
-                        p_dialog,
-                        rescrape,
-                        episode,
-                    )
-                    if deb_cached_results:
-                        final_results = post_process(deb_cached_results)
-                        if auto_play():
-                            close_all_dialog()
-                            p_dialog.close()
-                            play_first_result(deb_cached_results, ids, tv_data, mode)
-                            return
-                    else:
-                        notify("No debrid results")
-                        return
-                elif torr_client in ["Torrest", "Elementum", "Jacktorr"]:
-                    final_results = post_process(proc_results)
-                indexer_show_results(
-                    final_results,
-                    mode,
-                    query,
-                    ids,
-                    tv_data,
-                    plugin,
-                )
-            else:
-                notify("No results")
-        else:
-            notify("No results")
-
-def play_first_result(results, ids, tv_data, mode):
-    for res in results:
-        if res["debridPack"]:
-            continue
-        play_media(
-            plugin,
-            play_torrent,
-            title=results[0]["title"],
-            ids=ids,
-            tv_data=tv_data,
-            info_hash=results[0]["infoHash"],
-            torrent_id=results[0]["debridId"],
-            debrid_type=results[0]["debridType"],
-            is_debrid=True,
-            mode=mode,
-        )
-        break
-
-
-@plugin.route("/play_torrent")
-@query_arg("title", required=True)
-@query_arg("url", required=False)
-@query_arg("magnet", required=False)
-@query_arg("ids", required=False)
-@query_arg("tv_data", required=False)
-@query_arg("info_hash", required=False)
-@query_arg("torrent_id", required=False)
-@query_arg("is_torrent", required=False)
-@query_arg("is_debrid", required=False)
-@query_arg("debrid_type", required=False)
-@query_arg("mode", required=False)
-def play_torrent(
-    title,
-    url="",
-    magnet="",
-    ids="",
-    tv_data="",
-    torrent_id="",
-    info_hash="",
-    mode="",
-    debrid_type="",
-    is_torrent=False,
-    is_debrid=False,
-):
-
-    if torrent_id and debrid_type == "RD":
-        rd_client = RealDebrid(encoded_token=get_setting("real_debrid_token"))
-        url = get_rd_link(rd_client, torrent_id)
-    if info_hash and debrid_type == "PM":
-        pm_client = Premiumize(token=get_setting("premiumize_token"))
-        url = get_pm_link(pm_client, info_hash)
-    play(
-        url,
-        magnet,
-        ids,
-        tv_data,
-        title,
-        plugin,
-        debrid_type,
-        mode,
-        is_debrid,
-        is_torrent,
-    )
-
-
-@plugin.route("/torrents")
-@check_directory
-def torrents():
-    if JACKTORR_ADDON:
-        for torrent in api.torrents():
-            info_hash = torrent.get("hash")
-
-            context_menu_items = [(translation(30700), play_info_hash(info_hash))]
-
-            if torrent.get("stat") in [2, 3]:
-                context_menu_items.append(
-                    (
-                        translation(30709),
-                        action(plugin, torrent_action, info_hash, "drop"),
-                    )
-                )
-
-            context_menu_items.extend(
-                [
-                    (
-                        translation(30705),
-                        action(plugin, torrent_action, info_hash, "remove_torrent"),
-                    ),
-                    (
-                        translation(30707),
-                        action(plugin, torrent_action, info_hash, "torrent_status"),
-                    ),
-                ]
-            )
-
-            torrent_li = list_item(torrent.get("title", ""), "download.png")
-            torrent_li.addContextMenuItems(context_menu_items)
+def animation_item(params):
+    mode = params.get("mode")
+    if mode == "tv":
+        for item in animation_items:
             addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(torrent_files, info_hash),
-                torrent_li,
+                ADDON_HANDLE,
+                build_url(
+                    "search_item",
+                    category=item["category"],
+                    mode=item["mode"],
+                    submode=mode,
+                    api=item["api"],
+                ),
+                list_item(item["name"], item["icon"]),
                 isFolder=True,
             )
-    else:
-        notify("Addon Jacktorr not found")
-
-
-@plugin.route("/torrents/<info_hash>/<action_str>")
-def torrent_action(info_hash, action_str):
-    needs_refresh = True
-
-    if action_str == "drop":
-        api.drop_torrent(info_hash)
-    elif action_str == "remove_torrent":
-        api.remove_torrent(info_hash)
-    elif action_str == "torrent_status":
-        torrent_status(info_hash)
-        needs_refresh = False
-    else:
-        logging.error("Unknown action '%s'", action_str)
-        needs_refresh = False
-
-    if needs_refresh:
-        refresh()
-
-
-@plugin.route("/torrents/<info_hash>")
-@check_directory
-def torrent_files(info_hash):
-    info = api.get_torrent_info(link=info_hash)
-    file_stats = info.get("file_stats")
-
-    for f in file_stats:
-        name = f.get("path")
-        id = f.get("id")
-        serve_url = api.get_stream_url(link=info_hash, path=f.get("path"), file_id=id)
-        file_li = list_item(name, "download.png")
-        file_li.setPath(serve_url)
-
-        context_menu_items = []
-        info_type = None
-        info_labels = {"title": info.get("title")}
-        kwargs = dict(info_hash=info_hash, file_id=id, path=name)
-
-        if is_picture(name):
-            url = plugin.url_for(display_picture, **kwargs)
-            file_li.setInfo("pictures", info_labels)
-        elif is_text(name):
-            url = plugin.url_for(display_text, **kwargs)
-        else:
-            url = serve_url
-            if is_video(name):
-                info_type = "video"
-            elif is_music(name):
-                info_type = "music"
-
-            if info_type is not None:
-                file_li.setInfo(info_type, info_labels)
-                file_li.setProperty("IsPlayable", "true")
-
-                context_menu_items.append(
-                    (
-                        translation(30700),
-                        buffer_and_play(**kwargs),
-                    )
-                )
-
-                file_li.addContextMenuItems(context_menu_items)
-
-        if info_type is not None:
-            addDirectoryItem(
-                plugin.handle,
-                plugin.url_for(play_url, url=serve_url, name=name),
-                file_li,
-            )
-        else:
-            addDirectoryItem(plugin.handle, url, file_li)
-
-
-@plugin.route("/play_url")
-@query_arg("url")
-@query_arg("name")
-def play_url(url, name):
-    list_item = ListItem(name, path=url)
-    make_listing(list_item, mode="multi", title=name)
-
-    setResolvedUrl(plugin.handle, True, list_item)
-    player = JacktookPlayer()
-    player.set_constants(url)
-    player.run(list_item)
-
-
-@plugin.route("/display_picture/<info_hash>/<file_id>")
-@query_arg("path")
-def display_picture(info_hash, file_id, path):
-    show_picture(api.get_stream_url(link=info_hash, path=path, file_id=file_id))
-
-
-@plugin.route("/display_text/<info_hash>/<file_id>")
-@query_arg("path")
-def display_text(info_hash, file_id, path):
-    r = requests.get(api.get_stream_url(link=info_hash, path=path, file_id=file_id))
-    Dialog().textviewer(path, r.text)
-
-
-@plugin.route("/tv/details")
-@query_arg("ids", required=False)
-@query_arg("mode", required=False)
-@query_arg("media_type", required=False)
-@check_directory
-def tv_seasons_details(ids, mode, media_type=None):
-    setContent(plugin.handle, SHOWS_TYPE)
-    tmdb_id, tvdb_id, _ = ids.split(", ")
-
-    details = tmdb_get("tv_details", tmdb_id)
-    name = details.name
-    seasons = details.seasons
-    overview = details.overview
-
-    set_watched_title(name, ids, mode=mode, media_type=media_type)
-
-    show_poster = TMDB_POSTER_URL + details.get("poster_path", "")
-    fanart_data = search_fanart_tv(tvdb_id)
-    fanart = fanart_data["fanart"] if fanart_data else ""
-
-    for s in seasons:
-        season_name = s.name
-        if "Specials" in season_name:
-            continue
-        season_number = s.season_number
-        if season_number == 0:
-            continue
-        if s.poster_path:
-            poster = TMDB_POSTER_URL + s.poster_path
-        else:
-            poster = show_poster
-
-        list_item = ListItem(label=season_name)
-
-        if get_kodi_version() >= 20:
-            set_video_infotag(
-                list_item, mode, name, overview, season_number=season_number, ids=ids
-            )
-        else:
-            set_video_info(
-                list_item, mode, name, overview, season_number=season_number, ids=ids
-            )
-
-        list_item.setArt(
-            {
-                "poster": poster,
-                "tvshow.poster": poster,
-                "fanart": fanart,
-                "icon": os.path.join(ADDON_PATH, "resources", "img", "trending.png"),
-            }
-        )
-        list_item.setProperty("IsPlayable", "false")
-
-        addDirectoryItem(
-            plugin.handle,
-            plugin.url_for(
-                tv_episodes_details,
-                tv_name=name,
-                ids=ids,
-                mode=mode,
-                media_type=media_type,
-                season=season_number,
-            ),
-            list_item,
-            isFolder=True,
-        )
-
-    set_view("widelist")
-
-
-@plugin.route("/tv/details/season/<tv_name>/<season>")
-@query_arg("ids", required=False)
-@query_arg("mode", required=False)
-@query_arg("media_type", required=False)
-@check_directory
-def tv_episodes_details(tv_name, season, ids, mode, media_type):
-    setContent(plugin.handle, EPISODES_TYPE)
-    tmdb_id, tvdb_id, _ = ids.split(", ")
-    season_details = tmdb_get("season_details", {"id": tmdb_id, "season": season})
-    fanart_data = search_fanart_tv(tvdb_id)
-
-    for ep in season_details.episodes:
-        ep_name = ep.name
-        episode = ep.episode_number
-        label = f"{season}x{episode}. {ep_name}"
-        air_date = ep.air_date
-        duration = ep.runtime
-        tv_data = f"{ep_name}(^){episode}(^){season}"
-
-        still_path = ep.get("still_path", "")
-        if still_path:
-            poster = TMDB_POSTER_URL + still_path
-        else:
-            poster = fanart_data.get("fanart", "") if fanart_data else ""
-
-        list_item = ListItem(label=label)
-
-        if get_kodi_version() >= 20:
-            set_video_infotag(
-                list_item,
-                mode,
-                tv_name,
-                ep.overview,
-                episode=episode,
-                duration=duration,
-                air_date=air_date,
-                ids=ids,
-            )
-        else:
-            set_video_info(
-                list_item,
-                mode,
-                tv_name,
-                ep.overview,
-                episode=episode,
-                duration=duration,
-                air_date=air_date,
-                ids=ids,
-            )
-
-        list_item.setArt(
-            {
-                "poster": poster,
-                "tvshow.poster": poster,
-                "fanart": poster,
-                "icon": os.path.join(ADDON_PATH, "resources", "img", "trending.png"),
-            }
-        )
-        list_item.setProperty("IsPlayable", "false")
-        list_item.addContextMenuItems(
-            [
-                (
-                    "Rescrape item",
-                    container_update(
-                        name="search",
-                        mode=mode,
-                        query=tv_name,
-                        ids=ids,
-                        tv_data=tv_data,
-                        rescrape=True,
+    if mode == "movies":
+        for item in animation_items:
+            if item["api"] == "tmdb":
+                addDirectoryItem(
+                    ADDON_HANDLE,
+                    build_url(
+                        "search_item",
+                        category=item["category"],
+                        mode=item["mode"],
+                        submode=mode,
+                        api=item["api"],
                     ),
+                    list_item(item["name"], item["icon"]),
+                    isFolder=True,
                 )
-            ]
-        )
+    endOfDirectory(ADDON_HANDLE)
 
+
+def telegram_menu(params):
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("get_telegram_latest", page=1),
+        list_item("Latest", "cloud.png"),
+        isFolder=True,
+    )
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("get_telegram_files", page=1),
+        list_item("Files", "cloud.png"),
+        isFolder=True,
+    )
+    endOfDirectory(ADDON_HANDLE)
+
+
+def search_tmdb_year(params):
+    mode = params["mode"]
+    submode = params["submode"]
+    page = int(params["page"])
+    year = int(params["year"])
+
+    set_content_type(mode)
+
+    tmdb_search_year(mode, submode, year, page)
+
+
+def search_tmdb_genres(params):
+    mode = params["mode"]
+    submode = params["submode"]
+    genre_id = params["genre_id"]
+    page = int(params["page"])
+
+    set_content_type(mode)
+
+    tmdb_search_genres(mode, genre_id, page, submode=submode)
+
+
+def tv_shows_items(params):
+    for item in tv_items:
         addDirectoryItem(
-            plugin.handle,
-            plugin.url_for(
-                search,
-                mode=mode,
-                media_type=media_type,
-                query=tv_name,
-                ids=ids,
-                tv_data=tv_data,
+            ADDON_HANDLE,
+            build_url(
+                "search_item", mode=item["mode"], query=item["query"], api=item["api"]
             ),
-            list_item,
+            list_item(item["name"], item["icon"]),
             isFolder=True,
         )
-
-    set_view("widelist")
-
-
-@plugin.route("/get_rd_link_pack")
-@query_arg("args", required=False)
-@query_arg("ids", required=False)
-@query_arg("tv_data", required=False)
-@query_arg("mode", required=False)
-def get_rd_link_pack(args, ids, mode, tv_data=""):
-    id, torrent_id, debrid_type, title = args.split(" ", 3)
-    url = get_rd_pack_link(id, torrent_id)
-    play(
-        url=url,
-        magnet="",
-        ids=ids,
-        tv_data=tv_data,
-        mode=mode,
-        title=title,
-        is_debrid=True,
-        debrid_type=debrid_type,
-        plugin=plugin,
-    )
+    endOfDirectory(ADDON_HANDLE)
 
 
-@plugin.route("/show_pack")
-@query_arg("ids", required=False)
-@query_arg("query", required=False)
-@query_arg("mode", required=False)
-@query_arg("tv_data", required=False)
-def show_pack(ids, query, mode, tv_data=""):
-    info_hash, torrent_id, debrid_type = query.split()
-    if debrid_type == "RD":
-        info = get_rd_pack(torrent_id)
-        if info:
-            for id, title in info:
-                list_item = ListItem(label=f"{title}")
-                set_pack_item_rd(
-                    list_item,
-                    mode,
-                    id,
-                    torrent_id,
-                    title,
-                    ids,
-                    tv_data,
-                    debrid_type,
-                    plugin=plugin,
-                )
-                set_pack_art(list_item)
-            endOfDirectory(plugin.handle)
-    elif debrid_type == "PM":
-        info = get_pm_pack(info_hash)
-        if info:
-            for url, title in info:
-                list_item = ListItem(label=f"{title}")
-                set_pack_item_pm(
-                    list_item,
-                    mode,
-                    url,
-                    title,
-                    ids,
-                    tv_data,
-                    debrid_type,
-                    plugin=plugin,
-                )
-                set_pack_art(list_item)
-            endOfDirectory(plugin.handle)
+def movies_items(params):
+    for item in movie_items:
+        addDirectoryItem(
+            ADDON_HANDLE,
+            build_url(
+                "search_item", mode=item["mode"], query=item["query"], api=item["api"]
+            ),
+            list_item(item["name"], item["icon"]),
+            isFolder=True,
+        )
+    endOfDirectory(ADDON_HANDLE)
 
 
-@plugin.route("/anilist/<category>")
-def anilist(category, page=1):
-    setContent(plugin.handle, MOVIES_TYPE)
-    search_anilist(category, page, plugin)
-
-
-@plugin.route("/next_page/anilist/<category>/<page>")
-def next_page_anilist(category, page):
-    setContent(plugin.handle, MOVIES_TYPE)
-    page = int(page) + 1
-    search_anilist(category, page, plugin)
-
-
-@plugin.route("/anilist/episodes/<query>/<id>/<mal_id>")
-def get_anime_episodes(query, id, mal_id):
-    search_simkl_episodes(query, id, mal_id, plugin=plugin)
-
-
-@plugin.route("/next_page/<mode>/<page>/<genre_id>")
-def next_page(mode, page, genre_id):
-    search_tmdb(mode=mode, genre_id=int(genre_id), page=int(page))
-
-
-@plugin.route("/download")
-@query_arg("query", required=True)
-def download(query):
-    magnet, debrid_type = query.split(" ")
-    response = dialogyesno(
-        "Kodi", "Do you want to transfer this file to your Debrid Cloud?"
-    )
-    if response:
-        if debrid_type == "RD":
-            rd_client = RealDebrid(encoded_token=get_setting("real_debrid_token"))
-            Thread(
-                target=rd_client.download, args=(magnet,), kwargs={"pack": False}
-            ).start()
-        else:
-            pm_client = Premiumize(token=get_setting("premiumize_token"))
-            Thread(
-                target=pm_client.download, args=(magnet,), kwargs={"pack": False}
-            ).start()
-
-
-@plugin.route("/status")
-def status():
-    addon_status()
-
-
-@plugin.route("/settings")
-def settings():
-    addon_settings()
-
-
-@plugin.route("/history/clear/<type>")
-def clear_history(type):
-    clear(type=type)
-
-
-@plugin.route("/history")
-def history():
+def direct_menu(params):
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(files),
+        ADDON_HANDLE,
+        build_url("search_direct", mode="direct"),
+        list_item("Search", "search.png"),
+        isFolder=True,
+    )
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("search_direct", mode="direct"),
+        list_item("TV Search", "tv.png"),
+        isFolder=True,
+    )
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("search_direct", mode="direct"),
+        list_item("Movie Search", "movies.png"),
+        isFolder=True,
+    )
+    endOfDirectory(ADDON_HANDLE)
+
+
+def anime_menu(params):
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("anime_item", mode="tv"),
+        list_item("Tv Shows", "tv.png"),
+        isFolder=True,
+    )
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("anime_item", mode="movies"),
+        list_item("Movies", "movies.png"),
+        isFolder=True,
+    )
+    endOfDirectory(ADDON_HANDLE)
+
+
+def history(params):
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("files"),
         list_item("Files History", "history.png"),
         isFolder=True,
     )
 
     addDirectoryItem(
-        plugin.handle,
-        plugin.url_for(titles),
+        ADDON_HANDLE,
+        build_url("titles"),
         list_item("Titles History", "history.png"),
         isFolder=True,
     )
-    endOfDirectory(plugin.handle)
+    endOfDirectory(ADDON_HANDLE)
 
 
-@plugin.route("/history/titles")
-def titles():
-    last_titles(plugin)
+def anime_item(params):
+    mode = params.get("mode")
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("anime_search", mode=mode, category="Anime_Search"),
+        list_item("Search", "search.png"),
+        isFolder=True,
+    )
+
+    if mode == "tv":
+        for item in anime_items:
+            addDirectoryItem(
+                ADDON_HANDLE,
+                build_url(
+                    "search_item",
+                    category=item["category"],
+                    mode=item["mode"],
+                    submode=mode,
+                    api=item["api"],
+                ),
+                list_item(item["name"], item["icon"]),
+                isFolder=True,
+            )
+    if mode == "movies":
+        for item in anime_items:
+            if item["api"] == "tmdb":
+                addDirectoryItem(
+                    ADDON_HANDLE,
+                    build_url(
+                        "search_item",
+                        category=item["category"],
+                        mode=item["mode"],
+                        submode=mode,
+                        api=item["api"],
+                    ),
+                    list_item(item["name"], item["icon"]),
+                    isFolder=True,
+                )
+    endOfDirectory(ADDON_HANDLE)
 
 
-@plugin.route("/history/files")
-def files():
-    last_files(plugin)
+def search_direct(params):
+    mode = params.get("mode")
+    query = params.get("query", "")
+    is_clear = params.get("is_clear", False)
+    is_keyboard = params.get("is_keyboard", True)
+    update_listing = params.get("update_listing", False)
+    rename = params.get("rename", False)
+
+    if is_clear:
+        cache.clear_list(key=mode)
+        is_keyboard = False
+
+    if rename or is_clear:
+        update_listing = True
+
+    if is_keyboard:
+        text = show_keyboard(id=30243, default=query)
+        if text:
+            cache.add_to_list(
+                key=mode,
+                item=(mode, text),
+                expires=timedelta(hours=get_cache_expiration()),
+            )
+
+    list_item = ListItem(label=f"Search")
+    list_item.setArt(
+        {"icon": os.path.join(ADDON_PATH, "resources", "img", "search.png")}
+    )
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("search_direct", mode=mode),
+        list_item,
+        isFolder=True,
+    )
+
+    for mode, text in cache.get_list(key=mode):
+        list_item = ListItem(label=f"[I]{text}[/I]")
+        list_item.setArt(
+            {"icon": os.path.join(ADDON_PATH, "resources", "img", "search.png")}
+        )
+        list_item.setProperty("IsPlayable", "true")
+        list_item.addContextMenuItems(
+            [
+                (
+                    "Rescrape Item",
+                    play_media(
+                        name="search",
+                        mode=mode,
+                        query=quote(text),
+                        rescrape=True,
+                        direct=True,
+                    ),
+                ),
+                (
+                    "Modify Search",
+                    container_update(
+                        name="search_direct", mode=mode, query=text, rename=True
+                    ),
+                ),
+            ]
+        )
+        addDirectoryItem(
+            ADDON_HANDLE,
+            build_url("search", mode=mode, query=quote(text), direct=True),
+            list_item,
+            isFolder=False,
+        )
+
+    list_item = ListItem(label=f"Clear Searches")
+    list_item.setArt(
+        {"icon": os.path.join(ADDON_PATH, "resources", "img", "clear.png")}
+    )
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("search_direct", mode=mode, is_clear=True),
+        list_item,
+        isFolder=True,
+    )
+
+    endOfDirectory(ADDON_HANDLE, updateListing=update_listing)
 
 
-@plugin.route("/clear_cached_tmdb")
-def clear_cached_tmdb():
-    clear_tmdb_cache()
-    notify(translation(30240))
+def search(params):
+    query = params["query"]
+    mode = params["mode"]
+    media_type = params.get("media_type", "")
+    ids = params.get("ids", "")
+    tv_data = params.get("tv_data", "")
+    direct = params.get("direct", False)
+    rescrape = params.get("rescrape", False)
+
+    set_content_type(mode, media_type)
+    set_watched_title(query, ids, mode, media_type)
+
+    episode, season, ep_name = (0, 0, "")
+    if tv_data:
+        try:
+            ep_name, episode, season = tv_data.split("(^)")
+        except ValueError:
+            pass
+
+    with DialogListener() as listener:
+        results = search_client(
+            query, ids, mode, media_type, listener.dialog, rescrape, season, episode
+        )
+        if not results:
+            notification("No results found")
+            return
+
+        pre_results = pre_process(
+            results,
+            mode,
+            ep_name,
+            episode,
+            season,
+        )
+        if not pre_results:
+            notification("No results found for episode")
+            return
+
+    if get_setting("torrent_enable"):
+        post_results = post_process(pre_results)
+    else:
+        with DialogListener() as listener:
+            cached_results = handle_debrid_client(
+                query,
+                pre_results,
+                mode,
+                media_type,
+                listener.dialog,
+                rescrape,
+                episode,
+            )
+            if not cached_results:
+                notification("No cached results found")
+                return
+
+            if is_auto_play():
+                auto_play(cached_results, ids, tv_data, mode)
+                return
+
+            post_results = post_process(cached_results, season)
+
+    data = handle_results(post_results, mode, ids, tv_data, direct)
+
+    if not data:
+        cancel_playback()
+        return
+
+    player = JacktookPLayer(db=bookmark_db)
+    player.run(data=data)
+    del player
 
 
-@plugin.route("/clear_cached_all")
-def clear_cached_all():
+def handle_results(results, mode, ids, tv_data, direct=False):
+    if direct:
+        item_info = {"tv_data": tv_data, "ids": ids, "mode": mode}
+    else:
+        tmdb_id, tvdb_id, _ = [id.strip() for id in ids.split(",")]
+
+        details = get_tmdb_media_details(tmdb_id, mode)
+        poster = f"{TMDB_POSTER_URL}{details.poster_path or ''}"
+        overview = details.overview or ""
+
+        fanart_data = get_fanart_details(tvdb_id=tvdb_id, tmdb_id=tmdb_id, mode=mode)
+
+        item_info = {
+            "poster": poster,
+            "fanart": fanart_data["fanart"] or poster,
+            "clearlogo": fanart_data["clearlogo"],
+            "plot": overview,
+            "tv_data": tv_data,
+            "ids": ids,
+            "mode": mode,
+        }
+
+    if mode == "direct":
+        xml_file_string = "source_select_direct.xml"
+    else:
+        xml_file_string = "source_select.xml"
+
+    return source_select(
+        item_info,
+        xml_file=xml_file_string,
+        sources=results,
+    )
+
+
+def handle_debrid_client(
+    query,
+    proc_results,
+    mode,
+    media_type,
+    p_dialog,
+    rescrape,
+    episode,
+):
+    return check_debrid_cached(
+        query,
+        proc_results,
+        mode,
+        media_type,
+        p_dialog,
+        rescrape,
+        episode,
+    )
+
+
+def play_torrent(params):
+    data = literal_eval(params["data"])
+    player = JacktookPLayer(db=bookmark_db)
+    player.run(data=data)
+    del player
+
+
+def auto_play(results, ids, tv_data, mode):
+    result = clean_auto_play_undesired(results)
+    playback_info = get_playback_info(
+        data={
+            "title": result.get("title"),
+            "mode": mode,
+            "indexer": result.get("indexer"),
+            "type": result.get("type"),
+            "ids": ids,
+            "info_hash": result.get("infoHash"),
+            "tv_data": tv_data,
+            "is_torrent": False,
+        },
+    )
+    player = JacktookPLayer(db=bookmark_db)
+    player.run(data=playback_info)
+    del player
+
+
+def cloud_details(params):
+    type = params.get("type")
+
+    if type == Debrids.RD:
+        downloads_method = "get_rd_downloads"
+        info_method = "rd_info"
+    elif type == Debrids.PM:
+        notification("Not yet implemented")
+        return
+    elif type == Debrids.TB:
+        notification("Not yet implemented")
+        return
+    elif type == Debrids.ED:
+        notification("Not yet implemented")
+        return
+
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url(downloads_method),
+        list_item("Downloads", "download.png"),
+        isFolder=True,
+    )
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url(info_method),
+        list_item("Account Info", "download.png"),
+        isFolder=True,
+    )
+    endOfDirectory(ADDON_HANDLE)
+
+
+def cloud(params):
+    activated_debrids = [
+        debrid for debrid in Debrids.values() if check_debrid_enabled(debrid)
+    ]
+    if not activated_debrids:
+        return notification("No debrid services activated")
+
+    for debrid_name in activated_debrids:
+        torrent_li = list_item(debrid_name, "download.png")
+        addDirectoryItem(
+            ADDON_HANDLE,
+            build_url(
+                "cloud_details",
+                type=debrid_name,
+            ),
+            torrent_li,
+            isFolder=True,
+        )
+    endOfDirectory(ADDON_HANDLE)
+
+
+def rd_info(params):
+    get_rd_info()
+
+
+def get_rd_downloads(params):
+    page = int(params.get("page", 1))
+    type = Debrids.RD
+    debrid_color = get_random_color(type)
+    formated_type = f"[B][COLOR {debrid_color}]{type}[/COLOR][/B]"
+
+    rd_client = RealDebrid(token=get_setting("real_debrid_token"))
+    downloads = rd_client.get_user_downloads_list(page=page)
+
+    sorted_downloads = sorted(downloads, key=lambda x: x["filename"], reverse=False)
+    for d in sorted_downloads:
+        torrent_li = list_item(f"{formated_type} - {d['filename']}", "download.png")
+        torrent_li.setProperty("IsPlayable", "true")
+        addDirectoryItem(
+            ADDON_HANDLE,
+            build_url("play_url", url=d.get("download"), name=d["filename"]),
+            torrent_li,
+            isFolder=False,
+        )
+
+    page = page + 1
+    next_li = list_item("Next", icon="nextpage.png")
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("get_rd_downloads", page=page),
+        next_li,
+        isFolder=True,
+    )
+    endOfDirectory(ADDON_HANDLE)
+
+
+def torrents(params):
+    if not JACKTORR_ADDON:
+        notification(translation(30253))
+
+    for torrent in api.torrents():
+        info_hash = torrent.get("hash")
+
+        context_menu_items = [(translation(30700), play_info_hash(info_hash))]
+
+        if torrent.get("stat") in [2, 3]:
+            context_menu_items.append(
+                (
+                    translation(30709),
+                    action_url_run(
+                        "torrent_action", info_hash=info_hash, action_str="drop"
+                    ),
+                )
+            )
+
+        context_menu_items.extend(
+            [
+                (
+                    translation(30705),
+                    action_url_run(
+                        "torrent_action",
+                        info_hash=info_hash,
+                        action_str="remove_torrent",
+                    ),
+                ),
+                (
+                    translation(30707),
+                    action_url_run(
+                        "torrent_action",
+                        info_hash=info_hash,
+                        action_str="torrent_status",
+                    ),
+                ),
+            ]
+        )
+
+        torrent_li = list_item(torrent.get("title", ""), "download.png")
+        torrent_li.addContextMenuItems(context_menu_items)
+        addDirectoryItem(
+            ADDON_HANDLE,
+            build_url("torrent_files", info_hash=info_hash),
+            torrent_li,
+            isFolder=True,
+        )
+    endOfDirectory(ADDON_HANDLE)
+
+
+def play_url(params):
+    url = params.get("url")
+    list_item = ListItem(label=params.get("name"), path=url)
+    list_item.setPath(url)
+    setResolvedUrl(ADDON_HANDLE, True, list_item)
+
+
+def tv_seasons_details(params):
+    ids = params["ids"]
+    mode = params["mode"]
+    media_type = params.get("media_type", None)
+
+    setContent(ADDON_HANDLE, SHOWS_TYPE)
+    show_season_info(ids, mode, media_type)
+    set_view("widelist")
+    endOfDirectory(ADDON_HANDLE)
+
+
+def tv_episodes_details(params):
+    ids = params["ids"]
+    mode = params["mode"]
+    tv_name = params["tv_name"]
+    season = params["season"]
+    media_type = params.get("media_type", None)
+
+    setContent(ADDON_HANDLE, EPISODES_TYPE)
+    show_episode_info(tv_name, season, ids, mode, media_type)
+    set_view("widelist")
+    endOfDirectory(ADDON_HANDLE)
+
+
+def play_from_pack(params):
+    data = eval(params.get("data"))
+    data = get_playback_info(data)
+    list_item = make_listing(data)
+    setResolvedUrl(ADDON_HANDLE, True, list_item)
+
+
+def search_item(params):
+    kodilog("search_item")
+    query = params.get("query", "")
+    category = params.get("category", None)
+    api = params["api"]
+    mode = params["mode"]
+    submode = params.get("submode", None)
+    page = int(params.get("page", 1))
+
+    if api == "trakt":
+        handle_trakt_query(query, category, mode, page, submode, api)
+    elif api == "tmdb":
+        handle_tmdb_query(params)
+
+
+def trakt_list_content(params):
+    mode = params.get("mode")
+    set_content_type(mode)
+    show_trakt_list_content(
+        params.get("list_type"),
+        mode,
+        params.get("user"),
+        params.get("slug"),
+        params.get("with_auth", ""),
+        params.get("page", 1),
+    )
+
+
+def list_trakt_page(params):
+    mode = params.get("mode")
+    set_content_type(mode)
+    show_list_trakt_page(int(params.get("page", "")), mode)
+
+
+def anime_search(params):
+    mode = params.get("mode")
+    page = params.get("page", 1)
+    category = params.get("category")
+    set_content_type(mode)
+
+    handle_tmdb_anime_query(category, mode, submode=mode, page=page)
+
+
+def next_page_anime(params):
+    mode = params.get("mode")
+    set_content_type(mode)
+
+    handle_tmdb_anime_query(
+        params.get("category"),
+        mode,
+        params.get("submode"),
+        page=int(params.get("page", 1)) + 1,
+    )
+
+
+def download(magnet, type):
+    if type == "RD":
+        rd_client = RealDebrid(token=get_setting("real_debrid_token"))
+        thread = Thread(
+            target=rd_client.download, args=(magnet,), kwargs={"pack": False}
+        )
+    elif type == "TB":
+        tb_client = Torbox(token=get_setting("torbox_token"))
+        thread = Thread(target=tb_client.download, args=(magnet,))
+    elif type == "PM":
+        pm_client = Premiumize(token=get_setting("premiumize_token"))
+        thread = Thread(
+            target=pm_client.download, args=(magnet,), kwargs={"pack": False}
+        )
+    thread.start()
+
+
+def addon_update(params):
+    updates_check_addon()
+
+
+def donate(params):
+    msg = "If you like Jacktook and appreciate the time and effort invested by me developing this addon you can support me by making a one time payment to:"
+    dialog = CustomDialog(
+        "customdialog.xml",
+        ADDON_PATH,
+        heading="Support Jacktook",
+        text=msg,
+        url="[COLOR snow]https://ko-fi.com/sammax09[/COLOR]",
+    )
+    dialog.doModal()
+
+
+def settings(params):
+    addon_settings()
+
+
+def clear_history(params):
+    clear(type=params.get("type"))
+
+
+def titles(params):
+    last_titles()
+
+
+def files(params):
+    last_files()
+
+
+def clear_all_cached(params):
     clear_all_cache()
-    notify(translation(30244))
+    notification(translation(30244))
 
 
-@plugin.route("/rd_auth")
-def rd_auth():
-    rd_client = RealDebrid(encoded_token=get_setting("real_debrid_token"))
+def rd_auth(params):
+    rd_client = RealDebrid(token=get_setting("real_debrid_token"))
     rd_client.auth()
 
 
-@plugin.route("/pm_auth")
-def pm_auth():
+def rd_remove_auth(params):
+    rd_client = RealDebrid(token=get_setting("real_debrid_token"))
+    rd_client.remove_auth()
+
+
+def pm_auth(params):
     pm_client = Premiumize(token=get_setting("premiumize_token"))
     pm_client.auth()
 
 
-@plugin.route("/open_burst_config")
-def open_burst_config():
+def trakt_auth(params):
+    trakt_authenticate()
+
+
+def trakt_auth_revoke(params):
+    trakt_revoke_authentication()
+
+
+def open_burst_config(params):
     burst_addon_settings()
 
 
-def torrent_status(info_hash):
-    status = api.get_torrent_info(link=info_hash)
-    notify(
-        "{}".format(status.get("stat_string")),
-        status.get("name"),
-        sound=False,
-    )
+def torrentio_selection(params):
+    open_providers_selection()
 
 
-def run():
-    try:
-        plugin.run()
-    except Exception as e:
-        logging.error("Caught exception:", exc_info=True)
-        notify(str(e))
+def test_run_next(params):
+    run_next_mock()
+
+
+def test_source_select(params):
+    source_select_mock()
+
+
+def test_resume_dialog(params):
+    resume_dialog_mock()

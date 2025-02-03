@@ -1,157 +1,112 @@
-import json
 from urllib.parse import quote
-from lib.player import JacktookPlayer
-from lib.utils.kodi import (
-    get_kodi_version,
+from lib.utils.debrid_utils import get_debrid_direct_url, get_debrid_pack_direct_url
+from lib.utils.kodi_utils import (
     get_setting,
     is_elementum_addon,
     is_jacktorr_addon,
     is_torrest_addon,
-    notify,
-    set_property,
+    notification,
     translation,
 )
 from lib.utils.utils import (
-    set_video_info,
-    set_video_infotag,
+    Debrids,
+    IndexerType,
+    Players,
     set_watched_file,
+    torrent_clients,
 )
-from xbmcplugin import (
-    setResolvedUrl,
-)
-from xbmcgui import ListItem, Dialog
+from xbmcgui import Dialog
 
 
-torrent_clients = ["Jacktorr", "Torrest", "Elementum"]
+def get_playback_info(data):
+    title = data.get("title", "")
+    mode = data.get("mode", "")
+    type = data.get("type", "")
+    url = data.get("url", "")
+    magnet = data.get("magnet", "")
+    info_hash = data.get("info_hash", "")
+    is_torrent = data.get("is_torrent", "")
+    ids = data.get("ids", [])
+    is_pack = data.get("is_pack", False)
 
+    torrent_enable = get_setting("torrent_enable")
+    torrent_client = get_setting("torrent_client")
+    _url = None
+    addon_url = None
 
-def play(
-    url,
-    magnet,
-    ids,
-    tv_data,
-    title,
-    plugin,
-    debrid_type="",
-    mode="",
-    is_debrid=False,
-    is_torrent=False,
-):
-    set_watched_file(
-        title,
-        ids,
-        tv_data,
-        magnet,
-        url,
-        debrid_type,
-        is_debrid,
-        is_torrent,
-    )
+    if type == IndexerType.DIRECT:
+        set_watched_file(title, data, is_direct=True)
+        return data
 
-    if not magnet and not url:
-        notify(translation(30251))
-        return
+    if type == IndexerType.STREMIO_DEBRID:
+        set_watched_file(title, data)
+        return data
 
-    torr_client = get_setting("torrent_client")
-    if torr_client == "Torrest":
-        _url = get_torrest_url(magnet, url)
-    elif torr_client == "Elementum":
-        _url = get_elementum_url(magnet, mode, ids)
-    elif torr_client == "Jacktorr":
-        _url = get_jacktorr_url(magnet, url)
-    elif torr_client == "Debrid":
-        _url = url
-    elif torr_client == "All":
-        if is_debrid:
-            _url = url
-        elif is_torrent:
-            chosen_client = Dialog().select(translation(30800), torrent_clients)
-            if chosen_client < 0:
+    if torrent_enable:
+        if torrent_client == Players.TORREST:
+            addon_url = get_torrest_url(magnet, url)
+        elif torrent_client == Players.ELEMENTUM:
+            addon_url = get_elementum_url(magnet, url, mode, ids)
+        elif torrent_client == Players.JACKTORR:
+            addon_url = get_jacktorr_url(magnet, url)
+        if not addon_url:
+            return
+    else:
+        if is_torrent:
+            addon_url = get_torrent_url()
+            if not addon_url:
                 return
-            if torrent_clients[chosen_client] == "Torrest":
-                _url = get_torrest_url(magnet, url)
-            elif torrent_clients[chosen_client] == "Elementum":
-                _url = get_elementum_url(magnet, mode, ids)
-            elif torrent_clients[chosen_client] == "Jacktorr":
-                _url = get_jacktorr_url(magnet, url)
+        else:
+            if is_pack:
+                if type in [Debrids.RD, Debrids.TB]:
+                    pack_info = data.get("pack_info", {})
+                    file_id = pack_info.get("file_id", "")
+                    torrent_id = pack_info.get("torrent_id", "")
+                    _url = get_debrid_pack_direct_url(file_id, torrent_id, type)
+                else:
+                    _url = url
+            else:
+                _url = get_debrid_direct_url(info_hash, type)
 
     if _url:
-        list_item = ListItem(title, path=_url)
-        make_listing(list_item, mode, _url, title, ids, tv_data)
-        setResolvedUrl(plugin.handle, True, list_item)
-
-        if is_debrid:
-            player = JacktookPlayer()
-            player.set_constants(_url)
-            player.run(list_item)
-
-
-def make_listing(list_item, mode, url="", title="", ids="", tv_data=""):
-    list_item.setPath(url)
-    list_item.setContentLookup(False)
-    list_item.setLabel(title)
-
-    if tv_data:
-        ep_name, episode, season = tv_data.split("(^)")
+        data["url"] = _url
     else:
-        ep_name = episode = season = ""
+        data["url"] = addon_url
 
-    if get_kodi_version() >= 20:
-        set_video_infotag(
-            list_item,
-            mode,
-            title,
-            season_number=season,
-            episode=episode,
-            ep_name=ep_name,
-            ids=ids,
-        )
-    else:
-        set_video_info(
-            list_item,
-            mode,
-            title,
-            season_number=season,
-            episode=episode,
-            ep_name=ep_name,
-            ids=ids,
-        )
+    set_watched_file(title, data, is_torrent=is_torrent)
 
-    set_windows_property(mode, ids)
+    return data
 
 
-def set_windows_property(mode, ids):
-    if ids:
-        tmdb_id, tvdb_id, imdb_id = ids.split(", ")
-        if mode == "movie":
-            ids = {
-                "tmdb": tmdb_id,
-                "imdb": imdb_id,
-            }
-        else:
-            ids = {
-                "tvdb": tvdb_id,
-            }
-        set_property(
-            "script.trakt.ids",
-            json.dumps(ids),
-        )
+def get_torrent_url(magnet, url, mode, ids):
+    chosen_client = Dialog().select(translation(30800), torrent_clients)
+    if chosen_client < 0:
+        return None
+    if torrent_clients[chosen_client] == "Torrest":
+        addon_url = get_torrest_url(magnet, url)
+    elif torrent_clients[chosen_client] == "Elementum":
+        addon_url = get_elementum_url(magnet, url, mode, ids)
+    elif torrent_clients[chosen_client] == "Jacktorr":
+        addon_url = get_jacktorr_url(magnet, url)
+    return addon_url
 
 
-def get_elementum_url(magnet, mode, ids):
+def get_elementum_url(magnet, url, mode, ids):
     if not is_elementum_addon():
-        notify(translation(30252))
+        notification(translation(30252))
         return
     if ids:
-        tmdb_id, _, _ = ids.split(", ")
+        tmdb_id, _, _ = [id.strip() for id in ids.split(",")]
     else:
         tmdb_id = ""
-    return f"plugin://plugin.video.elementum/play?uri={quote(magnet)}&type={mode}&tmdb={tmdb_id}"
+
+    uri = magnet or url or ""
+    return f"plugin://plugin.video.elementum/play?uri={quote(uri)}&type={mode}&tmdb={tmdb_id}"
 
 
 def get_jacktorr_url(magnet, url):
     if not is_jacktorr_addon():
-        notify(translation(30253))
+        notification(translation(30253))
         return
     if magnet:
         _url = f"plugin://plugin.video.jacktorr/play_magnet?magnet={quote(magnet)}"
@@ -162,7 +117,7 @@ def get_jacktorr_url(magnet, url):
 
 def get_torrest_url(magnet, url):
     if not is_torrest_addon():
-        notify(translation(30250))
+        notification(translation(30250))
         return
     if magnet:
         _url = f"plugin://plugin.video.torrest/play_magnet?magnet={quote(magnet)}"

@@ -276,7 +276,7 @@ def install_apk(name, url):
         if os.path.exists(lib):
             redownload = dialog.yesno(CONFIG.ADDONTITLE, '[COLOR {}]{}[/COLOR] ya existe. Te gustaría volver a descargarlo?'.format(CONFIG.COLOR1, apk),
                                yeslabel="[B][COLOR darkorange]Volver a descargar[/COLOR][/B]",
-                               nolabel="[B][COLOR cyan]Instalar[/B]")
+                               nolabel="[B][COLOR cyan]Instalar[/COLOR][/B]")
             yes = False
         else:
             yes = dialog.yesno(CONFIG.ADDONTITLE,

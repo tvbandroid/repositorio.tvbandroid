@@ -1,5 +1,5 @@
 <p align="left">
-<img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-yellowgreen"> 
+<img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-limegreen"> 
 <img src="https://img.shields.io/badge/Nexus-indigo">
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
 <img src="https://img.shields.io/badge/Piers-magenta">
@@ -10,9 +10,9 @@
 
 
 ![img](https://) 
-# `Kodi 19` $\textbf{\color{green}Matrix\ {\color{white}\ {\color{indigo}}}}$
+# `Kodi 19` $\textbf{\color{limegreen}Matrix\ {\color{white}\ {\color{indigo}}}}$
 <p align="left">
-<img src="https://img.shields.io/badge/ANDTV-Matrix-yellogreen">
+<img src="https://img.shields.io/badge/ANDTV-Matrix-limegreen">
 <p align="center">
 <img src="https://i.imgur.com/FmHatKc.png">
 </p>
@@ -26,15 +26,16 @@
 
 <h1 align="left"> Kodi 21 $\textbf{\color{dodgerblue}Omega}$ </h1>
 <p align="left">
-<img src="https://img.shields.io/badge/TVBAN-MATNEXOM-yellowgreen">
-<img src="https://img.shields.io/badge/FUNCIONANDO-dodgerblue">
+<img src="https://img.shields.io/badge/TVBAN-MATNEXOM-dodgerblue">
+<img src="https://img.shields.io/badge/FUNCIONANDO-moccasin">
 <p align="center">
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>
 
 # `Kodi 22` $\textbf{\color{magenta}Piers}$ 
 <p align="left">
-<img src="https://img.shields.io/badge/Piers-e22ba8">
+<img src="https://img.shields.io/badge/Piers-magenta">
+<img src="https://img.shields.io/badge/PROXIMAMENTE-plum"> 
 <p align="center">
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>

@@ -1,5 +1,5 @@
 <p align="left">
-<img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-yellogreen"> 
+<img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-yellowgreen"> 
 <img src="https://img.shields.io/badge/Nexus-indigo">
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
 <img src="https://img.shields.io/badge/Piers-magenta">

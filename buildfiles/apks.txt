@@ -1,3 +1,11 @@
+name="[COLOR teal]Kodi.tv [COLOR white]Descargas[/COLOR]"
+section="no"
+url="https://kodi.tv/download/android/"
+icon="https://i.ibb.co/ynsb3ZY7/ap-resize-php-src-https-downloadr2-apkmirror-com-wp-content-uploads-2023-11-16-65562ffdc5cb0-com-exp.png" 
+fanart="https://www.vpnranks.com/wp-content/uploads/2023/04/ExpressVPN-2.webp"
+adult="no"
+description="Enlance a Kodi.tv Descargas"
+
 name="[COLOR dodgerblue]ExpressVPN [COLOR white]v11.60.0 (Premium)[/COLOR]"
 section="no"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/ExpressVPN.v11.60.0.Premium1.apk"

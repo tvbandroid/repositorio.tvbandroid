@@ -1,4 +1,4 @@
-39
+40
 |||
 
 [COLOR yellowgreen][B]¡¡¡BIENVENIDOS A LA [COLOR azure]BUILD TVBAN [COLOR cyan]MATNEXON [COLOR tan]- ORIGINAL !!![B][/COLOR]
@@ -17,7 +17,7 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, darle unos minut
 
 [COLOR tan]Para instalar un parche, deberemos seleccionar la Build que tengamos instalada, por ejemplo [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]- v1[COLOR tan], dentro veremos [B][COLOR white]el/os PARCHE/S[/B],[COLOR tan] por ejemplo: [B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1.1[/B] [COLOR tan]y damos a instalar.[/COLOR]
 
-[COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE [COLOR white]vf. [COLOR dodgerblue]del [COLOR white]03 de Febrero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
+[COLOR gold][B]¡¡¡Nuevo: [COLOR dodgerblue]PARCHE [COLOR white]vf.4.3 [COLOR dodgerblue]del [COLOR white]04 de Febrero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
 
 [COLOR orange][B]* Nuevas incorporaciones [/B][/COLOR]
 

@@ -68,7 +68,15 @@ url="https://github.com/andtv/andtv.github.io/releases/download/1.0/com.android.
 icon="https://i.imgur.com/9jUziUW.png" 
 fanart="https://i.imgur.com/tIofVq7.jpg"
 adult="no"
-description="Google Chrome para dispositivos TVBOX"
+description="Google Chrome para dispositivos TVBOX
+
+name="[COLOR dodgerblue]Aerial [COLOR white]Dream - V1.11.0 Mod[/COLOR]"
+section="no"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/Aerial_Dream-1.11.0.apk"
+icon="https://i.imgur.com/qw9qXFg.png" 
+fanart="https://i.imgur.com/RaeZRpQ.jpg"
+adult="no"
+description="Aplicacion Aerial Dream V1.11.0 Videos Salvapantallas para dispositivos Android"
 
 name="[COLOR darkorange]Avast One [COLOR white]- Avast modificado con VPN (solo Android)[/COLOR]"
 section="no"

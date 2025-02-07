@@ -70,13 +70,21 @@ fanart="https://i.imgur.com/tIofVq7.jpg"
 adult="no"
 description="Google Chrome para dispositivos TVBOX
 
-name="[COLOR dodgerblue]Aerial [COLOR white]Dream - V1.11.0 Mod[/COLOR]"
+name="[COLOR dodgerblue]Aerial Dream [COLOR white]- V1.11.0 Mod[/COLOR]"
 section="no"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/Aerial_Dream-1.11.0.apk"
 icon="https://i.imgur.com/qw9qXFg.png" 
 fanart="https://i.imgur.com/RaeZRpQ.jpg"
 adult="no"
 description="Aplicacion Aerial Dream V1.11.0 Videos Salvapantallas para dispositivos Android"
+
+name="[COLOR white]Tera[COLOR dodgerblue]Box [COLOR white]- V3.40.1 Premium[/COLOR]"
+section="no"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/TeraBox.Premium.v3.40.1.-.androforever.com.apk"
+icon="https://i.imgur.com/qw9qXFg.png" 
+fanart="https://i.imgur.com/RaeZRpQ.jpg"
+adult="no"
+description="Aplicacion TeraBox Premium V3.40.1"
 
 name="[COLOR darkorange]Avast One [COLOR white]- Avast modificado con VPN (solo Android)[/COLOR]"
 section="no"

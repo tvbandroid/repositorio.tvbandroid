@@ -81,8 +81,8 @@ description="Aplicacion Aerial Dream V1.11.0 Videos Salvapantallas para disposit
 name="[COLOR white]Tera[COLOR dodgerblue]Box [COLOR white]- V3.40.1 Premium[/COLOR]"
 section="no"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/TeraBox.Premium.v3.40.1.-.androforever.com.apk"
-icon="https://i.imgur.com/qw9qXFg.png" 
-fanart="https://i.imgur.com/RaeZRpQ.jpg"
+icon="https://i.imgur.com/Dc5ahko.png" 
+fanart="https://i.imgur.com/VPaOxCB.jpg"
 adult="no"
 description="Aplicacion TeraBox Premium V3.40.1"
 

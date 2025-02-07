@@ -19,7 +19,7 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, darle unos minut
 
 [COLOR gold][B]¡¡¡ATENCION: [COLOR dodgerblue]PARCHE SOLO PARA USUARIOS QUE USAN [COLOR gold]PALANTIR [COLOR white]Vf.7 [COLOR dodgerblue]del [COLOR white]07 de Febrero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
 
-[COLOR orange][B]* PARCHE SOLO PARA QUE USAN PALANTIR [/B][/COLOR]
+[COLOR white][B]* PARCHE [COLOR gold]PALANTIR [/B][/COLOR]
 
 
 

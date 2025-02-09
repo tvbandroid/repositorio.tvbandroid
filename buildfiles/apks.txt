@@ -76,7 +76,7 @@ url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/Ae
 icon="https://i.imgur.com/1srAyD7.png" 
 fanart="https://i.imgur.com/RaeZRpQ.jpg"
 adult="no"
-description="Google Chrome para dispositivos TVBOX
+description="Aplicación Aerial Dream - V1.11.0 Mod para dispositivos TVBOX
 
 name="[COLOR white]Tera[COLOR dodgerblue]Box [COLOR white]- V3.40.1 Premium[/COLOR]"
 section="no"
@@ -101,3 +101,13 @@ icon="https://i.imgur.com/QC8X5Je.png"
 fanart="https://i.imgur.com/0WWP00s.jpg"
 adult="no"
 description="Aplicación OXPVPN (modificada) para dispositivos Android"
+
+
+name="[COLOR darkorange]Avast One [COLOR white]- Avast modificado con VPN (solo Android)[/COLOR]"
+section="no"
+url="https://github.com/andtv/andtv.github.io/releases/download/1.0/Avast_One_v22.4.0_MOD_apkmody.io.apk"
+icon="https://i.imgur.com/8ntpDpt.png" 
+fanart="https://i.imgur.com/8r5Oc0e.jpg"
+adult="no"
+description="Aplicacion Avast One gratuita (modificada) para dispositivos Android"
+

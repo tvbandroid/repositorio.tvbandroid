@@ -17,7 +17,7 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, darle unos minut
 
 [COLOR tan]Para instalar un parche, deberemos seleccionar la Build que tengamos instalada, por ejemplo [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]- v1[COLOR tan], dentro veremos [B][COLOR white]el/os PARCHE/S[/B],[COLOR tan] por ejemplo: [B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1.1[/B] [COLOR tan]y damos a instalar.[/COLOR]
 
-[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE [COLOR yellowgreen][B]TVban matnexom [COLOR dodgerblue]y [COLOR gold]Palantit f12 [COLOR khaki]F9 [COLOR dodgerblue]del [COLOR white]12de Febrero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
+[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE [COLOR yellowgreen][B]TVban matnexom [COLOR dodgerblue]y [COLOR gold]Palantit [COLOR khaki]f12 [COLOR dodgerblue]del [COLOR white]12 de Febrero [COLOR dodgerblue]TVBAN MATNEXOM[COLOR gold]!!![/B][/COLOR]
 
 [COLOR white][B]* PARCHE [COLOR gold]PALANTIR [COLOR khaki]f12[/B][/COLOR]
 [COLOR orange]                   ****** [COLOR orange]¡ATENCION!: SOLO PARA USUARIOS QUE USAN [COLOR gold]PALANTIR ******                 [/COLOR] 

@@ -1,6 +1,6 @@
 name="TVban matnexom"
 version="1.0"
-url="https://github.com/tvbandroid/repositorio.tvbandroid/releases/download/1/TVban.matnexom.B.zip"
+url="https://github.com/tvbandroid/repositorio.tvbandroid/releases/download/1/TVban.matnexom.zip"
 minor="http://"
 gui="http://"
 kodi="21.2"
@@ -14,7 +14,7 @@ description="[B][COLOR azure]TVBAN [COLOR cyan]MATNEXOM [COLOR azure]para [COLOR
 
 name="ArcticFuse TVban Amillans"
 version="1.0"
-url="https://github.com/tvbandroid/repositorio.tvbandroid/releases/download/2/arcFuse.amillians.B.zip"
+url="https://github.com/tvbandroid/repositorio.tvbandroid/releases/download/2/arcFuse.amillians.zip"
 minor="http://"
 gui="http://"
 kodi="21.2"

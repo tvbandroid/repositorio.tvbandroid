@@ -579,18 +579,20 @@
     <extension point="xbmc.service" library="startup.py" start="startup" />
 
     <extension point="xbmc.addon.metadata">
-        <summary lang="en">
+        <summary lang="es">
 	[COLOR azure]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/COLOR],
 	tu [COLOR azure]tvban[COLOR tan]Wizard[/COLOR] para [COLOR teal]KODI[/COLOR]
 	    </summary>
-    	<description lang="en">
+    	<description lang="es">
 [COLOR lime][B]CREDITOS:[/COLOR][/B]
 [COLOR white][B]• Developers:[/B]      [COLOR darkorange]JoseaTeb[/COLOR]
 [COLOR white][B]• Testers:[/B]             [COLOR darkorange]JoseaTeb, [COLOR moccasin]Amillans[/COLOR]
 [COLOR white][B]• Telegram:[/B]         [COLOR dodgerblue]t.me/+andtvban[/COLOR]</description>
-        <disclaimer>[COLOR tan][B]Está Prohibida su distribución, cedido por su autor, editado por [COLOR azure]JoseaTeb [COLOR tan]y Protegidos por los Derechos del Autor y Editor.[/B][/COLOR]</disclaimer>
+        <disclaimer lang="es">[COLOR tan][B]Está Prohibida su distribución, cedido por su autor, editado por [COLOR azure]JoseaTeb [COLOR tan]y Protegidos por los Derechos del Autor y Editor.
+[COLOR khaki]Este Add-on no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido.[/B][/COLOR]</disclaimer>
 		<platform>all</platform>
 		<reuselanguageinvoker>false</reuselanguageinvoker>
+		<license>GNU GPL v3</license>
         <source>https://andtvban.github.io/tvban/</source>
 		<news>
 • [COLOR darkorange]3/07/2024[/COLOR]

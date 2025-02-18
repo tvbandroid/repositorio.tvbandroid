@@ -24,7 +24,7 @@ fanart="https://tvbandroid.github.io/tvband/wizard/wizardFI/Farfus.jpg"
 preview="http://"
 adult="no"
 info="http://"
-description="[B][COLOR azure]TVBAN [COLOR moccasin]AMILLANS [COLOR azure]para [COLOR teal]KODI: 21[/COLOR][/B]
+description="[B][COLOR azure]Arctic[COLOR deeppink]Fuse [COLOR azure]TVBAN [COLOR moccasin]Amillans [COLOR azure]para [COLOR teal]KODI: 21[/COLOR][/B]                                                      [COLOR limegreen][B]Créditos:[/B][/COLOR]                                    [COLOR dodgerblue][B]Developers:[/B][/COLOR]   [B]JoseaTEBA[/B]                         [COLOR orange][B]Colaborador:[/B][/COLOR] [COLOR cyan][B]andTvban[/B],[COLOR moccasin]Amillans[/COLOR]"
 
 name=""
 version="1.0"

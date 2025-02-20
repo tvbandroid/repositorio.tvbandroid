@@ -11,6 +11,7 @@
     "torrent",
     "movie",
     "tvshow",
+    "anime",
     "vos"
   ],
   "settings": [
@@ -71,7 +72,7 @@
       "id": "filter_languages",
       "type": "list",
       "label": "Mostrar enlaces en idioma...",
-      "default": 1,
+      "default": 0,
       "enabled": true,
       "visible": true,
       "lvalues": [
@@ -167,6 +168,14 @@
       "id": "include_in_newest_latino",
       "type": "bool",
       "label": "Incluir en Novedades - Latino",
+      "default": false,
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "include_in_newest_anime",
+      "type": "bool",
+      "label": "Incluir en Novedades - anime",
       "default": false,
       "enabled": true,
       "visible": true

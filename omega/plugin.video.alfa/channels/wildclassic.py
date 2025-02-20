@@ -1,24 +1,17 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
 import re
 
-from platformcode import config, logger
+from platformcode import logger
 from core import scrapertools
 from core.item import Item
 from core import servertools
 from core import httptools
+from core import urlparse
 
-host = 'http://www.wildclassic.com'
+host = 'https://www.wildclassic.com'
 
+#### ERROR AÑ REPRODUCIR DIRECTOS
 
 def mainlist(item):
     logger.info()
@@ -37,7 +30,7 @@ def search(item, texto):
     item.url = "%s/?query=%s" % (host, texto)
     try:
         return lista(item)
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -76,9 +69,11 @@ def lista(item):
         title = "[COLOR yellow]%s[/COLOR] %s" % (scrapedtime, scrapedtitle)
         scrapedurl = urlparse.urljoin(item.url,scrapedurl)
         thumbnail = scrapedthumbnail
+        if not thumbnail.startswith("https"):
+            thumbnail = "https:%s" % thumbnail
         plot = ""
         action = "play"
-        if logger.info() == False:
+        if logger.info() is False:
             action = "findvideos"
         itemlist.append(item.clone(action=action, title=title, url=scrapedurl,
                               thumbnail=thumbnail, fanart=thumbnail, plot=plot, contentTitle = title))
@@ -121,7 +116,10 @@ def play(item):
     url = scrapertools.find_single_match(data, '<source src="([^"]+)"')
     if not url:
         url = scrapertools.find_single_match(data, 'src="([^"]+)"')
-    url = urlparse.urljoin(item.url, url)
+    # url = url.replace("%3D", "=").replace("%2B", "+").replace("%2F", "/")
+    # url = urlparse.unquote(url)
+    # url += "|Referer=%s" % url
+    # url = urlparse.urljoin(item.url, url)
     itemlist.append(item.clone(action="play", title= "%s", contentTitle = item.title, url=url))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     return itemlist

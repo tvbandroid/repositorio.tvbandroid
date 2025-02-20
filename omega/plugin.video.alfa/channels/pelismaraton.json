@@ -1,10 +1,10 @@
 {
   "id": "pelismaraton",
   "name": "PelisMaraton",
-  "active": true,
+  "active": false,
   "adult": false,
-  "language": ["lat"],
-  "thumbnail": "https://pelismaraton.com//images/pelismaraton.png",
+  "language": ["lat", "cast", "vose"],
+  "thumbnail": "https://i.postimg.cc/sDMZyMmm/pelismaraton.png",
   "banner": "",
   "fanart": "",
   "categories": [

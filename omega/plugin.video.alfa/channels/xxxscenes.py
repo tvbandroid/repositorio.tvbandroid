@@ -1,23 +1,16 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
-import re
-
-from platformcode import config, logger
+from platformcode import config, logger, unify
 from core import scrapertools
 from core.item import Item
 from core import servertools
 from core import httptools
+from core import urlparse
 from bs4 import BeautifulSoup
 from modules import autoplay
+
+UNIFY_PRESET = config.get_setting("preset_style", default="Inicial")
+color = unify.colors_file[UNIFY_PRESET]
 
 list_quality = ['default']
 list_servers = []
@@ -40,14 +33,33 @@ def mainlist(item):
 
     autoplay.init(item.channel, list_servers, list_quality)
 
+    itemlist.append(Item(channel=item.channel, title="Peliculas" , action="submenu", url=host + "xxxmovies/"))
+
     itemlist.append(Item(channel=item.channel, title="Nuevos" , action="lista", url=host + "page/1?filter=latest"))
     itemlist.append(Item(channel=item.channel, title="Mas visto" , action="lista", url=host + "page/1?filter=most-viewed"))
     itemlist.append(Item(channel=item.channel, title="Mejor valorado" , action="lista", url=host + "page/1?filter=popular"))
     itemlist.append(Item(channel=item.channel, title="Pornstar" , action="categorias", url=host + "pornstars"))
     itemlist.append(Item(channel=item.channel, title="Canal" , action="canal", url=host + "studios"))
     itemlist.append(Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "genres"))
-    itemlist.append(Item(channel=item.channel, title="Buscar", action="search"))
+    itemlist.append(Item(channel=item.channel, title="Buscar", url=host, action="search"))
 
+    autoplay.show_option(item.channel, itemlist)
+
+    return itemlist
+
+def submenu(item):
+    logger.info()
+    itemlist = []
+    
+    autoplay.init(item.channel, list_servers, list_quality)
+    itemlist.append(Item(channel=item.channel, title="Nuevos" , action="lista", url=item.url + "page/1?filter=latest"))
+    itemlist.append(Item(channel=item.channel, title="Mas visto" , action="lista", url=item.url + "page/1?filter=most-viewed"))
+    itemlist.append(Item(channel=item.channel, title="Mejor valorado" , action="lista", url=item.url + "page/1?filter=popular"))
+    itemlist.append(Item(channel=item.channel, title="Pornstar" , action="categorias", url=item.url + "pornstars"))
+    itemlist.append(Item(channel=item.channel, title="Canal" , action="canal", url=item.url + "studios"))
+    itemlist.append(Item(channel=item.channel, title="Categorias" , action="categorias", url=item.url + "genres"))
+    itemlist.append(Item(channel=item.channel, title="Buscar", url=item.url, action="search"))
+    
     autoplay.show_option(item.channel, itemlist)
 
     return itemlist
@@ -56,10 +68,10 @@ def mainlist(item):
 def search(item, texto):
     logger.info()
     texto = texto.replace(" ", "+")
-    item.url = "%ssearch/%s" % (host,texto)
+    item.url = "%ssearch/%s" % (item.url,texto)
     try:
         return lista(item)
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -88,7 +100,11 @@ def categorias(item):
         url = elem.a['href']
         title = elem.find(class_='title').text.strip()
         cantidad = elem.find(class_='video-datas').text.strip()
-        thumbnail = elem.img['data-src']
+        thumbnail = ""
+        if elem.img.get('src', ''):
+            thumbnail = elem.img['src']
+        if "svg+" in thumbnail:
+            thumbnail = elem.img['data-lazy-src']
         if cantidad:
             title = "%s (%s)" % (title,cantidad)
         itemlist.append(Item(channel=item.channel, action="lista", title=title, url=url, fanart=thumbnail, thumbnail=thumbnail) )
@@ -118,11 +134,14 @@ def lista(item):
     soup = create_soup(item.url)
     matches = soup.find_all('div', class_='video-block')
     for elem in matches:
-        logger.debug(elem)
         url = elem.a['href']
         title = elem.find(class_='title').text.strip()
         time = elem.find(class_='duration')
-        thumbnail = elem.img['data-src']
+        thumbnail = ""
+        if elem.img.get('src', ''):
+            thumbnail = elem.img['src']
+        if "svg+" in thumbnail:
+            thumbnail = elem.img['data-lazy-src']
         if time:
             title = "[COLOR yellow]%s[/COLOR] %s" % (time.text.strip(),title)
         plot = ""
@@ -145,8 +164,8 @@ def findvideos(item):
     for x , value in enumerate(pornstars):
         pornstars[x] = value.text.strip()
     pornstar = ' & '.join(pornstars)
-    pornstar = "[COLOR cyan]%s[/COLOR]" % pornstar
-    if not "/xxxmovies/" in item.url:
+    pornstar = "[COLOR %s]%s[/COLOR]" % (color.get('rating_3',''), pornstar)
+    if "/xxxmovies/" not in item.url:
         lista = item.contentTitle.split()
         lista.insert (0, pornstar)
         item.contentTitle = ' '.join(lista)    
@@ -154,7 +173,7 @@ def findvideos(item):
     matches = soup.find('div', id='pettabs').find_all('a')
     for elem in matches:
         url = elem['href']
-        if not url in video_urls:
+        if url not in video_urls:
             video_urls += url
             itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.contentTitle, url=url, plot=plot))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())

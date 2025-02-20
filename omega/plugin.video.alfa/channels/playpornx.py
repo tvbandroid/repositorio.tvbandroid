@@ -1,14 +1,5 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
 import re
 
 from platformcode import config, logger
@@ -16,6 +7,7 @@ from core import scrapertools
 from core.item import Item
 from core import servertools
 from core import httptools
+from core import urlparse
 from bs4 import BeautifulSoup
 from modules import autoplay
 
@@ -25,6 +17,7 @@ list_servers = []
 # https://playpornfree.org/   https://streamporn.pw/  https://mangoporn.net/   https://watchfreexxx.net/   https://losporn.org/  https://xxxstreams.me/  https://speedporn.net/
 # pandamovie https://watchpornfree.info  https://xxxparodyhd.net  http://www.veporns.com  http://streamporno.eu
 # https://www.netflixporno.net   https://xxxscenes.net   https://mangoporn.net   https://speedporn.net
+
 canonical = {
              'channel': 'playpornx', 
              'host': config.get_setting("current_host", 'playpornx', default=''), 
@@ -78,7 +71,7 @@ def search(item, texto):
     item.url = "%s?s=%s&filter=latest" % (item.url,texto)
     try:
         return lista(item)
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -107,10 +100,11 @@ def categorias(item):
     for elem in matches:
         url = elem.a['href']
         title = elem.a['title'].replace("&nbsp;", "" )
-        if elem.img:
+        thumbnail = elem.img['src'].replace("amp;", "")
+        if "svg" in thumbnail and elem.img.get('data-lazy-src', ''):
+            thumbnail = elem.img['data-lazy-src'].replace("amp;", "")
+        elif elem.img.get('data-src', ''):
             thumbnail = elem.img['data-src'].replace("amp;", "")
-        else:
-            thumbnail = ""
         cantidad = elem.find(class_='video-datas')
         if cantidad:
             title = "%s (%s)" %(title, cantidad.text.strip())
@@ -142,13 +136,17 @@ def lista(item):
     soup = create_soup(item.url)
     matches = soup.find_all('div', class_='video-block')
     for elem in matches:
+        thumbnail = ""
         url = elem.a['href']
         title = elem.find(class_='title').text.strip()
-        if elem.img:
-            thumbnail = elem.img['data-src']
-        else:
-            thumbnail = ""
-        year = elem.find(class_='duration').text.strip()
+        thumbnail = elem.img['src'].replace("amp;", "")
+        if "svg" in thumbnail and elem.img.get('data-lazy-src', ''):
+            thumbnail = elem.img['data-lazy-src'].replace("amp;", "")
+        elif elem.img.get('data-src', ''):
+            thumbnail = elem.img['data-src'].replace("amp;", "")
+        time = elem.find(class_='duration')
+        if time:
+            title = "[COLOR yellow]%s[/COLOR] %s" % (time.text.strip(),title)
         plot = ""
         itemlist.append(Item(channel=item.channel, action="findvideos", title=title, url=url, thumbnail=thumbnail,
                                plot=plot, fanart=thumbnail, contentTitle=title ))
@@ -166,11 +164,10 @@ def findvideos(item):
     video_urls = []
     soup = create_soup(item.url)
     pornstars = soup.find('div', id='video-actors').find_all('a', href=re.compile("/(:?pornstar|pornstars)/"))
-    logger.debug(pornstars)
     for x , value in enumerate(pornstars):
         pornstars[x] = value.text.strip()
     pornstar = ' & '.join(pornstars)
-    if not "N/A" in pornstar:
+    if "N/A" not in pornstar:
         pornstar = "[COLOR cyan]%s[/COLOR]" % pornstar
     else:
         pornstar = ""
@@ -179,7 +176,7 @@ def findvideos(item):
     matches = soup.find('div', id='pettabs').find_all('a')
     for elem in matches:
         url = elem['href']
-        if not url in video_urls:
+        if url not in video_urls:
             video_urls += url
             itemlist.append(Item(channel=item.channel, title='%s', url=url, action='play', language='VO',contentTitle = item.contentTitle, plot=plot))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda x: x.title % x.server)

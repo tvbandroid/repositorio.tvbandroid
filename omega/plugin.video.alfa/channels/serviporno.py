@@ -1,18 +1,11 @@
 # -*- coding: utf-8 -*-
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
 import re
 
 from core import httptools
 from core import scrapertools
+from core import urlparse
 from core.item import Item
+from core import servertools
 from platformcode import config, logger
 
 canonical = {
@@ -47,7 +40,7 @@ def search(item, texto):
     try:
         return videos(item)
     # Se captura la excepción, para no interrumpir al buscador global si un canal falla
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -103,18 +96,19 @@ def videos(item):
     logger.info()
     itemlist = []
     data = httptools.downloadpage(item.url, canonical=canonical).data
-    patron  = '(?s)<div class="wrap-box-escena">.*?'
-    patron += '<div class="box-escena">.*?'
-    patron += '<a href="([^"]+)".*?'
-    patron += 'src="([^"]+.jpg)".*?'
-    patron += '<h4><a href="[^"]+">([^<]+)</a></h4>.*?'
-    patron += '<div class="duracion">([^"]+) min</div>'
+    patron  = '<div class="wrap-box-escena">.*?'
+    # patron += '<div class="box-escena">.*?'
+    patron += '<a\s+href="([^"]+)".*?'
+    patron += '"([^"]+.jpg)".*?'
+    patron += 'alt="([^"]+)".*?'
+    # patron += '<h4><a href="[^"]+">([^<]+)<.*?'
+    patron += '<div class="duracion">([^"]+) min<'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url, thumbnail, title,duration in matches:
         title = "[COLOR yellow]%s[/COLOR] %s" % (duration, title)
         url = urlparse.urljoin(item.url, url)
         action = "play"
-        if logger.info() == False:
+        if logger.info() is False:
             action = "findvideos"
         itemlist.append(Item(channel=item.channel, action=action, title=title, contentTitle = title, url=url, 
                              thumbnail=thumbnail, fanart=thumbnail))
@@ -129,18 +123,26 @@ def videos(item):
 def findvideos(item):
     logger.info()
     itemlist = []
-    data = httptools.downloadpage(item.url, canonical=canonical).data
-    url = scrapertools.find_single_match(data, "sendCdnInfo.'([^']+)")
-    url = url.replace("&amp;", "&")
-    itemlist.append(Item(channel=item.channel, action="play", title="Directo", url=url, contentTitle=item.contentTitle))
+    itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.contentTitle, url=item.url))
+    itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     return itemlist
 
 
 def play(item):
     logger.info()
     itemlist = []
-    data = httptools.downloadpage(item.url, canonical=canonical).data
-    url = scrapertools.find_single_match(data, "sendCdnInfo.'([^']+)")
-    url = url.replace("&amp;", "&")
-    itemlist.append(Item(channel=item.channel, action="play", url=url, contentTitle=item.contentTitle))
+    data = httptools.downloadpage(item.url).data
+    if ">Pornostars:<" in data:
+        data = scrapertools.find_single_match(data, '>Pornostars:</strong>(.*?)</p')
+        pornstars = scrapertools.find_multiple_matches(data, "'link12'\s+>([^<]+)")
+        pornstar = ' & '.join(pornstars)
+        pornstar = "[COLOR cyan]%s[/COLOR]" % pornstar
+        lista = item.title.split()
+        if "HD" in item.title:
+            lista.insert (4, pornstar)
+        else:
+            lista.insert (2, pornstar)
+        item.contentTitle = ' '.join(lista)
+    itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.contentTitle, url=item.url))
+    itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     return itemlist

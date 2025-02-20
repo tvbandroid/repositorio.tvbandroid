@@ -1,7 +1,7 @@
 {
   "id": "yestorrent",
   "name": "Yestorrent",
-  "active": true,
+  "active": false,
   "adult": false,
   "language": ["lat"],
   "thumbnail": "https://i.postimg.cc/rF6Qqprj/Yestorrent.png",
@@ -71,7 +71,7 @@
       "id": "filter_languages",
       "type": "list",
       "label": "Mostrar enlaces en idioma...",
-      "default": 1,
+      "default": 0,
       "enabled": true,
       "visible": true,
       "lvalues": [

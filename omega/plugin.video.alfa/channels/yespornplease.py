@@ -1,23 +1,13 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
 import re
-import xbmc
-import xbmcgui
 
 from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
 from core import servertools
 from core import httptools
+from core import urlparse
 from bs4 import BeautifulSoup
 from modules import autoplay
 
@@ -58,7 +48,7 @@ def search(item, texto):
     item.url = "%s?s=%s" % (host,texto)
     try:
         return lista(item)
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -118,21 +108,23 @@ def lista(item):
     logger.info()
     itemlist = []
     soup = create_soup(item.url)
-    matches = soup.find_all('article', class_=re.compile(r"^post-\d+"))
+    matches = soup.find_all('div', class_=re.compile(r"^post-\d+"))
     for elem in matches:
         url = elem.a['href']
         title = elem.a['title']
-        thumbnail = elem.img['src']
-        if "base64" in thumbnail:
+        thumbnail= ""
+        if elem.img:
+            thumbnail = elem.img['src']
+        if "base64" in thumbnail or ".gif" in thumbnail:
             thumbnail = elem.img['data-src']
         time = elem.find('p').text.strip()
         title = "[COLOR yellow]%s[/COLOR] %s" % (time,title)
         plot = ""
         itemlist.append(Item(channel=item.channel, action="findvideos", title=title, contentTitle=title, url=url,
                              fanart=thumbnail, thumbnail=thumbnail , plot=plot) )
-    next_page = soup.find('a', class_='current')
-    if next_page and next_page.parent.find_next_sibling("li"):
-        next_page = next_page.parent.find_next_sibling("li").a['href']
+    next_page = soup.find('a', class_='next')
+    if next_page:
+        next_page = next_page['href']
         next_page = urlparse.urljoin(item.url,next_page)
         itemlist.append(Item(channel=item.channel, action="lista", title="[COLOR blue]Página Siguiente >>[/COLOR]", url=next_page) )
     return itemlist
@@ -141,16 +133,17 @@ def lista(item):
 def findvideos(item):
     logger.info()
     itemlist = []
-    soup = create_soup(item.url)
-    matches = soup.find_all('div', class_='wp-video')
-    if soup.find('div', class_='iframe-container'):
-        matches.append(soup.find('div', class_='iframe-container'))
+    soup = create_soup(item.url).find('div', class_='wp-video')
+    matches = soup.find_all('iframe')
     for elem in matches:
-        url = elem.iframe['src']
+        if elem.get('data-litespeed-src',''):
+            url = elem['data-litespeed-src']
+        else:
+            url = elem['src']
         if "player-x.php?" in url:
             url = url.split("q=")
             url = url[-1]
-            import sys, base64
+            import base64
             url = base64.b64decode(url).decode('utf8')
             url = urlparse.unquote(url)
             url = BeautifulSoup(url, "html5lib", from_encoding="utf-8")

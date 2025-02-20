@@ -10,7 +10,7 @@ if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 import re
 import traceback
 
-from channels import filtertools
+from modules import filtertools
 from bs4 import BeautifulSoup
 from core import httptools
 from core import scrapertools
@@ -387,6 +387,8 @@ def findvideos(item):
             url = url['data-src']
             info = info.find('span', class_='server').text.split('-')
             srv = info[0].strip()
+            if "Vidhidepre" in srv:
+                srv = "Vidhidepro"
             lang = info[1].strip()
             infoLabels = item.infoLabels
             lang = IDIOMAS.get(lang, lang)
@@ -472,7 +474,6 @@ def play(item):
         if not item.server: itemlist = servertools.get_servers_itemlist(itemlist)
         
         return itemlist
-    
     url = create_soup(item.url).find("div", class_="Video").iframe["src"]
     if 'Gdri.php' in url:
         url = scrapertools.find_single_match(url, 'v=([A-z0-9-_=]+)')

@@ -84,6 +84,14 @@
       "visible": "!eq(-1,false)"
     },
     {
+      "id": "external_cookies",
+      "type": "text",
+      "label": "¿Introduce el valor *cf_clearance* de la Cookie de BTDigg?",
+      "default": "",
+      "enabled": true,
+      "visible": "!eq(-2,false)"
+    },
+    {
       "id": "filter_languages",
       "type": "list",
       "label": "Mostrar enlaces en idioma...",

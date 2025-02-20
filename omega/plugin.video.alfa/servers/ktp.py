@@ -2,25 +2,19 @@
 # --------------------------------------------------------
 # Conector vipporns By Alfa development Group
 # --------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
 import re
 
 from core import httptools
 from core import scrapertools
+from core import urlparse
 from platformcode import logger
 
 from lib.kt_player import decode
 
-kwargs = {'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'ignore_response_code': True, 'cf_assistant': False}
+# kwargs = {'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'ignore_response_code': True, 'cf_assistant': False}
+kwargs = {'set_tls': False, 'set_tls_min': False, 'retries_cloudflare': 3, 'ignore_response_code': True, 'cf_assistant': False}
 
+#https://trahkino.cc/video/353484/ necesita "False"
 
 def test_video_exists(page_url):
     
@@ -60,13 +54,14 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         patron += 'postfix:\s*(?:\'|")([^\,]+)(?:\'|")'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url, quality in matches:
-        if not "?login" in url and not "signup" in url and not "_preview" in url and ".mp4" in url:
+        if "?login" not in url and "signup" not in url and "_preview" not in url and ".mp4" in url:
             if "function/" in url:
                 url = decode(url, license_code)
             elif url.startswith("/get_file/"):
                 url = urlparse.urljoin(page_url, url)
             if "HD" in quality:
                 quality = "720p"
+            if "?br=" in url: url = url.split("?br=")[0]
             # url += "|verifypeer=false"
             url += "|Referer=%s" % page_url
             video_urls.append(['[ktplayer] %s' % quality, url])

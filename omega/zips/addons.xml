@@ -632,7 +632,7 @@
         <assets><icon>icon.png</icon></assets> </extension>
 </addon>
 
-<addon id="plugin.video.alfa" name="Alfa" version="3.9.23" provider-name="Alfa Addon">
+<addon id="plugin.video.alfa" name="Alfa" version="3.10.5" provider-name="Alfa Addon">
     <requires>
         <import addon="script.module.requests" />
         <import addon="script.module.beautifulsoup4" version="4.5.3" />
@@ -642,6 +642,7 @@
         <import addon="script.module.rijndael" />
         <import addon="script.module.brotlipython" />
         <import addon="script.module.requests-toolbelt" />
+        <import addon="script.module.futures" />
         <import addon="script.alfa-update-helper" optional="true" />
         <import addon="script.module.pyqrcode" optional="true" />
     </requires>
@@ -679,13 +680,11 @@
         <license>GNU GPL v3</license>
         <source>https://github.com/alfa-addon/addon</source>
         <news>
-            [B]Estos son los cambios para esta versión:[/B]
-
-            [B]Arreglos[/B]
-            • Cuevana 3.video                                       • Don Torrent
-            • HDFull                                                          • HenaoJara
-            • PoseidonHD                                               • SoloLatino
-            • +18</news>
+    [B]Estos son los cambios para esta versión:[/B]
+    • +18                                 • Allcalidad              • Don Torrent
+    • Entrepeliculasyseries     • HDFull                   • LatAnime
+    • PelisPanda                     • Pelitorrent             • Pelisforte
+    • Playdede                        • VerAnime Assistant</news>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>

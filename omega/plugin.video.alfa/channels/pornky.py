@@ -24,11 +24,12 @@ forced_proxy_opt = 'ProxySSL'
 # https://tubxporn.xxx  https://pornky.com  https://pornktube.tv  https://wwv.joysporn.sex/
 # https://www.pornky.club/ https://www.pornktube.club/  https://tubxporn.club/ https://joysporn.club/
 
+
 canonical = {
              'channel': 'pornky', 
              'host': config.get_setting("current_host", 'pornky', default=''), 
-             'host_alt': ["https://www.pornky.club/"], 
-             'host_black_list': ["https://www.pornky.com/"], 
+             'host_alt': ["https://hd.pornky.com/"], 
+             'host_black_list': ["https://www.pornky.club/", "https://www.pornky.com/"], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
@@ -53,10 +54,7 @@ finds = {'find': {'find_all': [{'tag': ['div'], 'class': ['video']}]},
                             ('find_all', [{'tag': ['a'], '@POS': [-1], 
                                            '@ARG': 'href', '@TEXT': '/(\d+)/'}])]), 
          'plot': {}, 
-         'findvideos': dict([('find', [{'tag': ['article']}]), 
-                             ('find_all', [{'tagOR': ['a'], 'href': True, 'rel': 'noreferrer'},
-                                           {'tag': ['iframe'], 'src': True}])]),
-         'title_clean': [['[\(|\[]\s*[\)|\]]', ''],['(?i)\s*videos*\s*', '']],
+         'findvideos': {},
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
          'profile_labels': {

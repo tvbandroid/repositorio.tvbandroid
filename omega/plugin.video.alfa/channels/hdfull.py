@@ -14,7 +14,8 @@ from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
 from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
 
 import ast
-from platformcode.platformtools import dialog_notification, dialog_ok, itemlist_refresh, show_channel_settings
+from platformcode.platformtools import dialog_notification, dialog_ok, itemlist_refresh, itemlist_update, show_channel_settings
+from lib.alfa_assistant import is_alfa_installed
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -22,38 +23,51 @@ list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES
 list_quality_tvshow = AlfaChannelHelper.LIST_QUALITY_TVSHOW
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS
-forced_proxy_opt = 'ProxySSL'
-assistant = False
+
+cf_assistant = True if is_alfa_installed() else False
+forced_proxy_opt = None
+debug = config.get_setting('debug_report', default=False)
 
 # https://dominioshdfull.com/
 
 canonical = {
              'channel': 'hdfull', 
              'host': config.get_setting("current_host", 'hdfull', default=''), 
-             "host_alt": ["https://hd-full.lol/", "https://hdfull.today/", "https://hdfull.quest/"], 
+             "host_alt": ["https://hdfull.today/", "https://hd-full.sbs/", "https://hdfull.monster/", "https://hd-full.vip/"], 
+             "host_alt_main": 2, 
              'host_verification': '%slogin', 
-             "host_black_list": ["https://hd-full.co/", "https://hd-full.biz/", 
+             "host_black_list": ["https://hd-full.biz/", "https://hd-full.me/", "https://hd-full.fit/", 
+                                 "https://hd-full.info/", "https://hdfull.blog/", "https://hd-full.life/", 
+
+                                 "https://hdfull.one/", "https://hdfull.buzz/", "https://hdfull.tel/", 
+                                 "https://hdfull.cfd/", "https://hdfull.sbs/", 
+
+                                 "https://hd-full.lol/", "https://hd-full.co/", "https://hdfull.quest/", 
                                  "https://hd-full.in/", "https://hd-full.im/", "https://hd-full.one/", 
-                                 "https://hdfull.icu/", "https://hdfull.sbs/", "https://hdfull.org/", 
-                                 "https://hdfull.store/", 
+                                 "https://hdfull.icu/", "https://hdfull.org/", 
                                  "https://hdfull.life/", "https://hdfull.digital/", "https://hdfull.work/", 
                                  "https://hdfull.video/", "https://hdfull.cloud/", "https://hdfull.wtf/", 
-                                 "https://hdfull.fun/", "https://hdfull.lol/", "https://hdfull.one/", 
+                                 "https://hdfull.fun/", "https://hdfull.lol/", "https://hdfull.store/", 
                                  "https://new.hdfull.one/", "https://hdfull.top/", "https://hdfull.bz/"],
              'pattern': r'<meta\s*property="og:url"\s*content="([^"]+)"', 
-             'set_tls': True, 'set_tls_min': False, 'retries_cloudflare': 1, 'expires': 365*24*60*60, 
-             'forced_proxy_ifnot_assistant': forced_proxy_opt, 'CF_if_assistant': True if assistant else False, 
-             'CF_stat': True if assistant else False, 'session_verify': True if assistant else False, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': True, 'set_tls_min': False, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': cf_assistant, 
+             'cf_assistant_ua': True, 'cf_assistant_get_source': True if cf_assistant == 'force' else False, 
+             'cf_no_blacklist': True, 'cf_removeAllCookies': False if cf_assistant == 'force' else True,
+             'cf_challenge': 1, 'cf_returnkey': 'url', 'cf_partial': True, 'cf_debug': debug, 
+             'cf_cookie': '$HOST|cf_clearance' if cf_assistant is True else None, 'cf_jscode': None, 
+             'cf_cookies_names': {'cf_clearance': False if cf_assistant is True else True},
+             'CF_if_assistant': True if cf_assistant is True else False, 'retries_cloudflare': -1, 
+             'CF_stat': True if cf_assistant is True else False, 'session_verify': True if cf_assistant is True else False, 
+             'CF': False, 'CF_test': True, 'alfa_s': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
+host_main = canonical['host_alt'][canonical.get('host_alt_main', 0)]
 host_save = host
 host_thumb = 'https://hdfullcdn.cc/'
 _silence = config.get_setting('silence_mode', channel=canonical['channel'])
 
 timeout = (5, 20)
 kwargs = {}
-debug = config.get_setting('debug_report', default=False)
 movie_path = "pelicula/"
 tv_path = 'serie/'
 language = []
@@ -100,7 +114,7 @@ finds = {'find': dict([('find', [{'tag': ['div'], 'class': ['container-flex', 'm
          'url_replace': [], 
          'controls': {'duplicates': [], 'min_temp': False, 'url_base64': False, 'add_video_to_videolibrary': True, 'cnt_tot': 20, 
                       'get_lang': False, 'reverse': False, 'videolab_status': True, 'tmdb_extended_info': True, 'seasons_search': False, 
-                      'IDIOMAS_TMDB': {0: 'es', 1: 'ja', 2: 'es'}, 'jump_page': True}, 
+                      'IDIOMAS_TMDB': {0: 'es', 1: 'ja', 2: 'es'}, 'jump_page': True, 'timer': 4.5}, 
          'timeout': timeout}
 AlfaChannel = DictionaryAllChannel(host, movie_path=movie_path, tv_path=tv_path, canonical=canonical, finds=finds, 
                                    idiomas=IDIOMAS, language=language, list_language=list_language, list_servers=list_servers, 
@@ -133,7 +147,8 @@ if not user_ or not pass_:
 credentials_req = True
 js_url = AlfaChannel.urljoin(host, "templates/hdfull/js/jquery.hdfull.view.min.js")
 data_js_url = AlfaChannel.urljoin(host, "js/providers.js")
-patron_sid = r"<input\s*type='hidden'\s*name='__csrf_magic'\s*value=\"([^\"]+)\"\s*\/>"
+patron_sid = r"<input\s*type=['|\"]hidden['|\"]\s*name=['|\"]__csrf_magic['|\"]\s*value=\"([^\"]+)\"\s*.*>"
+timer = AlfaChannel.finds['controls']['timer']
 
 try:
     window = None
@@ -144,13 +159,19 @@ try:
     js_data = window.getProperty("AH_hdfull_js_data")
     data_js = window.getProperty("AH_hdfull_data_js")
     just_logout = window.getProperty("AH_hdfull_just_logout")
+    login_age = float(window.getProperty("AH_hdfull_login_age") or -0.0)
     if window.getProperty("AH_hdfull_domain"):
-        host_alt = window.getProperty("AH_hdfull_domain")
-        if host_alt != host or host_alt != canonical['host_alt'][0]:
-            host = host_save = host_alt
-            if host_alt not in canonical['host_alt']: canonical['host_alt'] = [host_alt] + canonical['host_alt']
+        _host_alt_ = window.getProperty("AH_hdfull_domain")
+        if _host_alt_ in canonical['host_black_list']:
+            host = host_save = _host_alt_ = canonical['host_alt'][0]
+            window.setProperty("AH_hdfull_domain", "")
+            window.setProperty("AH_hdfull_login_age", "")
+            login_age = -0.0
+        elif _host_alt_ != host or _host_alt_ != canonical['host_alt'][0]:
+            host = host_save = _host_alt_
+            if _host_alt_ not in canonical['host_alt']: canonical['host_alt'] = [_host_alt_] + canonical['host_alt']
             for host_alt_ in canonical['host_alt'][:]:
-                if host_alt_ == host_alt: break
+                if host_alt_ == _host_alt_: break
                 if host_alt_ not in canonical['host_black_list']: canonical['host_black_list'] += [host_alt_]
                 if host_alt_ in canonical['host_alt']: canonical['host_alt'].remove(host_alt_)
         if config.get_setting("current_host", canonical['channel'], default='') != host:
@@ -161,12 +182,14 @@ except Exception:
     js_data = ''
     data_js = ''
     just_logout = ''
+    login_age = -0.0
     try:
         window.setProperty("AH_hdfull_user_status", jsontools.dump(user_status, silence=True))
         window.setProperty("AH_hdfull_sid", sid)
         window.setProperty("AH_hdfull_js_data", js_data)
         window.setProperty("AH_hdfull_data_js", data_js)
         window.setProperty("AH_hdfull_just_logout", str(just_logout))
+        window.setProperty("AH_hdfull_login_age", "")
         window.setProperty("AH_hdfull_domain", "")
     except Exception:
         logger.error(traceback.format_exc())
@@ -179,7 +202,7 @@ def mainlist(item):
     itemlist = []
 
     just_logout = window.getProperty("AH_hdfull_just_logout") or config.get_setting("just_logout", channel=canonical['channel'])
-    verify_credentials(force_login=False if just_logout else True)
+    verify_credentials(force_login=False if just_logout else 'timer')
     if debug: logger.debug('just_logout: %s, account: %s, sid: %s, user_status: %s' % (just_logout, account, sid, user_status))
     if just_logout:
         just_logout = ''
@@ -199,7 +222,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="sub_menu_series", title="Series", url=host,
                          thumbnail=get_thumb("channels_tvshow.png"), c_type="series", text_bold=True, plot=plot))
     if account:
-        itemlist.append(Item(channel=item.channel, action="list_all", extra="episodios",
+        itemlist.append(Item(channel=item.channel, action="list_all", extra="episodios_menu",
                              title="    - [COLOR orange]Para Ver[/COLOR]",
                              url=AlfaChannel.urljoin(host, "a/my"), post="target=shows&action=watch&start=0&limit=%s", 
                              thumbnail=get_thumb("videolibrary.png"), c_type="episodios", plot=plot))
@@ -209,7 +232,7 @@ def mainlist(item):
 
     if not account:
         itemlist.append(Item(channel=item.channel,  action="", url="", 
-                        title="[COLOR gold]Regístrate en %s y luego habilita tu cuenta[/COLOR]" % host,
+                        title="[COLOR gold]Regístrate en %s y luego habilita tu cuenta[/COLOR]" % host_main,
                         thumbnail=get_thumb("setting_0.png")))
 
         itemlist.append(Item(channel=item.channel,  action="configuracion", url="", text_bold=True,
@@ -423,6 +446,8 @@ def section(item):
 
     findS = finds.copy()
 
+    verify_credentials(force_login='timer')
+
     if item.extra in ['Género']:
         findS['categories'] = dict([('find_all', [{'tag': ['li'], 'class': ['dropdown'], '@POS': [2 if item.c_type == 'series' else 3]}, 
                                                   {'tag': ['a']}])])
@@ -445,10 +470,11 @@ def list_all(item):
     logger.info()
 
     findS = finds.copy()
+    item.url = item.url.replace(AlfaChannel.obtain_domain(item.url, scheme=True) + '/', host)
 
-    verify_credentials(force_login=not account)
+    verify_credentials(force_login='timer')
 
-    if item.extra in ["items_usuario", "listas", "episodios"]:
+    if item.extra in ["items_usuario", "listas", "episodios", "episodios_menu"]:
         findS['find'] = dict([('find', [{'tag': ['body']}]), 
                               ('get_text', [{'tag': '', '@STRIP': False, '@JSON': 'DEFAULT'}])])
         findS['controls'].update({'cnt_tot': cnt_tot_episodios if item.c_type == 'episodios' else cnt_tot_items_usuario, 
@@ -458,6 +484,13 @@ def list_all(item):
         if str(cnt_tot_episodios) not in item.post and str(cnt_tot_items_usuario) not in item.post: 
             item.post = item.post % findS['controls']['cnt_tot']
         item.post = re.sub(r'&start=\d+', '&start=%s' % ((item.curr_page - 1) * findS['controls']['cnt_tot']), item.post)
+
+        if item.extra in ["episodios_menu"]:
+            item.extra = "episodios"
+            AlfaChannel.itemlist.append(Item(channel=item.channel, action="list_all", extra="items_usuario",
+                                        title="[COLOR orange]Siguiendo[/COLOR]", text_bold=True, plot=item.plot, 
+                                        url=AlfaChannel.urljoin(host, "a/my"), post="target=shows&action=following&start=0&limit=%s", 
+                                        thumbnail=get_thumb("channels_tvshow.png"), c_type="series"))
 
     elif item.extra in ['Alfabético']:
         findS['controls'].update({'custom_pagination': True, 'jump_page': True})
@@ -497,7 +530,8 @@ def list_all_matches(item, matches_int, **AHkwargs):
                 if elem_json['mediatype'] == 'tvshow' and not elem.get('shows', ''): continue
                 if elem_json['mediatype'] == 'movie' and not elem.get('movies', ''): continue
                 elem_json['title'] = elem.get('title', '')
-                elem_json['url'] = AlfaChannel.urljoin(host, 'lista/' + (elem.get('permalink', '') or elem.get('perma', '')))
+                elem_json['url'] = AlfaChannel.urljoin(host, 'lista/' + (elem.get('permalink', '') or elem.get('perma', '')) \
+                                                       + '-' + elem.get('id', '1'))
                 elem_json['list_info'] = {elem.get('id', '1'): elem.get('id', '1')}
                 elem_json['action'] = 'list_all'
                 elem_json['extra'] = 'listas_res'
@@ -545,7 +579,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
                 path = tv_path if elem_json['mediatype'] in ['tvshow', 'episode'] else movie_path if elem_json['mediatype'] == 'movie' else tv_path
 
                 if not elem.get('permalink', '') and not elem.get('perma', ''): continue
-                elem_json['url'] = AlfaChannel.urljoin(host, '%s/' % path + (elem.get('permalink', '') or elem.get('perma', '')))
+                elem_json['url'] = AlfaChannel.urljoin(host, '%s' % path + (elem.get('permalink', '') or elem.get('perma', '')))
                 if elem_json['mediatype'] == 'episode':
                     elem_json['url'] += '/temporada-%s/episodio-%s' % (elem.get('season', '1'), elem.get('episode', '00').zfill(2))
                 elem_json['info'] = {elem.get('id', '0'): elem.get('id', '0')}
@@ -579,7 +613,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
                 elem_json['language'] = '*%s' % elem.get('languages', '')
 
                 if not elem.get('permalink', '') and not elem.get('perma', ''): continue
-                elem_json['url'] = AlfaChannel.urljoin(host, '%s/' % path + (elem.get('permalink', '') or elem.get('perma', '')))
+                elem_json['url'] = AlfaChannel.urljoin(host, '%s' % path + (elem.get('permalink', '') or elem.get('perma', '')))
                 elem_json['url'] += '/temporada-%s/episodio-%s' % (elem.get('season', '1'), elem.get('episode', '00').zfill(2))
                 elem_json['info'] = {elem.get('id', '0'): elem.get('show', {}).get('id', '0')}
 
@@ -658,6 +692,9 @@ def seasons(item):
     logger.info()
 
     findS = finds.copy()
+
+    verify_credentials(force_login='timer', force_check=False)
+
     if 'anim' in item.infoLabels['genre'].lower():
         findS['controls']['season_TMDB_limit'] = False
 
@@ -702,14 +739,18 @@ def seasons_matches(item, matches_int, **AHkwargs):
             continue
 
         elem_json['title'] = item.contentSerieName
-        str_ = get_status(status, elem_json, mediatype='tvshow')
-        elem_json['plot_extend'] = str_.replace('[COLOR blue](Visto)[/COLOR]', '')
-        elem_json = add_context(elem_json, str_, mediatype='tvshow')
 
         matches.append(elem_json.copy())
 
     if matches: matches = sorted(matches, key=lambda elem_json: int(elem_json['season']))
     matches = find_hidden_seasons(item, matches, item.info)
+    for elem_json in matches:
+        str_ = get_status(status, elem_json, mediatype='tvshow')
+        if str_.replace('[COLOR blue](Visto)[/COLOR]', ''):
+            str_sea = get_status(status, elem_json, mediatype='season')
+            elem_json['playcount'] = 1 if 'Visto' in str_sea else 0
+        elem_json['plot_extend'] = str_.replace('[COLOR blue](Visto)[/COLOR]', '')
+        elem_json = add_context(elem_json, str_, mediatype='season')
 
     return matches
 
@@ -718,7 +759,7 @@ def episodios(item):
     logger.info()
 
     itemlist = []
-    verify_credentials(force_login=True, force_check=False)
+    verify_credentials(force_login='timer', force_check=False)
 
     templist = seasons(item)
 
@@ -730,6 +771,8 @@ def episodios(item):
 
 def episodesxseason(item, **AHkwargs):
     logger.info()
+
+    verify_credentials(force_login='timer', force_check=False)
 
     kwargs['matches_post_get_video_options'] = findvideos_matches
     item.url = AlfaChannel.urljoin(host, "a/episodes")
@@ -786,7 +829,7 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
             elem_json['language'] = '*%s' % elem.get('languages', '')
 
             if not elem.get('permalink', '') and not elem.get('perma', ''): continue
-            elem_json['url'] = AlfaChannel.urljoin(host, '%s/' % path + (elem.get('permalink', '') or elem.get('perma', '')))
+            elem_json['url'] = AlfaChannel.urljoin(host, '%s' % path + (elem.get('permalink', '') or elem.get('perma', '')))
             elem_json['url'] += '/temporada-%s/episodio-%s' % (elem.get('season', '1'), elem.get('episode', '00').zfill(2))
             elem_json['info'] = {elem.get('id', '0'): sid}
 
@@ -802,6 +845,7 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
         elem_json['plot_extend'] = str_.replace('[COLOR blue](Visto)[/COLOR]', '')
         elem_json['plot_extend_show'] = False
         elem_json['playcount'] = 1 if 'Visto' in str_ else 0
+        if elem.get('episode_list') or item.episode_list: elem_json['episode_list'] = elem.get('episode_list', {}).copy() or item.episode_list.copy()
         elem_json = add_context(elem_json, str_)
 
         matches.append(elem_json.copy())
@@ -813,7 +857,7 @@ def findvideos(item):
     logger.info()
     global js_data, data_js
 
-    verify_credentials(force_login=True if item.contentChannel == 'videolibrary' else not account)
+    verify_credentials(force_login='timer')
 
     kwargs['matches_post_episodes'] = episodesxseason_matches
 
@@ -911,22 +955,24 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
         if 'clicknupload' in elem_json['url']: continue
 
         matches.append(elem_json.copy())
-    
+
     return matches, langs
 
 
 def play(item):
-    global user_status, account, sid
+
+    verify_credentials(force_login='timer', force_check=False)
     
     if "###" in item.url:
         item.info = {item.url.split("###")[1].split(";")[0]: item.url.split("###")[1].split(";")[0]}
         item.url = item.url.split("###")[0]
     mediatype = '1' if item.contentType == 'tvshow' else '2' if item.contentType == 'movie' else '3' if item.contentType == 'episode' else '4'
-    if item.info:
+    if item.info and config.get_setting("videolibrary_mark_as_watched"):
         post = "target_id=%s&target_type=%s&target_status=1" % (list(item.info.keys())[0], mediatype)
         
         data = agrupa_datos(AlfaChannel.urljoin(host, "a/status"), post=post, hide_infobox=True)
         check_user_status(reset=True)
+        screen_refresh()
     
     devuelve = servertools.findvideosbyserver(item.url, item.server)
     
@@ -939,14 +985,6 @@ def play(item):
             item.server = devuelve[0][2]
     item.thumbnail = item.contentThumbnail
 
-    #Forzar Login después de la reproducción
-    account = False
-    config.set_setting("logged", account, channel=canonical['channel'])
-    sid = ''
-    if window: window.setProperty("AH_hdfull_sid", sid)
-    user_status = {}
-    if window: window.setProperty("AH_hdfull_user_status", jsontools.dump(user_status))
-    
     return [item]
 
 
@@ -968,7 +1006,7 @@ def search(item, texto, **AHkwargs):
     logger.info()
     kwargs.update(AHkwargs)
 
-    verify_credentials(force_login=True)
+    verify_credentials(force_login='timer')
 
     try:
         texto = texto.replace(" ", "+")
@@ -995,7 +1033,7 @@ def search(item, texto, **AHkwargs):
 
 """ CREDENTIALS MANAGEMENT """
 def verify_credentials(force_login=True, force_check=True):
-    global account, credentials_req, user_, pass_, sid, user_status
+    global credentials_req, user_, pass_
     
     if debug: logger.debug('SID: %s; Account: %s; just_logout: %s; force_login: %s; force_check: %s; credentials: %s; credentials_req: %s' \
                             % (True if sid else False, account, just_logout, force_login, force_check, 
@@ -1003,12 +1041,7 @@ def verify_credentials(force_login=True, force_check=True):
 
     credentials = True if user_ and pass_ else False
     if not credentials:
-        account = False
-        config.set_setting("logged", account, channel=canonical['channel'])
-        sid = ''
-        if window: window.setProperty("AH_hdfull_sid", sid)
-        user_status = {}
-        if window: window.setProperty("AH_hdfull_user_status", jsontools.dump(user_status))
+        force_login_next()
         logger.info('NO LOGIN credentials', force=True)
         
         if credentials_req and force_check:
@@ -1030,22 +1063,21 @@ def verify_credentials(force_login=True, force_check=True):
                                                                               channel=canonical['channel'], default=''))), 
                                                                               str(type(config.get_setting('hdfullpassword', 
                                                                               channel=canonical['channel'], default=''))), setting))
+                force_login_next()
                 user_ = ''
                 pass_ = ''
-                account = False
                 config.set_setting('hdfulluser', user_, channel=canonical['channel'])
                 config.set_setting('hdfullpassword', pass_, channel=canonical['channel'])
-                config.set_setting('logged', account, channel=canonical['channel'])
 
             credentials = True if user_ and pass_ else False
-            if credentials and force_login: login()
-            
+
             if not credentials:
                 if not _silence:
                     dialog_notification("Falta usuario o contraseña", "Revise sus datos en la configuración del canal", sound=False)
                 credentials_req = False
                 logger.info('NO credentials for LOGIN', force=True)
 
+    if credentials and force_login == 'timer': check_login_age(force_check=force_check)
     elif credentials and force_login: login()
 
     return credentials
@@ -1089,15 +1121,37 @@ def check_login_status(data):
             config.set_setting("logged", account, channel=canonical['channel'])
         return account
     
+    force_login_next()
+    
+    return account
+
+def check_login_age(force_check=True):
+    global login_age
+    
+    time_now = time.time()
+    time_left = -0.0 if not login_age else (login_age - time_now)
+
+    if time_left <= 0.0:
+        logger.debug('Login TIMED OUT: %s m. / %s m.' % (timer, round(time_left/60, 2)))
+        force_login_next()
+        login(force_check=force_check)
+    else:
+        logger.debug('Login TIME LEFT: %s m. / %s m.' % (timer, round(time_left/60, 2)))
+
+def force_login_next():
+    global sid, account, user_status, login_age
+
     account = False
     config.set_setting("logged", account, channel=canonical['channel'])
     sid = ''
     if window: window.setProperty("AH_hdfull_sid", sid)
-    
-    return account
+    user_status = {}
+    if window: window.setProperty("AH_hdfull_user_status", jsontools.dump(user_status))
+    login_age = ''
+    if window: window.setProperty("AH_hdfull_login_age", str(login_age))
 
 def login(data='', alfa_s=False, force_check=True, retry=False):
-    global sid, account
+    global sid, account, login_age
 
     if data:
         sid = AlfaChannel.do_quote(scrapertools.find_single_match(data, patron_sid), plus=False)
@@ -1113,11 +1167,14 @@ def login(data='', alfa_s=False, force_check=True, retry=False):
         if window: window.setProperty("AH_hdfull_sid", sid)
 
     if check_login_status(data):
+        login_age = time.time() + timer*60
+        window.setProperty("AH_hdfull_login_age", str(login_age))
         check_user_status()
         logger.info('LOGGED IN', force=True)
         return True
 
     elif not verify_credentials(force_login=False, force_check=force_check):
+        force_login_next()
         return False
 
     else:
@@ -1125,11 +1182,12 @@ def login(data='', alfa_s=False, force_check=True, retry=False):
         sid = AlfaChannel.do_quote(scrapertools.find_single_match(data, patron_sid), plus=False)
         if window: window.setProperty("AH_hdfull_sid", sid)
         if not sid:
-            if not retry:
+            if not retry and not cf_assistant:
                 logout(Item())
                 logger.error('NO SID: RETRY: %s' % str(data))
                 return login(force_check=force_check, retry=True)
             logger.error('NO SID: %s' % str(data))
+            force_login_next()
             return False
 
         post = '__csrf_magic=%s&username=%s&password=%s&action=login' % (sid, user_, pass_)
@@ -1152,16 +1210,19 @@ def login(data='', alfa_s=False, force_check=True, retry=False):
                 if not config.get_setting("logged", channel=canonical['channel']):
                     config.set_setting("logged", account, channel=canonical['channel'])
                 logger.info('Just LOGGED', force=True)
+                login_age = time.time() + timer*60
+                window.setProperty("AH_hdfull_login_age", str(login_age))
                 check_user_status(reset=True)
                 return True
         
         logger.info('Error on LOGIN: %s' % str(new_data), force=True)
         if not _silence:
             dialog_notification("No se pudo realizar el login", "Revise sus datos en la configuración del canal", sound=False)
+        force_login_next()
         return False
 
 def logout(item):
-    global just_logout, account, user_status, sid, js_data, data_js, user_, pass_
+    global just_logout, js_data, data_js
     logger.info('LOGGED OFF', force=True)
     
     # Logoff en la web
@@ -1175,16 +1236,11 @@ def logout(item):
     dict_cookie = {"domain": '.'+domain, 'expires': 0}
     AlfaChannel.httptools.set_cookies(dict_cookie)
 
-    account = False
-    config.set_setting("logged", account, channel=canonical['channel'])
-    user_status = {}
-    sid = ''
+    force_login_next()
     js_data = ''
     data_js = ''
     just_logout = True
     if window:
-        window.setProperty("AH_hdfull_user_status", jsontools.dump(user_status))
-        window.setProperty("AH_hdfull_sid", sid)
         window.setProperty("AH_hdfull_js_data", js_data)
         window.setProperty("AH_hdfull_data_js", data_js)
         window.setProperty("AH_hdfull_just_logout", str(just_logout))
@@ -1198,7 +1254,6 @@ def logout(item):
     return [item]
 
 def agrupa_datos(url, post=None, referer=True, soup=False, json=False, force_check=False, force_login=True, alfa_s=False, hide_infobox=False):
-    global account, sid, user_status
 
     headers = {'Referer': host}
     if 'episodes' in url or 'buscar' in url:
@@ -1206,33 +1261,22 @@ def agrupa_datos(url, post=None, referer=True, soup=False, json=False, force_che
     if isinstance(referer, str):
         headers.update({'Referer': referer})
     if len(canonical['host_alt']) > 1:
-        url = verify_domain_alt(url, post=post, headers=headers, soup=False, json=False)
+        url = verify_domain_alt(url, post=post, headers=headers, soup=False, json=False, alfa_s=alfa_s or hide_infobox)
 
     page = AlfaChannel.create_soup(url, post=post, headers=headers, ignore_response_code=True, timeout=timeout, 
                                    soup=False, json=False, canonical=canonical, hide_infobox=hide_infobox, alfa_s=alfa_s)
 
     if page.sucess and page.host and host_save not in page.host:
-        account = False
-        config.set_setting("logged", account, channel=canonical['channel'])
-        sid = ''
-        if window: window.setProperty("AH_hdfull_sid", sid)
-        user_status = {}
-        if window: window.setProperty("AH_hdfull_user_status", jsontools.dump(user_status))
+        force_login_next()
         url = page.url_new
         if window: window.setProperty("AH_hdfull_domain", AlfaChannel.host)
         return agrupa_datos(url, post=post, referer=referer, alfa_s=alfa_s, hide_infobox=hide_infobox, 
                             json=json, force_check=force_check, force_login=True)
 
     if not page.sucess:
-        account = False
-        config.set_setting("logged", account, channel=canonical['channel'])
+        force_login_next()
         config.set_setting("current_host", '', channel=canonical['channel'])
-        sid = ''
-        if window: window.setProperty("AH_hdfull_sid", sid)
-        user_status = {}
-        if window: 
-            window.setProperty("AH_hdfull_user_status", jsontools.dump(user_status))
-            window.setProperty("AH_hdfull_domain", "")
+        if window: window.setProperty("AH_hdfull_domain", "")
         return {} if json else ''
 
     #dict_cookie = {'name': 'language' % AlfaChannel.obtain_domain(url), 'value': 'es', 'domain': AlfaChannel.response_preferred_proxy_ip.replace('https://', '.'), 'domain_initial_dot': True}
@@ -1242,7 +1286,9 @@ def agrupa_datos(url, post=None, referer=True, soup=False, json=False, force_che
         if not page.json and page.data:
             page.json = page.data
             if not isinstance(page.json, _dict):
-                page.json = jsontools.load(page.json)
+                page.json = jsontools.load(page.json, silence=True)
+                if not page.json:
+                    page.json = jsontools.load(scrapertools.find_single_match(str(page.data), r"(\{.*?\})(?:$|<\/)"), silence=True)
         return page.json
     
     if (page.data or (not page.data and not post)) and not 'application' in page.headers['Content-Type'] and not check_login_status(page.data):
@@ -1265,7 +1311,7 @@ def agrupa_datos(url, post=None, referer=True, soup=False, json=False, force_che
     
     return data
 
-def verify_domain_alt(url, post=None, headers={}, soup=False, json=False):
+def verify_domain_alt(url, post=None, headers={}, soup=False, json=False, alfa_s=True):
     global host, host_save, canonical
 
     host_alt = AlfaChannel.obtain_domain(url, scheme=True).rstrip('/') + '/'
@@ -1276,8 +1322,9 @@ def verify_domain_alt(url, post=None, headers={}, soup=False, json=False):
         for host_alt in canonical['host_alt']:
             canonical_alt['host'] = host_alt
             canonical_alt['host_alt'] = [host_alt]
+            headers['Referer'] = host_alt
             page = AlfaChannel.create_soup(host_alt + url_rest, post=post, headers=headers, ignore_response_code=True, timeout=timeout, 
-                                           soup=soup, json=json, canonical=canonical_alt, alfa_s=True, proxy_retries=0, retries_cloudflare=0,
+                                           soup=soup, json=json, canonical=canonical_alt, alfa_s=alfa_s, proxy_retries=0, retries_cloudflare=0,
                                            canonical_check=False)
             if page.sucess:
                 url = host_alt + url_rest
@@ -1308,13 +1355,16 @@ def set_status__(item):
         agreg = 'Pelicula "%s"' % item.contentTitle
         mediatype = '2'
     else:
-        agreg = 'Serie "%s"' % item.contentSerieName
-        mediatype = '1' if item.contentType == 'tvshow' else '3' if item.contentType == 'episode' else '4'
+        agreg = 'Serie "%s"' % item.contentSerieName or item.contentTitle
+        mediatype = '1' if item.contentType == 'tvshow' else '3' if item.contentType in ['season', 'episode'] else '4'
+    header = item.contentSerieName or item.contentTitle
+
     if "###" in item.url:
         item.info = {item.url.split("###")[1].split(";")[0]: item.url.split("###")[1].split(";")[0]}
         item.url = item.url.split("###")[0]
     info = list(item.info.keys())[0] if item.info else ''
     info_show = list(item.info.values())[0] if item.info else ''
+    info_season = list(item.episode_list.values())[0] if item.episode_list else ''
     list_info = list(item.list_info.values())[0] if item.list_info else ''
 
     if "Abandonar" in item.title and item.list_info:
@@ -1331,6 +1381,20 @@ def set_status__(item):
         title = "[COLOR darkgrey][B]Abandonando %s[/B][/COLOR]"
         path = "/a/status"
         post = "target_id=%s&target_type=%s&target_status=0" % (info_show, mediatype)
+
+    elif "Marcar Visto Temporada" in item.title and info_season:
+        title = "[COLOR blue][B]Visto %s[/B][/COLOR]"
+        header = item.season_search or item.contentSerieName or item.contentTitle
+        agreg = '"Temporada %s de ' % (item.contentSeason or "'Especiales'") + '%s"' % header
+        path = "/a/status"
+        post = "target_id=%s&target_type=%s&target_status=1" % (info_season, mediatype)
+
+    elif "Visto Temporada" in item.title and info_season:
+        title = "[COLOR darkgrey][B]No Vista %s[/B][/COLOR]"
+        header = item.season_search or item.contentSerieName or item.contentTitle
+        agreg = '"Temporada %s de ' % (item.contentSeason or "'Especiales'") + '%s"' % header
+        path = "/a/status"
+        post = "target_id=%s&target_type=%s&target_status=0" % (info_season, mediatype)
 
     elif "Marcar Visto" in item.title:
         title = "[COLOR blue][B]Visto %s[/B][/COLOR]"
@@ -1389,10 +1453,20 @@ def set_status__(item):
 
     data = agrupa_datos(AlfaChannel.urljoin(host, path), post=post, hide_infobox=True)
     check_user_status(reset=True)
-    if debug: logger.debug('Post: %s' % post)
+    if debug: logger.debug('Post: %s; Title: %s' % (post, title % agreg))
+
+    screen_refresh()
 
     title = title % agreg
-    dialog_ok(item.contentSerieName or item.contentTitle, title)
+    dialog_ok(header, title)
+
+def screen_refresh(item={}, replace=False):
+
+    if not item:
+        itemlist_refresh()
+
+    else:
+        itemlist_update(item, replace=replace)
 
 def get_status(status, elem, mediatype=''):
     
@@ -1400,10 +1474,12 @@ def get_status(status, elem, mediatype=''):
         info = elem.get('info', {})
         list_info = list(elem.get('list_info', {}).values())[0] if elem.get('list_info', {}) else ''
         mediatype = elem.get('mediatype', mediatype)
+        season = elem.get('season', 0)
     else:
         info = elem.info or {}
         list_info = list(elem.list_info.values())[0] if elem.list_info else ''
         mediatype = elem.contentType or mediatype
+        season = elem.contentSeason or 0
 
     if debug: logger.debug('info: %s; list_info: %s; mediatype: %s' % (info, list_info, mediatype))
     if not status or not account or not mediatype or (not info and not list_info):
@@ -1418,6 +1494,9 @@ def get_status(status, elem, mediatype=''):
     elif mediatype == 'tvshow':
         mediatype = 'shows'
         state = state_shows.copy()
+    elif mediatype == 'season':
+        mediatype = 'seasons'
+        state = state_episodes.copy()
     elif mediatype == 'episode':
         mediatype = 'episodes'
         state = state_episodes.copy()
@@ -1434,6 +1513,32 @@ def get_status(status, elem, mediatype=''):
              or (list_info and list_info in status.get('status', {}).get(mediatype, '')):
         str2 = state[status['status'][mediatype][list(info.values())[0] if info else list_info]]
         if str2: str2 = " [COLOR %s](%s)[/COLOR]" % ('orange' if 'Siguiendo' in str2 else 'blue', str2)
+
+    if mediatype == 'seasons':
+        if info and list(info.values())[0] in status.get('status', {}).get('shows', ''):
+            path = '/a/episodes'
+            post = 'action=season&start=0&limit=0&show=%s&season=%s' % (list(info.values())[0], season if season else '')
+            epis = agrupa_datos(AlfaChannel.urljoin(host, path), json=True, post=post, hide_infobox=True)
+            if epis and not isinstance(epis, list): epis = ast.literal_eval(epis)
+
+            if epis and isinstance(epis, list):
+                season_list = ''
+                visto = '1'
+                for epi in epis:
+                    if epi.get('id'):
+                        season_list += '%s,' % epi['id']
+                        if status.get('status', {}).get('episodes', '').get(epi['id'], '0') == '0':
+                            visto = '0'
+
+                if season_list:
+                    if isinstance(elem, _dict):
+                        elem['episode_list'] = {season: season_list.rstrip(',')}
+                        if debug: logger.debug("elem['episode_list']: %s; %s" % (elem['episode_list'], visto))
+                    else:
+                        elem.episode_list = {season: season_list.rstrip(',')}
+                        if debug: logger.debug("elem.episode_list: %s; %s" % (elem.episode_list, visto))
+                    str2 = state[visto]
+                    str2 = " [COLOR %s](%s)[/COLOR]" % ('orange' if 'Siguiendo' in str2 else 'blue', str2)
             
     if mediatype == 'episodes':
         if info and list(info.values())[0] in status.get('favorites', {}).get('shows', ''):
@@ -1480,7 +1585,7 @@ def add_context(elem_json, str_, mediatype=''):
         context_dict['title'] = "[COLOR limegreen][B]Abandonar[/B][/COLOR]"
         elem_json['context'].append(context_dict.copy())
 
-    if elem_json.get('mediatype', mediatype) in ['movie', 'tvshow']:
+    if elem_json.get('mediatype', mediatype) in ['movie', 'tvshow', 'season']:
         if "Pendiente" in str_:
             context_dict['title'] = "[COLOR limegreen][B]Quitar de Pendientes[/B][/COLOR]"
             elem_json['context'].append(context_dict.copy())
@@ -1502,7 +1607,7 @@ def add_context(elem_json, str_, mediatype=''):
         context_dict['title'] = "[COLOR blue][B]Marcar Visto[/B][/COLOR]"
         elem_json['context'].append(context_dict.copy())
 
-    elif elem_json.get('mediatype', mediatype) == 'tvshow':
+    elif elem_json.get('mediatype', mediatype)  in ['tvshow', 'season']:
         if "Siguiendo" in str_ :
             context_dict['title'] = "[COLOR limegreen][B]Quitar de Seguir[/B][/COLOR]"
             elem_json['context'].append(context_dict.copy())
@@ -1516,6 +1621,13 @@ def add_context(elem_json, str_, mediatype=''):
         else:
             context_dict['title'] = "[COLOR orange][B]Agregar a Finalizadas[/B][/COLOR]"
             elem_json['context'].append(context_dict.copy())
+        
+        if elem_json.get('episode_list', '') and elem_json.get('mediatype', mediatype) in ['season']:
+            context_dict['title'] = "[COLOR limegreen][B]Marcar No Visto Temporada[/B][/COLOR]"
+            elem_json['context'].append(context_dict.copy())
+
+            context_dict['title'] = "[COLOR blue][B]Marcar Visto Temporada[/B][/COLOR]"
+            elem_json['context'].append(context_dict.copy())
 
     elif elem_json.get('mediatype', mediatype) == 'episode':
         context_dict['title'] = "[COLOR limegreen][B]Marcar No Visto[/B][/COLOR]"
@@ -1523,6 +1635,17 @@ def add_context(elem_json, str_, mediatype=''):
 
         context_dict['title'] = "[COLOR blue][B]Marcar Visto[/B][/COLOR]"
         elem_json['context'].append(context_dict.copy())
+
+        if elem_json.get('episode_list', ''):
+            context_dict['title'] = "[COLOR limegreen][B]Marcar No Visto Temporada[/B][/COLOR]"
+            context_dict['episode_list'] = elem_json['episode_list'].copy()
+            elem_json['context'].append(context_dict.copy())
+            del context_dict['episode_list']
+
+            context_dict['title'] = "[COLOR blue][B]Marcar Visto Temporada[/B][/COLOR]"
+            context_dict['episode_list'] = elem_json['episode_list'].copy()
+            elem_json['context'].append(context_dict.copy())
+            del context_dict['episode_list']
 
         if list(context_dict['info'].values())[0] != '0':                       # No funciona en "Para Ver"
             context_dict_show = context_dict.copy()
@@ -1594,8 +1717,8 @@ def find_hidden_seasons(item, matches, sid):
             data = agrupa_datos(url, post=post, json=True, force_check=False, force_login=False, alfa_s=True)
 
             if data and isinstance(data, list):
-                matches.append({'url': url_season + (str(high_season) if high_json_season > 0 else ''), 
-                                'season': high_season, 'info': {sid: sid}})
+                matches.append({'url': url_season + (str(high_season) if high_json_season > 0 else ''), 'info': {sid: sid}, 
+                                'title': item.contentSerieName or item.contentTitle, 'season': high_season})
                 if high_season > tmdb_season: item.infoLabels['number_of_seasons'] = high_season
 
     except Exception:

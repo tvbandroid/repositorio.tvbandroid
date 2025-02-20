@@ -25,9 +25,22 @@ forced_proxy_opt = 'ProxySSL'
 canonical = {
              'channel': 'dontorrent', 
              'host': config.get_setting("current_host", 'dontorrent', default=''), 
-             'host_alt': ["https://dontorrent.directory/", "https://www9.dontorrent.link/", "https://tomadivx.net/",
-                          "https://todotorrents.org/"], 
-             'host_black_list': ["https://dontorrent.skin/", "https://dontorrent.agency/", "https://www2.dontorrent.fr/", 
+             'host_alt': ["https://dontorrent.tube/", "https://elitedivx.net/", "https://lilatorrent.com/", 
+                          "https://mastorrents.net/", "https://reinventorrent.org/", "https://todotorrents.org/", 
+                          "https://www18.dontorrent.link/"], 
+             'host_black_list': ["https://dontorrent.games/", "https://dontorrent.wiki/", "https://dontorrent.football/", 
+                                 "https://dontorrent.auction/", "https://dontorrent.co/", "https://dontorrent.foundation/", 
+                                 "https://www17.dontorrent.link/", "https://dontorrent.yoga/", "https://tomadivx.net/", 
+                                 "https://dontorrent.gallery/", "https://www16.dontorrent.link/", "https://dontorrent.fashion/", 
+                                 "https://dontorrent.equipment/", "https://www15.dontorrent.link/", "https://dontorrent.gratis/", 
+                                 "https://www15.dontorrent.link/", "https://dontorrent.faith/", "https://dontorrent.exposed/", 
+                                 "https://dontorrent.education/", "https://dontorrent.email/", "https://dontorrent.date/", 
+                                 "https://dontorrent.earth/", "https://dontorrent.cricket/", "https://dontorrent.dance/", 
+                                 "https://dontorrent.cologne/", "https://dontorrent.city/", "https://dontorrent.esq/", 
+                                 "https://dontorrent.cc/", "https://dontorrent.sbs/", "https://dontorrent.fyi/", 
+                                 "https://dontorrent.icu/", "https://dontorrent.clothing/", "https://dontorrent.business/", 
+                                 "https://dontorrent.miami/", "https://dontorrent.boutique/", "https://dontorrent.directory/", 
+                                 "https://dontorrent.skin/", "https://dontorrent.agency/", "https://www2.dontorrent.fr/", 
                                  "https://dontorrent.cyou/", "https://dontorrent.cooking/", "https://dontorrent.center/", 
                                  "https://dontorrent.band/", "https://dontorrent.makeup/", "https://dontorrent.yokohama/", 
                                  "https://dontorrent.capetown/", "https://dontorrent.cymru/", "https://dontorrent.contact/", 
@@ -210,6 +223,8 @@ def submenu(item):
                                  url=host, thumbnail=get_thumb("search.png"), c_type="search", 
                                  category=categoria, plot=AlfaChannelHelper.PLOT_BTDIGG, btdigg=True))
 
+        itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
+                             thumbnail=get_thumb("setting_0.png")))
         itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
         return itemlist
@@ -384,9 +399,13 @@ def list_all_matches(item, matches_int, **AHkwargs):
                     if movie_path in elem_json['url']:
                         elem_json['quality'] = '*%s' % re.sub(r'(?i)\(|\)|Ninguno', '', 
                                                 elem_a.find_next_sibling('span', class_='text-muted').get_text(strip=True))
+                        elem_json['title'] = re.sub(r'\[([^\]]+)\]', '', elem_json['title'])
+                        elem_json['title'] = re.sub(r'(?i)\s*\[*\(*(?:3d|4k)\)*\]*', '', elem_json['title'])
                     elif tv_path in elem_json['url']:
                         elem_json['quality'] = scrapertools.find_single_match(elem_json['title'], r'\[([^\]]+)\]')
                         elem_json['quality'] = 'HDTV-720p' if '720p' in elem_json['quality'] else 'HDTV'
+                    if '3d' in elem_json['title'].lower() and '3d' not in elem_json['quality'].lower():
+                        elem_json['quality'] = '%s,3d' % elem_json['quality']
 
                 except Exception:
                     logger.error(elem_a)
@@ -467,13 +486,16 @@ def list_all_matches(item, matches_int, **AHkwargs):
                     if items_found > 0: items_found -= 1
                     if movie_path not in elem_json['url'] and tv_path not in elem_json['url'] and docu_path not in elem_json['url']: continue
                     if movie_path in elem_json['url']:
-                        elem_json['title'] = elem_a.get_text('|').split('|')[0].rstrip('.')
+                        elem_json['title'] = (elem_a.get_text('|').split('|')[0] + elem_a.get_text('|').split('|')[1]).rstrip('.')
                         elem_json['quality'] = '*%s' % scrapertools.find_single_match(elem_a.get_text('|').split('|')[-2], 
                                                                                                       r'\((.*?)\)').replace('Ninguno', '')
                     else:
                         elem_json['title'] = re.sub(r'(?i)\s*\(.*?\).*?$', '', elem_a.get_text()).rstrip('.')
                         elem_json['quality'] = '*%s' % scrapertools.find_single_match(elem_a.get_text(), r'\((.*?)\)').replace('Ninguno', '')
+                    if '3d' in elem_json['title'].lower() and '3d' not in elem_json['quality'].lower():
+                        elem_json['quality'] = '%s,3d' % elem_json['quality']
                     elem_json['language'] = '*'
+                    if movie_path in elem_json['url']: elem_json['title'] = re.sub(r'(?i)\s*\[*\(*(?:3d|4k)\)*\]*', '', elem_json['title'])
 
                 except Exception:
                     logger.error(elem_a)
@@ -506,6 +528,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
                         elem_json['title'] = re.sub(r'\d{3,7}[-|_|\/]+\d{3,10}[-|\/]', '', elem_json['title'].split('/')[-1])
                         elem_json['title'] = re.sub(r'--[^\.|$]*|.jpg|.png|$', '', elem_json['title'])
                         elem_json['title'] = re.sub(r'-\d{6,10}-mmed(?:.jpg|.png|$)', '', elem_json['title'])
+                        elem_json['title'] = re.sub(r'(?i)\s*\[*\(*(?:3d|4k)\)*\]*', '', elem_json['title'])
                         elem_json['title'] = elem_json['title'].replace('-', ' ').replace('_', ' ').strip()
                     
                     else:
@@ -521,6 +544,8 @@ def list_all_matches(item, matches_int, **AHkwargs):
                         if not elem_json['title']:
                             elem_json['title'] = elem_json['url']
                         elem_json['title'] = scrapertools.remove_htmltags(elem_json['title'])
+                    if '3d' in elem_json['title'].lower() and '3d' not in elem_json['quality'].lower():
+                        elem_json['quality'] = '%s,3d' % elem_json['quality']
 
                 except Exception:
                     logger.error(elem_a)
@@ -592,6 +617,10 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
                     elif scrapertools.find_single_match(sxe, r'(?i)(\d+)x(\d+)\s*al\s*(\d+)'):
                         elem_json['season'], elem_json['episode'], alt_epi = \
                                 scrapertools.find_single_match(sxe, r'(?i)(\d+)x(\d+)\s*al\s*(\d+)')
+                        epi_rango = True
+                    elif scrapertools.find_single_match(sxe, r'(?i)(\d+)x(\d+)\s*-\s*\d+x(\d+)'):
+                        elem_json['season'], elem_json['episode'], alt_epi = \
+                                scrapertools.find_single_match(sxe, r'(?i)(\d+)x(\d+)\s*-\s*\d+x(\d+)')
                         epi_rango = True
                     elif scrapertools.find_single_match(sxe, r'(?i)(\d+)x(\d+)\s*-\s*(\d+)'):
                         elem_json['season'], elem_json['episode'], alt_epi = \
@@ -701,6 +730,8 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
 
                 elem_json['quality'] = elem.find('b', class_='bold', string=re.compile('Formato:'))\
                                            .find_previous('p').get_text('|', strip=True).split('|')[1]
+                if '3d' in elem_json['url'].lower() and '3d' not in elem_json['quality'].lower():
+                        elem_json['quality'] = '%s,3d' % elem_json['quality']
 
                 if  elem.find('b', class_='bold', string=re.compile('Clave:\s*')):
                     elem_json['password'] = elem.find('b', class_='bold', string=re.compile('Clave:\s*'))\
@@ -738,7 +769,7 @@ def search(item, texto, **AHkwargs):
     try:
         if texto:
             if item.btdigg: item.btdigg = texto
-            item.url = item.referer = host + 'buscar/' + texto + '/page/1'
+            item.url = item.referer = host + 'buscar/' + texto
             item.c_type = "search"
             item.texto = texto
             return list_all(item)

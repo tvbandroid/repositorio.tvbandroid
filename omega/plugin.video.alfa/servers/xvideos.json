@@ -4,11 +4,11 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://(?:flashservice|www).xvideos.com/embedframe/[0-9]+)",
+        "pattern": "(https://(?:flashservice|www).xvideos.com/embedframe/[A-z0-9]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(www.xvideos.com/video[0-9]+)",
+        "pattern": "(www.xvideos.com/video[A-z0-9.]+)",
         "url": "https://\\1/a"
       },
       {

@@ -1,14 +1,5 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
 import re
 
 from platformcode import config, logger
@@ -16,13 +7,15 @@ from core import scrapertools
 from core.item import Item
 from core import servertools
 from core import httptools
+from core import urlparse
 from bs4 import BeautifulSoup
+
 
 canonical = {
              'channel': 'porn4days', 
              'host': config.get_setting("current_host", 'porn4days', default=''), 
-             'host_alt': ["https://porn4days.red/"], 
-             'host_black_list': ["https://porn4days.biz/"], 
+             'host_alt': ["https://porn4days.blue/"], 
+             'host_black_list': ["https://porn4days.red/", "https://porn4days.biz/"], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
@@ -46,7 +39,7 @@ def search(item, texto):
     item.url = "%ssearch/page1/?s=%s" % (host,texto)
     try:
         return lista(item)
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -121,11 +114,11 @@ def lista(item):
         thumbnail = urlparse.urljoin(host,thumbnail)
         plot = ""
         action = "play"
-        if logger.info() == False:
+        if logger.info() is False:
             action = "findvideos"
         itemlist.append(Item(channel=item.channel, action=action, title=title, url=url, thumbnail=thumbnail,
                                plot=plot, fanart=thumbnail, contentTitle=title ))
-    next_page = soup.find('a', rel='next')
+    next_page = soup.find(class_='pagination').find_all('a')[-1]
     if next_page:
         next_page = next_page['href']
         # if "/?s=" in item.url and not"/search/" in next_page:

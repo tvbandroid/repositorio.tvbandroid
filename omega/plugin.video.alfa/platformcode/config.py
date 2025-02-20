@@ -157,6 +157,9 @@ def get_versions_from_repo(urls=[], xml_repo='addons.xml'):
     '''
     from core import httptools
     from core import filetools
+    
+    def versiontuple(v):
+        return tuple(map(int, (v.split("."))))
 
     versiones = {}
     if not urls:
@@ -174,7 +177,11 @@ def get_versions_from_repo(urls=[], xml_repo='addons.xml'):
             import xmltodict
             xml = xmltodict.parse(response.data)
             for addon in xml["addons"]["addon"]:
-                versiones[addon["@id"]] = addon["@version"]
+                # Store the latest version in the repository
+                if(addon["@id"] in versiones):
+                    versiones[addon["@id"]] = addon["@version"] if versiontuple(addon["@version"]) > versiontuple(versiones[addon["@id"]]) else versiones[addon["@id"]]
+                else:
+                    versiones[addon["@id"]] = addon["@version"]
             versiones['url'] = url
             response = httptools.downloadpage(url + xml_repo + '.md5', timeout=5, ignore_response_code=True, alfa_s=True)
 
@@ -223,7 +230,7 @@ def get_platform(full_version=False):
     code_db = {'10': 'MyVideos37.db', '11': 'MyVideos60.db', '12': 'MyVideos75.db',
                '13': 'MyVideos78.db', '14': 'MyVideos90.db', '15': 'MyVideos93.db',
                '16': 'MyVideos99.db', '17': 'MyVideos107.db', '18': 'MyVideos116.db',
-               '19': 'MyVideos119.db', '20': 'MyVideos121.db', '21': 'MyVideos122.db'}
+               '19': 'MyVideos119.db', '20': 'MyVideos121.db', '21': 'MyVideos131.db'}
 
     from platformcode import logger
     if not __kodi_version__:

@@ -24,11 +24,12 @@ forced_proxy_opt = 'ProxySSL'
 # https://tubxporn.xxx  https://pornky.com  https://pornktube.tv  https://wwv.joysporn.sex/
 # https://www.pornky.club/ https://www.pornktube.club/  https://tubxporn.club/ https://joysporn.club/
 
+
 canonical = {
              'channel': 'pornktube', 
              'host': config.get_setting("current_host", 'pornktube', default=''), 
-             'host_alt': ["https://www.pornktube.club/"], 
-             'host_black_list': ["https://vwv.pornktube.com/", "https://pornktube.tv", "https://wwv.pornktube.com/"], 
+             'host_alt': ["https://best.pornktube.com/"], 
+             'host_black_list': ["https://www.pornktube.club/", "https://vwv.pornktube.com/", "https://pornktube.tv", "https://wwv.pornktube.com/"], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
@@ -54,9 +55,7 @@ finds = {'find': {'find_all': [{'tag': ['div'], 'class': ['pornkvideos']}]},
                             ('find_all', [{'tag': ['a'], '@POS': [-1]}]),
                             ('get_text', [{'tag': '', 'strip': True}])]), 
          'plot': {}, 
-         'findvideos': dict([('find', [{'tag': ['article']}]), 
-                             ('find_all', [{'tagOR': ['a'], 'href': True, 'rel': 'noreferrer'},
-                                           {'tag': ['iframe'], 'src': True}])]),
+         'findvideos': {},
          'title_clean': [['[\(|\[]\s*[\)|\]]', ''],['(?i)\s*videos*\s*', '']],
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 

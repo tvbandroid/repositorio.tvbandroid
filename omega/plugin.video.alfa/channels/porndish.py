@@ -1,16 +1,5 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
-import re
-
 from platformcode import config, logger, platformtools
 from core import scrapertools
 from core import servertools
@@ -24,14 +13,14 @@ list_quality = ['default']
 list_servers = ['gounlimited']
 
 forced_proxy_opt = 'ProxySSL'
+timeout = 30
 
 canonical = {
              'channel': 'porndish', 
              'host': config.get_setting("current_host", 'porndish', default=''), 
              'host_alt': ["https://www.porndish.com"], 
              'host_black_list': [], 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
-             # 'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
+             'set_tls': False, 'set_tls_min': False, 'retries_cloudflare': 3, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
@@ -61,7 +50,7 @@ def search(item, texto):
     item.url = "%s/?s=%s" % (host,texto)
     try:
         return lista(item)
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -76,7 +65,7 @@ def categorias(item):
     for elem in matches:
         title = elem.a.text.strip()
         id = elem['id']
-        if not "Home" in title:
+        if "Home" not in title:
             itemlist.append(Item(channel=item.channel, action="canal", url=host, title=title, id=id))
     return itemlist
 
@@ -142,7 +131,7 @@ def lista(item):
             next_page = soup.find('div', class_='g1-collection-more-inner').a['data-g1-next-page-url']
         else:
             next_page = soup.find('link', rel='next')['href']
-    except:
+    except Exception:
         next_page = None
     if next_page:
         itemlist.append(Item(channel=item.channel, action="lista", title="[COLOR blue]Página Siguiente >>[/COLOR]", url=next_page.strip()))
@@ -155,12 +144,17 @@ def findvideos(item):
     soup = create_soup(item.url)
     if not soup:
         return itemlist
-    soup = soup.find('div', class_='entry-content')
+    # soup = soup.find('div', class_='entry-content')
+    soup = soup.find('div', class_='entry-inner')
     matches = soup.find_all('iframe')
     for elem in matches:
         url = elem['src']
         if "gif" in url:
             url = elem['data-src']
+        itemlist.append(Item(channel=item.channel, action="play", title= "%s" , contentTitle=item.title, url=url)) 
+    if soup.button:
+        data = soup.find_all('script')[1]
+        url =  scrapertools.find_single_match(str(data), '(?:src|SRC)="([^"]+)"')
         itemlist.append(Item(channel=item.channel, action="play", title= "%s" , contentTitle=item.title, url=url)) 
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize()) 
     # Requerido para AutoPlay

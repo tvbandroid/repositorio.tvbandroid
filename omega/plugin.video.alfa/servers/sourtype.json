@@ -4,7 +4,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://(?:www.|)(?:nonktube|udvl|leslez|teenxy|sunporno).com/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:nonktube|leslez|teenxy).com/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -12,7 +12,15 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:justporn|pulpo69).(?:com|net)/video/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:embed.|)fuqer.com/vid/[0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)(?:justporn|pulpo69|publicsexhub).(?:com|net)/video(?:s|)/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)(?:bingato|sexmex|taboodude).(?:com|net|to)/(?:item|video)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -26,6 +34,10 @@
       {
         "pattern": "(https://xxk.mobi/video/[A-z0-9-]+(?:/|))",
         "url": "\\1"
+      },
+      {
+        "pattern": "(titfap.com/video/[A-z0-9-]+(?:/|))",
+        "url": "https://\\1"
       },
       {
         "pattern": "(https://www.(?:porndroids|superporn).com/(?:es/|)video/[A-z0-9-]+(?:/|))",
@@ -44,15 +56,11 @@
         "url": "\\1"
       },
       {
-        "pattern": "https://pornez.(?:cm|cam|net|site)/([A-z0-9-]+(?:/|))",
-        "url": "https://pornez.site/\\1"
-      },
-      {
         "pattern": "(https://(?:www.|)canalporno.com/ver/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:drpornofilme|pornobereich|pornodiamant).com/film(?:e|)/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:drpornofilme|pornobereich|pornodiamant).com/film(?:e|)/[A-z0-9-ß]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -60,7 +68,11 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)eroticmv.com/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)tabooporn.to/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)koreanpornmovie.com/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -72,11 +84,15 @@
         "url": "\\1"
       },
      {
-        "pattern": "(https://(?:www.|)(?:pornvid69|sextube|ultrahorny).(?:com|nl)/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:pornvid69|sextube).(?:com|nl)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
      {
-        "pattern": "(https://(?:www.|)vlxxx.(?:com|porn)(?:/blog|)/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:pornoflix|veporn|ultrahorny).(?:com|nl)/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+     {
+        "pattern": "(https://(?:www.|)vlxxx.(?:com|porn|\\w{2,4})(?:/blog|/video|)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
      {
@@ -104,6 +120,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://eboblack.com/video/[0-9]+/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
         "pattern": "(http://www.absoluporn.com/(?:en|fr)/[A-z0-9-]+.html)",
         "url": "\\1"
       },
@@ -119,8 +139,36 @@
         "pattern": "(https://(?:www.|)biguz.net/(?:watch.php|video/)\\?id=[0-9]+&name=[A-z0-9-]+)",
         "url": "\\1"
       },
-     {
-        "pattern": "(https://(?:www.|)pornovideow.com/content_video/[A-z0-9-]+(?:/|))",
+      {
+        "pattern": "(https://draftsex.porn/video/[A-z0-9-]+.html)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://gotanynudes.com/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://xorgasmo.com/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://fansteek.com/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://ogporn.com/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)dump.xxx/video/[0-9-]+/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)veporn.net/video/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://www.serviporno.com/video/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {

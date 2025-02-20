@@ -24,8 +24,8 @@ forced_proxy_opt = 'ProxySSL'
 canonical = {
              'channel': 'cinecalidad', 
              'host': config.get_setting("current_host", 'cinecalidad', default=''), 
-             'host_alt': ["https://cinecalidad.fi/"], 
-             'host_black_list': ['https://wvvv.cinecalidad.so/', 
+             'host_alt': ["https://www.cinecalidad.vg/"], 
+             'host_black_list': ["https://cinecalidad.fi/", 'https://wvvv.cinecalidad.so/', 
                                  'https://vvvv.cinecalidad.so/', 'https://wv.cinecalidad.so/', 'https://w.cinecalidad.so/', 
                                  'https://ww.cinecalidad.so/', 'https://vvv.cinecalidad.so/', 'https://wwv.cinecalidad.so/', 
                                  'https://vww.cinecalidad.so/', 'https://wvw.cinecalidad.so/', 'https://www.cinecalidad.so/',
@@ -316,13 +316,14 @@ def list_all_matches(item, matches_int, **AHkwargs):
                 elem_json['title'], elem_json['year'] = elem.find('img', class_='w-full').get("title", "").split(' (')
             else:
                 elem_json['title'] = elem.find('img', class_='w-full').get("alt", "")
-            if 'Premium' in elem_json['title']: continue
+            if 'Premium' in elem_json['title'] or 'promo' in elem_json['title']: continue
 
             if not elem_json.get('year'):
                 elem_json['year'] = '-'
                 if elem.find('div'): elem_json['year'] = scrapertools.find_single_match(elem.find('div').get_text(strip=True), '\d{4}') or '-'
 
-            elem_json['thumbnail'] = re.sub(r'(-\d+x\d+.jpg)', '.jpg', elem.find('img', class_="w-full").get("src", ""))
+            elem_json['thumbnail'] = re.sub(r'(-\d+x\d+.jpg)', '.jpg', elem.find('img', class_="w-full").get("data-src", "") \
+                                                                       or elem.find('img', class_="w-full").get("src", ""))
 
             elem_json['plot'] = elem.p.get_text(strip=True) if elem.p else ''
             
@@ -342,7 +343,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
 
 def findvideos(item):
     logger.info()
-    
+
     return AlfaChannel.get_video_options(item, item.url, matches_post=findvideos_matches, 
                                          verify_links=False, generictools=True, findvideos_proc=True, **kwargs)
 
@@ -352,27 +353,33 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
     import base64
 
     matches = []
+    kwargs = {'error_check': False}
     findS = AHkwargs.get('finds', finds)
-    srv_ids = {"Dood": "Doodstream",
-               "Watchsb": "Streamsb",
-               "Maxplay": "voe",
+    srv_ids = {"dood": "Doodstream",
+               "watchsb": "Streamsb",
+               "maxplay": "voe",
+               "hlswish": "Streamwish",
+               "filemoon": "Tiwikiwi",
                "1fichier": "Onefichier",
-               "Latmax": "Fembed", 
+               "latmax": "Fembed", 
                "Ok": "Okru", 
-               "Torrent": "torrent"}
-
+               "torrent": "torrent"}
+    
     for elem in matches_int:
         elem_json = {}
         #logger.error(elem)
-
+        
         try:
             elem_json['url'] = base64.b64decode(elem.get("data-url", "") or elem.get("data-src", "")).decode('utf-8')
             if elem.get("data-url", ""):
-                if elem.get_text(strip=True).capitalize() != 'Torrent': continue
-                elem_json['url'] = AlfaChannel.create_soup(elem_json['url']).find("div", id="btn_enlace").a.get("href", "")
+                # if elem.get_text(strip=True).lower() != 'torrent': continue
+                elem_json['url'] = AlfaChannel.convert_url_base64(elem_json['url'], host)
+                if "mediafire" in elem_json['url']:continue
+                if elem_json['url'].startswith('http'):
+                    elem_json['url'] = AlfaChannel.create_soup(elem_json['url'], **kwargs).find("div", id="btn_enlace").a.get("href", "")
 
-            elem_json['server'] = elem.get_text(strip=True).capitalize()
-            if elem_json['server'] in ["Cineplay", "Netu", "trailer", "Fembed"]: continue
+            elem_json['server'] = elem.get_text(strip=True).lower().replace('utorrent', 'torrent')
+            if elem_json['server'] in ["Cineplay", "Netu", "trailer", "Fembed", "acortalink"]: continue
             if elem_json['server'] in srv_ids:
                 elem_json['server'] = srv_ids[elem_json['server']]
             

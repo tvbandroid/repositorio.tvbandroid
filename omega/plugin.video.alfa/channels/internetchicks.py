@@ -19,6 +19,7 @@ list_quality = []
 list_quality_movies = []
 list_quality_tvshow = []
 list_servers = []
+
 forced_proxy_opt = 'ProxySSL'
 
 
@@ -27,8 +28,8 @@ canonical = {
              'host': config.get_setting("current_host", 'internetchicks', default=''), 
              'host_alt': ["https://internetchicks.com/"], 
              'host_black_list': [], 
-             # 'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
-             # 'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': False, 'set_tls_min': False, 'retries_cloudflare': 3, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
+             'CF': False, 'CF_test': False, 'alfa_s': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
 
@@ -75,6 +76,7 @@ def mainlist(item):
     itemlist = []
     
     autoplay.init(item.channel, list_servers, list_quality)
+    
     itemlist.append(Item(channel=item.channel, title="Nuevos" , action="list_all", url=host + "page/1/"))
     itemlist.append(Item(channel=item.channel, title="Pornstars" , action="section", url=host + "actresses", extra="PornStar"))
     itemlist.append(Item(channel=item.channel, title="Categorias" , action="section", url=host + "categories/", extra="Categorias"))

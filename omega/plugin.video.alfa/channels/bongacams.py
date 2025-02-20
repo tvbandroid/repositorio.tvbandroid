@@ -1,28 +1,24 @@
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
 
 import re
 
 from platformcode import config, logger
 from core import scrapertools
 from core.item import Item
-from core import servertools
 from core import httptools
 from bs4 import BeautifulSoup
+
+forced_proxy_opt = 'ProxySSL'
+timeout = 30
 
 canonical = {
              'channel': 'bongacams', 
              'host': config.get_setting("current_host", 'bongacams', default=''), 
              'host_alt': ["https://bongacams.com/"], 
              'host_black_list': [], 
+             'set_tls': False, 'set_tls_min': False, 'retries_cloudflare': 3, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
+             'CF': False, 'CF_test': False, 'alfa_s': True
              # 'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
              # 'CF': False, 'CF_test': False, 'alfa_s': True
             }
@@ -47,7 +43,7 @@ def search(item, texto):
     item.url = "%ssearch/%s/" % (host,texto)
     try:
         return lista(item)
-    except:
+    except Exception:
         import sys
         for line in sys.exc_info():
             logger.error("%s" % line)
@@ -75,9 +71,9 @@ def categorias(item):
 def create_soup(url, referer=None, unescape=False):
     logger.info()
     if referer:
-        data = httptools.downloadpage(url, headers={'Referer': referer}, canonical=canonical).data
+        data = httptools.downloadpage(url, headers={'Referer': referer}, canonical=canonical, timeout=timeout).data
     else:
-        data = httptools.downloadpage(url, canonical=canonical).data
+        data = httptools.downloadpage(url, canonical=canonical, timeout=timeout).data
     if unescape:
         data = scrapertools.unescape(data)
     soup = BeautifulSoup(data, "html5lib", from_encoding="utf-8")
@@ -103,7 +99,7 @@ def lista(item):
         if elem.get("about_me", ""):
             plot = elem['about_me']
         action = "play"
-        if logger.info() == False:
+        if logger.info() is False:
             action = "findvideos"
         itemlist.append(Item(channel = item.channel, action=action, title=title, thumbnail=thumbnail, name=name,
                                plot=plot, fanart=thumbnail, contentTitle=title ))

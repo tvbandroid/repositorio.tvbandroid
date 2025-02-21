@@ -59,6 +59,8 @@ def list_all(item):
 
         plot = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 
+        title = title.replace('&#8217;', "'").replace('&#039;s', "'s")
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot,
                                     contentType='movie', infoLabels={"year": '-', "plot": plot}, contentTitle=title, contentExtra='documentary' ))
 
@@ -80,7 +82,7 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    url = scrapertools.find_single_match(data, 'data-lazy-type="iframe".*?<iframe.*?src="(.*?)"')
+    url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
     if url:
         servidor = servertools.get_server_from_url(url)

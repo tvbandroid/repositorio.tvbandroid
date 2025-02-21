@@ -7,6 +7,8 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
+# ~ las series no se tratan 29/8/24
+
 host = 'https://bloghorror.com/'
 
 
@@ -28,7 +30,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/terror-2/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'category/terror-3/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Asiáticas', action = 'list_all', url = host + 'category/asiatico1/', search_type = 'movie', text_color = 'moccasin' ))
 
@@ -105,7 +107,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, 'data-background="(.*?)"')
 
-        title = title.replace('&#038;', '&').replace('&#8211;', '')
+        title = title.replace('&#038;', '&').replace('&#8211;', '').replace('&#8217;s', "'s")
 
         year = '-'
 
@@ -178,9 +180,9 @@ def findvideos(item):
     ses = 0
 
     for qlty, url in matches:
-        ses += 1
-
         if 'www.subdivx' in url: continue
+
+        ses += 1
 
         if '</div>' in idioma: idioma = scrapertools.find_single_match(idioma, '(.*?)</div>').strip()
 
@@ -196,7 +198,7 @@ def findvideos(item):
         if '<span' in qlty: qlty = scrapertools.find_single_match(qlty, '(.*?)<span').strip()
         elif '<a href' in qlty: qlty = ''
 
-        url1 = url.replace('&amp;', '&')
+        url = url.replace('&amp;', '&')
 
         other = idioma
 
@@ -206,12 +208,48 @@ def findvideos(item):
         elif url.startswith('magnet:?'):
             servidor = 'torrent'
             if not idioma: other = 'Magnet'
+        elif '/tinyurl.' in url:
+            servidor = 'directo'
+            other = 'mega'
         else:
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
+        lng = ''
+
+        if idioma:
+            if not other == 'Magnet' and not other == 'mega':
+                lng = idioma.replace('<em>', '').strip()
+                other = ''
+
+        if servidor == 'directo':
+            if other == 'mega':
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                      language = lang, quality = qlty, other = other, age = lng ))
+
         if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = lang, quality = qlty, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url,
+                                  server = servidor, language = lang, quality = qlty, other = other, age = lng ))
+
+    # ~ Otros
+    matches = re.compile('<a href="(.*?)".*?data-wpel-link="external">(.*?)<', re.DOTALL).findall(bloque)
+
+    for url, tipo in matches:
+        ses += 1
+
+        if '1fichier' in url: continue
+
+        if tipo.lower() == 'subtitulos': continue
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        link_other = ''
+        if servidor == 'various': link_other = servertools.corregir_other(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
 
     if not itemlist:
         if not ses == 0:

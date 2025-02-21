@@ -46,7 +46,7 @@ except:
    except: pass
 
 
-host = 'https://megaxserie.me/'
+host = 'https://seriesmega.org/'
 
 
 def item_configurar_proxies(item):
@@ -82,6 +82,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://megaxserie.me/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/release/' in url: raise_weberror = False
 
     hay_proxies = False
@@ -89,7 +95,9 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     timeout = None
     if host in url:
-        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+        if hay_proxies:
+            timeout = config.get_setting('channels_repeat', default=30)
+            if '/series/': timeout = 60
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
@@ -149,7 +157,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_megaserie', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_megaserie', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('megaserie') ))
 
     platformtools.itemlist_refresh()
 
@@ -313,7 +321,7 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo, 
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
@@ -344,8 +352,18 @@ def temporadas(item):
 
     matches = re.compile('data-season="(.*?)"', re.DOTALL).findall(data)
 
+    tot_seasons = len(matches)
+
     for numtempo in matches:
-        title = 'Temporada ' + numtempo
+        if not numtempo: continue
+
+        nro_tempo = numtempo
+
+        if tot_seasons >= 10:
+            if len(nro_tempo) == 1:
+                nro_tempo = '0' + nro_tempo
+
+        title = 'Temporada ' + nro_tempo
 
         if len(matches) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -362,8 +380,6 @@ def temporadas(item):
     tmdb.set_infoLabels(itemlist)
 
     return sorted(itemlist,key=lambda x: x.title)
-
-    return itemlist
 
 
 def episodios(item):
@@ -395,7 +411,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -687,11 +706,11 @@ def play(item):
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
-            url = servertools.normalize_url(servidor, url)
-
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if not new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"): servidor = new_server
+
+            url = servertools.normalize_url(servidor, url)
 
             if servidor != 'directo':
                 itemlist.append(item.clone( url = url, server = servidor ))

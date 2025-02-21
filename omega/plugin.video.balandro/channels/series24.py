@@ -7,12 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww-w.series24.cc/'
+host = 'https://wc5n.series24.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.series24.cc/', 'https://www1.series24.cc/', 'https://ww3.series24.cc/',
-            'https://ww2.series24.cc/', 'https://www11.series24.cc/', 'https://w-ww.series24.cc/']
+            'https://ww2.series24.cc/', 'https://www11.series24.cc/', 'https://w-ww.series24.cc/',
+            'https://ww-w.series24.cc/', 'https://www.series24.cc/', 'https://wv5n.series24.cc/',
+            'https://wv5b.series24.cc/']
 
 
 domain = config.get_setting('dominio', 'series24', default='')
@@ -111,6 +113,8 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_series24', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'series24', thumbnail=config.get_thumb('series24') ))
 
     platformtools.itemlist_refresh()
 
@@ -247,6 +251,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if '/ver-pelicula-online/' in url: continue
+
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="imdb".*?</span>.*?<span>(.*?)</span>')
@@ -257,7 +263,7 @@ def list_all(item):
 
         if '/series-de/' in item.url: year = scrapertools.find_single_match(item.url, "/series-de/(.*?)/")
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         titulo = title
 
@@ -401,7 +407,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('Series24', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('Series24', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -570,7 +579,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -590,7 +599,11 @@ def list_search(item):
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
 
+        if '/ver-pelicula-online/' in url: continue
+
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
+
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

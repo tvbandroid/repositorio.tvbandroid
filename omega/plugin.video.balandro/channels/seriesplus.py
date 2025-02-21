@@ -7,7 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w-ww.gnula2h.cc/'
+host = 'https://wv7n.gnula2h.cc/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://w-ww.gnula2h.cc/', 'https://wl3v.gnula2h.cc/', 'https://wv3l.gnula2h.cc/']
+
+
+domain = config.get_setting('dominio', 'seriesplus', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'seriesplus')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'seriesplus')
+    else: host = domain
 
 
 def item_configurar_proxies(item):
@@ -43,6 +55,9 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/release/' in url: raise_weberror = False
 
     if not headers: headers = {'Referer': host}
@@ -76,10 +91,26 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+    domain_memo = config.get_setting('dominio', 'seriesplus', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_seriesplus', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='seriesplus', folder=False, text_color='chartreuse' ))
 
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_seriesplus', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'seriesplus', thumbnail=config.get_thumb('seriesplus') ))
 
     platformtools.itemlist_refresh()
 
@@ -216,6 +247,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if '/movies/' in url: continue
+
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="imdb".*?</span>.*?<span>(.*?)</span>')
@@ -226,7 +259,7 @@ def list_all(item):
 
         if '/release/' in item.url: year = scrapertools.find_single_match(item.url, "/release/(.*?)/")
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         titulo = title
 
@@ -370,7 +403,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('SeriesPlus', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesPlus', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -539,7 +575,7 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"): servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -559,7 +595,11 @@ def list_search(item):
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
 
+        if '/movies/' in url: continue
+
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
+
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

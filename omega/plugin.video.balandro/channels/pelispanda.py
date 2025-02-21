@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import re
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+import re, os
 
 from platformcode import logger, config, platformtools
 from core.item import Item
@@ -74,6 +79,20 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        if not url.startswith(host):
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('pelispanda', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not 'buscar/?buscar=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -99,6 +118,10 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_pelispanda', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_pelispanda', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('pelispanda') ))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'pelispanda', thumbnail=config.get_thumb('pelispanda') ))
 
     platformtools.itemlist_refresh()
 
@@ -330,7 +353,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('PelisPanda', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('PelisPanda', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -394,15 +420,20 @@ def findvideos(item):
     itemlist = []
 
     if item.contentType == 'episode':
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent', language = item.language, quality = item.quality ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent',
+                              language = item.language, quality = item.quality ))
 
         return itemlist
 
     data = do_downloadpage(item.url)
 
-    links = scrapertools.find_multiple_matches(data, '<td>Torrent</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
-    if not links: links = scrapertools.find_multiple_matches(data, '<td>Utorrent</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
-    if not links: links = scrapertools.find_multiple_matches(data, '<td>T</td>.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    bloque = scrapertools.find_single_match(data, '>Utorrent<(.*?)</table>')
+
+    links = scrapertools.find_multiple_matches(bloque, '<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+
+    if not links: links = scrapertools.find_multiple_matches(data, '>Torrent<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '>Utorrent<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
+    if not links: links = scrapertools.find_multiple_matches(data, '>T<.*?<td>(.*?)</td>.*?<td(.*?)</td>.*?<td>(.*?)</td>.*?href="(.*?)"')
 
     for qlty, lang, size, link in links:
         if 'Castellano' in lang: lang = 'Esp'
@@ -410,7 +441,10 @@ def findvideos(item):
         elif 'Subitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language = lang, quality = qlty, other = size ))
+        lang = lang.replace('>', '').strip()
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent',
+                              language = lang, quality = qlty, other = size ))
 
     return itemlist
 
@@ -424,11 +458,29 @@ def play(item):
     host_torrent = host[:-1]
     url_base64 = decrypters.decode_url_base64(url, host_torrent)
 
+    if not url_base64: return itemlist
+
     if url_base64.startswith('magnet:'):
         itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
     elif url_base64.endswith(".torrent"):
-        itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+        if config.get_setting('proxies', item.channel, default=''):
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(url_base64, 'pelispanda')
+            else:
+                data = do_downloadpage(url_base64)
+
+            if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        else:
+            itemlist.append(item.clone( url = url_base64 , server = 'torrent' ))
 
     return itemlist
 

@@ -78,11 +78,15 @@ def list_all(item):
 
             SerieName = SerieName.strip()
 
-            title = title + ' [COLOR goldenrod]Capitulo[/COLOR] ' + episode
+            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
+            title = title + ' [COLOR goldenrod]Epis.[/COLOR] ' + episode
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, contentSerieName=SerieName,
                                         contentType = 'episode', contentSeason = season, contentEpisodeNumber=episode, infoLabels={'year': '-'} ))
         else:
+            title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         contentSerieName=SerieName, contentType='tvshow', infoLabels={'year': '-'} ))
 
@@ -138,9 +142,6 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
-    if item.page == 0: episode = 0
-    else: episode = (item.page * item.perpage) + 1
-
     bloque = scrapertools.find_single_match(data, '<div class="list-group">(.*?)</div></div>')
 
     matches = re.compile('<a href="(.*?)".*?">(.*?)</a>', re.DOTALL).findall(bloque)
@@ -153,7 +154,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('DoramasQueen', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -251,12 +255,37 @@ def findvideos(item):
     return itemlist
 
 
+def list_search(item): 
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url, post = {'query': item.texto})
+
+    matches = scrapertools.find_multiple_matches(data, "href='(.*?)'.*?src='(.*?)'.*? /> (.*?)</p>")
+
+    for url, thumb, title in matches:
+        if not url or not title: continue
+
+        title_serie = re.sub(r'(\d{4})$', '', title).strip()
+
+        SerieName = title_serie
+
+        SerieName = SerieName.strip()
+
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                    contentSerieName=SerieName, contentType='tvshow', infoLabels={'year': '-'} ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + 'doramas.php' + '?'
+        item.url = host + 'app/buscar.php'
         item.texto = texto.replace(" ", "+")
-        return list_all(item)
+        return list_search(item)
     except:
         import sys
         for line in sys.exc_info():

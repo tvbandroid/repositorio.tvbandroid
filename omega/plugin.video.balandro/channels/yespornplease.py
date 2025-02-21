@@ -42,12 +42,12 @@ def mainlist_pelis(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xnxx-tags/' ))
+    itemlist.append(item.clone( title = 'Por canal', action = 'canales'))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xxx-categories/' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars/' ))
 
     return itemlist
@@ -57,21 +57,12 @@ def canales(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(item.url)
+    itemlist.append(item.clone (action='list_all', title= 'BangBros', url = host + 'bangbros/', text_color = 'violet' ))
+    itemlist.append(item.clone (action='list_all', title= 'Brazzers', url = host + 'brazzers/', text_color = 'violet' ))
+    itemlist.append(item.clone (action='list_all', title= 'RealityKings', url = host + 'reality-kings/', text_color = 'violet' ))
+    itemlist.append(item.clone (action='list_all', title= 'YouPorn', url = host + 'xnxx/youporn-2/', text_color = 'violet' ))
 
-    bloque = scrapertools.find_single_match(data, 'Categories<p>(.*?)Friends<p>')
-
-    matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
-
-    for url, title in matches:
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'orange' ))
-
-    if itemlist:
-        itemlist.append(item.clone (action='list_all', title= 'BangBros', url = host + '/bangbros/', text_color = 'orange' ))
-        itemlist.append(item.clone (action='list_all', title= 'Brazzers', url = host + '/brazzers/', text_color = 'orange' ))
-        itemlist.append(item.clone (action='list_all', title= 'Reality Kings', url = host + '/reality-kings/', text_color = 'orange' ))
-
-    return sorted(itemlist, key=lambda x: x.title)
+    return itemlist
 
 
 def categorias(item):
@@ -80,14 +71,24 @@ def categorias(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Categories<(.*?)Categories<p>')
+    bloque = scrapertools.find_single_match(data, '>Categories</h1>(.*?)</center>')
 
-    matches = re.compile('<a href="(.*?)".*?src="(.*?)".*?<figcaption>(.*?)</figcaption>', re.DOTALL).findall(bloque)
+    matches = re.compile('<a(.*?)</a></div>', re.DOTALL).findall(bloque)
 
-    for url, thumb, title in matches:
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+
+        title = scrapertools.find_single_match(match, '<figcaption>(.*?)</figcaption>')
+        if not title: title = scrapertools.find_single_match(match, 'class="wp-caption-text gallery-caption">(.*?)</a>')
+
+        if not url or not title: continue
+
         if title == 'All Videos': continue
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'tan' ))
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -110,9 +111,10 @@ def pornstars(item):
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -159,13 +161,18 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    matches0 = re.compile('<iframe.*?data-litespeed-src="(.*?)"', re.DOTALL).findall(data)
     matches1 = re.compile('<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
     matches2 = re.compile('<source type="video/mp4".*?src="(.*?)"', re.DOTALL).findall(data)
 
-    matches = matches1 + matches2
+    matches = matches0 + matches1 + matches2
 
     for link in matches:
         if '//a.' in link: continue
+
+        elif link == 'about:blank': continue
+
+        elif '/www.googletagmanager.' in link: continue
 
         if host in link:
             data2 = do_downloadpage(link)
@@ -177,13 +184,21 @@ def findvideos(item):
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
 
-        if 'player-x.php?' in link:
+                return itemlist
+
+        elif 'player-x.php?' in link:
+            data2 = do_downloadpage(link)
+
+            url = scrapertools.find_single_match(data2, '<source type="video/mp4".*?src="(.*?)"')
+
             url = scrapertools.find_single_match(data, 'mp4="(.*?)"')
 
             if url:
                 url += '|Referer=%s' % item.url
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
+
+                return itemlist
 
         servidor = servertools.get_server_from_url(link)
         servidor = servertools.corregir_servidor(servidor)
@@ -197,9 +212,24 @@ def findvideos(item):
     return itemlist
 
 
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if '/mediac.povaddict.' in url: return itemlist
+
+    itemlist.append(item.clone(server = item.server, url = url))
+
+    return itemlist
+
+
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         item.url =  host + '?s=%s' % (texto.replace(" ", "+"))
         return list_all(item)
     except:

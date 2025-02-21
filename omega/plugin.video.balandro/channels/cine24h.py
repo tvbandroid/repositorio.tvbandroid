@@ -97,7 +97,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_cine24h', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(Item( channel='helper', action='show_help_cine24h', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cine24h') ))
 
     platformtools.itemlist_refresh()
 
@@ -225,7 +225,7 @@ def list_all(item):
         title = re.sub(r'\((.*)', '', title)
         title = re.sub(r'\[(.*?)\]', '', title)
 
-        title = title.replace('&#8211;', '')
+        title = title.replace('&#8211;', '').replace('&#8230;', '')
 
         thumb = scrapertools.find_single_match(article, '<img src="(.*?)"')
 
@@ -236,7 +236,11 @@ def list_all(item):
 
         lang = 'Lat'
         if '-sub/' in url: lang = 'Vose'
-        if '-es/' in url: lang = 'Esp'
+        elif '-es/' in url: lang = 'Esp'
+
+        elif '-ESP' in article: lang = 'Esp'
+        elif '-LAT' in article: lang = 'Lat'
+        elif '-SUB' in article: lang = 'Vose'
 
         tipo = 'tvshow' if '/serie/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -270,10 +274,7 @@ def list_all(item):
 
     if buscar_next:
         if itemlist:
-            if 'class="page-numbers current">' in data:
-                 next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?<a class="page-numbers".*?href="(.*?)"')
-            else:
-                 next_page = scrapertools.find_single_match(data, '<a class="page-numbers".*?href="(.*?)"')
+            next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?<a class="page-numbers".*?href="(.*?)"')
 
             if '/page/' in next_page:
                itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_all', page=0, text_color='coral' ))
@@ -334,7 +335,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('Cine24h', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('Cine24h', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -371,7 +375,7 @@ def episodios(item):
     for epis, url, thumb, title in matches[item.page * item.perpage:]:
         if not 'http' in thumb: thumb = 'https:' + thumb
 
-        title = epis + 'x' + str(item.contentSeason) + ' ' + title
+        title = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
         itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
@@ -474,7 +478,10 @@ def play(item):
 
         new_url = scrapertools.find_single_match(data, 'src="(.*?)"')
 
-        if new_url: url = new_url
+        if new_url:
+           if new_url == 'null': return itemlist
+
+           url = new_url
 
     if url:
         if 'mystream.' in url: servidor = ''
@@ -489,7 +496,7 @@ def play(item):
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if not new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"): servidor = new_server
 
             itemlist.append(item.clone( url=url, server=servidor ))
 

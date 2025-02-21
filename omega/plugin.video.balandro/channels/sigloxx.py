@@ -25,14 +25,18 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'YouTube', action = 'youtubes', thumbnail=config.get_thumb('youtube'), search_type = 'movie', text_color = 'moccasin' ))
 
+    itemlist.append(item.clone ( title = 'Con acento español', action = 'list_films', url = host + 'especial-peliculas-con-acento-espanol/', search_type = 'movie' ))
+
     itemlist.append(item.clone ( title = 'Sagas', action = 'sagas', url = host + 'sagas/sagas-pag1/', search_type = 'movie' ))
+
+    itemlist.append(item.clone ( title = 'Navidad', action = 'list_films', url = host + 'especial-navidad/', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Por actor', action = 'listas', url = host + 'actores/actores-pag1/', group = 'Actores' ))
     itemlist.append(item.clone ( title = 'Por actriz', action = 'listas', url = host + 'actrices/actrices-pag1/', group = 'Actrices' ))
-    itemlist.append(item.clone ( title = 'Por dirección, guionistas, productores', action = 'listas', url = host + 'directores/directores-pag1/', group = 'Directores' ))
-    itemlist.append(item.clone ( title = 'Por compositores, escritores, novelistas', action = 'listas', url = host + 'otras-biografias/', group = 'Otras biografías' ))
+    itemlist.append(item.clone ( title = 'Por dirección, guionista, productor', action = 'listas', url = host + 'directores/directores-pag1/', group = 'Directores' ))
+    itemlist.append(item.clone ( title = 'Por compositor, escritor, novelista', action = 'listas', url = host + 'otras-biografias/', group = 'Otras biografías' ))
 
     return itemlist
 
@@ -41,17 +45,19 @@ def youtubes(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone ( title = 'Cine Clásico', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=r9y9RcsBv9k&list=PL5Elc2OLiWk6pkscyMTC6DCbE4GIeqfAe&index=2' ))
+    text_color = 'moccasin'
 
-    itemlist.append(item.clone ( title = 'Cine Clásico Español', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=OVjZTR0w_n4&list=PLhgZbivoHwSViCGE5ljvi8cYTgouloz_-' ))
+    itemlist.append(item.clone ( title = 'Cine Clásico', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=r9y9RcsBv9k&list=PL5Elc2OLiWk6pkscyMTC6DCbE4GIeqfAe&index=2', text_color=text_color ))
 
-    itemlist.append(item.clone ( title = 'Otras de Cine Clásico', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=_ppHqkSS_uQ&list=PL5Elc2OLiWk6pkscyMTC6DCbE4GIeqfAe' ))
+    itemlist.append(item.clone ( title = 'Cine Clásico Español', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=OVjZTR0w_n4&list=PLhgZbivoHwSViCGE5ljvi8cYTgouloz_-', text_color=text_color ))
 
-    itemlist.append(item.clone ( title = 'Bud Spencer & Terence Hill', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=PuMlIOHBaqg&list=PLy-qmp54bpB2yopTCH_4G5WLnniNQerQf' ))
+    itemlist.append(item.clone ( title = 'Otras de Cine Clásico', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=_ppHqkSS_uQ&list=PL5Elc2OLiWk6pkscyMTC6DCbE4GIeqfAe', text_color=text_color ))
 
-    itemlist.append(item.clone ( title = 'Cantinflas', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=U5neiehwYMk&list=PLEN1o4MXDPxA-o78qTZRqEU-XgRUyh76u' ))
+    itemlist.append(item.clone ( title = 'Bud Spencer & Terence Hill', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=PuMlIOHBaqg&list=PLy-qmp54bpB2yopTCH_4G5WLnniNQerQf', text_color=text_color ))
 
-    itemlist.append(item.clone ( title = 'Westerns', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=1g_SGZn4_-c&list=PLLxxgrF1QnBjEvwkfWLPkr-CLEeEHJuWl' ))
+    itemlist.append(item.clone ( title = 'Cantinflas', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=U5neiehwYMk&list=PLEN1o4MXDPxA-o78qTZRqEU-XgRUyh76u', text_color=text_color ))
+
+    itemlist.append(item.clone ( title = 'Westerns', action = 'list_tubes', url = 'https://www.youtube.com/watch?v=1g_SGZn4_-c&list=PLLxxgrF1QnBjEvwkfWLPkr-CLEeEHJuWl', text_color=text_color ))
 
     return itemlist
 
@@ -95,8 +101,8 @@ def sagas(item):
         itemlist.append(item.clone( action = 'list_films', title = title, url = url, thumbnail = thumb, text_color = 'moccasin' ))
 
     if itemlist:
-        if len(itemlist) <= 16:
-            next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
+        if '<ul class="pagination' in data:
+            next_page = scrapertools.find_single_match(data, '<ul class="pagination.*?<li class="page-item active success">.*?</li>.*?href="(.*?)"')
 
             if next_page:
                 if '-pag' in next_page:
@@ -152,11 +158,13 @@ def listas(item):
             itemlist.append(item.clone( action = 'list_films', title = title, url = url, thumbnail = thumb, text_color='moccasin' ))
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<li class="page-item active">.*?<li class="page-item">.*?href="(.*?)"')
+        if item.group == 'Directores':
+            if '<ul class="pagination' in data:
+                next_page = scrapertools.find_single_match(data, '<ul class="pagination.*?<li class="page-item active success">.*?</li>.*?href="(.*?)"')
 
-        if next_page:
-            if '-pag' in next_page:
-                itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'listas', text_color='coral' ))
+                if next_page:
+                    if '-pag' in next_page:
+                        itemlist.append(item.clone( title='Siguientes ...', url = next_page, action = 'listas', text_color='coral' ))
 
     if not item.group == 'Directores':
        return sorted(itemlist, key = lambda it: it.title)
@@ -221,10 +229,16 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'youtube', language = 'Esp', url = item.url ))
         return itemlist
 
+    if '.primevideo.' in item.url: return itemlist
+    elif '.2000cancionessigloxx.' in item.url: return itemlist
+
     data = httptools.downloadpage(item.url).data
 
     url = scrapertools.find_single_match(data, '<source src="(.*?)"')
+    if not url: url = scrapertools.find_single_match(data, '<iframe src="(.*?)"')
+
     if not url: url = scrapertools.find_single_match(data, '<source type="video/mp4".*?src="(.*?)"')
+    if not url: url = scrapertools.find_single_match(data, '<iframe type="video/mp4".*?src="(.*?)"')
 
     url = url.replace('https://www.adf.ly/6680622/banner/', '').replace('&amp;', '&')
 
@@ -248,6 +262,38 @@ def findvideos(item):
             url = servertools.normalize_url(servidor, url)
 
             itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, language = 'Esp', url = url, other = other ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    url = item.url
+
+    if item.server == 'youtube': pass
+
+    elif not url.endswith('.mp4'):
+        new_url = httptools.downloadpage(url, follow_redirects=False).headers['location']
+
+        if not new_url: return itemlist
+
+        new_url = new_url.replace('https://streaming.2000peliculassigloxx.com/yandex/yadisk.html?v=', 'https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key=https://yadi.sk/i/')
+
+        data = httptools.downloadpage(new_url).data
+
+        vid = scrapertools.find_single_match(data, '"href":"(.*?)"')
+
+        if vid: url = vid
+
+    if url:
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

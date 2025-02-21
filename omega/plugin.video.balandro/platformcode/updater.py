@@ -275,9 +275,7 @@ def get_last_chrome_list():
         try:
             data = httptools.downloadpage('https://chromiumdash.appspot.com/fetch_releases?channel=Stable&platform=Windows').data
 
-            if not data: data = httptools.downloadpage('https://versionhistory.googleapis.com/v1/chrome/platforms/win64/channels/extended/versions/').data
-
-            matches = scrapertools.find_multiple_matches(data, '"version":.*?"(.*?)"')
+            matches = scrapertools.find_multiple_matches(str(data), '"version":.*?"(.*?)"')
 
             for last_version in matches:
                 if last_version:

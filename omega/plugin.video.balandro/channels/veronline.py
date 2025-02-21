@@ -7,7 +7,18 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.veronline.sh/'
+host = 'https://www.veronline.mov/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/']
+
+domain = config.get_setting('dominio', 'veronline', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'veronline')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'veronline')
+    else: host = domain
 
 
 def item_configurar_proxies(item):
@@ -44,8 +55,6 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://www.veronline.cc/']
-
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
@@ -84,10 +93,28 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+    domain_memo = config.get_setting('dominio', 'veronline', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_veronline', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='veronline', folder=False, text_color='chartreuse' ))
 
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_veronline', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('veronlie'), text_color='turquoise' ))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'veronline', thumbnail=config.get_thumb('veronline') ))
 
     platformtools.itemlist_refresh()
 
@@ -108,7 +135,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-online.html', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos capítulos', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -170,12 +197,15 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Veronline.sh</span>(.*?)>mas vistas<')
+    bloque = scrapertools.find_single_match(data, '<span>Veronline.mov</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.sh</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.mov</span>(.*?)>mas vistas<')
 
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline</span>(.*?)>mas vistas<')
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline</span>(.*?)>mas vistas<')
+
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.*?</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline.*?</span>(.*?)>mas vistas<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<div class="shortstory-in">(.*?)</div></div></div>')
 
@@ -187,7 +217,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        title = title.replace('online gratis', '').strip()
+        title = title.replace('online gratis', '').replace('&#039;', "'").replace('&amp;', '&').strip()
 
         year = '-'
         if '/series-online/año/' in item.url:
@@ -231,7 +261,7 @@ def last_epis(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;', "'")
+        title = title.replace('&#039;', "'").replace('&amp;', '&')
 
         SerieName = scrapertools.find_single_match(title, '(.*?)- T').strip()
 
@@ -239,13 +269,17 @@ def last_epis(item):
 
         if not season: season = 1
 
-        epis = scrapertools.find_single_match(title, 'Capítulo(.*?)</span>').strip()
+        epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
 
         if not epis: epis = 1
 
-        title = title.replace('Capítulo ', '[COLOR goldenrod]Capítulo [/COLOR]')
+        title = title.replace(' T ', '[COLOR tan]Temp. [/COLOR]')
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, infoLabels={'year': '-'},
+        title = title.replace('Capítulo ', '[COLOR goldenrod]Epis. [/COLOR]')
+
+        titulo = str(season) + 'x' + str(epis) + ' ' + title
+
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, infoLabels={'year': '-'},
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
     tmdb.set_infoLabels(itemlist)
@@ -306,7 +340,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('VerOnline', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')

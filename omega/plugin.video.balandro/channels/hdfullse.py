@@ -5,12 +5,6 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re, base64
-
-from platformcode import config, logger, platformtools
-from core.item import Item
-from core import httptools, scrapertools, jsontools, servertools, tmdb
-
 
 LINUX = False
 BR = False
@@ -44,11 +38,19 @@ except:
    except: pass
 
 
+import re, base64
+
+from platformcode import config, logger, platformtools
+from core.item import Item
+from core import httptools, scrapertools, jsontools, servertools, tmdb
+
+
 # ~ web para comprobar dominio vigente en actions pero pueden requerir proxies
-# ~ web 0)-'https://hdfull.pm'
+# ~ web 0)-'https://hdfull.pm/' 1)-'https://www.hdfull.it'
 
 
 host = 'https://www.hdfull.it'
+
 
 refer = 'https://hdfull.pm/'
 
@@ -101,7 +103,7 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post = None, referer = None):
+def do_downloadpage(url, post=None, headers=None, referer=None):
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -152,18 +154,18 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone(channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfullse', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfullse', folder=False, text_color='chartreuse' ))
 
-    itemlist.append(Item( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigente[/B]',
-                          desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
+    itemlist.append(item.clone( channel='domains', action='operative_domains_hdfullse', title='Comprobar [B]Dominio Operativo Vigente' + '[COLOR dodgerblue] hdfull.pm[/B][/COLOR]',
+                          desde_el_canal = True, thumbnail=config.get_thumb('hdfullse'), text_color='mediumaquamarine' ))
 
-    itemlist.append(Item( channel='domains', action='last_domain_hdfullse', title='[B]Comprobar último dominio vigente[/B]',
-                          desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+    itemlist.append(item.clone( channel='domains', action='last_domain_hdfullse', title='[B]Comprobar último dominio vigente[/B]',
+                          desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('hdfullse'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
@@ -172,7 +174,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_hdfullse', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_hdfullse', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('hdfullse') ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'hdfullse', thumbnail=config.get_thumb('hdfullse') ))
 
     platformtools.itemlist_refresh()
 
@@ -201,10 +205,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
     itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'star', search_type = 'person', 
-                                plot = 'Debe indicarse el nombre y apellido/s del intérprete.'))
-
+                                plot = 'Indicar el Nombre y Apellido/s del intérprete.'))
     itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
-                                plot = 'Debe indicarse el nombre y apellido/s del director.'))
+                                plot = 'Indicar el Nombre y Apellido/s del director.'))
 
     return itemlist
 
@@ -460,7 +463,7 @@ def episodios(item):
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(item.url, referer = item.referer)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, 'id="season-episodes">(.*?)</div></div></div>')
@@ -481,7 +484,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('HdFullSe', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -608,10 +614,12 @@ def findvideos(item):
         ses += 1
 
         if embed == 'd':
-            if not 'uptobox' in url: continue
+            if 'clicknupload' in url: pass
+            elif not 'uptobox' in url: continue
 
         elif '/powvideo.' in url: continue
         elif '/streamplay.' in url: continue
+        elif '/vidtodo.' in url: continue
 
         elif 'onlystream.tv' in url: url = url.replace('onlystream.tv', 'upstream.to')
         elif 'vev.io' in url: url = url.replace('vev.io', 'streamtape.com/e')
@@ -642,10 +650,10 @@ def search(item, texto):
     logger.info()
     try:
         if item.group:
-            item.url = host + '/search' + '/' + item.group + '/' + texto
+            item.url = host + '/search' + '/' + item.group + '/' + texto.replace(' ', '+')
         else:
             texto = texto.replace(' ', '+')
-            item.search_post = {'menu': 'search', 'query': texto}
+            item.search_post = {'menu': 'search', 'query': texto.replace(' ', '+')}
             item.url = host + '/search'
 			
         return list_all(item)

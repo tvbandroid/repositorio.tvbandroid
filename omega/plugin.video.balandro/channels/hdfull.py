@@ -49,21 +49,35 @@ except:
 
 
 dominios = [
+         'https://hdfull.monster/',
+         'https://hdfull.cfd/',
+         'https://hdfull.tel/',
+         'https://hdfull.buzz/',
+         'https://hdfull.blog/',
+         'https://hd-full.info/',
+         'https://hd-full.sbs/',
+         'https://hd-full.life/',
          'https://hd-full.fit/',
          'https://hd-full.me/',
          'https://hd-full.vip/',
-         'https://hd-full.lol/',
-         'https://hd-full.co/',
+         'https://hdfull.today/',
          'https://hd-full.biz/',
-         'https://hd-full.in/',
-         'https://hd-full.im/',
-         'https://hd-full.one/',
+         'https://hdfull.sbs/',
+         'https://hdfull.one/',
+         'https://hdfull.org/',
+         'https://new.hdfull.one/'
+         ]
+
+
+domains_cloudflare = [
+         'https://hdfull.monster/',
+         'https://hdfull.cfd/',
+         'https://hdfull.tel/',
+         'https://hdfull.buzz/',
          'https://hdfull.today/',
          'https://hdfull.sbs/',
          'https://hdfull.one/',
          'https://hdfull.org/',
-         'https://hdfull.quest/',
-         'https://hdfull.icu/',
          'https://new.hdfull.one/'
          ]
 
@@ -74,18 +88,20 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hdfull.pro/', 'https://hdfull.la/', 'https://hdfull.tv/',
              'https://hd-full.cc/', 'https://hdfull.me/', 'https://hdfull.io/',
              'https://hdfull.lv/', 'https://hdfullcdn.cc/', 'https://hdfull.stream/',
-             'https://hdfull.click/', 'https://hdfull.link/', 'https://hdfull.lol/',
-             'https://hdfull.fun/', 'https://hdfull.top/', 'https://hdfull.vip/',
-             'https://hdfull.wtf/', 'https://hdfull.gdn/', 'https://hdfull.cloud/',
-             'https://hdfull.video/', 'https://hdfull.work/', 'https://hdfull.life/',
-             'https://hdfull.digital/', 'https://hdfull.store/']
+             'https://hdfull.click/', 'https://hdfull.lol/', 'https://hdfull.fun/',
+             'https://hdfull.top/', 'https://hdfull.vip/', 'https://hdfull.wtf/',
+             'https://hdfull.gdn/', 'https://hdfull.cloud/', 'https://hdfull.video/',
+             'https://hdfull.work/', 'https://hdfull.life/', 'https://hdfull.digital/',
+             'https://hdfull.store/', 'https://hd-full.in/', 'https://hdfull.icu/',
+             'https://hd-full.im/', 'https://hd-full.one/', 'https://hdfull.link/',
+             'https://hd-full.co/', 'https://hd-full.lol/', 'https://hdfull.quest/']
 
 
 if host in str(ant_hosts): config.set_setting('dominio', dominios[0], 'hdfull')
 
 
 login_ok = '[COLOR chartreuse]HdFull Login correcto[/COLOR]'
-start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
+start_ses_ok = '[COLOR chartreuse][B]Sesión Iniciada[/B][/COLOR], Por favor, si fuera necesario, [COLOR cyan][B]Retroceda Menús[/B][/COLOR] y acceda de Nuevo al Canal.'
 
 perpage = 20
 
@@ -262,6 +278,19 @@ def login(item):
     username = config.get_setting('hdfull_username', 'hdfull', default='')
     password = config.get_setting('hdfull_password', 'hdfull', default='')
 
+    try:
+       if username:
+           userint = int(username)
+
+           if userint:
+               platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR red][B]El Usuario NO puede ser sólo números.[/B][/COLOR]', '[COLOR cyan][B]Credenciales[/B] [/COLOR][COLOR chartreuse][B]Anuladas[/B][/COLOR]')
+               config.set_setting('channel_hdfull_hdfull_username', '')
+               config.set_setting('channel_hdfull_hdfull_password', '')
+               config.set_setting('channel_hdfull_hdfull_login', False)
+               return False
+    except:
+       pass
+
     url = '%slogin' %(domain)
 
     data = do_make_login_logout(url)
@@ -324,7 +353,7 @@ def logout(item):
 
     if item:
         if item.category: 
-            platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
+            platformtools.dialog_ok(config.__addon_name + ' HdFull', '[COLOR yellow][B]Sesión Cerrada[/B][/COLOR].', 'Por favor, si fuera necesario, [COLOR cyan][B]Retroceda Menús[/B][/COLOR] e [COLOR chartreuse][B]Inicie Sesión[/B][/COLOR] de nuevo.')
 
 
 def item_configurar_dominio(item):
@@ -460,9 +489,11 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone(channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('hdfull'), text_color='green' ))
+
+    itemlist.append(item.clone( action='diagnosis_domain', title='[B]Diágnosis Acceso al canal[/B]', text_color='darkgoldenrod' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_hdfull', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='hdfull', folder=False, text_color='chartreuse' ))
@@ -470,38 +501,44 @@ def acciones(item):
     username = config.get_setting('hdfull_username', 'hdfull', default='')
 
     if username:
-        itemlist.append(Item( channel='domains', action='operative_domains_hdfull', title='[B]Dominios Operativos Vigentes[/B]',
-                              desde_el_canal = True, thumbnail=config.get_thumb('settings'), text_color='mediumaquamarine' ))
+        itemlist.append(item.clone( channel='domains', action='operative_domains_hdfull', title='[COLOR mediumaquamarine][B]Dominios Operativos Vigentes' + '[COLOR dodgerblue] dominioshdfull.com[/B][/COLOR]',
+                              desde_el_canal = True, thumbnail=config.get_thumb('hdfull') ))
 
-        itemlist.append(Item( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
-                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('settings'), text_color='chocolate' ))
+        itemlist.append(item.clone( channel='domains', action='last_domain_hdfull', title='[B]Comprobar último dominio vigente[/B]',
+                              desde_el_canal = True, host_canal = url, thumbnail=config.get_thumb('hdfull'), text_color='chocolate' ))
 
     if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
     else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
 
-    itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, thumbnail=config.get_thumb('keyboard'), text_color='darkorange' ))
+    itemlist.append(item.clone( channel='domains', action='manto_domain_hdfull', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     if not config.get_setting('hdfull_login', 'hdfull', default=False):
         if username:
             itemlist.append(item.clone( title = '[COLOR chartreuse][B]Iniciar sesión[/B][/COLOR]', action = 'login', start_ses = True ))
 
-            itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = '', thumbnail=config.get_thumb('pencil') ))
-            itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
-        else:
-            itemlist.append(Item( channel='helper', action='show_help_register', title='[B]Información para registrarse[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+            itemlist.append(item.clone( channel='submnuctext', action='_credenciales_hdfull', title= 'Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales', thumbnail=config.get_thumb('hdfull') ))
 
-            itemlist.append(item.clone( title = '[COLOR crimson][B]Credenciales cuenta[/B][/COLOR]', action = 'login' ))
+            itemlist.append(item.clone( title = '[COLOR springgreen][B]Credenciales[/B][/COLOR]', action = 'show_credenciales' ))
+            itemlist.append(item.clone( channel='domains', action='del_datos_hdfull', title='[B]Eliminar Credenciales[/B]', thumbnail=config.get_thumb('hdfull'), text_color='crimson' ))
+        else:
+            itemlist.append(item.clone( channel='helper', action='show_help_register', title='Información para [COLOR violet][B]Registrarse[/B][/COLOR]', desde_el_canal = True, channel_id='hdfull', thumbnail=config.get_thumb('hdfull'), text_color='green' ))
+
+            itemlist.append(item.clone( title = '[COLOR crimson][B]Informar Credenciales Cuenta[/B][/COLOR]', action = 'login', thumbnail=config.get_thumb('pencil') ))
 
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR chartreuse][B]Cerrar sesión[/B][/COLOR]', action = 'logout' ))
 
-        itemlist.append(item.clone( title = '[COLOR springgreen][B]Ver las credenciales[/B][/COLOR]', action = 'show_credenciales', thumbnail=config.get_thumb('pencil') ))
-        itemlist.append(Item( channel='domains', action='del_datos_hdfull', title='[B]Eliminar credenciales cuenta[/B]', thumbnail=config.get_thumb('folder'), text_color='crimson' ))
+        itemlist.append(item.clone( channel='submnuctext', action='_credenciales_hdfull', title= 'Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales', thumbnail=config.get_thumb('hdfull') ))
+
+        itemlist.append(item.clone( title = '[COLOR springgreen][B]Credenciales[/B][/COLOR]', action = 'show_credenciales' ))
+        itemlist.append(item.clone(channel='domains', action='del_datos_hdfull', title='[B]Eliminar Credenciales[/B]', thumbnail=config.get_thumb('hdfull'), text_color='crimson' ))
 
     itemlist.append(item_configurar_dominio(item))
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_hdfull', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('help') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_hdfull', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', _mnu = True, thumbnail=config.get_thumb('hdfull') ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'hdfull', thumbnail=config.get_thumb('hdfull') ))
 
     platformtools.itemlist_refresh()
 
@@ -520,7 +557,7 @@ def mainlist(item):
     if config.get_setting('hdfull_login', 'hdfull', default=False):
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'all' ))
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -536,13 +573,13 @@ def mainlist(item):
         itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
 
         itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', group = 'actor', search_type = 'person',
-                                    plot = 'Debe indicarse el nombre y apellido/s del intérprete (lo más exacto posible).'))
+                                    plot = 'Indicar el Nombre y Apellido/s del intérprete (lo más exacto posible).'))
         itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', group = 'director', search_type = 'person',
-                                    plot = 'Debe indicarse el nombre y apellido/s del director (lo más exacto posible).'))
+                                    plot = 'Indicar el Nombre y Apellido/s del director (lo más exacto posible).'))
 
-        itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='tan' ))
-        itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all',
-                                    plot = 'Debe indicarse el título de la lista (ó parte del mismo).'))
+        itemlist.append(item.clone( title = 'Búsqueda en listas populares:', action = '', folder=False, text_color='greenyellow' ))
+        itemlist.append(item.clone( title = ' - Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop',
+                                    plot = 'Indicar el título de la lista (ó parte del mismo).'))
 
     return itemlist
 
@@ -563,14 +600,16 @@ def mainlist_pelis(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
+
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'peliculas', search_type = 'movie' ))
 
-        itemlist.append(item.clone( action='list_all', title='Últimos estrenos', url = dominio + 'peliculas-estreno', search_type = 'movie', text_color='cyan' ))
-        itemlist.append(item.clone( action='list_all', title='Últimas actualizadas', url = dominio + 'peliculas-actualizadas', search_type = 'movie' ))
+        itemlist.append(item.clone( action='list_all', title='Estrenos', url = dominio + 'peliculas-estreno', search_type = 'movie', text_color='cyan' ))
+        itemlist.append(item.clone( action='list_all', title='Actualizadas', url = dominio + 'peliculas-actualizadas', search_type = 'movie' ))
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url = dominio + 'peliculas/imdb_rating', search_type = 'movie' ))
 
@@ -597,13 +636,15 @@ def mainlist_series(item):
 
         itemlist.append(item.clone( title = '[COLOR teal][B]Menú usuario[/B][/COLOR]', action = 'mainlist_user', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = '[COLOR moccasin][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
+        itemlist.append(item.clone( title = '[COLOR greenyellow][B]Listas populares[/B][/COLOR]', action = 'list_listas', target_action = 'top', search_type = 'all' ))
 
         itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
+
         itemlist.append(item.clone( action='list_all', title='Catálogo', url = dominio + 'series', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow', text_color='cyan' ))
+        itemlist.append(item.clone( action='list_all', title='Últimas', url = dominio + 'series/date', search_type='tvshow', text_color='yellowgreen' ))
 
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url= dominio + 'series/imdb_rating', search_type = 'tvshow' ))
 
@@ -613,14 +654,14 @@ def mainlist_series(item):
         if not config.get_setting('descartar_anime', default=False):
             itemlist.append(item.clone( action='list_all', title='Animes', url= dominio + 'tags-tv/anime', search_type = 'tvshow', text_color='springgreen' ))
 
-        itemlist.append(item.clone( title = 'Episodios:', action = '', folder=False, text_color='tan' ))
+        itemlist.append(item.clone( title = '[B]Episodios:[/B]', action = '', folder=False, text_color='tan' ))
 
         itemlist.append(item.clone( action='list_episodes', title=' - [COLOR cyan]Estreno[/COLOR]', opcion = 'premiere', search_type = 'tvshow' ))
 
         if not config.get_setting('descartar_anime', default=False):
             itemlist.append(item.clone( action='list_episodes', title=' - [COLOR springgreen]Anime[/COLOR]', opcion = 'anime', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='list_episodes', title=' - [COLOR moccasin]Últimos[/COLOR]', opcion = 'latest', search_type = 'tvshow' ))
+        itemlist.append(item.clone( action='list_episodes', title=' - [COLOR yellowgreen]Últimos[/COLOR]', opcion = 'latest', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( action='series_abc', title='Por letra (A - Z)', search_type = 'tvshow' ))
@@ -660,7 +701,7 @@ def mainlist_user(item):
                 if tipo_list == 'movies': continue
 
         itemlist.append(item.clone( title = title, url = domain + url if not url.startswith('/') else domain + url[1:],
-                                    action = 'user_subsections', search_type = item.search_type, tipo_list = tipo_list, text_color = 'yellow' ))
+                                    action = 'user_sections', search_type = item.search_type, tipo_list = tipo_list, text_color = 'yellow' ))
 
     return itemlist
 
@@ -813,7 +854,7 @@ def list_episodes(item):
         show = epi['show']['title']['es'] if 'es' in epi['show']['title'] and epi['show']['title']['es'] != '' else epi['show']['title']['en'] if 'en' in epi['show']['title'] else ''
 
         tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] != '' else epi['title']['en'] if 'en' in epi['title'] else ''
-        titulo = '%s %sx%s %s' % (show, epi['season'], epi['episode'], tit)
+        titulo = '%sx%s %s %s' % (epi['season'], epi['episode'], tit, '[COLOR violet]' + show + '[/COLOR]')
 
         langs = ['Vose' if idio == 'ESPSUB' else idio.capitalize() for idio in epi['languages']]
         if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ', '.join(langs))
@@ -1012,7 +1053,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('HdFull', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -1048,6 +1092,8 @@ def episodios(item):
 
     for epi in data[item.page * item.perpage:]:
         tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] else epi['title']['en'] if 'en' in epi['title'] and epi['title']['en'] else ''
+        if not tit: tit = epi['show']['title']['es'] if 'es' in epi['show']['title'] and epi['show']['title']['es'] != '' else epi['show']['title']['en'] if 'en' in epi['show']['title'] else ''
+
         titulo = '%sx%s %s' % (epi['season'], epi['episode'], tit)
 
         langs = ['Vose' if idio == 'ESPSUB' else idio.capitalize() for idio in epi['languages']]
@@ -1201,7 +1247,7 @@ def findvideos(item):
     return itemlist
 
 
-def user_subsections(item):
+def user_sections(item):
     logger.info()
     itemlist = []
 
@@ -1214,12 +1260,12 @@ def user_subsections(item):
         elif item.search_type == 'tvshow': text_color = 'hotpink'
         else: text_color = 'tan'
 
-        itemlist.append(item.clone( title = title, target_action = action, action = 'list_user_subsections' if item.tipo_list != 'listas' else 'list_listas', text_color = text_color))
+        itemlist.append(item.clone( title = title, target_action = action, action = 'list_user_sections' if item.tipo_list != 'listas' else 'list_listas', text_color = text_color))
 
     return itemlist
 
 
-def list_user_subsections(item):
+def list_user_sections(item):
     logger.info()
     itemlist = []
 
@@ -1294,7 +1340,7 @@ def list_user_subsections(item):
 
             next_post = 'target=%s&action=%s&start=%s&limit=28' % (item.tipo_list, item.target_action, next_start)
 
-            itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_user_subsections', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_user_sections', text_color = 'coral' ))
 
     return itemlist
 
@@ -1323,34 +1369,73 @@ def list_listas(item):
     data = jsontools.load(do_downloadpage(url, post=post))
 
     for match in data:
-        title = match.get('title')
-        url = '%slista/%s' % (domain, match.get('permalink'))
+        if '&search=' in post:
+            if not match.get('external'): continue
 
-        if item.target_action == 'top': text_color = 'moccasin'
-        else: text_color = ''
+        if 'http' in match.get('permalink'): continue
+        elif not match.get('id'): continue
+
+        title = match.get('title')
+
+        title = title.replace('&amp;', '').strip()
+
+        url = '%slista/%s-%s' % (domain, match.get('permalink'), match.get('id'))
+
+        if item.target_action == 'top': text_color = 'greenyellow'
+        else: text_color = 'moccasin'
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, page = 0, text_color = text_color ))
 
     if itemlist:
-        if len(itemlist) >= int(tope):
-            if not '&search=' in post:
-                next_start = (item.page * perpage)
-                next_page = item.page + 1
+        if not '&search=' in post:
+            next_start = (item.page * perpage)
+            next_page = item.page + 1
 
-                next_post = 'target=lists&action=%s&start=%s&limit=28' % (item.target_action, next_start)
+            next_post = 'target=lists&action=%s&start=%s&limit=28' % (item.target_action, next_start)
 
-                itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_listas', text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', post = next_post, page = next_page, pageaction = 'list_listas', text_color = 'coral' ))
 
     return itemlist
+
+
+def diagnosis_domain(item):
+    logger.info()
+
+    domain = config.get_setting('dominio', 'hdfull', default=dominios[0])
+
+    txt = ''
+
+    if domain in str(domains_cloudflare):
+        if not config.get_setting('channel_hdfull_proxies', default=''):
+            txt += '[CR][B][COLOR goldenrod]Posible CloudFlare[/COLOR]'
+            txt += '[CR][COLOR darkorange]Quizás necesite[/COLOR]'
+            txt += '[CR][COLOR red]Configurar Proxies[/B][/COLOR]'
+    else:
+        if config.get_setting('channel_hdfull_proxies', default=''):
+            txt += '[CR][B][COLOR goldenrod]Comprobar[/COLOR]'
+            txt += '[CR][COLOR darkorange]Quizás NO necesite[/COLOR]'
+            txt += '[CR][COLOR red]Proxies[/B][/COLOR]'
+
+        else:
+            txt += '[CR][COLOR yellow]El Acceso al canal es Correcto[/B][/COLOR]'
+
+    platformtools.dialog_ok(config.__addon_name + ' HdFull - Diágnosis', 'Domain.:   [COLOR cyan][B]' + domain + ' ' + txt)
 
 
 def show_credenciales(item):
     logger.info()
 
+    domain = config.get_setting('dominio', 'hdfull', default=dominios[0])
+
+    if config.get_setting('hdfull_login', 'hdfull', default=False):
+       domain += '[I][COLOR teal] (sesion)[/I][/COLOR]'
+    else:
+       domain += '[I][COLOR teal] (login)[/I][/COLOR]'
+
     username = config.get_setting('hdfull_username', 'hdfull', default='')
     password = config.get_setting('hdfull_password', 'hdfull', default='')
 
-    platformtools.dialog_ok(config.__addon_name + ' HdFull - Credenciales', 'User..:  [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.:  [COLOR yellow][B]' + password + '[/B][/COLOR]')
+    platformtools.dialog_ok(config.__addon_name + ' HdFull - Credenciales', 'Domain.:   [COLOR cyan][B]' + domain + '[/B][/COLOR]', 'User......:   [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.....:   [COLOR yellow][B]' + password + '[/B][/COLOR]')
 
 
 def search(item, texto):
@@ -1361,11 +1446,14 @@ def search(item, texto):
     if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
 
     try:
+        if item.search_type == 'all':
+            if item.search_pop: config.set_setting('search_last_list', texto)
+
         if item.group:
-            item.url = dominio + 'buscar' + '/' + item.group + '/' + texto
+            item.url = dominio + 'buscar' + '/' + item.group + '/' + texto.replace(' ', '+')
 
         elif item.target_action:
-            item.post = 'target=lists&action=search&search=%s&start=0&limit=99' % texto.replace(' ','+')
+            item.post = 'target=lists&action=search&search=%s&start=0&limit=99' % texto.replace(' ', '+')
             return list_listas(item)
 
         else:
@@ -1374,7 +1462,7 @@ def search(item, texto):
             magic = scrapertools.find_single_match(data, "name='__csrf_magic'\s*value=\"([^\"]+)")
             if not magic: return []
 
-            item.search_post = '__csrf_magic=%s&menu=search&query=%s' % (magic, texto.replace(' ','+'))
+            item.search_post = '__csrf_magic=%s&menu=search&query=%s' % (magic, texto.replace(' ', '+'))
             item.url = dominio + 'buscar'
 
         return list_all(item)

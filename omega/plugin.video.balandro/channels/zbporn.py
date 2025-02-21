@@ -12,6 +12,7 @@ host = 'https://zbporn.com/'
 
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
     return data
 
 
@@ -29,11 +30,13 @@ def mainlist_pelis(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'latest-updates/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'most-popular/' ))
+    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'latest-updates/' ))
+
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-popular/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/' ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url= host + 'channels/' ))
@@ -55,7 +58,7 @@ def canales(item):
     matches = re.compile('<div class="th".*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
     for url, title, thumb in matches:
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, tipo = 'canales', text_color='orange' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, tipo = 'canales', text_color='violet' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<div class="page page-current".*?href="(.*?)"')
@@ -80,7 +83,7 @@ def categorias(item):
     matches = re.compile('<div class="th".*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
     for url, title, thumb in matches:
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='tan' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -97,7 +100,7 @@ def pornstars(item):
     matches = re.compile('<div class="th".*?href="(.*?)".*?title="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
 
     for url, title, thumb in matches:
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, tipo = 'pornstars', text_color='moccasin' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, tipo = 'pornstars', text_color='orange' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<div class="page page-current".*?href="(.*?)"')
@@ -134,10 +137,10 @@ def list_all(item):
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<li class="page-current"><span class="item">.*?href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<div class="page page-current".*?<a class="page-link".*?href="(.*?)"')
 
         if next_page:
-            next_page = host[:-1] + next_page
+            if not host in next_page: next_page = host[:-1] + next_page
 
             itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
 
@@ -168,6 +171,8 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         item.url =  host + 'search/%s/' % (texto.replace(" ", "+"))
         return list_all(item)
     except:

@@ -3,16 +3,16 @@
   "name": "RePelisRe",
   "thumbnail": "repelisre.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["movie", "torrent"],
+  "categories": ["movie", "tvshow", "torrent"],
   "language": ["cast", "lat", "vose"],
 
-  "clusters": ["suggested", "torrents", "news", "rankings", "languages", "kids", "docs", "vos"],
+  "clusters": ["notice", "kids", "docs", "vos"],
 
-  "notes": "Canal con enlaces Streaming y Torrent. Películas por géneros y año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Canal con enlaces Streaming y Torrent. Películas por géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 
 }

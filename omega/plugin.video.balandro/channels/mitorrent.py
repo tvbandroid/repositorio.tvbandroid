@@ -54,6 +54,8 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_mitorrent', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'mitorrent', thumbnail=config.get_thumb('mitorrent') ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -362,7 +364,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('MiTorrent', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('MiTorrent', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -429,10 +434,28 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    links = scrapertools.find_multiple_matches(data, 'target="_blank".*?href="(.*?)"')
+    links = scrapertools.find_multiple_matches(data, 'target="_blank".*?href="(.*?)".*?class="quality-download">(.*?)</a>')
 
-    for link in links:
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language = item.languages, quality = item.qualities))
+    qltys = item.qualities
+
+    for link, qlty in links:
+        if not qlty: qlty = qltys
+
+        qlty = qlty.strip()
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language=item.languages, quality=qlty))
+
+    if '>Disponible en:' in data:
+        bloque = scrapertools.find_single_match(data, '>Disponible en:(.*?)</div></div><div></div>')
+
+        matches = scrapertools.find_multiple_matches(bloque, 'target="_blank".*?href="(.*?)".*?class="quality-download">(.*?)</a>')
+
+        for link, qlty in matches:
+            if not qlty: qlty = qltys
+
+            qlty = qlty.strip()
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language=item.languages, quality=qlty))
 
     return itemlist
 

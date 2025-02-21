@@ -221,7 +221,7 @@ def search_trailers(item):
             ret = xbmcgui.Dialog().select('Tráilers para [B][COLOR yellow]%s[/B][/COLOR]' % nombre, opciones, useDetails=True)
             if ret == -1: break
 
-            platformtools.dialog_notification(resultados[ret]['name'], 'Cargando tráiler ...', time=3000, sound=False)
+            platformtools.dialog_notification(resultados[ret]['name'], '[COLOR cyan]Cargando Tráiler[/COLOR] ...', time=3000, sound=False)
 
             from core import servertools
 
@@ -286,6 +286,75 @@ def manto_domains(item):
        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Dominios eliminados[/B][/COLOR]' % color_infor)
 
 
+def show_old_domains(item):
+    logger.info()
+
+    platformtools.dialog_notification(config.__addon_name + ' ' + item.channel_id, '[B][COLOR %s]Accediendo Historial Canal[/B][/COLOR]' % color_infor)
+
+    channel_py = item.channel_id + '.py'
+    filename_py = os.path.join(config.get_runtime_path(), 'channels', channel_py)
+
+    try:
+        data = filetools.read(filename_py)
+    except:
+        el_canal = ('Falta [B][COLOR %s]' + channel_py) % color_alert
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+        return
+
+    part_py = 'def mainlist'
+
+    if 'ver_stable_chrome' in data: part_py = 'ver_stable_chrome'
+
+    elif 'CLONES =' in data or 'clones =' in data: part_py = 'clones  ='
+    elif 'CLASS login_' in data or 'class login_' in data: part_py = 'class login_'
+
+    elif 'def do_make_login_logout' in data: part_py = 'def do_make_login_logout'
+    elif 'def login' in data: part_py = 'def login'
+    elif 'def logout' in data: part_py = 'def logout'
+
+    elif 'def configurar_proxies' in data: part_py = 'def configurar_proxies'
+    elif 'def do_downloadpage' in data: part_py = 'def do_downloadpage'
+
+    bloc = scrapertools.find_single_match(data.lower(), '(.*?)' + part_py)
+    bloc = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', bloc)
+
+    ant_hosts = scrapertools.find_single_match(str(bloc), 'ant_hosts.*?=.*?(.*?)]')
+    if not ant_hosts: ant_hosts = scrapertools.find_single_match(str(bloc), "ant_hosts.*?=.*?(.*?)]")
+
+    if not ant_hosts:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin Historial de Dominios[/B][/COLOR]' % color_exec)
+        return
+
+    tab_hosts = scrapertools.find_multiple_matches(ant_hosts, "'(.*?)'")
+    if not tab_hosts: tab_hosts = scrapertools.find_multiple_matches(ant_hosts, '"(.*?)"')
+
+    if not tab_hosts:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin Historial de Dominios[/B][/COLOR]' % color_exec)
+        return
+
+    txt = ''
+
+    sort_hosts = []
+
+    i = 0
+
+    for ant_host in tab_hosts:
+        i +=1
+
+        sort_hosts.append((i, ant_host))
+
+    tab_hosts = sorted(sort_hosts, key=lambda i: i[0], reverse=True)
+
+    ant_hosts = tab_hosts
+
+    txt = '[COLOR moccasin][B]Dominios Anteriores [COLOR yellowgreen]' + item.channel_id + '[/COLOR]:[/B][CR]'
+
+    for ant_host in ant_hosts:
+        txt += '[COLOR mediumaquamarine][B]' + ant_host[1] + '[/B][/COLOR][CR]'
+
+    platformtools.dialog_textviewer('Historial Dominios ' + item.channel_id.capitalize(), txt)
+
+
 def manto_proxies(item):
     logger.info()
 
@@ -345,7 +414,6 @@ def manto_params(item):
 
         config.set_setting('proxies', '', 'test_providers')
 
-        config.set_setting('channel_animefenix_dominio', '')
         config.set_setting('channel_animeflv_dominio', '')
         config.set_setting('channel_animeid_dominio', '')
         config.set_setting('channel_animeonline_dominio', '')
@@ -366,11 +434,10 @@ def manto_params(item):
         config.set_setting('channel_elifilms_dominio', '')
         config.set_setting('channel_elitetorrent_dominio', '')
         config.set_setting('channel_elitetorrentnz_dominio', '')
-        config.set_setting('channel_ennovelas_dominio', '')
         config.set_setting('channel_ennovelastv_dominio', '')
         config.set_setting('channel_entrepeliculasyseries_dominio', '')
-        config.set_setting('channel_estrenosdoramas_dominio', '')
 
+        config.set_setting('channel_gnula_dominio', '')
         config.set_setting('channel_gnula24_dominio', '')
         config.set_setting('channel_gnula24h_dominio', '')
         config.set_setting('channel_grantorrent_dominio', '')
@@ -382,29 +449,23 @@ def manto_params(item):
 
         config.set_setting('channel_hdfullse_dominio', '')
         config.set_setting('channel_henaojara_dominio', '')
+        config.set_setting('channel_homecine_dominio', '')
 
         config.set_setting('channel_mejortorrentapp_dominio', '')
         config.set_setting('channel_mejortorrentnz_dominio', '')
         config.set_setting('channel_mitorrent_dominio', '')
 
-        config.set_setting('channel_nextdede_dominio', '')
-        config.set_setting('channel_nextdede_nextdede_login', False)
-        config.set_setting('channel_nextdede_nextdede_email', '')
-        config.set_setting('channel_nextdede_nextdede_password', '')
-        config.set_setting('channel_nextdede_nextdede_username', '')
+        config.set_setting('channel_novelastop_dominio', '')
 
         config.set_setting('channel_peliculaspro_dominio', '')
         config.set_setting('channel_pelisforte_dominio', '')
-        config.set_setting('channel_pelismaraton_dominio', '')
         config.set_setting('channel_pelismart_dominio', '')
         config.set_setting('channel_pelispanda_dominio', '')
-        config.set_setting('channel_pelispedia2me_dominio', '')
         config.set_setting('channel_pelispediaws_dominio', '')
         config.set_setting('channel_pelisplus_dominio', '')
         config.set_setting('channel_pelisplushd_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
         config.set_setting('channel_pelisplushdnz_dominio', '')
-        config.set_setting('channel_pelispluslat_dominio', '')
 
         config.set_setting('channel_playdede_dominio', '')
         config.set_setting('channel_playdede_playdede_login', False)
@@ -414,16 +475,15 @@ def manto_params(item):
         config.set_setting('channel_poseidonhd2_dominio', '')
 
         config.set_setting('channel_series24_dominio', '')
-        config.set_setting('channel_seriesantiguas_dominio', '')
         config.set_setting('channel_serieskao_dominio', '')
-        config.set_setting('channel_seriesmetro_dominio', '')
+        config.set_setting('channel_seriespapayato_dominio', '')
+        config.set_setting('channel_seriesplus_dominio', '')
         config.set_setting('channel_srnovelas_dominio', '')
         config.set_setting('channel_subtorrents_dominio', '')
 
         config.set_setting('channel_todotorrents_dominio', '')
-        config.set_setting('channel_tupelihd_dominio', '')
 
-        config.set_setting('channel_yestorrent_dominio', '')
+        config.set_setting('channel_veronline_dominio', '')
 
         config.set_setting('autoplay_max_links', '10')
 
@@ -460,6 +520,8 @@ def manto_params(item):
         config.set_setting('search_last_tvshow', '')
         config.set_setting('search_last_documentary', '')
         config.set_setting('search_last_person', '')
+        config.set_setting('search_last_list', '')
+        config.set_setting('search_last_video', '')
 
         config.set_setting('search_no_work_proxies', False)
         config.set_setting('search_no_results_proxies', True)
@@ -489,7 +551,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '126.0.6478.36')
+        config.set_setting('chrome_last_version', '133.0.6943.127')  # ~ 19/2/25
 
         config.set_setting('debug', '0')
 
@@ -500,6 +562,8 @@ def manto_params(item):
         config.set_setting('user_test_channel', '')
 
         config.set_setting('sin_resp', '')
+
+        config.set_setting('proxies_tplus_proces', '')
 
         manto_proxies(item)
 
@@ -516,6 +580,8 @@ def manto_textos(item):
     elif config.get_setting('search_last_tvshow', default=''): hay_lastest = True
     elif config.get_setting('search_last_documentary', default=''): hay_lastest = True
     elif config.get_setting('search_last_person', default=''): hay_lastest = True
+    elif config.get_setting('search_last_list', default=''): hay_lastest = True
+    elif config.get_setting('search_last_video', default=''): hay_lastest = True
 
     if not hay_lastest:
          platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No hay Textos Memorizados[/COLOR][/B]' % color_alert)
@@ -527,6 +593,8 @@ def manto_textos(item):
         config.set_setting('search_last_tvshow', '')
         config.set_setting('search_last_documentary', '')
         config.set_setting('search_last_person', '')
+        config.set_setting('search_last_list', '')
+        config.set_setting('search_last_video', '')
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Texos restablecidos[/B][/COLOR]' % color_infor)
 
@@ -1151,7 +1219,8 @@ def manto_folder_downloads(item):
               path = filetools.join(config.get_data_path(), 'downloads')
               filetools.rmdirtree(path)
            except:
-              pass
+              platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Contenido Descargas NO Localizado[/COLOR][/B]' % color_alert)
+              return
 
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Contenido Descargas eliminado[/B][/COLOR]' % color_infor)
 
@@ -1278,14 +1347,70 @@ def show_ubicacion(item):
         ficheros = glob.glob(path)
         ficheros.sort(key=os.path.getmtime, reverse=False)
 
-    txt = 'Carpeta de descargas (por defecto [COLOR chocolate][B].../addon_data.../downloads[/B][/COLOR])'
+    txt = '[COLOR goldenrod][B]UBICACIÓN DESCARGAS:[/B][/COLOR][CR]'
+
+    txt += 'Carpeta de descargas (por defecto [COLOR chocolate][B].../addon_data.../downloads[/B][/COLOR])'
 
     if not ficheros: txt += '[CR][CR][COLOR yellow][B]Aún no tiene[/B][/COLOR][CR]'
     else: txt += '[CR][CR][COLOR cyan][B]Hay descargas[/B][/COLOR][CR]'
 
     txt += '[CR]' + path.replace('*.json', '').replace('.json', '')
 
-    platformtools.dialog_textviewer('Ubicación de las Descargas', txt)
+    txt += '[CR][CR][COLOR goldenrod][B]AJUSTES DESCARGAS:[/B][/COLOR][CR]'
+
+    down_block = config.get_setting('block_size', default=1)
+
+    if down_block == 0: block = '128 KB'
+    elif down_block == 1: block = '256 KB'
+    elif down_block == 2: block = '512 KB'
+    elif down_block == 3: block = '1024 KB'
+    else: cache = '2048 KB'
+
+    txt += ' - [COLOR cyan]Tamaño por Bloque (por defecto 256 KB): [/COLOR][COLOR red][B]' + block + '[/B][/COLOR][CR]'
+
+    down_part = config.get_setting('part_size', default=1)
+
+    if down_part == 0: part = '1 MB'
+    elif down_part == 1: part = '2 MB'
+    elif down_part == 2: part = '4 MB'
+    elif down_part == 3: part = '8 MB'
+    elif down_part == 4: part = '16 MB'
+    else: part  = '32 MB'
+
+    txt += ' - [COLOR cyan]Tamaño por Parte (por defecto 2 MB): [/COLOR][COLOR red][B]' + part + '[/B][/COLOR][CR]'
+
+    down_connections = config.get_setting('max_connections', default=4)
+
+    if down_connections == 0: connections = '1'
+    elif down_connections == 1: connections = '2'
+    elif down_connections == 2: connections = '3'
+    elif down_connections == 3: connections = '4'
+    elif down_connections == 4: connections = '5'
+    elif down_connections == 5: connections = '6'
+    elif down_connections == 6: connections = '7'
+    elif down_connections == 7: connections = '8'
+    elif down_connections == 8: connections = '9'
+    else: connections  = '10'
+
+    txt += ' - [COLOR cyan]Número máximo de Conexiones Simultáneas (por defecto 5): [/COLOR][COLOR red][B]' + connections + '[/B][/COLOR][CR]'
+
+    down_buffer = config.get_setting('max_buffer', default=4)
+
+    if down_buffer == 0: buffer = '0'
+    elif down_buffer == 1: buffer = '2'
+    elif down_buffer == 2: buffer = '4'
+    elif down_buffer == 3: buffer = '6'
+    elif down_buffer == 4: buffer = '8'
+    elif down_buffer == 5: buffer = '10'
+    elif down_buffer == 6: buffer = '12'
+    elif down_buffer == 7: buffer = '14'
+    elif down_buffer == 8: buffer = '16'
+    elif down_buffer == 9: buffer = '18'
+    else: buffer = '20'
+
+    txt += ' - [COLOR cyan]Número máximo de Partes en Memoria (por defecto 10): [/COLOR][COLOR red][B]' + buffer + '[/B][/COLOR][CR]'
+
+    platformtools.dialog_textviewer('Ajustes de las Descargas', txt)
 
 
 def show_servers_alternatives(item):
@@ -1344,10 +1469,6 @@ def test_internet(item):
     platformtools.dialog_ok(config.__addon_name, '[COLOR red][B]Parece que NO hay conexión con internet.[/B][/COLOR]', 'Compruebelo realizando cualquier Búsqueda, desde un Navegador Web ')
     return
 
-
-def opciones_animefenix(item):
-    item.from_channel = 'animefenix'
-    opciones_domains_common(item)
 
 def opciones_animeflv(item):
     item.from_channel = 'animeflv'
@@ -1417,10 +1538,6 @@ def opciones_elitetorrentnz(item):
     item.from_channel = 'elitetorrentnz'
     opciones_domains_common(item)
 
-def opciones_ennovelas(item):
-    item.from_channel = 'ennovelas'
-    opciones_domains_common(item)
-
 def opciones_ennovelastv(item):
     item.from_channel = 'ennovelastv'
     opciones_domains_common(item)
@@ -1429,8 +1546,8 @@ def opciones_entrepeliculasyseries(item):
     item.from_channel = 'entrepeliculasyseries'
     opciones_domains_common(item)
 
-def opciones_estrenosdoramas(item):
-    item.from_channel = 'estrenosdoramas'
+def opciones_gnula(item):
+    item.from_channel = 'gnula'
     opciones_domains_common(item)
 
 def opciones_gnula24(item):
@@ -1457,6 +1574,10 @@ def opciones_henaojara(item):
     item.from_channel = 'henaojara'
     opciones_domains_common(item)
 
+def opciones_homecine(item):
+    item.from_channel = 'homecine'
+    opciones_domains_common(item)
+
 def opciones_mejortorrentapp(item):
     item.from_channel = 'mejortorrentapp'
     opciones_domains_common(item)
@@ -1469,8 +1590,8 @@ def opciones_mitorrent(item):
     item.from_channel = 'mitorrent'
     opciones_domains_common(item)
 
-def opciones_nextdede(item):
-    item.from_channel = 'nextdede'
+def opciones_novelastop(item):
+    item.from_channel = 'novelastop'
     opciones_domains_common(item)
 
 def opciones_peliculaspro(item):
@@ -1481,20 +1602,12 @@ def opciones_pelisforte(item):
     item.from_channel = 'pelisforte'
     opciones_domains_common(item)
 
-def opciones_pelismaraton(item):
-    item.from_channel = 'pelismaraton'
-    opciones_domains_common(item)
-
 def opciones_pelismart(item):
     item.from_channel = 'pelismart'
     opciones_domains_common(item)
 
 def opciones_pelispanda(item):
     item.from_channel = 'pelispanda'
-    opciones_domains_common(item)
-
-def opciones_pelispedia2me(item):
-    item.from_channel = 'pelispedia2me'
     opciones_domains_common(item)
 
 def opciones_pelispediaws(item):
@@ -1517,10 +1630,6 @@ def opciones_pelisplushdnz(item):
     item.from_channel = 'pelisplushdnz'
     opciones_domains_common(item)
 
-def opciones_pelispluslat(item):
-    item.from_channel = 'pelispluslat'
-    opciones_domains_common(item)
-
 def opciones_playdede(item):
     item.from_channel = 'playdede'
     opciones_domains_common(item)
@@ -1533,16 +1642,16 @@ def opciones_series24(item):
     item.from_channel = 'series24'
     opciones_domains_common(item)
 
-def opciones_seriesantiguas(item):
-    item.from_channel = 'seriesantiguas'
-    opciones_domains_common(item)
-
 def opciones_serieskao(item):
     item.from_channel = 'serieskao'
     opciones_domains_common(item)
 
-def opciones_seriesmetro(item):
-    item.from_channel = 'seriesmetro'
+def opciones_seriespapayato(item):
+    item.from_channel = 'seriespapayato'
+    opciones_domains_common(item)
+
+def opciones_seriesplus(item):
+    item.from_channel = 'seriesplus'
     opciones_domains_common(item)
 
 def opciones_srnovelas(item):
@@ -1557,12 +1666,8 @@ def opciones_todotorrents(item):
     item.from_channel = 'todotorrents'
     opciones_domains_common(item)
 
-def opciones_tupelihd(item):
-    item.from_channel = 'tupelihd'
-    opciones_domains_common(item)
-
-def opciones_yestorrent(item):
-    item.from_channel = 'yestorrent'
+def opciones_veronline(item):
+    item.from_channel = 'veronline'
     opciones_domains_common(item)
 
 
@@ -1617,9 +1722,7 @@ def opciones_domains_common(item):
         from modules import domains
 
         if ret == 0:
-            if item.from_channel == 'animefenix': domains.manto_domain_animefenix(item)
-
-            elif item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
+            if item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
 
             elif item.from_channel == 'animeid': domains.manto_domain_animeid(item)
 
@@ -1653,13 +1756,11 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'elitetorrentnz': domains.manto_domain_elitetorrentnz(item)
 
-            elif item.from_channel == 'ennovelas': domains.manto_domain_ennovelas(item)
-
             elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
 
-            elif item.from_channel == 'estrenosdoramas': domains.manto_domain_estrenosdoramas(item)
+            elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
             elif item.from_channel == 'gnula24': domains.manto_domain_gnula24(item)
 
@@ -1673,25 +1774,23 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'henaojara': domains.manto_domain_henaojara(item)
 
+            elif item.from_channel == 'homecine': domains.manto_domain_homecine(item)
+
             elif item.from_channel == 'mejortorrentapp': domains.manto_domain_mejortorrentapp(item)
 
             elif item.from_channel == 'mejortorrentnz': domains.manto_domain_mejortorrentnz(item)
 
             elif item.from_channel == 'mitorrent': domains.manto_domain_mitorrent(item)
 
-            elif item.from_channel == 'nextdede': domains.manto_domain_nextdede(item)
+            elif item.from_channel == 'novelastop': domains.manto_domain_novelastop(item)
 
             elif item.from_channel == 'peliculaspro': domains.manto_domain_peliculaspro(item)
 
             elif item.from_channel == 'pelisforte': domains.manto_domain_pelisforte(item)
 
-            elif item.from_channel == 'pelismaraton': domains.manto_domain_pelismaraton(item)
-
             elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
-
-            elif item.from_channel == 'pelispedia2me': domains.manto_domain_pelispedia2me(item)
 
             elif item.from_channel == 'pelispediaws': domains.manto_domain_pelispediaws(item)
 
@@ -1703,19 +1802,17 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pelisplushdnz': domains.manto_domain_pelisplushdnz(item)
 
-            elif item.from_channel == 'pelispluslat': domains.manto_domain_pelispluslat(item)
-
             elif item.from_channel == 'playdede': domains.manto_domain_playdede(item)
 
             elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
 
             elif item.from_channel == 'series24': domains.manto_domain_series24(item)
 
-            elif item.from_channel == 'seriesantiguas': domains.manto_domain_seriesantiguas(item)
-
             elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
-            elif item.from_channel == 'seriesmetro': domains.manto_domain_seriesmetro(item)
+            elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
+
+            elif item.from_channel == 'seriesplus': domains.manto_domain_seriesplus(item)
 
             elif item.from_channel == 'srnovelas': domains.manto_domain_srnovelas(item)
 
@@ -1723,17 +1820,13 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
 
-            elif item.from_channel == 'tupelihd': domains.manto_domain_tupelihd(item)
-
-            elif item.from_channel == 'yestorrent': domains.manto_domain_yestorrent(item)
+            elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
 
         elif ret == 1:
-            if item.from_channel == 'animefenix': domains.test_domain_animefenix(item)
-
-            elif item.from_channel == 'animeflv': domains.test_domain_animeflv(item)
+            if item.from_channel == 'animeflv': domains.test_domain_animeflv(item)
 
             elif item.from_channel == 'animeid': domains.test_domain_animeid(item)
 
@@ -1767,13 +1860,11 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'elitetorrentnz': domains.test_domain_elitetorrentnz(item)
 
-            elif item.from_channel == 'ennovelas': domains.test_domain_ennovelas(item)
-
             elif item.from_channel == 'ennovelastv': domains.test_domain_ennovelastv(item)
 
             elif item.from_channel == 'entrepeliculasyseries': domains.test_domain_entrepeliculasyseries(item)
 
-            elif item.from_channel == 'estrenosdoramas': domains.test_domain_estrenosdoramas(item)
+            elif item.from_channel == 'gnula': domains.test_domain_gnula(item)
 
             elif item.from_channel == 'gnula24': domains.test_domain_gnula24(item)
 
@@ -1787,25 +1878,23 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'henaojara': domains.test_domain_henaojara(item)
 
+            elif item.from_channel == 'homecine': domains.test_domain_homecine(item)
+
             elif item.from_channel == 'mejortorrentapp': domains.test_domain_mejortorrentapp(item)
 
             elif item.from_channel == 'mejortorrentnz': domains.test_domain_mejortorrentnz(item)
 
             elif item.from_channel == 'mitorrent': domains.test_domain_mitorrent(item)
 
-            elif item.from_channel == 'nextdede': domains.test_domain_nextdede(item)
+            elif item.from_channel == 'novelastop': domains.test_domain_novelastop(item)
 
             elif item.from_channel == 'peliculaspro': domains.test_domain_peliculaspro(item)
 
             elif item.from_channel == 'pelisforte': domains.test_domain_pelisforte(item)
 
-            elif item.from_channel == 'pelismaraton': domains.test_domain_pelismaraton(item)
-
             elif item.from_channel == 'pelismart': domains.manto_domain_pelismart(item)
 
             elif item.from_channel == 'pelispanda': domains.manto_domain_pelispanda(item)
-
-            elif item.from_channel == 'pelispedia2me': domains.test_domain_pelispedia2me(item)
 
             elif item.from_channel == 'pelispediaws': domains.test_domain_pelispediaws(item)
 
@@ -1817,19 +1906,17 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'pelisplushdnz': domains.test_domain_pelisplushdnz(item)
 
-            elif item.from_channel == 'pelispluslat': domains.test_domain_pelispluslat(item)
-
             elif item.from_channel == 'playdede': domains.test_domain_playdede(item)
 
             elif item.from_channel == 'poseidonhd2': domains.test_domain_poseidonhd2(item)
 
             elif item.from_channel == 'series24': domains.test_domain_series24(item)
 
-            elif item.from_channel == 'seriesantiguas': domains.test_domain_seriesantiguas(item)
-
             elif item.from_channel == 'serieskao': domains.test_domain_serieskao(item)
 
-            elif item.from_channel == 'seriesmetro': domains.test_domain_seriesmetro(item)
+            elif item.from_channel == 'seriespapayato': domains.test_domain_seriespapayato(item)
+
+            elif item.from_channel == 'seriesplus': domains.test_domain_seriesplus(item)
 
             elif item.from_channel == 'srnovelas': domains.test_domain_srnovelas(item)
 
@@ -1837,9 +1924,7 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'todotorrents': domains.test_domain_todotorrents(item)
 
-            elif item.from_channel == 'tupelihd': domains.test_domain_tupelihd(item)
-
-            elif item.from_channel == 'yestorrent': domains.test_domain_yestorrent(item)
+            elif item.from_channel == 'veronline': domains.test_domain_veronline(item)
 
             else:
                platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Acción No Permitida[/B][/COLOR]' % color_alert)
@@ -1847,9 +1932,7 @@ def opciones_domains_common(item):
         elif ret == 2:
             from modules import helper
 
-            if item.from_channel == 'animefenix': helper.show_help_animefenix(item)
-
-            elif item.from_channel == 'animeonline': helper.show_help_animeonline(item)
+            if item.from_channel == 'animeonline': helper.show_help_animeonline(item)
 
             elif item.from_channel == 'cinecalidadlol': helper.show_help_cinecalidadlol(item)
 
@@ -1857,9 +1940,9 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'cuevana3video': helper.show_help_cuevana3video(item)
 
-            elif item.from_channel == 'ennovelas': helper.show_help_ennovelas(item)
-
             elif item.from_channel == 'entrepeliculasyseries': helper.show_help_entrepeliculasyseries(item)
+
+            elif item.from_channel == 'gnula': helper.show_help_gnula(item)
 
             elif item.from_channel == 'gnula24h': helper.show_help_gnula24h(item)
 
@@ -1867,16 +1950,30 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'henaojara': helper.show_help_henaojara(item)
 
-            elif item.from_channel == 'peliculaspro': helper.show_help_peliculaspro(item)
+            elif item.from_channel == 'homecine': helper.show_help_homecine(item)
 
-            elif item.from_channel == 'peliplayhd': helper.show_help_henaojara(item)
+            elif item.from_channel == 'peliculaspro': helper.show_help_peliculaspro(item)
 
             elif item.from_channel == 'pelisforte': helper.show_help_pelisforte(item)
 
-            elif item.from_channel == 'pelismaraton': helper.show_help_pelismaraton(item)
-
             elif item.from_channel == 'playdede': helper.show_help_playdede(item)
+
+            elif item.from_channel == 'seriespapayato': helper.show_help_seriespapayato(item)
+
+            elif item.from_channel == 'seriesplus': helper.show_help_seriesplus(item)
 
             elif item.from_channel == 'srnovelas': helper.show_help_srnovelas(item)
 
             elif item.from_channel == 'subtorrents': helper.show_help_subtorrents(item)
+
+def quitar_autoplay(item):
+    logger.info()
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Quitar el Auto Play ?[/B][/COLOR]'):
+        config.set_setting('autoplay', False)
+
+def quitar_autoplay_one_link(item):
+    logger.info()
+
+    if platformtools.dialog_yesno(config.__addon_name, '[COLOR red][B]¿ Confirma Quitar el Auto Play [/B][/COLOR]Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] para reproducir ?'):
+        config.set_setting('autoplay_one_link', False)

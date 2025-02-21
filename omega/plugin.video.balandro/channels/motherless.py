@@ -46,13 +46,16 @@ def mainlist_pelis(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
+    itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host  + 'videos/recent' ))
 
-    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host  + 'videos/viewed' ))
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host  + 'videos/popular' ))
-    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'videos/commented' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host  + 'videos/viewed' ))
+
+    itemlist.append(item.clone( title = 'Favoritos', action = 'list_all', url = host  + 'videos/favorited', text_color = 'pink' ))
+
+    itemlist.append(item.clone( title = 'Comentados', action = 'list_all', url = host  + 'videos/commented', text_color = 'tan' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host ))
 
@@ -69,15 +72,16 @@ def categorias(item):
 
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|\\", "", data)
 
-    data = scrapertools.find_single_match(data, '<div class="menu-categories-tab"(.*?)<div class="menu-categories-tab"')
+    bloque = scrapertools.find_single_match(data, '<div class="menu-categories-tab"(.*?)<div class="menu-categories-tab"')
 
-    matches = re.compile('<a href="([^"]+)" class="[^"]+">([^<]+)<', re.DOTALL).findall(data)
+    matches = re.compile('<a href="([^"]+)" class="[^"]+">([^<]+)<', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         title = title.strip()
+
         url = urlparse.urljoin(item.url, url)
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'tan' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -143,6 +147,8 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         item.url =  host + 'search/videos?term=%s&size=0&range=0&sort=date' % (texto.replace(" ", "+"))
         return list_all(item)
     except:

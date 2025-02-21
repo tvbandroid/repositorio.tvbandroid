@@ -30,7 +30,7 @@ def mainlist_pelis(item):
         from modules import actions
         if actions.adults_password(item) == False: return
 
-    # ~ itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
+    # ~ itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = url_api + 'facts/tag?id=27173&limit=48&offset=0' ))
 
@@ -45,8 +45,9 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    if item.group == 'chan': text_color = 'tan'
-    else: text_color = 'moccasin'
+    if item.tcat == 'prods': text_color = 'violet'
+    elif item.tcat == 'other': text_color = 'moccasin'
+    else: text_color = 'orange'
 
     data = httptools.downloadpage(item.url).data
     jdata = jsontools.load(data)
@@ -163,6 +164,8 @@ def list_search(item):
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         # ~  websocket
         # ~ # ws_send('{"type":"search","payload":{"Search_string":"' + texto.replace(" ", "+") + '","offset":0,"limit":30}}')
         item.url =  "wss://search.externulls.com/" + texto.replace(" ", "+")

@@ -7,14 +7,56 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.srnovelas.top/'
+host = 'https://www.srnovelashd.cc/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.srnovelas.top/', 'https://imu.srnovelas.top/']
+
+domain = config.get_setting('dominio', 'novelastop', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', '', 'novelastop')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'novelastop')
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/release/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'novelastop', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_novelastop', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='novelastop', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_novelastop', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'novelastop', thumbnail=config.get_thumb('novelastop') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -24,6 +66,8 @@ def mainlist(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -38,6 +82,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por año', action='anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por productora', action='plataformas', search_type = 'tvshow', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -89,6 +135,42 @@ def anios(item):
     return itemlist
 
 
+def plataformas(item):
+    logger.info()
+    itemlist = []
+
+    productoras = [
+        ('antena-3', 'Antena 3'),
+        ('atresplayer-premium', 'Atresplayer Premium'),
+        ('atv', 'Atv'),
+        ('canal', 'Canal+'),
+        ('cbs', 'Cbs'),
+        ('caracol-tv', 'Caracol TV'),
+        ('fox', 'FOX'),
+        ('kanal7', 'Kanal 7'),
+        ('kanal-d', 'Kanal D'),
+        ('las-estrellas', 'Las Estrellas'),
+        ('mega', 'Mega'),
+        ('novelastv', 'Novelas TV'),
+        ('mtv-latin-america', 'MTV Latin América'),
+        ('netflix', 'Netflix'),
+        ('rcn', 'Rcn'),
+        ('star-tv', 'Star Tv'),
+        ('telemundo', 'Telemundo'),
+        ('tf1', 'TF1'),
+        ('trt1', 'TRT 1'),
+        ('tv-globo', 'TV Globo'),
+        ('vix', 'Vix+')
+        ]
+
+    for opc, tit in productoras:
+        url = host + 'network/' + opc + '/'
+
+        itemlist.append(item.clone( title = tit, action = 'list_all', url = url, text_color = 'hotpink' ))
+
+    return itemlist
+
+
 def list_all(item):
     logger.info()
     itemlist = []
@@ -134,7 +216,7 @@ def list_all(item):
         if item.group == 'temp':
             tempo = scrapertools.find_single_match(match, '<h3>.*?class="local-link">(.*?)</a>')
 
-            titulo = titulo + ' ' + tempo.replace('Temporada', '[COLOR goldenrod]Temporada[/COLOR]')
+            titulo = titulo + ' ' + tempo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='temporadas', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -292,7 +374,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('NovelasTop', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('NovelasTop', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')

@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import re
+import sys
+
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+import re, os
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -112,7 +117,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas-populares/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'hd-4k/', search_type = 'movie', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En [COLOR moccasin]4K[/COLOR]', action = 'list_all', url = host + 'hd-4k/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
@@ -219,8 +224,13 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'tvshow': continue
 
+            titulo = title
+
+            if "La Película" in titulo: titulo = titulo.split("La Película")[0]
+            if "La película" in title: titulo = titulo.split("La película")[0]
+
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, fmt_sufijo = sufijo,
-                                        contentType = 'movie', contentTitle = title, infoLabels = {'year': year} ))
+                                        contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
         if tipo == 'tvshow':
             if item.search_type != 'all':
@@ -304,7 +314,10 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('AllPeliculasSe', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
         elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('AllPeliculasSe', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
@@ -406,10 +419,8 @@ def findvideos(item):
 
         if '/1fichier.' in match: continue
         elif '/turbobit.' in match: continue
-        elif '/fembed.' in match: continue
 
-        if '/1fichier.' in url: continue
-        elif '/turbobit.' in url: continue
+        elif '/fembed.' in match: continue
 
         elif '/cloudemb.' in url or '.fembed.' in url or '/fembad.' in url or 'vanfem' in url: continue
         elif '/tubesb.' in url  or '/sbsonic.' in url or '/sbrapid.' in url or '/lvturbo.' in url or '/sbface.' in url or '/sbbrisk.' in url or '/sblona.' in url: continue
@@ -424,7 +435,7 @@ def findvideos(item):
 
         if '/megaup' in match: link_other = 'Megaup'
         elif '/undefined' in match: link_other = 'Indefinido'
-        elif '/torrent' in match: link_other = 'Torrent'
+        elif '/torrent' in match or 'Utorrent' in match: link_other = 'Torrent'
         elif '/mega' in match: link_other = 'Mega'
         elif '/google' in match: link_other = 'Gvideo'
         elif '/mediafire' in match: link_other = 'Mediafire'
@@ -445,9 +456,24 @@ def play(item):
 
     url = item.url
 
-    if item.server == 'torrent':
-        itemlist.append(item.clone( url = item.url, server = 'torrent' ))
-        return itemlist
+    if item.url.endswith('.torrent'):
+        if config.get_setting('proxies', item.channel, default=''):
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(item.url, 'allpeliculasse')
+            else:
+                data = do_downloadpage(item.url)
+
+            if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        else:
+            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
 
     else:
         if 'magnet' in item.other:
@@ -463,8 +489,25 @@ def play(item):
                 return itemlist
 
             elif url_base64.endswith(".torrent"):
-                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
-                return itemlist
+               if config.get_setting('proxies', item.channel, default=''):
+                   if PY3:
+                       from core import requeststools
+                       data = requeststools.read(url_base64, 'allpeliculasse')
+                   else:
+                       data = do_downloadpage(url_base64)
+
+                   if data:
+                       if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                           return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                       file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                       with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                       itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+               else:
+                   itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+
+               return itemlist
 
     if url:
         if '/acortalink.' in url:
@@ -472,7 +515,7 @@ def play(item):
 
         if item.server == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): item.server = new_server
+            if new_server.startswith("http"): item.server = new_server
 
         itemlist.append(item.clone(url = url, server = item.server))
 

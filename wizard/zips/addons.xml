@@ -61,9 +61,9 @@
             <datadir zip="true">https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/nexus/zips/</datadir>
         </dir>
         <dir minversion="20.9.9" maxversion="21.9.9">
-            <info compressed="false">https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/wizard/zips/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/wizard/zips/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/wizard/zips/</datadir>
+            <info compressed="false">https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/omega/zips/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/omega/zips/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/omega/zips/</datadir>
         </dir>
 		<dir minversion="21.9.9" maxversion="22.9.9">
             <info compressed="false">https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/wizard/zips/addons.xml</info>

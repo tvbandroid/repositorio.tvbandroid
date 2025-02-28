@@ -33,7 +33,7 @@
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>
 
-# `Kodi 22` $\textbf{\color{magenta}Piers}$ 
+# `Kodi 22` $\textbf{\color{magenta}Piers}$ $\textbf{\color{orange}Próximamente}$
 <p align="left">
 <img src="https://img.shields.io/badge/Piers-magenta">
 <img src="https://img.shields.io/badge/PROXIMAMENTE-plum"> 

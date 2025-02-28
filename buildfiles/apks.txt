@@ -1,4 +1,4 @@
-name="[COLOR aqua]Yatse [COLOR teal]Kodi[COLOR white]Remote_11.6.0_Mod.Pro_arm-v7a[/COLOR]"
+name="[COLOR aqua]Yatse [COLOR teal]Kodi [COLOR white]Remote_11.6.0_Mod.Pro_arm-v7a[/COLOR]"
 section="no"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/Yatse.Kodi.Remote_11.6.0_Mod.Pro_arm-v7a.apk"
 icon="https://i.imgur.com/4CJftb0.png" 
@@ -78,7 +78,7 @@ fanart="https://i.imgur.com/tIofVq7.jpg"
 adult="no"
 description="Google Chrome para dispositivos TVBOX
 
-name="[COLOR dodgerblue]Aerial Dream [COLOR white]- V1.11.0 Mod[/COLOR]"
+name="Aerial Dream - V1.11.0 Mod"
 section="no"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/Aerial_Dream-1.11.0.apk"
 icon="https://i.imgur.com/1srAyD7.png" 

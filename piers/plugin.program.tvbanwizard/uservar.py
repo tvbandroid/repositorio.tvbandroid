@@ -114,9 +114,9 @@ AUTOINSTALL = 'Yes'
 # Addon ID for the repository
 REPOID = 'repository.andtvban'
 # Url to Addons.xml file in your repo folder(this is so we can get the latest version)
-REPOADDONXML = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/wizard/zips/addons.xml'
+REPOADDONXML = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/piers/zips/addons.xml'
 # Url to folder zip is located in
-REPOZIPURL = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/wizard/zips/repository.andtvban/'
+REPOZIPURL = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/piers/zips/repository.andtvban/'
 #########################################################
 
 #########################################################

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.program.theredwizard" name="[COLOR red]The Red Wizard[/COLOR]" version="4.1.4" provider-name="Sarge, Slamious, [COLOR red]The Red Wizard[/COLOR]">
+	<requires>
+		<import addon="xbmc.python" version="3.0.1"/>
+		<import addon="script.module.accountmgr" optional="true"/>
+		<import addon="service.installlitebinaries" optional="true"/>
+		<import addon="service.installmybinaries" optional="true"/>
+		<import addon="service.installrwbinaries" optional="true"/>
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="addon.py">
+		<provides>executable</provides>
+	</extension>
+	<extension point="xbmc.service" library="service.py" />
+	<extension point="xbmc.addon.metadata">
+		<summary lang="en_GB">[COLOR red]The Red Wizard for Kodi 21 Omega and Kodi 22 Piers[/COLOR]</summary>
+		<description lang="en_GB">[COLOR red]The Red Wizard for installing, updating and maintaining The Red Wizard Kodi 21 Omega and Kodi 22 Piers builds[/COLOR]</description>
+		<disclaimer lang="en_GB">[COLOR red]The author of this add-on does not host any content and has no affiliation with the content providers[/COLOR]</disclaimer>
+		<language>en</language>
+		<platform>all</platform>
+		<license>GPL-2.0-or-later</license>
+		<forum>https://t.me/theredwizard</forum>
+		<website>https://redwizard.xyz/</website> 
+		<email>info@redwizard.xyz</email>
+		<source>https://github.com/Slamious/plugin.program.simplewizard</source>
+		<news>[COLOR red]2025-02-28
+- Supports Kodi 21 Omega and Kodi 22 Piers (and Kodi 20 Nexus, maintenance only)
+- Fork of Simple Wizard v3.0.8 by Slamious, Sarge, Funsterbe and BYB
+- Multiple changes, additions and fixes, see changelog.txt
+- Save Advanced Settings enabled and integrated with Account Manager (no need to Whitelist supported add-ons)
+- The Red Wizard has a new home! Go to https://redwizard.xyz[/COLOR]</news>
+		<assets>
+				<icon>resources/media/icon.png</icon>
+				<fanart>resources/media/fanart.jpg</fanart>
+				<screenshot>resources/media/screenshot01.jpg</screenshot>
+				<screenshot>resources/media/screenshot02.jpg</screenshot>
+				<screenshot>resources/media/screenshot03.jpg</screenshot>
+				<screenshot>resources/media/screenshot04.jpg</screenshot>
+				<screenshot>resources/media/screenshot05.jpg</screenshot>
+				<screenshot>resources/media/screenshot06.jpg</screenshot>
+				<screenshot>resources/media/screenshot07.jpg</screenshot>
+				<screenshot>resources/media/screenshot08.jpg</screenshot>
+				<screenshot>resources/media/screenshot09.jpg</screenshot>
+				<screenshot>resources/media/screenshot10.jpg</screenshot>
+				<screenshot>resources/media/screenshot11.jpg</screenshot>
+		</assets>
+	</extension>
+</addon>

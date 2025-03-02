@@ -215,7 +215,6 @@ class Config:
         # View variables
 		self.SHOW22 = self.get_setting('show22')
         self.SHOW21 = self.get_setting('show21')
-        self.SHOW20 = self.get_setting('show20')
         self.SHOWADULT = self.get_setting('adult')
         self.SEPARATE = self.get_setting('separate')
         self.DEVELOPER = self.get_setting('developer')

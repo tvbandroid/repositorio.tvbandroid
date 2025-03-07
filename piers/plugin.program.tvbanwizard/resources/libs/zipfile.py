@@ -208,7 +208,7 @@ def _EndRecData64(fpin, offset, endrec):
         return endrec
 
     if diskno != 0 or disks != 1:
-        raise BadZipfile("No se admiten archivos zip que abarcan varios discos")
+        raise BadZipfile("zipfiles that span multiple disks are not supported")
 
     # Assume no 'zip64 extensible data'
     fpin.seek(offset - sizeEndCentDir64Locator - sizeEndCentDir64, 2)
@@ -336,7 +336,7 @@ class ZipInfo (object):
         self.date_time = date_time      # year, month, day, hour, min, sec
 
         if date_time[0] < 1980:
-            raise ValueError('ZIP no admite marcas de tiempo anteriores a 1980')
+            raise ValueError('ZIP does not support timestamps before 1980')
 
         # Standard values:
         self.compress_type = ZIP_STORED # Type of compression for the file
@@ -382,7 +382,7 @@ class ZipInfo (object):
             extra = extra + struct.pack(fmt, 1, struct.calcsize(fmt)-4, file_size, compress_size)
         if file_size > ZIP64_LIMIT or compress_size > ZIP64_LIMIT:
             if not zip64:
-                raise LargeZipFile("El tamaño del archivo requeriría extensiones ZIP64")
+                raise LargeZipFile("Filesize would require ZIP64 extensions")
             # File is larger than what fits into a 4 byte integer,
             # fall back to the ZIP64 extension
             file_size = 0xffffffff
@@ -429,7 +429,7 @@ class ZipInfo (object):
                 elif ln == 0:
                     counts = ()
                 else:
-                    raise RuntimeError("Campo extra corrupto %s"%(ln,))
+                    raise RuntimeError("Corrupt extra field %s"%(ln,))
 
                 idx = 0
 
@@ -560,9 +560,9 @@ class ZipExtFile(io.BufferedIOBase):
         elif self._compress_type != ZIP_STORED:
             descr = compressor_names.get(self._compress_type)
             if descr:
-                raise NotImplementedError("tipo de compresión %d (%s)" % (self._compress_type, descr))
+                raise NotImplementedError("compression type %d (%s)" % (self._compress_type, descr))
             else:
-                raise NotImplementedError("tipo de compresión %d" % (self._compress_type,))
+                raise NotImplementedError("compression type %d" % (self._compress_type,))
         self._unconsumed = ''
 
         self._readbuffer = ''
@@ -774,15 +774,15 @@ class ZipFile(object):
     def __init__(self, file, mode="r", compression=ZIP_STORED, allowZip64=False):
         """Open the ZIP file with mode read "r", write "w" or append "a"."""
         if mode not in ("r", "w", "a"):
-            raise RuntimeError('Archivo Zip() requiere modo "r", "w", or "a"')
+            raise RuntimeError('ZipFile() requires mode "r", "w", or "a"')
 
         if compression == ZIP_STORED:
             pass
         elif compression == ZIP_DEFLATED:
             if not zlib:
-                raise RuntimeError("La compresión requiere el módulo zlib (faltante)")
+                raise RuntimeError("Compression requires the (missing) zlib module")
         else:
-            raise RuntimeError("Ese método de compresión no es compatible")
+            raise RuntimeError("That compression method is not supported")
 
         self._allowZip64 = allowZip64
         self._didModify = False
@@ -835,7 +835,7 @@ class ZipFile(object):
                     # even if no files are added to the archive
                     self._didModify = True
             else:
-                raise RuntimeError('El modo debe ser "r", "w" or "a"')
+                raise RuntimeError('Mode must be "r", "w" or "a"')
         except:
             fp = self.fp
             self.fp = None
@@ -855,9 +855,9 @@ class ZipFile(object):
         try:
             endrec = _EndRecData(fp)
         except IOError:
-            raise BadZipfile("El archivo no es un archivo zip")
+            raise BadZipfile("File is not a zip file")
         if not endrec:
-            raise BadZipfile("El archivo no es un archivo zip")
+            raise BadZipfile("File is not a zip file")
         if self.debug > 1:
             print(endrec)
         size_cd = endrec[_ECD_SIZE]             # bytes in central directory
@@ -882,10 +882,10 @@ class ZipFile(object):
         while total < size_cd:
             centdir = fp.read(sizeCentralDir)
             if len(centdir) != sizeCentralDir:
-                raise BadZipfile("Directorio central truncado")
+                raise BadZipfile("Truncated central directory")
             centdir = struct.unpack(structCentralDir, centdir)
             if centdir[_CD_SIGNATURE] != stringCentralDir:
-                raise BadZipfile("Número mágico incorrecto para el directorio central")
+                raise BadZipfile("Bad magic number for central directory")
             if self.debug > 2:
                 print(centdir)
             filename = fp.read(centdir[_CD_FILENAME_LENGTH])
@@ -955,7 +955,7 @@ class ZipFile(object):
         info = self.NameToInfo.get(name)
         if info is None:
             raise KeyError(
-                'No hay ningún elemento llamado %r en el archivo' % name)
+                'There is no item named %r in the archive' % name)
 
         return info
 
@@ -973,7 +973,7 @@ class ZipFile(object):
         # check for valid comment length
         if len(comment) > ZIP_MAX_COMMENT:
             import warnings
-            warnings.warn('El comentario del archivo es demasiado largo; se truncará a %d bytes'
+            warnings.warn('Archive comment is too long; truncating to %d bytes'
                           % ZIP_MAX_COMMENT, stacklevel=2)
             comment = comment[:ZIP_MAX_COMMENT]
         self._comment = comment
@@ -986,9 +986,9 @@ class ZipFile(object):
     def open(self, name, mode="r", pwd=None):
         """Return file-like object for 'name'."""
         if mode not in ("r", "U", "rU"):
-            raise RuntimeError('abierto() requiere modo "r", "U", or "rU"')
+            raise RuntimeError('open() requires mode "r", "U", or "rU"')
         if not self.fp:
-            raise RuntimeError("Intento de leer archivo ZIP que ya estaba cerrado")
+            raise RuntimeError("Attempt to read ZIP archive that was already closed")
 
         # Only open a new file for instances where we were not
         # given a file object in the constructor
@@ -1023,7 +1023,7 @@ class ZipFile(object):
                 zef_file.read(fheader[_FH_EXTRA_FIELD_LENGTH])
 
             if fname != zinfo.orig_filename:
-                raise BadZipfile('El nombre del archivo en el directorio "%s" y el encabezado "%s" son diferentes.' % (zinfo.orig_filename, fname))
+                raise BadZipfile('File name in directory "%s" and header "%s" differ.' % (zinfo.orig_filename, fname))
 
             # check for encrypted flag & handle password
             is_encrypted = zinfo.flag_bits & 0x1
@@ -1032,7 +1032,7 @@ class ZipFile(object):
                 if not pwd:
                     pwd = self.pwd
                 if not pwd:
-                    raise RuntimeError("El archivo %s está encriptado, se requiere contraseña para la extracción" % name)
+                    raise RuntimeError("File %s is encrypted, password required for extraction" % name)
 
                 zd = _ZipDecrypter(pwd)
                 # The first 12 bytes in the cypher stream is an encryption header
@@ -1049,7 +1049,7 @@ class ZipFile(object):
                     # compare against the CRC otherwise
                     check_byte = (zinfo.CRC >> 24) & 0xff
                 if ord(h[11]) != check_byte:
-                    raise RuntimeError("Contraseña incorrecta para el archivo", name)
+                    raise RuntimeError("Bad password for file", name)
 
             return ZipExtFile(zef_file, mode, zinfo, zd,
                     close_fileobj=should_close)
@@ -1133,33 +1133,33 @@ class ZipFile(object):
         """Check for errors before writing a file to the archive."""
         if zinfo.filename in self.NameToInfo:
             import warnings
-            warnings.warn('Nombre duplicado: %r' % zinfo.filename, stacklevel=3)
+            warnings.warn('Duplicate name: %r' % zinfo.filename, stacklevel=3)
         if self.mode not in ("w", "a"):
-            raise RuntimeError('Escribir() requiere modo "w" or "a"')
+            raise RuntimeError('write() requires mode "w" or "a"')
         if not self.fp:
-            raise RuntimeError("Intento de escribir un archivo ZIP que ya estaba cerrado")
+            raise RuntimeError("Attempt to write ZIP archive that was already closed")
         if zinfo.compress_type == ZIP_DEFLATED and not zlib:
-            raise RuntimeError("La compresión requiere el módulo zlib (faltante)")
+            raise RuntimeError("Compression requires the (missing) zlib module")
         if zinfo.compress_type not in (ZIP_STORED, ZIP_DEFLATED):
-            raise RuntimeError("Ese método de compresión no es compatible")
+            raise RuntimeError("That compression method is not supported")
         if not self._allowZip64:
             requires_zip64 = None
             if len(self.filelist) >= ZIP_FILECOUNT_LIMIT:
-                requires_zip64 = "Recuento de archivos"
+                requires_zip64 = "Files count"
             elif zinfo.file_size > ZIP64_LIMIT:
-                requires_zip64 = "Tamaño del archivo"
+                requires_zip64 = "Filesize"
             elif zinfo.header_offset > ZIP64_LIMIT:
-                requires_zip64 = "Tamaño del archivo zip"
+                requires_zip64 = "Zipfile size"
             if requires_zip64:
                 raise LargeZipFile(requires_zip64 +
-                                   " Requeriría extensiones ZIP64")
+                                   " would require ZIP64 extensions")
 
     def write(self, filename, arcname=None, compress_type=None):
         """Put the bytes from filename into the archive under the name
         arcname."""
         if not self.fp:
             raise RuntimeError(
-                  "Intento de escribir en un archivo ZIP que ya estaba cerrado")
+                  "Attempt to write to ZIP archive that was already closed")
 
         st = os.stat(filename)
         isdir = stat.S_ISDIR(st.st_mode)
@@ -1234,7 +1234,7 @@ class ZipFile(object):
         zinfo.file_size = file_size
         if not zip64 and self._allowZip64:
             if file_size > ZIP64_LIMIT:
-                raise RuntimeError('El tamaño del archivo ha aumentado durante la compresión.')
+                raise RuntimeError('File size has increased during compressing')
             if compress_size > ZIP64_LIMIT:
                 raise RuntimeError('Compressed size larger than uncompressed size')
         # Seek backwards and write file header (which will now include
@@ -1265,7 +1265,7 @@ class ZipFile(object):
 
         if not self.fp:
             raise RuntimeError(
-                  "Intento de escribir en un archivo ZIP que ya estaba cerrado")
+                  "Attempt to write to ZIP archive that was already closed")
 
         if compress_type is not None:
             zinfo.compress_type = compress_type
@@ -1285,7 +1285,7 @@ class ZipFile(object):
         zip64 = zinfo.file_size > ZIP64_LIMIT or \
                 zinfo.compress_size > ZIP64_LIMIT
         if zip64 and not self._allowZip64:
-            raise LargeZipFile("El tamaño del archivo requeriría extensiones ZIP64")
+            raise LargeZipFile("Filesize would require ZIP64 extensions")
         self.fp.write(zinfo.FileHeader(zip64))
         self.fp.write(bytes)
 
@@ -1376,16 +1376,16 @@ class ZipFile(object):
                 centDirOffset = pos1
                 requires_zip64 = None
                 if centDirCount > ZIP_FILECOUNT_LIMIT:
-                    requires_zip64 = "Recuento de archivos"
+                    requires_zip64 = "Files count"
                 elif centDirOffset > ZIP64_LIMIT:
-                    requires_zip64 = "Desplazamiento del directorio central"
+                    requires_zip64 = "Central directory offset"
                 elif centDirSize > ZIP64_LIMIT:
-                    requires_zip64 = "Tamaño del directorio central"
+                    requires_zip64 = "Central directory size"
                 if requires_zip64:
                     # Need to write the ZIP64 end-of-archive records
                     if not self._allowZip64:
                         raise LargeZipFile(requires_zip64 +
-                                           " Requeriría extensiones ZIP64")
+                                           " would require ZIP64 extensions")
                     zip64endrec = struct.pack(
                             structEndArchive64, stringEndArchive64,
                             44, 45, 45, 0, 0, centDirCount, centDirCount,
@@ -1438,10 +1438,10 @@ class PyZipFile(ZipFile):
                 else:
                     basename = name
                 if self.debug:
-                    print("Añadiendo paquete en", pathname, "como", basename)
+                    print("Adding package in", pathname, "as", basename)
                 fname, arcname = self._get_codename(initname[0:-3], basename)
                 if self.debug:
-                    print("Añadiendo", arcname)
+                    print("Adding", arcname)
                 self.write(fname, arcname)
                 dirlist = os.listdir(pathname)
                 dirlist.remove("__init__.py")
@@ -1496,7 +1496,7 @@ class PyZipFile(ZipFile):
              os.stat(file_pyc).st_mtime < os.stat(file_py).st_mtime:
             import py_compile
             if self.debug:
-                print("Compilando", file_py)
+                print("Compiling", file_py)
             try:
                 py_compile.compile(file_py, file_pyc, None, True)
             except py_compile.PyCompileError as err:
@@ -1540,8 +1540,8 @@ def main(args = None):
         with ZipFile(args[1], 'r') as zf:
             badfile = zf.testzip()
         if badfile:
-            print("El siguiente archivo adjunto está dañado: {!r}".format(badfile))
-        print("Pruebas realizadas")
+            print("The following enclosed file is corrupted: {!r}".format(badfile))
+        print("Done testing")
 
     elif args[0] == '-e':
         if len(args) != 3:

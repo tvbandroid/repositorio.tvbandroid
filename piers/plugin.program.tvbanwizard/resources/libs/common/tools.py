@@ -86,7 +86,7 @@ def write_to_file(file, content, mode='w'):
 def remove_folder(path):
     from resources.libs.common import logging
 
-    logging.log("Eliminar Carpeta: {0}".format(path))
+    logging.log("Deleting Folder: {0}".format(path))
     try:
         shutil.rmtree(path, ignore_errors=True, onerror=None)
     except:
@@ -96,7 +96,7 @@ def remove_folder(path):
 def remove_file(path):
     from resources.libs.common import logging
 
-    logging.log("Eliminar Archivo: {0}".format(path))
+    logging.log("Deleting File: {0}".format(path))
     try:
         os.remove(path)
     except:
@@ -114,7 +114,7 @@ def empty_folder(folder):
             total += 1
 
             from resources.libs.common import logging
-            logging.log("Carpeta Vacía: {0}".format(root))
+            logging.log("Empty Folder: {0}".format(root))
     return total
 
 
@@ -138,14 +138,14 @@ def clean_house(folder, ignore=False):
                     try:
                         shutil.rmtree(os.path.join(root, f))
                     except:
-                        logging.log("Error al Eliminar {0}".format(f), level=xbmc.LOGERROR)
+                        logging.log("Error Deleting {0}".format(f), level=xbmc.LOGERROR)
             for d in dirs:
                 total_folds += 1
                 try:
                     shutil.rmtree(os.path.join(root, d))
                     total_folds += 1
                 except:
-                    logging.log("Error al Eliminar {0}".format(d), level=xbmc.LOGERROR)
+                    logging.log("Error Deleting {0}".format(d), level=xbmc.LOGERROR)
     return total_files, total_folds
 
 
@@ -396,17 +396,15 @@ def platform():
         return 'ios'
 
 
-def kodi_version():
-    if 19.0 <= CONFIG.KODIV <= 19.9:
-        vername = 'Matrix'
-    if 20.0 <= CONFIG.KODIV <= 20.9:
-        vername = 'Nexus'
-    if 21.0 <= CONFIG.KODIV <= 21.9:
-        vername = 'Omega'
-	if 22.0 <= CONFIG.KODIV <= 22.9:
-        vername = 'Piers'	
-    else:
-        vername = "Unknown"
+def kodi_version():
+    if 20.0 <= CONFIG.KODIV <= 20.9:
+        vername = 'Nexus'
+    elif 21.0 <= CONFIG.KODIV <= 21.9:
+        vername = 'Omega'
+    elif 22.0 <= CONFIG.KODIV <= 22.9:
+        vername = 'Piers'
+    else:
+        vername = "Unknown"
     return vername
 
 
@@ -516,7 +514,7 @@ def reload_fix(default=None):
     if CONFIG.KODIV >= 17:
         db.kodi_17_fix()
     if default is None:
-        logging.log("Cambiando a: {0}".format(CONFIG.get_setting('defaultskin')))
+        logging.log("Switching to: {0}".format(CONFIG.get_setting('defaultskin')))
         gotoskin = CONFIG.get_setting('defaultskin')
         skin.switch_to_skin(gotoskin)
         skin.look_and_feel_data('restore')
@@ -562,7 +560,7 @@ def ascii_check(use=None, over=False):
 
     if source == "":
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]Comprobación ASCII:[/COLOR] [COLOR gold]Cancelado[/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]ASCII Check:[/COLOR] [COLOR gold]Cancelado[/COLOR]".format(CONFIG.COLOR2))
         return
 
     files_found = os.path.join(CONFIG.PLUGIN_DATA, 'asciifiles.txt')
@@ -587,9 +585,9 @@ def ascii_check(use=None, over=False):
             try:
                 file.encode('ascii')
             except UnicodeEncodeError:
-                logging.log("[Comprobación ASCII] Carácter ilegal encontrado en archivo: {0}".format(file))
+                logging.log("[ASCII Check] Carácter ilegal encontrado en archivo: {0}".format(file))
             except UnicodeDecodeError:
-                logging.log("[Comprobación ASCII] Carácter ilegal encontrado en archivo: {0}".format(file))
+                logging.log("[ASCII Check] Carácter ilegal encontrado en archivo: {0}".format(file))
                 badfile = os.path.join(base, file)
                 if yes:
                     try:
@@ -598,19 +596,19 @@ def ascii_check(use=None, over=False):
                             afiles.write(chunk+'\n')
                         afiles.write('\n')
                         f1 += 1
-                        logging.log("[Comprobación ASCII] Archivo Eliminado: {0} ".format(badfile), level=xbmc.LOGERROR)
+                        logging.log("[ASCII Check] Archivo Eliminado: {0} ".format(badfile), level=xbmc.LOGERROR)
                     except:
                         for chunk in chunks(badfile, 75):
                             afails.write(chunk+'\n')
                         afails.write('\n')
                         f2 += 1
-                        logging.log("[Comprobación ASCII] Archivo Fallido: {0} ".format(badfile), level=xbmc.LOGERROR)
+                        logging.log("[ASCII Check] Archivo Fallido: {0} ".format(badfile), level=xbmc.LOGERROR)
                 else:
                     for chunk in chunks(badfile, 75):
                         afiles.write(chunk+'\n')
                     afiles.write('\n')
                     f1 += 1
-                    logging.log("[Comprobación ASCII] Archivo Encontrado: {0} ".format(badfile), level=xbmc.LOGERROR)
+                    logging.log("[ASCII Check] Archivo Encontrado: {0} ".format(badfile), level=xbmc.LOGERROR)
                 pass
         if progress_dialog.iscanceled():
             progress_dialog.close()
@@ -629,15 +627,15 @@ def ascii_check(use=None, over=False):
         if yes:
             if use:
                 logging.log_notify(CONFIG.ADDONTITLE,
-                                 "[COLOR {0}]Comprobación ASCII: {1} Eliminado / {2} Fallido.[/COLOR]".format(CONFIG.COLOR2, f1, f2))
+                                 "[COLOR {0}]ASCII Check: {1} Eliminado / {2} Fallido.[/COLOR]".format(CONFIG.COLOR2, f1, f2))
             else:
-                window.show_text_box("Ver Archivos ASCII Eliminados",
+                window.show_text_box("Viewing Removed ASCII Files",
                                   "[COLOR yellow][B]{0} Archivos Eliminados:[/B][/COLOR]\n {1}\n\n[COLOR yellow][B]{2} Archivos Fallidos:[B][/COLOR]\n {3}".format(f1, msg, f2, msg2))
         else:
-            window.show_text_box("Ver Archivos ASCII Encontrados", "[COLOR yellow][B]{0} Archivos Encontrados:[/B][/COLOR]\n {1}".format(f1, msg))
+            window.show_text_box("Viewing Found ASCII Files", "[COLOR yellow][B]{0} Archivos Encontrados:[/B][/COLOR]\n {1}".format(f1, msg))
     else:
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]Comprobación ASCII:[/COLOR] [COLOR gold]Nada Encontrado.[/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]ASCII Check:[/COLOR] [COLOR gold]Nada Encontrado.[/COLOR]".format(CONFIG.COLOR2))
 
 
 def clean_text(text):
@@ -709,7 +707,7 @@ def _check_url(url, cred):
                 logging.log("Verificación de URL redirigida de {0} a {1}: Código de estado [{2}]".format(url, response.headers['Location'], response.status_code), level=xbmc.LOGDEBUG)
                 return _check_url(response.headers['Location'])
             elif response.status_code == 401:
-                logging.log("La URL requiere autenticación para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                logging.log("URL requiere autenticación para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
                 return 'auth'
             else:
                 logging.log("Error al comprobar la URL de {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)

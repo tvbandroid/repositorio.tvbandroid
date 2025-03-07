@@ -1,16 +1,4 @@
-name="[B][COLOR green]====== BUILDS & PARCHES KODI 19/20/21 ======[/COLOR][/B]"
-version="0.0.0"
-url="http://"
-minor="http://"
-gui="http://"
-kodi="19.3"
-theme="http://"
-icon="https://andtv.github.io/tvban/wizard/wizardFI/ICBuild.jpg"
-fanart="http://"
-preview="http://"
-adult="no"
-info="http://"
-description="====== BUILDS & PARCHES KODI 19/20/21 ======"
+
 
 name="TVban matnexom"
 version="1.0"

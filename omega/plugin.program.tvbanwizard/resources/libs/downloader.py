@@ -37,7 +37,7 @@ class Downloader:
 
     def download(self, url, dest): 
         cancelled = False
-        self.progress_dialog.create(CONFIG.ADDONTITLE, "[B]Descargando Contenido...[/B]")
+        self.progress_dialog.create(CONFIG.ADDONTITLE, "[B][COLOR khaki]Descargando Contenido...[/COLOR][/B]")
         self.progress_dialog.update(0)
         
         path = os.path.split(dest)[0]

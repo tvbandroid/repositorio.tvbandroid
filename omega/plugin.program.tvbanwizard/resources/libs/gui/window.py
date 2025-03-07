@@ -56,7 +56,7 @@ def highlight_text(msg):
     for item in matches:
         string = '-->Python callback/script returned the following error<--{0}-->End of Python script error report<--'.format(item)
         msg = msg.replace(string, '[COLOR red]{0}[/COLOR]'.format(string))
-    msg = msg.replace('WARNING', '[COLOR yellow]ADVERTENCIA[/COLOR]').replace('ERROR', '[COLOR red]ERROR[/COLOR]').replace('[NL]', '\n').replace(': EXCEPCIÓN Lanzado (PythonToCppException) :', '[COLOR red]: EXCEPCIÓN Lanzado (PythonToCppException) :[/COLOR]')
+    msg = msg.replace('WARNING', '[COLOR red]ADVERTENCIA[/COLOR]').replace('ERROR', '[COLOR red]ERROR[/COLOR]').replace('[NL]', '\n').replace(': EXCEPCIÓN Lanzado (PythonToCppException) :', '[COLOR red]: EXCEPCIÓN Lanzado (PythonToCppException) :[/COLOR]')
     msg = msg.replace('\\\\', '\\').replace(CONFIG.HOME, '')
     return msg
 

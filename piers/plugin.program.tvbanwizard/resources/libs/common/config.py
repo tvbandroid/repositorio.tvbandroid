@@ -74,13 +74,14 @@ class Config:
         self.SPACER = uservar.SPACER
         self.COLOR1 = uservar.COLOR1
         self.COLOR2 = uservar.COLOR2
+        self.COLOR3 = uservar.COLOR3
+        self.COLOR4 = uservar.COLOR4
         self.THEME1 = uservar.THEME1
         self.THEME2 = uservar.THEME2
         self.THEME3 = uservar.THEME3
         self.THEME4 = uservar.THEME4
         self.THEME5 = uservar.THEME5
         self.THEME6 = uservar.THEME6
-        self.THEME7 = uservar.THEME7
         self.HIDECONTACT = uservar.HIDECONTACT
         self.CONTACT = uservar.CONTACT
         self.CONTACTICON = uservar.CONTACTICON if not uservar.CONTACTICON.endswith('://') else self.ADDON_ICON
@@ -212,10 +213,12 @@ class Config:
         self.EXTRACT = self.get_setting('extract')
         self.EXTERROR = self.get_setting('errors')
         
-        # View variables
-        self.SHOW22 = self.get_setting('show22')
-        self.SHOW21 = self.get_setting('show21')
+        # View variables
+        self.SHOW18 = self.get_setting('show18')
+        self.SHOW19 = self.get_setting('show19')
         self.SHOW20 = self.get_setting('show20')
+        self.SHOW21 = self.get_setting('show21')
+		self.SHOW22 = self.get_setting('show22')
         self.SHOWADULT = self.get_setting('adult')
         self.SEPARATE = self.get_setting('separate')
         self.DEVELOPER = self.get_setting('developer')
@@ -305,7 +308,7 @@ class Config:
             xbmcaddon.Addon(id).openSettings()
         except:
             import logging
-            logging.log('No se puede abrir la configuración de {}'.format(id), level=xbmc.LOGERROR)
+            logging.log('No se puede abrir la configuración de  {}'.format(id), level=xbmc.LOGERROR)
         
         if int(self.KODIV) < 18:
             use = 0
@@ -313,7 +316,7 @@ class Config:
             use = 1
 
         if cat is not None:
-            category_id = cat + offset[use][0]
+            category_id = cat + str(offset[use][0])
             xbmc.executebuiltin('SetFocus({})'.format(category_id))
             if set is not None:
                 setting_id = set + offset[use][1]
@@ -358,4 +361,3 @@ class Config:
 
 
 CONFIG = Config()
-

@@ -65,7 +65,7 @@ from resources.libs.common.config import CONFIG
 
 
 def read_from_file(file, mode='r'):
-    f = open(file, mode, encoding='utf-8')
+    f = open(file, mode, encoding='utf-8', errors='ignore')
     a = f.read()
     f.close()
     return a
@@ -396,15 +396,19 @@ def platform():
         return 'ios'
 
 
-def kodi_version():
-    if 20.0 <= CONFIG.KODIV <= 20.9:
-        vername = 'Nexus'
-    elif 21.0 <= CONFIG.KODIV <= 21.9:
-        vername = 'Omega'
-    elif 22.0 <= CONFIG.KODIV <= 22.9:
-        vername = 'Piers'
-    else:
-        vername = "Unknown"
+def kodi_version():
+    if 18.0 <= CONFIG.KODIV <= 18.9:
+        vername = 'Leia'
+    if 19.0 <= CONFIG.KODIV <= 19.9:
+        vername = 'Matrix'
+    if 20.0 <= CONFIG.KODIV <= 20.9:                             
+        vername = 'Nexus'                
+    if 21.0 <= CONFIG.KODIV <= 21.9:                             
+        vername = 'Omega'                                            
+    if 22.0 <= CONFIG.KODIV <= 22.9:                             
+        vername = 'Piers'           
+	else:
+        vername = "Unknown"
     return vername
 
 
@@ -476,7 +480,7 @@ def convert_special(url, over=False):
     logging.log("[Convertir Rutas en Especiales Completas")
     if not over:
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]Convertir Rutas en Especiales:[/COLOR] [COLOR gold]Completo![/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]Convertir Rutas en Especiales:[/COLOR] [COLOR azure]Completo![/COLOR]".format(CONFIG.COLOR2))
 
 
 def redo_thumbs():
@@ -707,7 +711,7 @@ def _check_url(url, cred):
                 logging.log("Verificación de URL redirigida de {0} a {1}: Código de estado [{2}]".format(url, response.headers['Location'], response.status_code), level=xbmc.LOGDEBUG)
                 return _check_url(response.headers['Location'])
             elif response.status_code == 401:
-                logging.log("URL requiere autenticación para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                logging.log("La URL requiere autenticación para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
                 return 'auth'
             else:
                 logging.log("Error al comprobar la URL de {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)

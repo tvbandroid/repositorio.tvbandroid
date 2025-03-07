@@ -711,7 +711,7 @@ def remove_addon_menu():
 
         xbmc.sleep(500)
 
-        dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi, Presione OK para Forzar el Cierre de Kodi[/COLOR]".format(CONFIG.COLOR2))
+        dialog.ok(CONFIG.ADDONTITLE, "[B][COLOR khaki]ELIMINADO CORRECTAMENTE.[/B]\n\n[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
         
         update.addon_updates('reset')
         tools.kill_kodi(over=True)

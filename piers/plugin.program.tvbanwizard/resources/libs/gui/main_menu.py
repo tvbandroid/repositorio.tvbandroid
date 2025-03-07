@@ -70,7 +70,7 @@ class MainMenu:
         directory.add_dir('[B][COLOR orange]BUILDS[COLOR azure] - [COLOR orange]PARCHES:[COLOR azure] TVBAN [COLOR cyan]MATNEXOM[/COLOR][/B]', {'mode': 'builds'}, icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME1)
         directory.add_dir('[B]Mantenimiento[/B]', {'mode': 'maint'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
         if (tools.platform() == 'android' or CONFIG.DEVELOPER == 'true'):
-            directory.add_dir('[B]Instalador de APK[/B]', {'mode': 'apk'}, icon=CONFIG.ICONAPK, themeit=CONFIG.THEME1)
+            directory.add_dir('[B]Instalador de [COLOR yellowgreen]APKs[/COLOR][/B]', {'mode': 'apk'}, icon=CONFIG.ICONAPK, themeit=CONFIG.THEME1)
         if tools.open_url(CONFIG.ADDONFILE, check=True) or os.path.exists(os.path.join(CONFIG.ADDON_PATH, 'resources', 'text', 'addons.json')):
             directory.add_dir('[B]Instalador de Addon[/B]', {'mode': 'addons'}, icon=CONFIG.ICONADDONS, themeit=CONFIG.THEME1)
         if tools.open_url(CONFIG.YOUTUBEFILE, check=True) and not CONFIG.YOUTUBETITLE == '':

@@ -42,7 +42,8 @@
                 <font>font12</font>
                 <align>left</align>
                 <aligny>top</aligny>
-                <label>[B]Primera ejecución del asistente, le gustaría habilitar alguna de las siguientes configuraciones?[/B]</label>
+                <!--<label>[B]Primera Ejecución del Asistente, ¿te gustaría habilitar alguna de las siguientes opciones?[/B]</label> -->
+				<label>[B][COLOR white]Esta es tu primera Ejecución de[/COLOR] [COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[COLOR white]. ¡Te recomendamos continuar con las opciones predeterminadas![/COLOR][/B]</label>
             </control>
         </control>
 	    <!-- Scrollbar  -->
@@ -78,7 +79,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi Trakt</label>
+                <label>[COLOR gold]Mantener Mi Trakt[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -94,7 +95,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi Real Debrid</label>
+                <label>[COLOR gold]Mantener Mi Real Debrid[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -110,7 +111,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mis datos de inicio de sesión</label>
+                <label>[COLOR gold]Mantener Mis Datos de Inicio de Sesión[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -126,7 +127,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi archivo .xml de mis fuentes</label>
+                <label>[COLOR darkgreen]Mantener Mis Fuentes.xml[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -142,7 +143,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi archivo .xml de mis Perfiles</label>
+                <label>[COLOR darkgreen]Mantener Mis Perfiles.xml[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -158,7 +159,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi archivo playercorefactory.xml</label>
+                <label>[COLOR darkgreen]Mantener Mi playercorefactory.xml[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -174,7 +175,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi archivo guisettings.xml</label>
+                <label>[COLOR darkgreen]Mantener Mi guisettings.xml[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -190,7 +191,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi archivo AdvancedSettings.xml</label>
+                <label>[COLOR darkgreen]Mantener Mi AdvancedSettings.xml[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -206,7 +207,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi archivo Favoritos.xml</label>
+                <label>[COLOR darkgreen]Mantener Mis Favoritos.xml[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -222,7 +223,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mis Super Favoritos</label>
+                <label>[COLOR gold]Mantener Mis Super Favoritos[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -238,7 +239,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mis Repositorios</label>
+                <label>[COLOR darkgreen]Mantener Mis Repositorios[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -254,7 +255,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Conservar mi Lista Blanca</label>
+                <label>[COLOR darkgreen]Mantener Mi Lista Blanca[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -270,7 +271,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Borrar Caché al iniciar</label>
+                <label>[COLOR red]Borrar Caché al Iniciar[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -286,7 +287,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Borrar Paquetes al iniciar</label>
+                <label>[COLOR red]Borrar Paquetes al Iniciar[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>
@@ -302,7 +303,7 @@
                 <textoffsetx>10</textoffsetx>
                 <radioheight>45</radioheight>
                 <radioposx>530</radioposx>
-                <label>Borrar Miniaturas antiguas al iniciar</label>
+                <label>[COLOR red]Borrar Miniaturas Antiguas al Iniciar[/COLOR]</label>
                 <font>font12</font>
                 <texturefocus colordiffuse="FF12B2E7">RadioButton/MenuItemFO.png</texturefocus><!-- 12B2E7 -->
                 <texturenofocus>RadioButton/MenuItemNF.png</texturenofocus>

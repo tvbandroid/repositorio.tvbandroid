@@ -216,7 +216,7 @@ def fresh_start(install=None, over=False):
 
             Wizard().build('normal', install, over=True)
         else:
-            dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi, Presione [COLOR azure]OK[/COLOR] para Forzar el Cierre de Kodi[/B][/COLOR]".format(CONFIG.COLOR2))
+            dialog.ok(CONFIG.ADDONTITLE, "[B][COLOR khaki]INSTALADO CORRECTAMENTE.[/B]\n\n[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi, Presione [COLOR azure]OK[/COLOR] para Forzar el Cierre de Kodi[/B][/COLOR]".format(CONFIG.COLOR2))
             from resources.libs import update
             update.addon_updates('reset')
             tools.kill_kodi(over=True)
@@ -274,13 +274,13 @@ def install_apk(name, url):
         redownload = True
         yes = True
         if os.path.exists(lib):
-            redownload = dialog.yesno(CONFIG.ADDONTITLE, '[COLOR {}]{}[/COLOR] ya existe. Te gustaría volver a descargarlo?'.format(CONFIG.COLOR1, apk),
+            redownload = dialog.yesno(CONFIG.ADDONTITLE, '[COLOR {}]{} [COLOR white]ya existe. \n\nTe gustaría volver a descargarlo?[/COLOR]'.format(CONFIG.COLOR1, apk),
                                yeslabel="[B][COLOR darkorange]Volver a descargar[/COLOR][/B]",
                                nolabel="[B][COLOR cyan]Instalar[/COLOR][/B]")
             yes = False
         else:
             yes = dialog.yesno(CONFIG.ADDONTITLE,
-                                   "[COLOR {0}]Le gustaría descargar e instalar: ".format(CONFIG.COLOR2)
+                                   "[COLOR {0}][COLOR white]Le gustaría descargar e instalar:[/COLOR] ".format(CONFIG.COLOR2)
                                    +'\n'+"[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, name),
                                    yeslabel="[B][COLOR cyan]Descargar[/COLOR][/B]",
                                    nolabel="[B][COLOR red]Cancelar[/COLOR][/B]")
@@ -294,7 +294,7 @@ def install_apk(name, url):
             response = tools.open_url(url, check=True)
             if not response:
                 logging.log_notify(CONFIG.ADDONTITLE,
-                                   '[COLOR {0}]APK Instalador:[/COLOR] [COLOR gold]Apk Url Invalida![/COLOR]'.format(CONFIG.COLOR2))
+                                   '[COLOR {0}]Instalador APK:[/COLOR] [COLOR gold]Url Apk Invalida![/COLOR]'.format(CONFIG.COLOR2))
                 return
                 
             progress_dialog.create(CONFIG.ADDONTITLE,

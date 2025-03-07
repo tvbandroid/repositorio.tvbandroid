@@ -79,6 +79,8 @@ class Config:
         self.THEME3 = uservar.THEME3
         self.THEME4 = uservar.THEME4
         self.THEME5 = uservar.THEME5
+        self.THEME6 = uservar.THEME6
+        self.THEME7 = uservar.THEME7
         self.HIDECONTACT = uservar.HIDECONTACT
         self.CONTACT = uservar.CONTACT
         self.CONTACTICON = uservar.CONTACTICON if not uservar.CONTACTICON.endswith('://') else self.ADDON_ICON
@@ -106,8 +108,8 @@ class Config:
 
     def init_paths(self):
         # Static variables
-        self.CLEANFREQ = ['Every Startup', 'Every Day', 'Every Three Days',
-                          'Weekly', 'Monthly']
+        self.CLEANFREQ = ['Cada Inicio', 'Todos los Días', 'Cada Tres Días',
+                          'Semanalmente', 'Mensualmente']
         self.LOGFILES = ['log', 'xbmc.old.log', 'kodi.log']
         self.DEFAULTPLUGINS = ['metadata.album.universal',
                                'metadata.artists.universal',
@@ -131,8 +133,8 @@ class Config:
                               'Textures13.db', 'Thumbs.db']
         self.XMLS = ['advancedsettings.xml', 'sources.xml', 'favourites.xml',
                      'profiles.xml', 'playercorefactory.xml', 'guisettings.xml']
-        self.MODURL = 'http://mirrors.kodi.tv/addons/omega/'
-        self.MODURL2 = 'http://mirrors.kodi.tv/addons/piers/'
+        self.MODURL = 'http://mirrors.kodi.tv/addons/matrix/'
+        self.MODURL2 = 'http://mirrors.kodi.tv/addons/jarvis/'
         self.DEPENDENCIES = ['script.module.bottle', 'script.module.certifi',
                              'script.module.chardet', 'script.module.idna',
                              'script.module.requests', 'script.module.six',
@@ -184,7 +186,7 @@ class Config:
                              os.path.join(self.HOME, 'cache'),
                              os.path.join(self.HOME, 'system'),
                              os.path.join(self.HOME, 'temp'),
-                             os.path.join(self.HOME, 'My_Builds'),
+                             os.path.join(self.HOME, 'mi_build'),
                              os.path.join(self.HOME, 'cdm'),
                              os.path.join(self.ADDONS, 'temp'),
                              os.path.join(self.ADDONS, 'packages'),
@@ -211,9 +213,8 @@ class Config:
         self.EXTERROR = self.get_setting('errors')
         
         # View variables
-        self.SHOW22 = self.get_setting('show22')
+		self.SHOW22 = self.get_setting('show22')
         self.SHOW21 = self.get_setting('show21')
-        self.SHOW20 = self.get_setting('show20')
         self.SHOWADULT = self.get_setting('adult')
         self.SEPARATE = self.get_setting('separate')
         self.DEVELOPER = self.get_setting('developer')
@@ -263,7 +264,7 @@ class Config:
 
         # Backup variables
         self.BACKUPLOCATION = xbmcvfs.translatePath(self.get_setting('path') if not self.get_setting('path') == '' else self.HOME)
-        self.MYBUILDS = os.path.join(self.BACKUPLOCATION, 'My_Builds')
+        self.MYBUILDS = os.path.join(self.BACKUPLOCATION, 'Mi_Build')
 
         # Logging variables
         self.DEBUGLEVEL = self.get_setting('debuglevel')
@@ -303,7 +304,7 @@ class Config:
             xbmcaddon.Addon(id).openSettings()
         except:
             import logging
-            logging.log('Cannot open settings for {}'.format(id), level=xbmc.LOGERROR)
+            logging.log('No se puede abrir la configuración de {}'.format(id), level=xbmc.LOGERROR)
         
         if int(self.KODIV) < 18:
             use = 0

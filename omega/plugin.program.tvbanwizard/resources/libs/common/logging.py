@@ -350,7 +350,7 @@ def view_log_file():
     wizlog = grab_log(file=True, wizard=True)
     
     choices = []
-    logfiles = {'mainlog': "[COLOR khaki]VER[/COLOR] {0}".format(os.path.basename(mainlog)), 'oldlog': "[COLOR khaki]VER[/COLOR] {0}".format(os.path.basename(oldlog)), 'wizlog': "[COLOR khaki]VER[/COLOR] {0}".format(os.path.basename(wizlog))}
+    logfiles = {'mainlog': "View {0}".format(os.path.basename(mainlog)), 'oldlog': "View {0}".format(os.path.basename(oldlog)), 'wizlog': "View {0}".format(os.path.basename(wizlog))}
     
     which = 0
     logtype = oldlog

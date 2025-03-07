@@ -72,7 +72,7 @@ def apk_menu(url=None):
 
     if check_for_fm():
         directory.add_dir('[B]APK\'s OFICIAL DE [COLOR teal]KODI[/COLOR][/B]', {'mode': 'kodiapk'}, icon=CONFIG.ICONAPK, themeit=CONFIG.THEME1)
-        directory.add_separator('[B]DESCARGAR APLICACIONES[/B]', themeit=CONFIG.THEME7)
+        directory.add_separator('[B]DESCARGAR APLICACIONES[/B]')
     response = tools.open_url(CONFIG.APKFILE)
     url_response = tools.open_url(url)
 
@@ -519,17 +519,17 @@ def enable_addons(all=False):
         if len(addonids) == 0:
             directory.add_file("No se encontrado Addons para habilitar o deshabilitar..", icon=CONFIG.ICONMAINT)
         else:
-            directory.add_file("[I][B][COLOR red]!! AVISO: [COLOR white]Desactivar Algunos Addons Puede Causar Problemas [COLOR red]!![/COLOR][/B][/I]", icon=CONFIG.ICONMAINT)
+            directory.add_file("[I][B][COLOR red]!! AVISO: Desactivar Algunos Addons Puede Causar Problemas !![/COLOR][/B][/I]", icon=CONFIG.ICONMAINT)
             directory.add_dir('[B]Habilitar Todos los Addons[/B]', {'mode': 'enableall'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
             for i in range(0, len(addonids)):
                 folder = os.path.join(CONFIG.ADDONS, addonids[i])
                 icon = os.path.join(folder, 'icon.png') if os.path.exists(os.path.join(folder, 'icon.png')) else CONFIG.ADDON_ICON
                 fanart = os.path.join(folder, 'fanart.jpg') if os.path.exists(os.path.join(folder, 'fanart.jpg')) else CONFIG.ADDON_FANART
                 if tools.get_addon_info(addonids[i], 'name'):
-                    state = "[COLOR yellowgreen][Habilitado][/COLOR]"
+                    state = "[COLOR green][Habilitado][/COLOR]"
                     goto = "false"
                 else:
-                    state = "[COLOR tomato][Deshabilitado][/COLOR]"
+                    state = "[COLOR orange][Deshabilitado][/COLOR]"
                     goto = "true"
 
                 directory.add_file("{0} {1}".format(state, addonnames[i]), {'mode': 'toggleaddon', 'name': addonids[i], 'url': goto}, icon=icon, fanart=fanart)
@@ -542,10 +542,10 @@ def enable_addons(all=False):
 
 def remove_addon_data_menu():
     if os.path.exists(CONFIG.ADDON_DATA):
-        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data', {'mode': 'removedata', 'name': 'all'}, themeit=CONFIG.THEME2)
-        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data para Addons Desinstalados', {'mode': 'removedata', 'name': 'uninstalled'}, themeit=CONFIG.THEME2)
-        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] Todas las Carpetas Vacías en Addon_Data', {'mode': 'removedata', 'name': 'empty'}, themeit=CONFIG.THEME2)
-        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] {0} Addon_Data'.format(CONFIG.ADDONTITLE), {'mode': 'resetaddon'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data', {'mode': 'removedata', 'name': 'all'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data para Addons Desinstalados', {'mode': 'removedata', 'name': 'uninstalled'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] Todas las Carpetas Vacías en Addon_Data', {'mode': 'removedata', 'name': 'empty'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] {0} Addon_Data'.format(CONFIG.ADDONTITLE), {'mode': 'resetaddon'}, themeit=CONFIG.THEME2)
         directory.add_separator(themeit=CONFIG.THEME3)
         fold = glob.glob(os.path.join(CONFIG.ADDON_DATA, '*/'))
         for folder in sorted(fold, key = lambda x: x):

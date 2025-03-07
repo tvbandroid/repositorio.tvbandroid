@@ -396,17 +396,15 @@ def platform():
         return 'ios'
 
 
-def kodi_version():
-    if 19.0 <= CONFIG.KODIV <= 19.9:
-        vername = 'Matrix'
-    elif 20.0 <= CONFIG.KODIV <= 20.9:
-        vername = 'Nexus'
-    elif 21.0 <= CONFIG.KODIV <= 21.9:
-        vername = 'Omega'
-	elif 22.0 <= CONFIG.KODIV <= 22.9:
-        vername = 'Piers'	
-    else:
-        vername = "Unknown"
+def kodi_version():
+    if 20.0 <= CONFIG.KODIV <= 20.9:
+        vername = 'Nexus'
+    elif 21.0 <= CONFIG.KODIV <= 21.9:
+        vername = 'Omega'
+    elif 22.0 <= CONFIG.KODIV <= 22.9:
+        vername = 'Piers'
+    else:
+        vername = "Unknown"
     return vername
 
 

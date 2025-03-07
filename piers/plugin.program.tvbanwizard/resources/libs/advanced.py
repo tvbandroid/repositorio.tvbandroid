@@ -35,7 +35,7 @@ def view_current():
 
 def remove_current():
     dialog = xbmcgui.Dialog()
-    ok = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]Estás seguro de que deseas eliminar el [COLOR khaki]advancedsettings.xml[/COLOR] actual?[/COLOR]".format(CONFIG.COLOR2),
+    ok = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]Está seguro de que desea eliminar el [COLOR khaki]advancedsettings.xml[/COLOR] actual?[/COLOR]".format(CONFIG.COLOR2),
                                            yeslabel="[B][COLOR cyan]Si[/COLOR][/B]",
                                            nolabel="[B][COLOR red]No[/COLOR][/B]")
 
@@ -155,14 +155,14 @@ class AdvancedMenu:
             logging.log("[Advanced Settings] URL no funciona: {0}".format(CONFIG.ADVANCEDFILE))
 
     def quick_configure(self):
-        directory.add_file('[I][B][COLOR khaki]LOS CAMBIOS NO SE REFLEJARAN HASTA QUE SE REINICIE [COLOR teal]KODI.[/COLOR][/B][/I]', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
-        directory.add_file('[COLOR azure]Haga [COLOR cyan][B]CLIC AQUI[/B] [COLOR azure]para reiniciar [COLOR teal]Kodi.[/COLOR]', {'mode': 'forceclose'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_file('[COLOR azure]Los cambios no se reflejarán hasta que se reinicie [COLOR cyan]Kodi.[/COLOR]', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_file('[COLOR azure]Haga Clic aquí para reiniciar [COLOR cyan]Kodi.[/COLOR]', {'mode': 'forceclose'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         # directory.add_file('Más categorías próximamente :)', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_separator(middle='[B]CATEGORIAS[/B]')
         # directory.add_dir('Troubleshooting', {'mode': 'advanced_settings', 'action': 'show_section', 'tags': 'loglevel|jsonrpc'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         # directory.add_dir('Playback', {'mode': 'advanced_settings', 'action': 'show_section', 'tags': 'skiploopfilter|video|audio|edl|pvr|epg|forcedswaptime'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         # directory.add_dir('Video Library', {'mode': 'advanced_settings', 'action': 'show_section', 'tags': 'videoextensions|discstubextensions|languagecodes|moviestacking|folderstacking|cleandatetime|cleanstrings|tvshowmatching|tvmultipartmatching'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
-        directory.add_dir('[COLOR azure]RED / CACHE[/COLOR]', {'mode': 'advanced_settings', 'action': 'show_section', 'tags': 'cache|network'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_dir('[COLOR azure]RED y CACHE[/COLOR]', {'mode': 'advanced_settings', 'action': 'show_section', 'tags': 'cache|network'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
 
     def show_section(self, tags):
         from xml.etree import ElementTree
@@ -219,11 +219,11 @@ class AdvancedMenu:
         value = None
         
         if tag == 'buffermode':
-            values = ['Almacenar en Buffer todos los sistemas de archivos de Internet',
-                      'Almacenar en Buffer todos los sistemas de archivos',
-                      'Almacenar en Buffer solo sistemas de archivos de Internet auténticos',
-                      'Sin Buffer',
-                      'Todos los sistemas de archivos de Red']
+            values = ['Buffer all internet filesystems',
+                      'Buffer all filesystems',
+                      'Only buffer true internet filesystems',
+                      'No buffer',
+                      'All network filesystems']
                       
             items = []
             for i in range(len(values)):
@@ -237,18 +237,18 @@ class AdvancedMenu:
             recommended = int(float(free_memory[:-2]) / 3) * 1024 * 1024
             recommended_converted = tools.convert_size(int(float(free_memory[:-2]) / 3) * 1024 * 1024)
         
-            value = tools.get_keyboard(default='{0}'.format(recommended), heading='Tamaño de la Memoria en Bytes\n(Recomendado: {0} = {1})'.format(recommended_converted, recommended))
+            value = tools.get_keyboard(default='{0}'.format(recommended), heading='Memory Size in Bytes\n(Recommended: {0} = {1})'.format(recommended_converted, recommended))
         elif tag == 'readfactor':
-            value = tools.get_keyboard(default='{0}'.format(current), heading='Tasa de Llenado de Caché (Los números altos provocarán un uso intensivo del ancho de banda)!)')
+            value = tools.get_keyboard(default='{0}'.format(current), heading='Fill Rate of Cache\n(High numbers will cause heavy bandwidth use!)')
             
         return value
             
     def _network(self, tag, current):
-        msgs = {'curlclienttimeout': 'Tiempo de espera en segundos para conexiones de URL de biblioteca (http/ftp)',
-                'curllowspeedtime': 'Tiempo en segundos que tarda la URL de la biblioteca en considerar que una conexión es de baja velocidad',
-                'curlretries': 'Cantidad de reintentos para ciertas operaciones de URL de biblioteca fallidas (por ejemplo, tiempo de espera))',
-                'httpproxyusername': 'Nombre de Usuario para Autenticación Básica de Proxy',
-                'httpproxypassword': 'Contraseña para Autenticación Básica de Proxy'}
+        msgs = {'curlclienttimeout': 'Timeout in seconds for libcurl (http/ftp) connections',
+                'curllowspeedtime': 'Time in seconds for libcurl to consider a connection lowspeed',
+                'curlretries': 'Amount of retries for certain failed libcurl operations (e.g. timeout)',
+                'httpproxyusername': 'Username for Basic Proxy Authentication',
+                'httpproxypassword': 'Password for Basic Proxy Authentication'}
         
         value = tools.get_keyboard(default='{0}'.format(current), heading=msgs[tag])
             
@@ -273,7 +273,7 @@ class AdvancedMenu:
 
             if choice == 1:
                 tools.write_to_file(CONFIG.ADVANCED, response.text)
-                tools.kill_kodi(msg='[COLOR {0}]El nuevo ajuste preestablecido [COLOR khaki]advancedsettings.xml[/COLOR] se ha escrito correctamente, pero los cambios no surtirán efecto hasta que cierre [COLOR teal]Kodi.[/COLOR]'.format(
+                tools.kill_kodi(msg='[COLOR {0}]El nuevo ajuste preestablecido [COLOR khaki]advancedsettings.xml[/COLOR] se ha escrito correctamente, pero los cambios no surtirán efecto hasta que cierre [COLOR cyan]Kodi.[/COLOR]'.format(
                                    CONFIG.COLOR2))
             else:
                 logging.log("[Advanced Settings] instalación canceleda")

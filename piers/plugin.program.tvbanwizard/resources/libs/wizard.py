@@ -144,7 +144,7 @@ class Wizard:
                 from resources.libs.gui.build_menu import BuildMenu
                 themecount = BuildMenu().theme_count(name)
 
-                if themecount > 0:
+                if themecount > 99:
                     self.theme(name)
 
                 db.addon_database(CONFIG.ADDON_ID, 1)
@@ -292,7 +292,7 @@ class Wizard:
             from resources.libs import skin
             from resources.libs import test
             test1 = test.test_theme(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
-            test2 = test.test_gui(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
+            #test2 = test.test_gui(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
 
             if test1:
                 skin.look_and_feel_data('save')
@@ -310,22 +310,28 @@ class Wizard:
             logging.log('INSTALLED {0}: [ERRORS:{1}]'.format(percent, errors))
             self.dialogProgress.close()
 
-            db.force_check_updates(over=True)
+            #db.force_check_updates(over=True)
             installed = db.grab_addons(lib)
             db.addon_database(installed, 1, True)
+			
+			self.dialog.ok(CONFIG.ADDONTITLE, "[B][COLOR khaki]INSTALADO CORRECTAMENTE.[/B]\n\n[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
+            tools.kill_kodi(over=True)
 
             if test2:
                 skin.look_and_feel_data('save')
+				xbmc.log('test2= ' + str(test2), xbmc.LOGINFO)
                 skin.skin_to_default("Theme Install")
                 gotoskin = CONFIG.get_setting('defaultskin')
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
             elif test1:
-                skin.look_and_feel_data('save')
-                skin.skin_to_default("Theme Install")
+                #skin.look_and_feel_data('save')
+                #skin.skin_to_default("Theme Install")
                 gotoskin = CONFIG.get_setting('defaultskin')
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
+				if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
+                	xbmc.executebuiltin('SendClick(yesnodialog, 11)')
             else:
                 xbmc.executebuiltin("ReloadSkin()")
                 xbmc.sleep(1000)

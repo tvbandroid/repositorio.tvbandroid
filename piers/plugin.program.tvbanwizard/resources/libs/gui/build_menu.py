@@ -115,7 +115,7 @@ class BuildMenu:
             else:
                 if count22 > 0:
                     state = '[COLOR azure]+[/COLOR]' if CONFIG.SHOW22 == 'false' else '[COLOR azure]-[/COLOR]'
-                    directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR orange]PARCHES:[COLOR azure]TVBAN [COLOR cyan]MATNEXOM [COLOR magenta]PIERS[/COLOR][/B]'.format(state, count22), {'mode': 'togglesetting',
+                    directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR orange]PARCHES: [COLOR azure]TVBAN [COLOR cyan]MATNEXOM [COLOR magenta]PIERS[/COLOR][/B]'.format(state, count22), {'mode': 'togglesetting',
                                        'name': 'show22'}, themeit=CONFIG.THEME3)
                     if CONFIG.SHOW22 == 'true':
                         self._list_all(match, kodiv=22)

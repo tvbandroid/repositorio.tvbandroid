@@ -311,7 +311,7 @@ class Wizard:
             logging.log('INSTALADO {0}: [ERRORES:{1}]'.format(percent, errors))
             self.dialogProgress.close()
 
-            #db.force_check_updates(over=True)
+            db.force_check_updates(over=True)
             installed = db.grab_addons(lib)
             db.addon_database(installed, 1, True)
 
@@ -332,7 +332,7 @@ class Wizard:
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
                 if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
-                	#xbmc.executebuiltin('SendClick(yesnodialog, 11)')
+                	xbmc.executebuiltin('SendClick(yesnodialog, 11)')
             else:
                 xbmc.executebuiltin("ReloadSkin()")
                 xbmc.sleep(1000)

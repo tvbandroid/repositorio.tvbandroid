@@ -296,7 +296,7 @@ class Wizard:
 
             if test1:
                 skin.look_and_feel_data('save')
-				xbmc.log('test1= ' + str(test1), xbmc.LOGINFO)
+				xbmc.log('test1=' + str(test1), xbmc.LOGINFO)
                 swap = skin.skin_to_default('Theme Install')
 
                 if not swap:

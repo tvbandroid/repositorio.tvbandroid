@@ -74,6 +74,9 @@ class Config:
         self.SPACER = uservar.SPACER
         self.COLOR1 = uservar.COLOR1
         self.COLOR2 = uservar.COLOR2
+		self.COLOR3 = uservar.COLOR3
+        self.COLOR4 = uservar.COLOR4
+        self.COLOR5 = uservar.COLOR5
         self.THEME1 = uservar.THEME1
         self.THEME2 = uservar.THEME2
         self.THEME3 = uservar.THEME3

@@ -292,7 +292,7 @@ class Wizard:
             from resources.libs import skin
             from resources.libs import test
             test1 = test.test_theme(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
-            test2 = test.test_gui(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
+            #test2 = test.test_gui(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
 
             if test1:
                 skin.look_and_feel_data('save')
@@ -331,8 +331,8 @@ class Wizard:
                 gotoskin = CONFIG.get_setting('default.skin')
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
-             if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
-                xbmc.executebuiltin('SendClick(yesnodialog, 11)')
+                if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
+                   xbmc.executebuiltin('SendClick(yesnodialog, 11)')
             else:
                 xbmc.executebuiltin("ReloadSkin()")
                 xbmc.sleep(1000)

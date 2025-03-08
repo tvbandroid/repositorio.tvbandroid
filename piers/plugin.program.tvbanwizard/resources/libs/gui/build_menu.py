@@ -91,7 +91,7 @@ class BuildMenu:
             directory.add_file('{0}'.format(CONFIG.BUILDFILE), icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME3)
             return
 
-        total, count22, count21, count20, count19, adultcount, hidden = check.build_count()
+        total, count22, count21, count20, adultcount, hidden = check.build_count()
 
         match = re.compile('name="(.+?)".+?ersion="(.+?)".+?rl="(.+?)".+?ui="(.+?)".+?odi="(.+?)".+?heme="(.+?)".+?con="(.+?)".+?anart="(.+?)".+?dult="(.+?)".+?escription="(.+?)"').findall(link)
         
@@ -114,29 +114,29 @@ class BuildMenu:
                 self._list_all(match)
             else:
                 if count22 > 0:
-                    state = '[COLOR azure]+[/COLOR]' if CONFIG.SHOW22 == 'false' else '[COLOR azure]-[/COLOR]'
-                    directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR orange]PARCHES:[COLOR azure] TVBAN [COLOR cyan]MATNEXOM [COLOR azure]_ [COLOR moccasin]AMILLANS[/COLOR][/B]'.format(state, count22), {'mode': 'togglesetting',
-                                       'name': 'show22'}, themeit=CONFIG.THEME3)
+                    state = '[COLOR azure]+[/COLOR]' if CONFIG.SHOW21 == 'false' else '[COLOR azure]-[/COLOR]'
+                    directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR orange]PARCHES:[COLOR azure]TVBAN [COLOR cyan]MATNEXOM [COLOR magenta]PIERS[/COLOR][/B]'.format(state, count22), {'mode': 'togglesetting',
+                                       'name': 'show21'}, themeit=CONFIG.THEME3)
                     if CONFIG.SHOW22 == 'true':
                         self._list_all(match, kodiv=22)
+                if count21 > 0:
+                    state = '[COLOR azure]+[/COLOR]' if CONFIG.SHOW21 == 'false' else '[COLOR azure]-[/COLOR]'
+                    directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR orange]PARCHES:[COLOR azure] TVBAN [COLOR cyan]MATNEXOM [COLOR azure]_ [COLOR moccasin]AMILLANS[/COLOR][/B]'.format(state, count21), {'mode': 'togglesetting',
+                                       'name': 'show21'}, themeit=CONFIG.THEME3)
+                    if CONFIG.SHOW21 == 'true':
+                        self._list_all(match, kodiv=21)
                 if count20 > 0:
-                    state = '[COLOR azure]+[/COLOR]' if CONFIG.SHOW20 == 'false' else '[COLOR azure]-[/COLOR]'
+                    state = '+' if CONFIG.SHOW20 == 'false' else '-'
                     directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR azure]- [COLOR orange]PARCHES:[COLOR azure] TVBAN [COLOR cyan]MATNEXOM [COLOR blueviolet]NEXUS[/COLOR][/B]'.format(state, count20), {'mode': 'togglesetting',
                                        'name': 'show20'}, themeit=CONFIG.THEME3)
                     if CONFIG.SHOW20 == 'true':
                         self._list_all(match, kodiv=20)
-                if count19 > 0:
-                    state = '+' if CONFIG.SHOW19 == 'false' else '-'
-                    directory.add_file('[B]{0} Matrix Builds ({1})[/B]'.format(state, count19), {'mode': 'togglesetting',
-                                       'name': 'show19'}, themeit=CONFIG.THEME3)
-                    if CONFIG.SHOW19 == 'true':
-                        self._list_all(match, kodiv=19)
 
         elif hidden > 0:
             if adultcount > 0:
                 directory.add_file('[COLOR azure]Actualmente Solo hay Builds para Adultos[COLOR]', icon=CONFIG.ICONBUILDS,
                                    themeit=CONFIG.THEME3)
-                directory.add_file('[COLOR azure]Habilitar Mostrar Adultos en los Ajustes de Addon[COLOR] > Misc', icon=CONFIG.ICONBUILDS,
+                directory.add_file('[COLOR azure]Habilitar Mostrar Adultos en los Ajustes de Add-on[COLOR] > TVban', icon=CONFIG.ICONBUILDS,
                                    themeit=CONFIG.THEME3)
             else:
                 directory.add_file('[COLOR azure]Actualmente No Se Ofrecen Builds de[COLOR] {0}'.format(CONFIG.ADDONTITLE),
@@ -173,9 +173,13 @@ class BuildMenu:
             previewcheck = tools.open_url(preview, check=True)
             guicheck = tools.open_url(gui, check=True)
             themecheck = tools.open_url(themefile, check=True)
-            
+            if versioncheck:
+                directory.add_file(
+                    '[B][I][COLOR powderblue]Build diseñado para [COLOR teal]Kodi v{0}[/COLOR] [COLOR azure]( instalado: [COLOR khaki]v{1} )[/COLOR][/I][/B]'.format(str(kodi), str(CONFIG.KODIV)),
+                    fanart=fanart, icon=icon, themeit=CONFIG.THEME3)
+                
             if updatecheck:
-                build = '[COLOR yellowgreen]{0}[/COLOR] [COLOR khaki]v{1}[/COLOR]'.format(build, CONFIG.BUILDVERSION)
+                build = '[COLOR yellowgreen]{0} [COLOR khaki]v{1}[/COLOR]'.format(build, CONFIG.BUILDVERSION)
                 
             directory.add_file(build, description=description, fanart=fanart, icon=icon, themeit=CONFIG.THEME4)
             directory.add_separator()
@@ -187,12 +191,8 @@ class BuildMenu:
                 directory.add_file('Ver Vista Previa de Video', {'mode': 'buildpreview', 'name': name}, description=description, fanart=fanart,
                                    icon=icon, themeit=CONFIG.THEME3)
             
-            if versioncheck:
-                directory.add_file(
-                    '[I][COLOR powderblue]Build diseñado para Kodi v{0}[/COLOR] [COLOR azure]( instalado: [COLOR gold]v{1}[/COLOR] )[/COLOR][/I]'.format(str(kodi), str(CONFIG.KODIV)),
-                    fanart=fanart, icon=icon, themeit=CONFIG.THEME3)
-                directory.add_file(
-                    '[I][COLOR azure]Soporte[/COLOR] [COLOR dodgerblue]TELEGRAM:[/COLOR] [I][COLOR azure]t.me/+andTvban[/COLOR][/I]'.format(str(kodi), str(CONFIG.KODIV)),
+            directory.add_file(
+                    '[B][I][COLOR powderblue]Soporte[/COLOR] [COLOR dodgerblue]TELEGRAM:[/COLOR] [COLOR azure]t.me/+andTvban[/COLOR][/I][/B]'.format(str(kodi), str(CONFIG.KODIV)),
                     fanart=fanart, icon=icon, themeit=CONFIG.THEME3)
                     
             directory.add_separator('[B]INSTALACION BUILD[/B]', fanart=fanart, icon=icon, themeit=CONFIG.THEME2)

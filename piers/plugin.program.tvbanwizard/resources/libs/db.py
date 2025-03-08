@@ -272,10 +272,10 @@ def toggle_addon(id, value, over=None):
     if 'error' in response and over is None:
         dialog = xbmcgui.Dialog()
         
-        v = 'Enabling' if value == 'true' else 'Disabling'
+        v = 'Habilitando' if value == 'true' else 'Deshabilitando'
         dialog.ok(CONFIG.ADDONTITLE,
                       "[COLOR {0}]Error {1} [COLOR {2}]{3}[/COLOR]".format(CONFIG.COLOR2, v, CONFIG.COLOR1, id) + '\n' +
-                      "Verifique que la lista de add-ons este actualizada y vuelva a intentarlo.[/COLOR]")
+                      "Verifique que la lista de add-ons esté actualizada y vuelva a intentarlo.[/COLOR]")
 
 
 def toggle_dependency(name, dp=None):

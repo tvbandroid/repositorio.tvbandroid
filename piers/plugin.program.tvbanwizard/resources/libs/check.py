@@ -45,9 +45,8 @@ def check_paths():
     pathclean = CONFIG.ADDON_PATH.replace('\\','/')
     folderpath = pathclean.split('/')[-2]
     if not CONFIG.ADDON_ID == folderpath:
-        dialog.ok(CONFIG.ADDONTITLE,
-                      '[COLOR {0}]Asegúrese de que la carpeta del plugin sea la misma que la identificación del addon.[/COLOR]'.format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]Plugin ID:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.ADDON_ID) + '\n' + '[COLOR {0}]Carpeta de plugins:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, path))
-        logging.log("[Path Check] ADDON_ID y la carpeta del plugin no coinciden. {0} / {1} ".format(CONFIG.ADDON_ID, path))
+        dialog.ok(CONFIG.ADDONTITLE, '[COLOR red][B]AVISO!![/B]'.format(CONFIG.ADDONTITLE)  + '\n' + '[COLOR {0}]Asegúrese de que la Carpeta del Plugin sea la misma que la identificación del addon.[/COLOR]'.format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]Plugin ID:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.ADDON_ID) + '\n' + '[COLOR {0}]Carpeta de plugins:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, path))
+        logging.log("[Path Check] ADDON_ID y la carpeta del Plugin no coinciden. {0} / {1} ".format(CONFIG.ADDON_ID, path))
     else:
         logging.log("[Path Check] Bien!")
 
@@ -384,14 +383,12 @@ def build_count():
     response = tools.open_url(CONFIG.BUILDFILE)
 
     total = 0
-    count21 = 0
-    count20 = 0
-    count19 = 0
+    count22 = 0
     hidden = 0
     adultcount = 0
 
     if not response:
-        return total, count22, count21, count20, count19, adultcount, hidden
+        return total, count22, adultcount, hidden
 
     link = response.text.replace('\n', '').replace('\r', '').replace('\t', '')
     match = re.compile('name="(.+?)".+?odi="(.+?)".+?dult="(.+?)"').findall(link)
@@ -407,14 +404,8 @@ def build_count():
                 continue
             kodi = int(float(kodi))
             total += 1
-			if kodi == 22:
+            if kodi == 22:
                 count22 += 1
-            if kodi == 21:
-                count21 += 1
-            if kodi == 20:
-                count20 += 1
-            if kodi == 19:
-                count19 += 1
-    return total, count22, count21, count20, count19, adultcount, hidden
+    return total, count22, adultcount, hidden
 
 

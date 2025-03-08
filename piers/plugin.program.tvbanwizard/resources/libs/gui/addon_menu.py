@@ -288,7 +288,7 @@ class AddonMenu:
             repo_id = urls[1]
         
             if not xbmc.getCondVisibility('System.HasAddon({0})'.format(repo_id)):
-                logging.log("Repositorio no instalado, instalandolo")
+                logging.log("Repository not installed, installing it")
 
                 from xml.etree import ElementTree
                 root = ElementTree.fromstring(repositoryxml_response.text.encode('ascii', 'backslashreplace'))
@@ -313,13 +313,13 @@ class AddonMenu:
                     logging.log(
                         "[Addon Installer] Repositorio no instalado: [COLOR gold]No se puede obtener la URL![/COLOR] ({0})".format(urls[1]))
             else:
-                logging.log("Repositorio instalado, instalando addon")
+                logging.log("Repository installed, installing addon")
                 install = install_from_kodi(plugin)
                 if install:
                     xbmc.executebuiltin('Container.Refresh()')
                     return True
         elif url_response:
-            logging.log("Sin repositorio, instalando addon")
+            logging.log("No repository, installing addon")
             self.install_addon_from_url(plugin, urls[0])
 
             if os.path.exists(os.path.join(CONFIG.ADDONS, plugin)):

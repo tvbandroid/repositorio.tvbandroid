@@ -73,12 +73,12 @@ class Wizard:
             warning = False
 
         if warning:
-            yes_pressed = self.dialog.yesno("{0} - [B][COLOR red]ADVERTENCIA[COLOR white]!![/COLOR][/B]".format(CONFIG.ADDONTITLE), '[COLOR {0}]Existe la posibilidad de que el Skin no se vea correctamente'.format(CONFIG.COLOR2) + '\n' + 'al instalar una {0} Build en un Kodi {1} instalado'.format(check.check_build(name, 'kodi'), CONFIG.KODIV) + '\n' + 'Todavía te gustaría instalar: [COLOR {0}]{1} v{2}[/COLOR]?[/COLOR]'.format(CONFIG.COLOR1, name, check.check_build(name, 'version')), nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]', yeslabel='[B][COLOR cyan]Si, Instalar[/COLOR][/B]')
+            yes_pressed = self.dialog.yesno("{0} - [B][COLOR red]ADVERTENCIA!![/COLOR][/B]".format(CONFIG.ADDONTITLE), '[COLOR {0}]Exíste la posibilidad de que el Skin no se vea correctamente'.format(CONFIG.COLOR2) + '\n' + 'Al instalar una {0} Build en un Kodi {1} instalado'.format(check.check_build(name, 'kodi'), CONFIG.KODIV) + '\n' + 'Todavía te gustaría instalar: [COLOR {0}]{1} v{2}[/COLOR]?[/COLOR]'.format(CONFIG.COLOR1, name, check.check_build(name, 'version')), nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]', yeslabel='[B][COLOR cyan]Si, Instalar[/COLOR][/B]')
         else:
             if over:
                 yes_pressed = 1
             else:
-                yes_pressed = self.dialog.yesno(CONFIG.ADDONTITLE, '[COLOR red][B]AVISO[COLOR white]!![/B]'.format(CONFIG.ADDONTITLE)  + '\n' + '[COLOR {0}][B]La Instalación Sobreescribirá los datos de su [COLOR teal]Kodi Actual[/COLOR]![/B]'.format(CONFIG.COLOR2)  + '\n\n' + '[COLOR {0}][B]Le gustaría Descargar e Instalar:[/B] '.format(CONFIG.COLOR2) + '[B][COLOR yellowgreen]{1} [COLOR khaki]v{2}[COLOR azure]?[/COLOR][/B]'.format(CONFIG.COLOR1, name, check.check_build(name,'version')), nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]', yeslabel='[B][COLOR cyan]Si, Instalar[/COLOR][/B]')
+                yes_pressed = self.dialog.yesno(CONFIG.ADDONTITLE, '[COLOR red][B]AVISO!![/B]'.format(CONFIG.ADDONTITLE)  + '\n' + '[COLOR {0}][B]La Instalación Sobreescribirá los datos de su [COLOR cyan]Kodi Actual[/COLOR]![/B]'.format(CONFIG.COLOR2)  + '\n\n' + '[COLOR {0}][B]Le gustaría Descargar e Instalar:[/B] '.format(CONFIG.COLOR2) + '[B][COLOR yellowgreen]{1} [COLOR khaki]v{2}[COLOR azure]?[/COLOR][/B]'.format(CONFIG.COLOR1, name, check.check_build(name,'version')), nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]', yeslabel='[B][COLOR cyan]Si, Instalar[/COLOR][/B]')
         if yes_pressed:
             CONFIG.clear_setting('build')
             buildzip = check.check_build(name, 'url')
@@ -112,7 +112,7 @@ class Wizard:
             self.dialogProgress.update(0, title + '\n' + 'Espere por Favor')
             percent, errors, error = extract.all(lib, CONFIG.HOME, title=title)
             
-            skin.skin_to_default('Build Install')
+            skin.skin_to_default('Install Build')
 
             if int(float(percent)) > 0:
                 db.fix_metas()
@@ -152,7 +152,7 @@ class Wizard:
                 if os.path.exists(os.path.join(CONFIG.USERDATA, '.enableall')):
                 	CONFIG.set_setting('enable_all', 'true')
 
-                self.dialog.ok(CONFIG.ADDONTITLE, "[B][COLOR khaki]INSTALADO CORRECTAMENTE.[/B]\n\n[COLOR {0}][B] Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
+                self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
                 tools.kill_kodi(over=True)
             else:
                 from resources.libs.gui import window
@@ -167,11 +167,11 @@ class Wizard:
                 yes_pressed = 1
             else:
                 yes_pressed = self.dialog.yesno(CONFIG.ADDONTITLE,
-                                   '[COLOR {0}][B]Le gustaría aplicar la Corrección de la Interfaz Gráfica de usuario para:'.format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]{1}[/COLOR]?[/B][/COLOR]'.format(CONFIG.COLOR1, name),
+                                   '[COLOR {0}][B]Le gustaría aplicar la Corrección de la interfaz gráfica de usuario para:'.format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]{1}[/COLOR]?[/B][/COLOR]'.format(CONFIG.COLOR1, name),
                                    nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]',
                                    yeslabel='[B][COLOR cyan]Aplicar Corrección[/COLOR][/B]')
         else:
-            yes_pressed = self.dialog.yesno("{0} - [B][COLOR red]ADVERTENCIA[COLOR white]!![/COLOR][/B]".format(CONFIG.ADDONTITLE),
+            yes_pressed = self.dialog.yesno("{0} - [B][COLOR red]ADVERTENCIA!![/COLOR][/B]".format(CONFIG.ADDONTITLE),
                                "[COLOR {0}][COLOR {1}]{2}[/COLOR] [B]La Build de la comunidad no está instalada actualmente.".format(CONFIG.COLOR2, CONFIG.COLOR1, name) + '\n' + "Le gustaría aplicar la Corrección Gui ([COLOR azure]de la interfaz gráfica de usuario[/COLOR]) de todos modos?[/B][/COLOR]",
                                nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]',
                                yeslabel='[B][COLOR cyan]Aplicar Corrección[/COLOR][/B]')
@@ -182,10 +182,10 @@ class Wizard:
             response = tools.open_url(guizip, check=True)
             if not response:
                 logging.log_notify(CONFIG.ADDONTITLE,
-                                   '[COLOR {0}]Corrección Interfaz Gráfica:[/COLOR] [COLOR gold]Url Zip Inválido![/COLOR]'.format(CONFIG.COLOR2))
+                                   '[COLOR {0}]Corrección Gui:[/COLOR] [COLOR gold]Url Zip Inválido![/COLOR]'.format(CONFIG.COLOR2))
                 return
 
-            self.dialogProgress.create(CONFIG.ADDONTITLE, '[COLOR {0}][B]Descargando Corrección Interfaz Gráfica:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name), '', 'Espere por Favor')
+            self.dialogProgress.create(CONFIG.ADDONTITLE, '[COLOR {0}][B]Descargando Corrección Gui:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name), '', 'Espere por Favor')
 
             lib = os.path.join(CONFIG.PACKAGES, '{0}_guisettings.zip'.format(zipname))
             
@@ -214,7 +214,7 @@ class Wizard:
             installed = db.grab_addons(lib)
             db.addon_database(installed, 1, True)
 
-            self.dialog.ok(CONFIG.ADDONTITLE, "[B][COLOR khaki]INSTALADO CORRECTAMENTE.[/B]\n\n[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
+            self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
             tools.kill_kodi(over=True)
         else:
             logging.log_notify(CONFIG.ADDONTITLE,
@@ -315,7 +315,7 @@ class Wizard:
             installed = db.grab_addons(lib)
             db.addon_database(installed, 1, True)
 
-            self.dialog.ok(CONFIG.ADDONTITLE, "[B][COLOR khaki]INSTALADO CORRECTAMENTE.[/B]\n\n[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
+            self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
             tools.kill_kodi(over=True)
             
             if test2:
@@ -332,7 +332,7 @@ class Wizard:
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
                 if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
-                   xbmc.executebuiltin('SendClick(yesnodialog, 11)')
+                	xbmc.executebuiltin('SendClick(yesnodialog, 11)')
             else:
                 xbmc.executebuiltin("ReloadSkin()")
                 xbmc.sleep(1000)

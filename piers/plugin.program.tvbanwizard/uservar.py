@@ -18,7 +18,7 @@ ADDONTITLE = '[COLOR azure][B]Tvban[/B][/COLOR] [COLOR tan][B]Wizard[/B][/COLOR]
 BUILDERNAME = 'JoseAndTEB & tvband'
 EXCLUDES = [ADDON_ID, 'repository.andtvban']
 # Text File with build info in it.
-BUILDFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/buildfiles/builds.txt'
+BUILDFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/andfiles/builds.txt'
 # How often you would like it to check for build updates in days
 # 0 being every startup of kodi
 UPDATECHECK = 0
@@ -103,7 +103,7 @@ CONTACTFANART = 'http://'
 # Enable Auto Update 'Yes' or 'No'
 AUTOUPDATE = 'Yes'
 # Url to wizard version
-BUILDFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/buildfiles/builds.txt' 
+BUILDFILE = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/andfiles/builds.txt' 
 #########################################################
 
 #########################################################
@@ -114,9 +114,9 @@ AUTOINSTALL = 'Yes'
 # Addon ID for the repository
 REPOID = 'repository.andtvban'
 # Url to Addons.xml file in your repo folder(this is so we can get the latest version)
-REPOADDONXML = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/piers/zips/addons.xml'
+REPOADDONXML = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/piers/addons.xml'
 # Url to folder zip is located in
-REPOZIPURL = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/piers/zips/repository.andtvban/'
+REPOZIPURL = 'https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/piers/repository.andtvban/'
 #########################################################
 
 #########################################################

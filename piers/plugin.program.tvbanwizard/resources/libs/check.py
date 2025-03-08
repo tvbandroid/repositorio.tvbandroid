@@ -29,8 +29,8 @@ try:
     from urllib.request import urlopen
     from urllib.request import Request
 except ImportError:
-    from urllib3 import urlopen
-    from urllib3 import Request
+    from urllib2 import urlopen
+    from urllib2 import Request
 
 from resources.libs.common.config import CONFIG
 
@@ -40,16 +40,16 @@ def check_paths():
 
     dialog = xbmcgui.Dialog()
     
-    logging.log("[Path Check] Started")
+    logging.log("[Path Check] Comenzó")
     path = CONFIG.ADDON_PATH
     pathclean = CONFIG.ADDON_PATH.replace('\\','/')
     folderpath = pathclean.split('/')[-2]
     if not CONFIG.ADDON_ID == folderpath:
         dialog.ok(CONFIG.ADDONTITLE,
-                      '[COLOR {0}]Please make sure that the plugin folder is the same as the add-on id.[/COLOR]'.format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]Plugin ID:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.ADDON_ID) + '\n' + '[COLOR {0}]Plugin Folder:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, path))
-        logging.log("[Path Check] ADDON_ID and plugin folder doesnt match. {0} / {1} ".format(CONFIG.ADDON_ID, path))
+                      '[COLOR {0}]Asegúrese de que la carpeta del plugin sea la misma que la identificación del addon.[/COLOR]'.format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]Plugin ID:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.ADDON_ID) + '\n' + '[COLOR {0}]Carpeta de plugins:[/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, path))
+        logging.log("[Path Check] ADDON_ID y la carpeta del plugin no coinciden. {0} / {1} ".format(CONFIG.ADDON_ID, path))
     else:
-        logging.log("[Path Check] Good!")
+        logging.log("[Path Check] Bien!")
 
 
 def check_build(name, ret):
@@ -175,14 +175,14 @@ def check_build_update():
         CONFIG.set_setting('latestversion', version)
         if version > CONFIG.BUILDVERSION:
             if CONFIG.DISABLEUPDATE == 'false':
-                logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}] Opening Update Window".format(CONFIG.BUILDVERSION, version))
+                logging.log("[Check Updates] [Versión Instalada: {0}] [Versión Actual: {1}] Abrir Ventana de Actualización".format(CONFIG.BUILDVERSION, version))
                 window.show_update_window(CONFIG.BUILDNAME, CONFIG.BUILDVERSION, version, icon, fanart)
             else:
-                logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}] Update Window Disabled".format(CONFIG.BUILDVERSION, version))
+                logging.log("[Check Updates] [Versión Instalada: {0}] [Versión Actual: {1}] Abrir Ventana de Actualización".format(CONFIG.BUILDVERSION, version))
         else:
-            logging.log("[Check Updates] [Installed Version: {0}] [Current Version: {1}]".format(CONFIG.BUILDVERSION, version))
+            logging.log("[Check Updates] [Versión Instalada: {0}] [Versión Actual: {1}]".format(CONFIG.BUILDVERSION, version))
     else:
-        logging.log("[Check Updates] ERROR: Unable to find build version in build text file", level=xbmc.LOGERROR)
+        logging.log("[Check Updates] ERROR: No se puede encontrar la versión de la Buil en el archivo de texto de la Build", level=xbmc.LOGERROR)
 
 
 def check_skin():
@@ -191,17 +191,17 @@ def check_skin():
 
     dialog = xbmcgui.Dialog()
     
-    logging.log("[Build Check] Invalid Skin Check Start")
+    logging.log("[Build Check] Inicio de verificación de la Skin no válido")
     
     gotoskin = False
     if not CONFIG.DEFAULTSKIN == '':
         if os.path.exists(os.path.join(CONFIG.ADDONS, CONFIG.DEFAULTSKIN)):
             if dialog.yesno(CONFIG.ADDONTITLE,
-                                "[COLOR {0}]It seems that the skin has been set back to [COLOR {1}]{2}[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.SKIN[5:].title()) + '\n' + "Would you like to set the skin back to:[/COLOR]" + '\n' + '[COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, CONFIG.DEFAULTNAME)):
+                                "[COLOR {0}]Parece que la Skin ha vuelto a [COLOR {1}]{2}[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.SKIN[5:].title()) + '\n' + "¿Le gustaría volver a configurar la Skin:[/COLOR]" + '\n' + '[COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, CONFIG.DEFAULTNAME)):
                 gotoskin = CONFIG.DEFAULTSKIN
                 gotoname = CONFIG.DEFAULTNAME
             else:
-                logging.log("Skin was not reset")
+                logging.log("La Skin no se restableció")
                 CONFIG.set_setting('defaultskinignore', 'true')
                 gotoskin = False
         else:
@@ -223,33 +223,33 @@ def check_skin():
                     skinlist.append(str(match[0]))
                     skinname.append(str(match2[0]))
                 else:
-                    logging.log("ID not found for {0}".format(folder))
+                    logging.log("ID no encontrado para {0}".format(folder))
             else:
-                logging.log("ID not found for {0}".format(folder))
+                logging.log("ID no encontrado para {0}".format(folder))
         if len(skinlist) > 0:
             if len(skinlist) > 1:
                 if dialog.yesno(CONFIG.ADDONTITLE,
-                                    "[COLOR {0}]It seems that the skin has been set back to [COLOR {1}]{2}[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.SKIN[5:].title()) + '\n' + "Would you like to view a list of avaliable skins?[/COLOR]"):
-                    choice = dialog.select("Select skin to switch to!", skinname)
+                                    "[COLOR {0}]Parece que la Skin ha vuelto a [COLOR {1}]{2}[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.SKIN[5:].title()) + '\n' + "¿Le gustaría ver una lista de Skins disponibles?[/COLOR]"):
+                    choice = dialog.select("¡Seleccione el Skin para cambiar!", skinname)
                     if choice == -1:
-                        logging.log("Skin was not reset")
+                        logging.log("La Skin no se restableció")
                         CONFIG.set_setting('defaultskinignore', 'true')
                     else:
                         gotoskin = skinlist[choice]
                         gotoname = skinname[choice]
                 else:
-                    logging.log("Skin was not reset")
+                    logging.log("La Skin no fue resuelta")
                     CONFIG.set_setting('defaultskinignore', 'true')
             else:
                 if dialog.yesno(CONFIG.ADDONTITLE,
-                                    "[COLOR {0}]It seems that the skin has been set back to [COLOR {1}]{2}[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.SKIN[5:].title()) + '\n' + "Would you like to set the skin back to:[/COLOR]" + '\n' + '[COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, skinname[0])):
+                                    "[COLOR {0}]Parece que la Skin se ha vuelto a establecer en [COLOR {1}]{2}[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.SKIN[5:].title()) + '\n' + "¿Le gustaría volver a establecer la Skin en:[/COLOR]" + '\n' + '[COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, skinname[0])):
                     gotoskin = skinlist[0]
                     gotoname = skinname[0]
                 else:
-                    logging.log("Skin was not reset")
+                    logging.log("La Skin no se restableció")
                     CONFIG.set_setting('defaultskinignore', 'true')
         else:
-            logging.log("No skins found in addons folder.")
+            logging.log("No se encontraron Skins en la carpeta de addons.")
             CONFIG.set_setting('defaultskinignore', 'true')
             gotoskin = False
     if gotoskin:
@@ -257,7 +257,7 @@ def check_skin():
 
         if skin.switch_to_skin(gotoskin):
             skin.look_and_feel_data('restore')
-    logging.log("[Build Check] Invalid Skin Check End")
+    logging.log("[Build Check] Fin de comprobación de Skin no válido")
 
 
 def check_sources():
@@ -269,7 +269,7 @@ def check_sources():
     
     if not os.path.exists(CONFIG.SOURCES):
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]No sources.xml File Found![/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]¡No se encontró ningún Archivo fuentes.xml![/COLOR]".format(CONFIG.COLOR2))
         return False
     x = 0
     bad = []
@@ -280,53 +280,53 @@ def check_sources():
 
     if len(match) > 0:
         match2 = re.compile('<source>.+?<name>(.+?)</name>.+?<path pathversion="1">(.+?)</path>.+?<allowsharing>(.+?)</allowsharing>.+?</source>').findall(match[0])
-        progress_dialog.create(CONFIG.ADDONTITLE, "[COLOR {0}]Scanning Sources for Broken links[/COLOR]".format(CONFIG.COLOR2))
+        progress_dialog.create(CONFIG.ADDONTITLE, "[COLOR {0}]Escaneando Fuentes en busca de enlaces Rotos[[/COLOR]".format(CONFIG.COLOR2))
         for name, path, sharing in match2:
             x += 1
             perc = int(tools.percentage(x, len(match2)))
             progress_dialog.update(perc,
-                          '' + '\n' + "[COLOR {0}]Checking [COLOR {1}]{2}[/COLOR]:[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, name) + '\n' + "[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, path))
+                          '' + '\n' + "[COLOR {0}]Comprobando [COLOR {1}]{2}[/COLOR]:[/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, name) + '\n' + "[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, path))
                           
             working = tools.open_url(path, check=True)
             if not working:
                 bad.append([name, path, sharing, working])
 
-        logging.log("Bad Sources: {0}".format(len(bad)))
+        logging.log("Fuentes Incorrectas: {0}".format(len(bad)))
         if len(bad) > 0:
-            choice = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]{1}[/COLOR][COLOR {2}] Source(s) have been found Broken".format(CONFIG.COLOR1, len(bad), CONFIG.COLOR2) + '\n' + "Would you like to Remove all or choose one by one?[/COLOR]",
-                                      yeslabel="[B][COLOR springgreen]Remove All[/COLOR][/B]",
-                                      nolabel="[B][COLOR red]Choose to Delete[/COLOR][/B]")
+            choice = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]{1}[/COLOR][COLOR {2}] Se han encontrado Fuente(s) Rotas".format(CONFIG.COLOR1, len(bad), CONFIG.COLOR2) + '\n' + "¿Le gustaría eliminar todo o elegir uno por uno?[/COLOR]",
+                                      yeslabel="[B][COLOR springgreen]Eliminar Todo[/COLOR][/B]",
+                                      nolabel="[B][COLOR red]Elija EliminaR[/COLOR][/B]")
             if choice == 1:
                 remove = bad
             else:
                 for name, path, sharing, working in bad:
-                    logging.log("{0} sources: {1}, {2}".format(name, path, working))
+                    logging.log("{0} Fuentes: {1}, {2}".format(name, path, working))
                     if dialog.yesno(CONFIG.ADDONTITLE,
-                                        "[COLOR {0}]{1}[/COLOR][COLOR {2}] was reported as non working".format(CONFIG.COLOR1, name, CONFIG.COLOR2) + '\n' + "[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, path) + '\n' + "[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, working),
-                                        yeslabel="[B][COLOR springgreen]Remove Source[/COLOR][/B]",
-                                        nolabel="[B][COLOR red]Keep Source[/COLOR][/B]"):
+                                        "[COLOR {0}]{1}[/COLOR][COLOR {2}] se informó que no funciona".format(CONFIG.COLOR1, name, CONFIG.COLOR2) + '\n' + "[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, path) + '\n' + "[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, working),
+                                        yeslabel="[B][COLOR springgreen]Eliminar Fuente[/COLOR][/B]",
+                                        nolabel="[B][COLOR red]Mantener Fuente[/COLOR][/B]"):
                         remove.append([name, path, sharing, working])
-                        logging.log("Removing Source {0}".format(name))
+                        logging.log("Eliminando Fuente {0}".format(name))
                     else:
-                        logging.log("Source {0} was not removed".format(name))
+                        logging.log("La Fuente {0} no se eliminó".format(name))
             if len(remove) > 0:
                 for name, path, sharing, working in remove:
                     a = a.replace('\n<source>\n<name>{0}</name>\n<path pathversion="1">{1}</path>\n<allowsharing>{2}</allowsharing>\n</source>'.format(name, path, sharing), '')
-                    logging.log("Removing Source {0}".format(name))
+                    logging.log("Eliminando Fuente {0}".format(name))
 
                 tools.write_to_file(CONFIG.SOURCES, str(a))
                 alive = len(match) - len(bad)
                 kept = len(bad) - len(remove)
                 removed = len(remove)
                 dialog.ok(CONFIG.ADDONTITLE,
-                              "[COLOR {0}]Checking sources for broken paths has been completed".format(CONFIG.COLOR2) + '\n' + "Working: [COLOR {0}]{1}[/COLOR] | Kept: [COLOR {2}]{3}[/COLOR] | Removed: [COLOR {4}]{5}[/COLOR][/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, alive, CONFIG.COLOR1, kept, CONFIG.COLOR1, removed))
+                              "[COLOR {0}]Se ha completado la comprobación de fuentes en busca de rutas rotas".format(CONFIG.COLOR2) + '\n' + "Trabajando: [COLOR {0}]{1}[/COLOR] | Mantenido: [COLOR {2}]{3}[/COLOR] | Eliminado: [COLOR {4}]{5}[/COLOR][/COLOR]".format(CONFIG.COLOR2, CONFIG.COLOR1, alive, CONFIG.COLOR1, kept, CONFIG.COLOR1, removed))
             else:
-                logging.log("No Bad Sources to be removed.")
+                logging.log("No se deben eliminar Fuentes incorrectas.")
         else:
             logging.log_notify(CONFIG.ADDONTITLE,
-                               "[COLOR {0}]All Sources Are Working[/COLOR]".format(CONFIG.COLOR2))
+                               "[COLOR {0}]Todas las Fuentes están Funcionando[/COLOR]".format(CONFIG.COLOR2))
     else:
-        logging.log("No Sources Found")
+        logging.log("No se Encontraron Fuentes")
 
 
 def check_repos():
@@ -335,14 +335,14 @@ def check_repos():
 
     progress_dialog = xbmcgui.DialogProgress()
     
-    progress_dialog.create(CONFIG.ADDONTITLE, '[COLOR {0}]Checking Repositories...[/COLOR]'.format(CONFIG.COLOR2))
+    progress_dialog.create(CONFIG.ADDONTITLE, '[COLOR {0}]Comprobando Repositorios...[/COLOR]'.format(CONFIG.COLOR2))
     badrepos = []
     xbmc.executebuiltin('UpdateAddonRepos')
     repolist = glob.glob(os.path.join(CONFIG.ADDONS, 'repo*'))
     if len(repolist) == 0:
         progress_dialog.close()
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]No Repositories Found![/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]¡No se Encontraron Repositorios![/COLOR]".format(CONFIG.COLOR2))
         return
     sleeptime = len(repolist)
     start = 0
@@ -352,29 +352,29 @@ def check_repos():
             break
         perc = int(tools.percentage(start, sleeptime))
         progress_dialog.update(perc,
-                      '\n' + '[COLOR {0}]Checking: [/COLOR][COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, repolist[start-1].replace(CONFIG.ADDONS, '')[1:]))
+                      '\n' + '[COLOR {0}]Comprobando: [/COLOR][COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, repolist[start-1].replace(CONFIG.ADDONS, '')[1:]))
         xbmc.sleep(1000)
     if progress_dialog.iscanceled():
         progress_dialog.close()
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]Enabling Add-ons Cancelled[/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]Habilitación de Addons Cancelada[/COLOR]".format(CONFIG.COLOR2))
         sys.exit()
     progress_dialog.close()
     logfile = logging.grab_log()
     fails = re.compile('CRepositoryUpdateJob(.+?)failed').findall(logfile)
     for item in fails:
-        logging.log("Bad Repository: {0} ".format(item))
+        logging.log("Repositorio Incorrecto: {0} ".format(item))
         brokenrepo = item.replace('[', '').replace(']', '').replace(' ', '').replace('/', '').replace('\\', '')
         if brokenrepo not in badrepos:
             badrepos.append(brokenrepo)
     if len(badrepos) > 0:
-        msg = "[COLOR {0}]Below is a list of Repositories that did not resolve.  This does not mean that they are Depreciated, sometimes hosts go down for a short period of time.  Please do serveral scans of your repository list before removing a repository just to make sure it is broken.[/COLOR][CR][CR][COLOR {1}]".format(CONFIG.COLOR2, CONFIG.COLOR1)
+        msg = "[COLOR {0}]A continuación se muestra una lista de repositorios que no se resolvieron. Esto no significa que estén depreciados, a veces los hosts dejan de funcionar durante un corto período de tiempo. Realice varios análisis de su lista de repositorios antes de eliminarlos. un repositorio solo para asegurarse de que no funcione.[/COLOR][CR][CR][COLOR {1}]".format(CONFIG.COLOR2, CONFIG.COLOR1)
         msg += '[CR]'.join(badrepos)
         msg += '[/COLOR]'
         window.show_text_box("Viewing Broken Repositories", msg)
     else:
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]All Repositories Working![/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]¡Todos los Repositorios Funcionando![/COLOR]".format(CONFIG.COLOR2))
 
 
 def build_count():
@@ -384,14 +384,14 @@ def build_count():
     response = tools.open_url(CONFIG.BUILDFILE)
 
     total = 0
-    count22 = 0
     count21 = 0
     count20 = 0
+    count19 = 0
     hidden = 0
     adultcount = 0
 
     if not response:
-        return total, count22, count21, count20, adultcount, hidden
+        return total, count22, count21, count20, count19, adultcount, hidden
 
     link = response.text.replace('\n', '').replace('\r', '').replace('\t', '')
     match = re.compile('name="(.+?)".+?odi="(.+?)".+?dult="(.+?)"').findall(link)
@@ -407,12 +407,14 @@ def build_count():
                 continue
             kodi = int(float(kodi))
             total += 1
-            if kodi == 22:
+			if kodi == 22:
                 count22 += 1
             if kodi == 21:
                 count21 += 1
             if kodi == 20:
                 count20 += 1
-    return total, count22, count21, count20, adultcount, hidden
+            if kodi == 19:
+                count19 += 1
+    return total, count22, count21, count20, count19, adultcount, hidden
 
 

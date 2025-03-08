@@ -47,8 +47,8 @@ def create_code():
         if not dialog.yesno(CONFIG.ADDONTITLE,
                                 "[COLOR {0}]It seems the URL you entered either isn't valid or isn\'t working, Would you like to create it anyways?[/COLOR]".format(CONFIG.COLOR2)
                                 +'\n'+"[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, url),
-                                yeslabel="[B][COLOR red]Create![/COLOR][/B]",
-                                nolabel="[B][COLOR springgreen]Cancel[/COLOR][/B]"):
+                                yeslabel="[B][COLOR red]Yes Create[/COLOR][/B]",
+                                nolabel="[B][COLOR springgreen]No Cancel[/COLOR][/B]"):
             return
     name = tools.get_keyboard('', "{0}: Insert the name for the QR Code.".format(CONFIG.ADDONTITLE))
     name = "QR_Code_{0}".format(tools.id_generator(6)) if name == "" else name

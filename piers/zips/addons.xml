@@ -594,7 +594,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="0.0.21" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
+<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="0.0.22" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
     <requires>
         <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" />
@@ -640,11 +640,11 @@
 	<assets>
 	    <icon>icon.png</icon>
         <fanart>fanart.jpg</fanart>
-		<screenshot->resources/media/screenshot-01.jpg</screenshot->
-		<screenshot->resources/media/screenshot-02.jpg</screenshot->
-		<screenshot->resources/media/screenshot-03.jpg</screenshot->
-		<screenshot->resources/media/screenshot-04.jpg</screenshot->
-		<screenshot->resources/media/screenshot-05.jpg</screenshot->
+		<screenshot>resources/media/screenshot01.jpg</screenshot>
+		<screenshot>resources/media/screenshot02.jpg</screenshot>
+		<screenshot>resources/media/screenshot03.jpg</screenshot>
+		<screenshot>resources/media/screenshot04.jpg</screenshot>
+		<screenshot>resources/media/screenshot05.jpg</screenshot>
 	</assets>
 	<license>GNU GENERAL PUBLIC LICENSE Version 22</license>
 		<email></email>

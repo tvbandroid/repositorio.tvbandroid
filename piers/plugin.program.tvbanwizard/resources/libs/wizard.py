@@ -296,6 +296,7 @@ class Wizard:
 
             if test1:
                 skin.look_and_feel_data('save')
+				xbmc.log('test1= ' + str(test1), xbmc.LOGINFO)
                 swap = skin.skin_to_default('Theme Install')
 
                 if not swap:
@@ -310,7 +311,7 @@ class Wizard:
             logging.log('INSTALLED {0}: [ERRORS:{1}]'.format(percent, errors))
             self.dialogProgress.close()
 
-            db.force_check_updates(over=True)
+            #db.force_check_updates(over=True)
             installed = db.grab_addons(lib)
             db.addon_database(installed, 1, True)
 
@@ -326,6 +327,8 @@ class Wizard:
                 gotoskin = CONFIG.get_setting('defaultskin')
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
+				if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
+                    xbmc.executebuiltin('SendClick(yesnodialog, 11)')
             else:
                 xbmc.executebuiltin("ReloadSkin()")
                 xbmc.sleep(1000)

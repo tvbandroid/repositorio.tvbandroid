@@ -91,7 +91,7 @@ class BuildMenu:
             directory.add_file('{0}'.format(CONFIG.BUILDFILE), icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME3)
             return
 
-        total, count22, count21, count20, adultcount, hidden = check.build_count()
+        total, count22, count21, adultcount, hidden = check.build_count()
 
         match = re.compile('name="(.+?)".+?ersion="(.+?)".+?rl="(.+?)".+?ui="(.+?)".+?odi="(.+?)".+?heme="(.+?)".+?con="(.+?)".+?anart="(.+?)".+?dult="(.+?)".+?escription="(.+?)"').findall(link)
         
@@ -114,9 +114,9 @@ class BuildMenu:
                 self._list_all(match)
             else:
                 if count22 > 0:
-                    state = '[COLOR azure]+[/COLOR]' if CONFIG.SHOW21 == 'false' else '[COLOR azure]-[/COLOR]'
+                    state = '[COLOR azure]+[/COLOR]' if CONFIG.SHOW22 == 'false' else '[COLOR azure]-[/COLOR]'
                     directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR orange]PARCHES:[COLOR azure]TVBAN [COLOR cyan]MATNEXOM [COLOR magenta]PIERS[/COLOR][/B]'.format(state, count22), {'mode': 'togglesetting',
-                                       'name': 'show21'}, themeit=CONFIG.THEME3)
+                                       'name': 'show22'}, themeit=CONFIG.THEME3)
                     if CONFIG.SHOW22 == 'true':
                         self._list_all(match, kodiv=22)
                 if count21 > 0:
@@ -125,12 +125,6 @@ class BuildMenu:
                                        'name': 'show21'}, themeit=CONFIG.THEME3)
                     if CONFIG.SHOW21 == 'true':
                         self._list_all(match, kodiv=21)
-                if count20 > 0:
-                    state = '+' if CONFIG.SHOW20 == 'false' else '-'
-                    directory.add_file('[B][COLOR orange]{0} BUILDS [COLOR azure]- [COLOR orange]PARCHES:[COLOR azure] TVBAN [COLOR cyan]MATNEXOM [COLOR blueviolet]NEXUS[/COLOR][/B]'.format(state, count20), {'mode': 'togglesetting',
-                                       'name': 'show20'}, themeit=CONFIG.THEME3)
-                    if CONFIG.SHOW20 == 'true':
-                        self._list_all(match, kodiv=20)
 
         elif hidden > 0:
             if adultcount > 0:

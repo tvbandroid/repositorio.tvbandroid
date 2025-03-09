@@ -32,7 +32,7 @@ try:  # Python 3
 except ImportError:  # Python 2
     from urllib import quote_plus
 
-from resources.libs.common import config
+from resources.libs.common.config import CONFIG
 from resources.libs import clear
 from resources.libs import check
 from resources.libs import db

@@ -109,8 +109,8 @@ class Config:
 
     def init_paths(self):
         # Static variables
-        self.CLEANFREQ = ['Every Startup', 'Every Day', 'Every Three Days',
-                          'Weekly', 'Monthly']
+        self.CLEANFREQ = ['Cada día', 'Todos los días', 'Cada tres días',
+                          'Semanal', 'Mensual'']
         self.LOGFILES = ['log', 'xbmc.old.log', 'kodi.log']
         self.DEFAULTPLUGINS = ['metadata.album.universal',
                                'metadata.artists.universal',
@@ -214,10 +214,9 @@ class Config:
         self.EXTERROR = self.get_setting('errors')
         
         # View variables
-		self.SHOW22 = self.get_setting('show22')
+		
         self.SHOW21 = self.get_setting('show21')
-        self.SHOW20 = self.get_setting('show20')
-        self.SHOW19 = self.get_setting('show19')
+		self.SHOW22 = self.get_setting('show22')
         self.SHOWADULT = self.get_setting('adult')
         self.SEPARATE = self.get_setting('separate')
         self.DEVELOPER = self.get_setting('developer')

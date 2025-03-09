@@ -76,12 +76,15 @@ class Config:
         self.COLOR2 = uservar.COLOR2
         self.COLOR3 = uservar.COLOR3
         self.COLOR4 = uservar.COLOR4
+		self.COLOR5 = uservar.COLOR5
+		self.COLOR6 = uservar.COLOR6
         self.THEME1 = uservar.THEME1
         self.THEME2 = uservar.THEME2
         self.THEME3 = uservar.THEME3
         self.THEME4 = uservar.THEME4
         self.THEME5 = uservar.THEME5
         self.THEME6 = uservar.THEME6
+		self.THEME7 = uservar.THEME7
         self.HIDECONTACT = uservar.HIDECONTACT
         self.CONTACT = uservar.CONTACT
         self.CONTACTICON = uservar.CONTACTICON if not uservar.CONTACTICON.endswith('://') else self.ADDON_ICON
@@ -109,8 +112,8 @@ class Config:
 
     def init_paths(self):
         # Static variables
-        self.CLEANFREQ = ['Cada Inicio', 'Todos los Días', 'Cada Tres Días',
-                          'Semanalmente', 'Mensualmente']
+        self.CLEANFREQ = ['Every Startup', 'Every Day', 'Every Three Days',
+                          'Weekly', 'Monthly']
         self.LOGFILES = ['log', 'xbmc.old.log', 'kodi.log']
         self.DEFAULTPLUGINS = ['metadata.album.universal',
                                'metadata.artists.universal',
@@ -134,8 +137,8 @@ class Config:
                               'Textures13.db', 'Thumbs.db']
         self.XMLS = ['advancedsettings.xml', 'sources.xml', 'favourites.xml',
                      'profiles.xml', 'playercorefactory.xml', 'guisettings.xml']
-        self.MODURL = 'http://mirrors.kodi.tv/addons/matrix/'
-        self.MODURL2 = 'http://mirrors.kodi.tv/addons/jarvis/'
+        self.MODURL = 'http://mirrors.kodi.tv/addons/omega/'
+        self.MODURL2 = 'http://mirrors.kodi.tv/addons/piers/'
         self.DEPENDENCIES = ['script.module.bottle', 'script.module.certifi',
                              'script.module.chardet', 'script.module.idna',
                              'script.module.requests', 'script.module.six',
@@ -240,12 +243,14 @@ class Config:
         self.INCLUDETHECREW = self.get_setting('includethecrew')
         self.INCLUDEYODA = self.get_setting('includeyoda')
         self.INCLUDEVENOM = self.get_setting('includevenom')
-        self.INCLUDENUMBERS = int(self.get_setting('noteid'))        
+        #self.INCLUDENUMBERS = int(self.get_setting('noteid'))
+        self.INCLUDENUMBERS = self.get_setting('includenumbers')  
         self.INCLUDESCRUBS = self.get_setting('includescrubs')
         
         # Notification variables
         self.NOTIFY = self.get_setting('notify')
-        self.NOTEID = int(self.get_setting('noteid'))
+        #self.NOTEID = int(self.get_setting('noteid'))
+		self.NOTEID = self.get_setting('noteid')
         self.NOTEDISMISS = self.get_setting('notedismiss')
         
         # Save Data variables
@@ -315,10 +320,12 @@ class Config:
             use = 1
 
         if cat is not None:
-            category_id = cat + str(offset[use][0])
+            #category_id = cat + str(offset[use][0])
+			category_id = cat + offset[use][0]
             xbmc.executebuiltin('SetFocus({})'.format(category_id))
             if set is not None:
-                setting_id = set + str(offset[use][1])
+                #setting_id = set + str(offset[use][1])
+				setting_id = set + offset[use][1]
                 xbmc.executebuiltin('SetFocus({})'.format(setting_id))
                 
                 if activate:

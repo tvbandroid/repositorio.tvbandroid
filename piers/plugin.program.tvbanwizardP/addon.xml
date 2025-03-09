@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.program.tvbanwizardP" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="6.1.25" provider-name="[B][COLOR azure]JoseaTeba[/COLOR][/B]">
+<addon id="plugin.program.tvbanwizardP" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="6.0.25" provider-name="[B][COLOR azure]JoseaTeba[/COLOR][/B]">
     <requires>
         <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.accountmgr" optional="true"/>

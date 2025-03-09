@@ -364,7 +364,7 @@ class AddonMenu:
             os.makedirs(CONFIG.PACKAGES)
         
         progress_dialog.create(CONFIG.ADDONTITLE,
-                      '[COLOR {0}][B]Descargando:[/B][/COLOR] [COLOR {5}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR5, name)
+                      '[COLOR {0}][B]Descargando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name)
                       +'\n'+''
                       +'\n'+'[COLOR {0}]Espere por Favor[/COLOR]'.format(CONFIG.COLOR2))
         urlsplits = url.split('/')
@@ -374,7 +374,7 @@ class AddonMenu:
         except:
             pass
         Downloader().download(url, lib)
-        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {5}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR5, name)
+        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name)
         progress_dialog.update(0, title
                                 +'\n'+''
                                 +'\n'+'[COLOR {0}]Espere por Favor[/COLOR]'.format(CONFIG.COLOR2))
@@ -421,7 +421,7 @@ class AddonMenu:
         except:
             pass
         Downloader().download(url, lib)
-        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR2, name)
+        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name)
         progress_dialog.update(0, title
                                     +'\n'+''
                                     +'\n'+'[COLOR {0}]Espere por Favor[/COLOR]'.format(CONFIG.COLOR2))

@@ -58,7 +58,7 @@ def wipe():
         CONFIG.set_setting('loginnextsave', str(tools.get_date(days=3, formatted=True)))
 
     exclude_dirs = CONFIG.EXCLUDES
-    exclude_dirs.append('mi_build')
+    exclude_dirs.append('Mis_Builds')
     
     progress_dialog = xbmcgui.DialogProgress()
     
@@ -124,11 +124,11 @@ def wipe():
             elif name == 'advancedsettings.xml' and fold[-1] == 'userdata' and CONFIG.KEEPADVANCED == 'true':
                 logging.log("Mantener advancedsettings.xml: {0}".format(os.path.join(root, name)))
             elif name in CONFIG.LOGFILES:
-                logging.log("Mantener archivo Log: {0}".format(name))
+                logging.log("Mantener archivo del Log: {0}".format(name))
             elif name.endswith('.db'):
                 try:
                     if name == latestAddonDB:
-                        logging.log("Ignorando {0} en Kodi {1}".format(name, tools.kodi_version()))
+                        logging.log("Ignorando {0} en Kodi{1}".format(name, tools.kodi_version()))
                     else:
                         os.remove(os.path.join(root, name))
                 except Exception as e:
@@ -146,18 +146,18 @@ def wipe():
         if progress_dialog.iscanceled():
             progress_dialog.close()
             logging.log_notify(CONFIG.ADDONTITLE,
-                               "[COLOR {0}]Nuevo Comienzo Cancelado[/COLOR]".format(CONFIG.COLOR2))
+                               "[COLOR {0}]Fresh Start Cancelado[/COLOR]".format(CONFIG.COLOR2))
             return False
     for root, dirs, files in os.walk(xbmcPath, topdown=True):
         dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for name in dirs:
-            progress_dialog.update(100, '\n' + 'Limpieza de Carpetas Vacías: [COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, name))
+            progress_dialog.update(100, '\n' + '[B]Limpieza de Carpeta Vacía:[/B] [COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, name))
             if name not in ["Database", "userdata", "temp", "addons", "addon_data"]:
                 shutil.rmtree(os.path.join(root, name), ignore_errors=True, onerror=None)
         if progress_dialog.iscanceled():
             progress_dialog.close()
             logging.log_notify(CONFIG.ADDONTITLE,
-                               "[COLOR {0}]Nuevo Comienzo Cancelado[/COLOR]".format(CONFIG.COLOR2))
+                               "[COLOR {0}]Fresh Start Cancelado[/COLOR]".format(CONFIG.COLOR2))
             return False
             
     progress_dialog.close()
@@ -191,19 +191,22 @@ def fresh_start(install=None, over=False):
 
     elif install == 'restore':
         yes_pressed = dialog.yesno(CONFIG.ADDONTITLE,
-                                       "[COLOR {0}]¿Desea restaurar su".format(CONFIG.COLOR2)
-                                       +'\n'+"Configuración de Kodi a la configuración predeterminada"
-                                       +'\n'+"Antes de instalar la copia de seguridad local?[/COLOR]",
-                                       nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]',
+                                       "[COLOR {0}][B]Desea Restaurar su Configuración de Kodi[/B]".format(CONFIG.COLOR2)
+                                       +'\n'+"[B] a la Configuración Predeterminada,[/B]"
+                                       +'\n'+"[B]Antes de instalar la Copia de Seguridad local?[/B][/COLOR]",                                       
+									   nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]',
                                        yeslabel='[B][COLOR cyan]Continuar[/COLOR][/B]')
     elif install:
-        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]¿Desea restaurar su".format(CONFIG.COLOR2)
-                                       +'\n'+"Configuración de Kodi a la configuración predeterminada"
-                                       +'\n'+"Antes de instalar [COLOR {0}]{1}[/COLOR]?".format(CONFIG.COLOR1, install),
+        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}][B]Desea Restaurar su Configuración de Kodi[/B]".format(CONFIG.COLOR2)
+                                       +'\n'+"[B] a la Configuración Predeterminada[/B]"
+                                       +'\n'+"[B]Antes de instalar[/B] [COLOR {0}]{1}[/COLOR][B]?[/B]".format(CONFIG.COLOR1, install),
                                        nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]',
                                        yeslabel='[B][COLOR cyan]Continuar[/COLOR][/B]')
     else:
-        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]¿Desea restaurar su".format(CONFIG.COLOR2) +' \n' + "Configuración de Kodi a la configuración predeterminada?[/COLOR]", nolabel='[B][COLOR red]No, CancelAR[/COLOR][/B]', yeslabel='[B][COLOR CYAN]ContinuAR[/COLOR][/B]')
+        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}][B]Desea Restaurar su Configuración de Kodi[/B]".format(CONFIG.COLOR2) 
+                                       +'\n'+ "[B] a la Configuración Predeterminada?[/B][/COLOR]", 
+                                       nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]', 
+                                       yeslabel='[B][COLOR cyan]Continuar[/COLOR][/B]')
     if yes_pressed:
         wipe()
         
@@ -275,8 +278,8 @@ def install_apk(name, url):
         yes = True
         if os.path.exists(lib):
             redownload = dialog.yesno(CONFIG.ADDONTITLE, '[COLOR {}]{}[/COLOR] ya existe. Te gustaría volver a descargarlo?'.format(CONFIG.COLOR1, apk),
-                               yeslabel="[B][COLOR darkorange]Volver a descargar[/COLOR][/B]",
-                               nolabel="[B][COLOR cyan]Instalar[/COLOR][/B]")
+                               yeslabel="[B]Volver a descargar[/B]",
+                               nolabel="[B]Instalar[/B]")
             yes = False
         else:
             yes = dialog.yesno(CONFIG.ADDONTITLE,

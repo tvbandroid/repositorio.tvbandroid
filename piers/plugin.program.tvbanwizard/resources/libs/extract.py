@@ -90,11 +90,11 @@ def all_with_progress(_in, _out, dp, ignore, title):
         line1 = '{0} [COLOR {1}][B][Errores:{2}][/B][/COLOR]'.format(title,
                                                                     CONFIG.COLOR2,
                                                                     errors)
-        line2 = '[COLOR {0}][B]Archivo:[/B][/COLOR] [COLOR {1}]{2}/{3}[/COLOR] '.format(CONFIG.COLOR2,
+        line2 = '[COLOR {0}][B]Archivo:[/B][/COLOR] [COLOR {1}]{2}[/COLOR][COLOR white]/[/COLOR][COLOR {1}]{3}[/COLOR] '.format(CONFIG.COLOR2,
                                                                                      CONFIG.COLOR1,
                                                                                      count,
                                                                                      int(nFiles))
-        line2 += '[COLOR {0}][B]Tamaño:[/B][/COLOR] [COLOR {1}]{2}/{3}[/COLOR]'.format(CONFIG.COLOR2,
+        line2 += '[COLOR {0}][B]Tamaño:[/B][/COLOR] [COLOR {1}]{2}[/COLOR][COLOR white]/[/COLOR][COLOR {1}]{3}[/COLOR]'.format(CONFIG.COLOR2,
                                                                                      CONFIG.COLOR1,
                                                                                      tools.convert_size(size),
                                                                                      zipsize)
@@ -132,13 +132,13 @@ def all_with_progress(_in, _out, dp, ignore, title):
             try:
                 zin.extract(item, _out)
             except Exception as e:
-                errormsg = "[COLOR {0}]Archivo:[/COLOR] [COLOR {1}]{2}[/COLOR]\n".format(CONFIG.COLOR2,
+                errormsg = "[COLOR {0}][B]Archivo:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]\n".format(CONFIG.COLOR2,
                                                                                       CONFIG.COLOR1,
                                                                                       file[-1])
-                errormsg += "[COLOR {0}]Carpeta:[/COLOR] [COLOR {1}]{2}[/COLOR]\n".format(CONFIG.COLOR2,
+                errormsg += "[COLOR {0}][B]Carpeta:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]\n".format(CONFIG.COLOR2,
                                                                                          CONFIG.COLOR1,
                                                                                          item.filename.replace(file[-1], ''))
-                errormsg += "[COLOR {0}]Error:[/COLOR] [COLOR {1}]{2}[/COLOR]\n\n".format(CONFIG.COLOR2,
+                errormsg += "[COLOR {0}][B]Error:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]\n\n".format(CONFIG.COLOR2,
                                                                                           CONFIG.COLOR1,
                                                                                           str(e).replace('\\\\', '\\')
                                                                                           .replace("'{0}'"

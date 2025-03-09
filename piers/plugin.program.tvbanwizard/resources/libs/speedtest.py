@@ -248,7 +248,7 @@ def get_config():
     request = build_request('http://www.speedtest.net/speedtest-config.php')
     uh = catch_request(request)
     if uh is False:
-        logging.log('No se pudo recuperar la configuración de: {0}'.format(uh), level=xbmc.LOGDEBUG)
+        logging.log('Could not retrieve speedtest.net configuration: {0}'.format(uh), level=xbmc.LOGDEBUG)
         sys.exit(1)
 
     configxml = []
@@ -278,7 +278,7 @@ def get_config():
                 'upload': get_attributes_by_tag_name(root, 'upload'),
                 }
     except SyntaxError:
-        logging.log('Error al analizar la configuración de speedtest.net', level=xbmc.LOGDEBUG)
+        logging.log('Failed to parse speedtest.net configuration', level=xbmc.LOGDEBUG)
         sys.exit(1)
 
     del root
@@ -337,7 +337,7 @@ def closest_servers(client, all=False):
         if servers:
             break
     if not servers:
-        logging.log('Error al recuperar la lista de servidores speedtest.net: {0}'.format('\n'.join(errors)), level=xbmc.LOGDEBUG)
+        logging.log('Failed to retrieve list of speedtest.net servers: {0}'.format('\n'.join(errors)), level=xbmc.LOGDEBUG)
         sys.exit(1)
     closest = []
     for d in sorted(servers.keys()):
@@ -389,7 +389,7 @@ def get_best_server(servers):
 def ctrl_c():
     global shutdown_event
     shutdown_event.set()
-    raise SystemExit('\nCancelando...')
+    raise SystemExit('\nCancelling...')
 
 
 def version():
@@ -402,38 +402,38 @@ def speedtest(list=False, mini=None, server=None, share=True, simple=False, src=
     global line1, line2, line3
 
     dp = xbmcgui.DialogProgress()
-    line1 = '[COLOR {0}]iniciando prueba..[/COLOR]'.format(CONFIG.COLOR2)
-    dp.create('{0}: [COLOR {1}]Prueba de velocidad[/COLOR]'.format(CONFIG.ADDONTITLE, CONFIG.COLOR1), line1)
+    line1 = '[COLOR {0}]Starting test..[/COLOR]'.format(CONFIG.COLOR2)
+    dp.create('{0}: [COLOR {1}]Speed Test[/COLOR]'.format(CONFIG.ADDONTITLE, CONFIG.COLOR1), line1)
     dp.update(0)
-    logging.log('Recuperando la configuración de speedtest.net...', level=xbmc.LOGDEBUG)
-    line2 = '[COLOR {0}]Recuperando la configuración de speedtest.net...[/COLOR]'.format(CONFIG.COLOR2)
+    logging.log('Retrieving speedtest.net configuration...', level=xbmc.LOGDEBUG)
+    line2 = '[COLOR {0}]Retrieving speedtest.net configuration...[/COLOR]'.format(CONFIG.COLOR2)
     dp.update(2, line1, line2)
     try:
         config = get_config()
     except URLError as e:
-        logging.log('no se puede recuperar la configuración de speedtest: {0}'.format(e), level=xbmc.LOGDEBUG)
+        logging.log('Cannot retrieve speedtest configuration: {0}'.format(e), level=xbmc.LOGDEBUG)
         sys.exit(1)
 
-    logging.log('Recuperando la lista de servidores de speedtest.net...', level=xbmc.LOGDEBUG)
-    line3 = '[COLOR {0}]Recuperando la lista de servidores de speedtest.net...[/COLOR]'.format(CONFIG.COLOR2)
+    logging.log('Retrieving speedtest.net server list...', level=xbmc.LOGDEBUG)
+    line3 = '[COLOR {0}]Retrieving speedtest.net server list...[/COLOR]'.format(CONFIG.COLOR2)
     dp.update(4, line1, line2, line3)
 
     servers = closest_servers(config['client'])
 
-    logging.log('Probando desde %(isp)s (%(ip)s)...' % config['client'], level=xbmc.LOGDEBUG)
+    logging.log('Testing from %(isp)s (%(ip)s)...' % config['client'], level=xbmc.LOGDEBUG)
     line1 = '[COLOR ' + CONFIG.COLOR2 + ']Testing From:[/COLOR] [COLOR ' \
         + CONFIG.COLOR1 + ']%(isp)s (%(ip)s)[/COLOR]' % config['client']
     dp.update(6, line1)
 
-    logging.log('Selección del mejor servidor en función de la latencia...', level=xbmc.LOGDEBUG)
-    line2 = '[COLOR {0}]Selección del mejor servidor en función de la latencia...[/COLOR]'.format(CONFIG.COLOR2)
+    logging.log('Selecting best server based on latency...', level=xbmc.LOGDEBUG)
+    line2 = '[COLOR {0}]Selecting best server based on latency...[/COLOR]'.format(CONFIG.COLOR2)
     dp.update(8, '', line2)
     best = get_best_server(servers)
 
-    logging.log('Alojado por %(sponsor)s (%(name)s) [%(d)0.2f km]: %(latency)s ms' % best)
+    logging.log('Hosted by %(sponsor)s (%(name)s) [%(d)0.2f km]: %(latency)s ms' % best)
 
     line2 = ('[COLOR ' + CONFIG.COLOR2
-             + ']Ubicación del servidor: %(name)s [%(d)0.2f km]: %(latency)s ms[/COLOR]' % best)
+             + ']Server location: %(name)s [%(d)0.2f km]: %(latency)s ms[/COLOR]' % best)
     dp.update(10, '', line2)
 
     sizes = [350, 500, 750, 1000, 1500, 2000, 2500, 3000, 3500, 4000]
@@ -442,12 +442,12 @@ def speedtest(list=False, mini=None, server=None, share=True, simple=False, src=
         for i in range(0, 4):
             urls.append('{0}/random{1}x{2}.jpg'.format(os.path.dirname(best['url']), size, size))
 
-    logging.log('Probando la velocidad de descarga', level=xbmc.LOGDEBUG)
-    line3 = '[COLOR {0}]Probando la velocidad de descarga...[/COLOR]'.format(CONFIG.COLOR2)
+    logging.log('Testing download speed', level=xbmc.LOGDEBUG)
+    line3 = '[COLOR {0}]Testing download speed...[/COLOR]'.format(CONFIG.COLOR2)
     dp.update(15, '', '', line3)
     dlspeed = download_speed(urls, simple)
 
-    logging.log('Descarga: %0.2f M%s/s' % (dlspeed / 1000 / 1000 * units[1], units[0]))
+    logging.log('Download: %0.2f M%s/s' % (dlspeed / 1000 / 1000 * units[1], units[0]))
 
     sizesizes = [int(.25 * 1000 * 1000), int(.5 * 1000 * 1000)]
     sizes = []
@@ -455,9 +455,9 @@ def speedtest(list=False, mini=None, server=None, share=True, simple=False, src=
         for i in range(0, 25):
             sizes.append(size)
 
-    logging.log('[COLOR red]Probando la velocidad de carga[/COLOR]', level=xbmc.LOGDEBUG)
-    line2 = '[COLOR %s]Probando la velocidad de descarga:[/COLOR] [COLOR %s]%0.2f M%s/s[/COLOR]' % (CONFIG.COLOR2, CONFIG.COLOR1, dlspeed / 1000 / 1000 * units[1], units[0])
-    line3 = '[COLOR {0}]Probando la velocidad de carga...[/COLOR]'.format(CONFIG.COLOR2)
+    logging.log('[COLOR red]Testing upload speed[/COLOR]', level=xbmc.LOGDEBUG)
+    line2 = '[COLOR %s]Testing download speed:[/COLOR] [COLOR %s]%0.2f M%s/s[/COLOR]' % (CONFIG.COLOR2, CONFIG.COLOR1, dlspeed / 1000 / 1000 * units[1], units[0])
+    line3 = '[COLOR {0}]Testing upload speed...[/COLOR]'.format(CONFIG.COLOR2)
     dp.update(65, '', line2, line3)
     ulspeed = upload_speed(best['url'], sizes, simple)
 
@@ -476,8 +476,8 @@ def speedtest(list=False, mini=None, server=None, share=True, simple=False, src=
             return uploadfail
 
     line1 = line2
-    line2 = '[COLOR %s]Probando la velocidad de carga:[/COLOR] [COLOR %s]%0.2f M%s/s[/COLOR]' % (CONFIG.COLOR2, CONFIG.COLOR1, ulspeed / 1000 / 1000 * units[1], units[0])
-    line3 = '[COLOR %s]Obteniendo resultados...[/COLOR]' % CONFIG.COLOR2
+    line2 = '[COLOR %s]Testing upload speed:[/COLOR] [COLOR %s]%0.2f M%s/s[/COLOR]' % (CONFIG.COLOR2, CONFIG.COLOR1, ulspeed / 1000 / 1000 * units[1], units[0])
+    line3 = '[COLOR %s]Getting results...[/COLOR]' % CONFIG.COLOR2
     dp.update(95, line1, line2, line3)
 
     if share:
@@ -502,14 +502,14 @@ def speedtest(list=False, mini=None, server=None, share=True, simple=False, src=
                                 headers=headers)
         f = catch_request(request)
         if f is False:
-            logging.log('No se pudieron enviar los resultados a speedtest.net: {0}'.format(e), level=xbmc.LOGDEBUG)
+            logging.log('Could not submit results to speedtest.net: {0}'.format(e), level=xbmc.LOGDEBUG)
             sys.exit(1)
         response = f.read()
         code = f.code
         f.close()
 
         if int(code) != 200:
-            logging.log('No se pudieron enviar los resultados a speedtest.net', level=xbmc.LOGDEBUG)
+            logging.log('Could not submit results to speedtest.net', level=xbmc.LOGDEBUG)
             sys.exit(1)
 
         qsargs = parse_qs(response.decode())
@@ -518,7 +518,7 @@ def speedtest(list=False, mini=None, server=None, share=True, simple=False, src=
             logging.log('Could not submit results to speedtest.net', level=xbmc.LOGDEBUG)
             sys.exit(1)
 
-        logging.log('Compartir resultados: {0}://www.speedtest.net/result/{1}.png'.format(scheme, resultid[0]), level=xbmc.LOGDEBUG)
+        logging.log('Share results: {0}://www.speedtest.net/result/{1}.png'.format(scheme, resultid[0]), level=xbmc.LOGDEBUG)
 
         dp.close()
 
@@ -596,7 +596,7 @@ def main():
     try:
         speedtest()
     except KeyboardInterrupt:
-        logging.log('\nCancelando...', level=xbmc.LOGDEBUG)
+        logging.log('\nCancelling...', level=xbmc.LOGDEBUG)
         dp = xbmcgui.DialogProgress()
         dp.close()
         sys.exit()

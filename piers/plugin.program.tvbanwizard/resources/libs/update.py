@@ -44,15 +44,14 @@ def wizard_update():
             return
         if ver > CONFIG.ADDON_VERSION:
             yes = dialog.yesno(CONFIG.ADDONTITLE,
-                                   '[COLOR {0}]Hay una nueva versión del {1}!'.format(CONFIG.COLOR2, CONFIG.ADDONTITLE)
-                                   +'\n'+'¿Quieres descargar [COLOR {0}]v{1}[/COLOR]?[/COLOR]'.format(CONFIG.COLOR1, ver),
-                                   nolabel='[B][COLOR red]Recuérdame Más Tarde[/COLOR][/B]',
-                                   yeslabel="[B][COLOR springgreen]Actualizar Wizard[/COLOR][/B]")
+                                   '[COLOR {0}]Hay una nueva versión de{1}!'.format(CONFIG.COLOR2, CONFIG.ADDONTITLE)
+                                   +'\n'+'¿Quieres descargar la [COLOR {0}]v{1}[/COLOR]?[/COLOR]'.format(CONFIG.COLOR1, ver),
+                                   nolabel='[B][COLOR red]Recordar Más tarde[/COLOR][/B]',
+                                   yeslabel="[B][COLOR cyan]Actualizar[/COLOR][/B]")
             if yes:
                 from resources.libs import db
                 from resources.libs.common import tools
 
-                logging.log("[Wizard de Actualización Automática] Instalación Wizard v{0}".format(ver))
                 progress_dialog.create(CONFIG.ADDONTITLE, '[COLOR {0}]Descargando Actualización...'.format(CONFIG.COLOR2)
                                         +'\n'+''
                                         +'\n'+'Espere por favor[/COLOR]')
@@ -65,7 +64,7 @@ def wizard_update():
                 from resources.libs import extract
                 Downloader().download(zip, lib)
                 xbmc.sleep(2000)
-                progress_dialog.update(0, '\n'+"Instalación {0} actualizar".format(CONFIG.ADDONTITLE))
+                progress_dialog.update(0, '\n'+"Instalando {0} Actualización".format(CONFIG.ADDONTITLE))
                 percent, errors, error = extract.all(lib, CONFIG.ADDONS, True)
                 progress_dialog.close()
                 xbmc.sleep(1000)
@@ -73,15 +72,15 @@ def wizard_update():
                 xbmc.sleep(1000)
                 logging.log_notify(CONFIG.ADDONTITLE,
                                    '[COLOR {0}]Add-on actualizado[/COLOR]'.format(CONFIG.COLOR2))
-                logging.log("[Wizard de Actualización Automática] Wizard actualizado a v{0}".format(ver))
+                logging.log("[Auto Update Wizard] Wizard actualizado a la v{0}".format(ver))
                 tools.remove_file(os.path.join(CONFIG.ADDON_DATA, 'settings.xml'))
                 window.show_save_data_settings()
             else:
-                logging.log("[Wizard de Actualización Automática] Instalar Nuevo Wizard Ignorado: {0}".format(ver))
+                logging.log("[Auto Update Wizard] Instalación del Wizard Nuevo Ignorado: {0}".format(ver))
         else:
-            logging.log("[Wizard de Actualización Automática] Sin Nueva Versión v{0}".format(ver))
+            logging.log("[Auto Update Wizard] No hay Nueva Versión v{0}".format(ver))
     else:
-        logging.log("[Wizard de Actualización Automática] La URL del archivo del Wizard no es válida: {0}".format(CONFIG.BUILDFILE))
+        logging.log("[Auto Update Wizard] URL del Archivo del Wizard no válida: {0}".format(CONFIG.BUILDFILE))
 
 
 def addon_updates(do=None):
@@ -113,7 +112,7 @@ def toggle_addon_updates():
     
     setting = '"general.addonupdates"'
     selected = 0
-    options = ['Instalar actualizaciones automáticamente', 'Notificar, pero no instalar actualizaciones', 'Nunca comprobar si hay actualizaciones']
+    options = ['Instalar actualizaciones automáticamente', 'Notificar, pero no instalar actualizaciones', 'Nunca buscar actualizaciones']
     set_query = '{{"jsonrpc":"2.0", "method":"Settings.SetSettingValue","params":{{"setting":"general.addonupdates","value":{0}}}, "id":1}}'
     
     dialog = xbmcgui.Dialog()

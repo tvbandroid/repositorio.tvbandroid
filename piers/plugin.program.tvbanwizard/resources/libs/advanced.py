@@ -35,7 +35,7 @@ def view_current():
 
 def remove_current():
     dialog = xbmcgui.Dialog()
-    ok = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]Está seguro de que desea eliminar el [COLOR khaki]advancedsettings.xml[/COLOR] actual?[/COLOR]".format(CONFIG.COLOR2),
+    ok = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]Está seguro de que desea eliminar el advancedsettings.xml actual?[/COLOR]".format(CONFIG.COLOR2),
                                            yeslabel="[B][COLOR cyan]Si[/COLOR][/B]",
                                            nolabel="[B][COLOR red]No[/COLOR][/B]")
 
@@ -43,14 +43,14 @@ def remove_current():
         if os.path.exists(CONFIG.ADVANCED):
             tools.remove_file(CONFIG.ADVANCED)
             logging.log_notify("[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, CONFIG.ADDONTITLE),
-                               "[COLOR {0}][COLOR khaki]advancedsettings.xml eliminado[/COLOR]".format(CONFIG.COLOR2))
+                               "[COLOR {0}]advancedsettings.xml eliminado[/COLOR]".format(CONFIG.COLOR2))
             xbmc.executebuiltin('Container.Refresh()')
         else:
             logging.log_notify("[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, CONFIG.ADDONTITLE),
-                               "[COLOR {0}][COLOR khaki]advancedsettings.xml no encontrado[/COLOR]".format(CONFIG.COLOR2))
+                               "[COLOR {0}]advancedsettings.xml no encontrado[/COLOR]".format(CONFIG.COLOR2))
     else:
         logging.log_notify("[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, CONFIG.ADDONTITLE),
-                               "[COLOR {0}][COLOR khaki]advancedsettings.xml no eliminado[/COLOR]".format(CONFIG.COLOR2))
+                               "[COLOR {0}]advancedsettings.xml no eliminado[/COLOR]".format(CONFIG.COLOR2))
 
 
 def _write_setting(category, tag, value):
@@ -75,7 +75,7 @@ def _write_setting(category, tag, value):
 
     tree = ElementTree.ElementTree(root)
 
-    logging.log('Escribiendo {0} - {1}: {2} a [COLOR khaki]advancedsettings.xml[/COLOR]'.format(category, tag, value), level=xbmc.LOGDEBUG)
+    logging.log('Writing {0} - {1}: {2} to advancedsettings.xml'.format(category, tag, value), level=xbmc.LOGDEBUG)
     tree.write(CONFIG.ADVANCED)
 
     xbmc.executebuiltin('Container.Refresh()')
@@ -88,15 +88,15 @@ class AdvancedMenu:
         self.tags = {}
 
     def show_menu(self, url=None):
-        directory.add_dir('[COLOR azure]Configuración Rápida [COLOR khaki]advancedsettings.xml[/COLOR]',
+        directory.add_dir('[COLOR azure]Configuración Rápida advancedsettings.xml[/COLOR]',
                                {'mode': 'advanced_settings', 'action': 'quick_configure'}, icon=CONFIG.ICONMAINT,
                                themeit=CONFIG.THEME3)
 
         if os.path.exists(CONFIG.ADVANCED):
-            directory.add_file('Ver Actual [COLOR khaki]advancedsettings.xml[/COLOR]',
+            directory.add_file('Ver Actual advancedsettings.xml',
                                {'mode': 'advanced_settings', 'action': 'view_current'}, icon=CONFIG.ICONMAINT,
                                themeit=CONFIG.THEME3)
-            directory.add_file('Eliminar Actual [COLOR khaki]advancedsettings.xml[/COLOR]',
+            directory.add_file('Eliminar Actual advancedsettings.xml',
                                {'mode': 'advanced_settings', 'action': 'remove_current'}, icon=CONFIG.ICONMAINT,
                                themeit=CONFIG.THEME3)
         
@@ -137,10 +137,10 @@ class AdvancedMenu:
                         description = preset.get('description', '')
 
                         if not name:
-                            logging.log('[Advanced Settings] Etiqueta faltante \'name\'', level=xbmc.LOGDEBUG)
+                            logging.log('[Advanced Settings] Missing tag \'name\'', level=xbmc.LOGDEBUG)
                             continue
                         if not preseturl:
-                            logging.log('[Advanced Settings] Etiqueta faltante \'url\'', level=xbmc.LOGDEBUG)
+                            logging.log('[Advanced Settings] Missing tag \'url\'', level=xbmc.LOGDEBUG)
                             continue
                         
                         if section:
@@ -155,8 +155,8 @@ class AdvancedMenu:
             logging.log("[Advanced Settings] URL no funciona: {0}".format(CONFIG.ADVANCEDFILE))
 
     def quick_configure(self):
-        directory.add_file('[COLOR azure]Los cambios no se reflejarán hasta que se reinicie [COLOR cyan]Kodi.[/COLOR]', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
-        directory.add_file('[COLOR azure]Haga Clic aquí para reiniciar [COLOR cyan]Kodi.[/COLOR]', {'mode': 'forceclose'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_file('[COLOR azure]Los cambios no se reflejarán hasta que se reinicie Kodi.[/COLOR]', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_file('[COLOR azure]Haga Clic aquí para reiniciar Kodi.[/COLOR]', {'mode': 'forceclose'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         # directory.add_file('Más categorías próximamente :)', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_separator(middle='[B]CATEGORIAS[/B]')
         # directory.add_dir('Troubleshooting', {'mode': 'advanced_settings', 'action': 'show_section', 'tags': 'loglevel|jsonrpc'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
@@ -188,7 +188,7 @@ class AdvancedMenu:
                 self.tags[name] = values
 
         if len(self.tags) == 0:
-            directory.add_file('No existe ninguna configuración para esta categoría en su [COLOR khaki]advancedsettings.xml[/COLOR] file.', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+            directory.add_file('No existe ninguna configuración para esta categoría en su advancedsettings.xml file.', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
             directory.add_separator()
             
         for category in self.tags:
@@ -260,7 +260,7 @@ class AdvancedMenu:
         if response:
             if os.path.exists(CONFIG.ADVANCED):
                 choice = self.dialog.yesno(CONFIG.ADDONTITLE,
-                                           "[COLOR {0}]Le gustaría sobrescribir su [COLOR khaki]Advanced Settings[/COLOR] actual [COLOR {1}]{2}[/COLOR]?[/COLOR]".format(
+                                           "[COLOR {0}]Le gustaría sobrescribir su Advanced Settings actual [COLOR {1}]{2}[/COLOR]?[/COLOR]".format(
                                                CONFIG.COLOR2, CONFIG.COLOR1, name),
                                            yeslabel="[B][COLOR cyan]Sobrescribir[/COLOR][/B]",
                                            nolabel="[B][COLOR red]Cancelar[/COLOR][/B]")
@@ -273,7 +273,7 @@ class AdvancedMenu:
 
             if choice == 1:
                 tools.write_to_file(CONFIG.ADVANCED, response.text)
-                tools.kill_kodi(msg='[COLOR {0}]El nuevo ajuste preestablecido [COLOR khaki]advancedsettings.xml[/COLOR] se ha escrito correctamente, pero los cambios no surtirán efecto hasta que cierre [COLOR cyan]Kodi.[/COLOR]'.format(
+                tools.kill_kodi(msg='[COLOR {0}]El nuevo ajuste preestablecido advancedsettings.xml se ha escrito correctamente, pero los cambios no surtirán efecto hasta que cierre Kodi.[/COLOR]'.format(
                                    CONFIG.COLOR2))
             else:
                 logging.log("[Advanced Settings] instalación canceleda")

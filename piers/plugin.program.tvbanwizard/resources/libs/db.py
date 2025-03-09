@@ -203,7 +203,7 @@ def purge_db():
                 display.append('({0}) {1}'.format(dir[len(dir)-2], dir[len(dir)-1]))
     choice = dialog.multiselect("[COLOR {0}]Seleccione el archivo DB para Purgar[/COLOR]".format(CONFIG.COLOR2), display)
     if choice is None or len(choice) == 0:
-        logging.log_notify("[COLOR {0}][COLOR white]Purge Database[/COLOR]".format(CONFIG.COLOR1),
+        logging.log_notify("[COLOR {0}][COLOR gold]Purge Database[/COLOR]".format(CONFIG.COLOR1),
                            "[COLOR {0}][COLOR gold]Cancelado[/COLOR]".format(CONFIG.COLOR2))
     else:
         for purge in choice:

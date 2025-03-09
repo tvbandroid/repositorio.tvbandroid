@@ -30,12 +30,12 @@ from resources.libs.common.config import CONFIG
 class MaintenanceMenu:
 
     def get_listing(self):
-        directory.add_dir('[B][COLOR khaki]Herramientas de Limpieza[/COLOR][/B]', {'mode': 'maint', 'name': 'clean'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
-        directory.add_dir('[B][COLOR khaki]Herramientas de Addon[/COLOR][/B]', {'mode': 'maint', 'name': 'addon'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
-        directory.add_dir('[B][COLOR khaki]Herramientas de Registro[/COLOR][/B]', {'mode': 'maint', 'name': 'logging'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
+        directory.add_dir('[B]Herramientas de Limpieza[/B]', {'mode': 'maint', 'name': 'clean'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
+        directory.add_dir('[B]Herramientas de Addon[/B]', {'mode': 'maint', 'name': 'addon'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
+        directory.add_dir('[B]Herramientas de Registro[/B]', {'mode': 'maint', 'name': 'logging'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
         directory.add_dir('[B]Mantenimiento Misc[/B]', {'mode': 'maint', 'name': 'misc'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
         directory.add_dir('[B]Copia de Seguridad/Restaurar[/B]', {'mode': 'maint', 'name': 'backup'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
-        directory.add_dir('[B]Ajustes/Correcciones del Sistema[/B]', {'mode': 'maint', 'name': 'tweaks'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME2)
+        directory.add_dir('[B]Ajustes/Correcciones del Sistema[/B]', {'mode': 'maint', 'name': 'tweaks'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
 
     def clean_menu(self):
         from resources.libs import clear
@@ -64,7 +64,7 @@ class MaintenanceMenu:
                            {'mode': 'clearcache'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         if xbmc.getCondVisibility('System.HasAddon(script.module.urlresolver)') or xbmc.getCondVisibility(
                 'System.HasAddon(script.module.resolveurl)'):
-            directory.add_file('Borrar Caches de Función de Resolver', {'mode': 'clearfunctioncache'}, icon=CONFIG.ICONMAINT,
+            directory.add_file('Borrar Cache de Función de Resolver', {'mode': 'clearfunctioncache'}, icon=CONFIG.ICONMAINT,
                                themeit=CONFIG.THEME3)
         directory.add_file('Borrar Paquetes: [COLOR azure][B]{0}[/B][/COLOR]'.format(tools.convert_size(sizepack)),
                            {'mode': 'clearpackages'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
@@ -158,15 +158,15 @@ class MaintenanceMenu:
                 directory.add_file(
                     '--- Include Yoda: {0}'.format(includeyoda.replace('true', on).replace('false', off)),
                     {'mode': 'togglecache', 'name': 'includeyoda'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
-            directory.add_file('[COLOR azure]---[/COLOR] Habilitar Todos los Addons de Video', {'mode': 'togglecache', 'name': 'true'}, icon=CONFIG.ICONMAINT,
+            directory.add_file('[COLOR azure]---[/COLOR] Habilitar TODOS los Addons de Video', {'mode': 'togglecache', 'name': 'true'}, icon=CONFIG.ICONMAINT,
                                themeit=CONFIG.THEME3)
-            directory.add_file('[COLOR azure]---[/COLOR] Desactivar Todos los Addons de Video', {'mode': 'togglecache', 'name': 'false'}, icon=CONFIG.ICONMAINT,
+            directory.add_file('[COLOR azure]---[/COLOR] Desactivar TODOS los Addons de Video', {'mode': 'togglecache', 'name': 'false'}, icon=CONFIG.ICONMAINT,
                                themeit=CONFIG.THEME3)
 
     def addon_menu(self):
         directory.add_file('[B][COLOR red]Eliminar Addons[/COLOR][/B]', {'mode': 'removeaddons'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_dir('[B][COLOR red]Eliminar Addon Data[/COLOR][/B]', {'mode': 'removeaddondata'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
-        directory.add_dir('[B][COLOR green]Habilitar[COLOR cyan]/[COLOR orange]Deshabilitar[/COLOR] [COLOR cyan]Addons[/B]', {'mode': 'enableaddons'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_dir('[B]Habilitar/Deshabilitar Addons[/B]', {'mode': 'enableaddons'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         # directory.add_file('Enable/Disable Adult Addons', 'toggleadult', icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('[B]Forzar Actualización de Todos los Repositorios[/B]', {'mode': 'forceupdate'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('[B]Forzar Actualización de Todos los Addons[/B]', {'mode': 'forceupdate', 'action': 'auto'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
@@ -174,7 +174,7 @@ class MaintenanceMenu:
    
     def logging_menu(self):
         errors = int(logging.error_checking(count=True))
-        errorsfound = str(errors) + ' Error(es) Encontrado' if errors > 0 else '[COLOR azure]Nada Encontrado[/COLOR]'
+        errorsfound = str(errors) + 'Error(es) Encontrado' if errors > 0 else '[COLOR gold]Nada Encontrado[/COLOR]'
         wizlogsize = ': [COLOR red]No Encontrado[/COLOR]' if not os.path.exists(
             CONFIG.WIZLOG) else ": [COLOR azure]{0}[/COLOR]".format(
             tools.convert_size(os.path.getsize(CONFIG.WIZLOG)))
@@ -218,10 +218,11 @@ class MaintenanceMenu:
         directory.add_file('[Restaurar]: [COLOR azure]Addon_Data Externo[/COLOR]', {'mode': 'restore', 'action': 'addondata', 'name': 'external'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
 
     def tweaks_menu(self):
-        directory.add_dir('[COLOR khaki]Advanced Settings[/COLOR]', {'mode': 'advanced_settings'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_dir('Advanced Settings', {'mode': 'advanced_settings'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('Escanear Fuentes en busca de Enlaces Rotos', {'mode': 'checksources'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('Buscar Repositorios Rotos', {'mode': 'checkrepos'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('Eliminar nombres de archivo que No sean ASCII', {'mode': 'asciicheck'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         # directory.add_file('Toggle Passwords On Keyboard Entry', {'mode': 'togglepasswords'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
-        directory.add_dir('[COLOR azure]Forzar Cierre Kodi[/COLOR]', {'mode': 'forceclose'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_file('Convertir Rutas en Especiales', {'mode': 'convertpath'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_dir('Forzar Cierre Kodi', {'mode': 'forceclose'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_dir('Información del Sistema', {'mode': 'systeminfo'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)

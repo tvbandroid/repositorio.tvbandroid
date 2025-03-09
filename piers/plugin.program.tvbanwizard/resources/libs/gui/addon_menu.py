@@ -288,7 +288,7 @@ class AddonMenu:
             repo_id = urls[1]
         
             if not xbmc.getCondVisibility('System.HasAddon({0})'.format(repo_id)):
-                logging.log("Repository not installed, installing it")
+                logging.log("Repositorio no instalado, instalandolo")
 
                 from xml.etree import ElementTree
                 root = ElementTree.fromstring(repositoryxml_response.text.encode('ascii', 'backslashreplace'))
@@ -313,13 +313,13 @@ class AddonMenu:
                     logging.log(
                         "[Addon Installer] Repositorio no instalado: [COLOR gold]No se puede obtener la URL![/COLOR] ({0})".format(urls[1]))
             else:
-                logging.log("Repository installed, installing addon")
+                logging.log("Repositorio instalado, instalando addon")
                 install = install_from_kodi(plugin)
                 if install:
                     xbmc.executebuiltin('Container.Refresh()')
                     return True
         elif url_response:
-            logging.log("No repository, installing addon")
+            logging.log("Sin repositorio, instalando addon")
             self.install_addon_from_url(plugin, urls[0])
 
             if os.path.exists(os.path.join(CONFIG.ADDONS, plugin)):
@@ -364,7 +364,7 @@ class AddonMenu:
             os.makedirs(CONFIG.PACKAGES)
         
         progress_dialog.create(CONFIG.ADDONTITLE,
-                      '[COLOR {0}][B]Descargando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name)
+                      '[COLOR {0}][B]Descargando:[/B][/COLOR] [COLOR {5}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR5, name)
                       +'\n'+''
                       +'\n'+'[COLOR {0}]Espere por Favor[/COLOR]'.format(CONFIG.COLOR2))
         urlsplits = url.split('/')
@@ -374,7 +374,7 @@ class AddonMenu:
         except:
             pass
         Downloader().download(url, lib)
-        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name)
+        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {5}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR5, name)
         progress_dialog.update(0, title
                                 +'\n'+''
                                 +'\n'+'[COLOR {0}]Espere por Favor[/COLOR]'.format(CONFIG.COLOR2))
@@ -421,7 +421,7 @@ class AddonMenu:
         except:
             pass
         Downloader().download(url, lib)
-        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, name)
+        title = '[COLOR {0}][B]Instalando:[/B][/COLOR] [COLOR {1}]{2}[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR2, name)
         progress_dialog.update(0, title
                                     +'\n'+''
                                     +'\n'+'[COLOR {0}]Espere por Favor[/COLOR]'.format(CONFIG.COLOR2))

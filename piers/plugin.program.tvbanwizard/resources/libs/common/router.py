@@ -29,7 +29,6 @@ class Router:
         _url = sys.argv[0]
 
         self.params = dict(parse_qsl(paramstring))
-
         logstring = '{0}: '.format(_url)
         for param in self.params:
             logstring += '[ {0}: {1} ] '.format(param, self.params[param])
@@ -45,6 +44,8 @@ class Router:
         url = self.params['url'] if 'url' in self.params else None
         name = self.params['name'] if 'name' in self.params else None
         action = self.params['action'] if 'action' in self.params else None
+        icon = self.params.get('icon', '')
+        description = self.params.get('description', '')
 
         # MAIN MENU
         if mode is None:
@@ -54,7 +55,7 @@ class Router:
 
         # SETTINGS
         elif mode == 'settings':  # OpenWizard settings
-            CONFIG.open_settings(cat = name)
+            CONFIG.open_settings(name)
             xbmc.executebuiltin('Container.Refresh()')
         elif mode == 'opensettings':  # Open other addons' settings
             settings_id = eval(url.upper() + 'ID')[name]['plugin']
@@ -171,7 +172,7 @@ class Router:
             self._finish(handle)
         elif mode == 'viewVideo':  # View  Video
             from resources.libs import yt
-            yt.play_video(url)
+            yt.play_video(name, url, icon, description)
         elif mode == 'trakt':  # Save Data -> Keep Trakt Data
             menu.trakt_menu()
             self._finish(handle)
@@ -311,7 +312,7 @@ class Router:
             from resources.libs.common import tools
             tools.remove_file(CONFIG.WIZLOG)
             logging.log_notify("[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, CONFIG.ADDONTITLE),
-                               "[COLOR {0}]Wizard Log Borrado![/COLOR]".format(CONFIG.COLOR2))
+                               "[COLOR {0}]Wizard Log Cleared![/COLOR]".format(CONFIG.COLOR2))
 
         # ADVANCED SETTINGS
         elif mode == advanced_settings_mode:

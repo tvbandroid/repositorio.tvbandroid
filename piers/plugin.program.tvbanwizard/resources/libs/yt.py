@@ -1,3 +1,42 @@
+import sys
+import re
+import requests
+import xbmc
+import xbmcgui
+
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:132.0) Gecko/20100101 Firefox/132.0'
+HEADERS = {"User-Agent": USER_AGENT}
+
+def play_video(name: str, url: str, icon:str, description:str):
+    link = resolve_rumble(url)
+    if not link:
+        sys.exit()
+    liz = xbmcgui.ListItem(name, path=link)
+    liz.setInfo('video', {'title': name, 'plot': description})
+    liz.setArt({'thumb': icon, 'icon': icon, 'poster': icon})
+    xbmc.Player().play(link, liz)
+
+def resolve_rumble(url: str):
+    _id = ''
+    response = requests.get(url, headers=HEADERS, timeout=10).text
+    pattern = r'"video":"(.+?)"'
+    match = re.findall(pattern, response)
+    if match:
+        _id = match[0]
+        link = f'https://rumble.com/embedJS/u3/?request=video&ver=2&v={_id}'
+        retry = 1
+        while retry <= 5:
+            response = requests.get(link, headers=HEADERS, timeout=10).json()
+            mp4 = response['ua']['mp4']
+            if not mp4:
+                xbmc.sleep(1000)
+                retry += 1
+                continue
+            mp4_sorted = dict(sorted(mp4.items(), key=lambda item: int(item[0]), reverse=True))
+            first_item_url = next(iter(mp4_sorted.values()))["url"]
+            return first_item_url
+    return ''
+"""
 ################################################################################
 #      Copyright (C) 2013 Sean Poyser                                          #
 #                                                                              #
@@ -43,19 +82,15 @@
 #        120: "hd720",
 #        121: "hd1080"
 
+import re
+import urllib3
+import urllib
+import cgi
+from html.parser import unescape
+import json
 import xbmc
 import xbmcgui
 
-import re
-import urllib.request, urllib.error, urllib.parse
-import urllib
-import cgi
-import html.parser
-
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 from resources.libs.common.config import CONFIG
 
@@ -71,12 +106,12 @@ def Clean(text):
     text = text.replace('<b>',     '')
     text = text.replace('</b>',    '')
     text = text.replace('&amp;',   '&')
-    text = text.replace('\\ufeff', '')
+    text = text.replace('\ufeff', '')
     return text
 
 def PlayVideo(id, forcePlayer=False):
     import sys
-    dp.create("Loading video", 'Please Wait')
+    dp.create("Loading video",'Please Wait')
 
     video, links = GetVideoInformation(id)
 
@@ -87,12 +122,12 @@ def PlayVideo(id, forcePlayer=False):
     title = video['title']
     image = video['thumbnail']
 
-    liz = xbmcgui.ListItem(title, iconImage=image, thumbnailImage=image)
+    liz = xbmcgui.ListItem(title)
+    liz.setArt({'thumb': image, 'icon': image, 'poster': image})
 
     liz.setInfo( type="Video", infoLabels={ "Title": title} )
 
     if forcePlayer or len(sys.argv) < 2 or int(sys.argv[1]) == -1:
-        import xbmc
         pl = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         pl.clear()
         pl.add(url, liz)
@@ -164,20 +199,21 @@ def Scrape(html):
     if flashvars.has_key(u"ttsurl"):
         video[u"ttsurl"] = flashvars[u"ttsurl"]
 
-    if flashvars.has_key(u"hlsvp"):                               
-        video[u"hlsvp"] = flashvars[u"hlsvp"]    
+    if flashvars.has_key("hlsvp"):
+        video["hlsvp"] = flashvars["hlsvp"]
 
-    for url_desc in flashvars[u"url_encoded_fmt_stream_map"].split(u","):
-        url_desc_map = cgi.parse_qs(url_desc)
+    for url_desc in flashvars["url_encoded_fmt_stream_map"].split(","):
+        from urllib.parse import parse_qs
+        url_desc_map = parse_qs(url_desc)
         
-        if not (url_desc_map.has_key(u"url") or url_desc_map.has_key(u"stream")):
+        if not ("url" in url_desc_map or "stream" in url_desc_map):
             continue
 
-        key = int(url_desc_map[u"itag"][0])
-        url = u""
+        key = int(url_desc_map["itag"][0])
+        url = ""
         
-        if url_desc_map.has_key(u"url"):
-            url = urllib.unquote(url_desc_map[u"url"][0])
+        if 'url' in url_desc_map:
+            url = urllib.unquote(url_desc_map["url"][0])
         
         elif url_desc_map.has_key(u"conn") and url_desc_map.has_key(u"stream"):
             url = urllib.unquote(url_desc_map[u"conn"][0])
@@ -270,18 +306,18 @@ def ExtractFlashVars(data, assets=False):
 
 
 def FetchPage(url):
-    req = urllib2.Request(url)
+    req = urllib3.Request(url)
     req.add_header('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3')
     req.add_header('Referer',    'http://www.youtube.com/')
 
-    return urllib2.urlopen(req).read().decode("utf-8")
+    return urllib3.urlopen(req).read().decode("utf-8")
 
 
 def replaceHTMLCodes(txt):
     # Fix missing ; in &#<number>;
     txt = re.sub("(&#[0-9]+)([^;^0-9]+)", "\\1;\\2", txt)
 
-    txt = HTMLParser.HTMLParser().unescape(txt)
+    txt = unescape(txt)
     txt = txt.replace("&amp;", "&")
     return txt
 
@@ -443,12 +479,12 @@ def DecryptSignatureNew(s, playerUrl):
     allLocalVarNamesTab = []
     playerData          = ''    
 
-    request = urllib2.Request(playerUrl)
+    request = urllib3.Request(playerUrl)
     #res        = core._fetchPage({u"link": playerUrl})
     #playerData = res["content"]
             
     try:
-        playerData = urllib2.urlopen(request).read()
+        playerData = urllib3.urlopen(request).read()
         playerData = playerData.decode('utf-8', 'ignore')
     
     except Exception as e:
@@ -579,4 +615,5 @@ def play_video(url):
         xbmc.Player().play(url)
     xbmc.sleep(2000)
     if xbmc.Player().isPlayingVideo() == 0:
-        'playvideo(url)'
+        PlayVideo(url)
+"""

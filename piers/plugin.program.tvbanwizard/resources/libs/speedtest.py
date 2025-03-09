@@ -43,10 +43,10 @@ try:
     from http.client import HTTPSConnection
     from queue import Queue
 except ImportError:
-    from urllib2 import urlopen
-    from urllib2 import Request
-    from urllib2 import HTTPError
-    from urllib2 import URLError
+    from urllib3 import urlopen
+    from urllib3 import Request
+    from urllib3 import HTTPError
+    from urllib3 import URLError
     from urlparse import urlparse
     from urlparse import parse_qs
     from httplib import HTTPConnection

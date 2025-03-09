@@ -144,7 +144,7 @@ class Wizard:
                 from resources.libs.gui.build_menu import BuildMenu
                 themecount = BuildMenu().theme_count(name)
 
-                if themecount > 0:
+                if themecount > 99:
                     self.theme(name)
 
                 db.addon_database(CONFIG.ADDON_ID, 1)
@@ -292,13 +292,13 @@ class Wizard:
             from resources.libs import skin
             from resources.libs import test
             test1 = test.test_theme(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
-            test2 = test.test_gui(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
+            #test2 = test.test_gui(lib) if CONFIG.SKIN not in skin.DEFAULT_SKINS else False
 
             if test1:
-                skin.look_and_feel_data('save')
-				xbmc.log('test1= ' + str(test1), xbmc.LOGINFO)
+                skin.look_and_feel_data('save')				
                 swap = skin.skin_to_default('Theme Install')
-
+				#xbmc.log('test1= ' + str(test1), xbmc.LOGINFO)
+      
                 if not swap:
                     return False
 
@@ -322,8 +322,8 @@ class Wizard:
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
             elif test1:
-                skin.look_and_feel_data('save')
-                skin.skin_to_default("Theme Install")
+                #skin.look_and_feel_data('save')
+                #skin.skin_to_default("Theme Install")
                 gotoskin = CONFIG.get_setting('defaultskin')
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')

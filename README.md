@@ -11,7 +11,7 @@
 
 
 ![img](https://) 
-# `Kodi 19` $\textbf{\color{limegreen}Matrix\ {\color{white}\ {\color{indigo}}}}$
+<h1 align="left"> kodi 19 $\textbf{\color{limegreen}Matrix\ {\color{white}\ {\color{indigo}}}}$
 <p align="left">
 <img src="https://img.shields.io/badge/ANDTV-Matrix-limegreen">
 <p align="center">
@@ -25,7 +25,7 @@
 <img src="https://i.imgur.com/19lQWCN.png">  
 </p>
 
-<h1 align="left"> Kodi 21 $\textbf{\color{dodgerblue}Omega}$ </h1>
+# `Kodi 21` $\textbf{\color{dodgerblue}Omega}$ </h1>
 <p align="left">
 <img src="https://img.shields.io/badge/TVBAN-MATNEXOM-dodgerblue">
 <img src="https://img.shields.io/badge/FUNCIONANDO-moccasin">
@@ -35,7 +35,7 @@
 
 # `Kodi 22` $\textbf{\color{magenta}Piers}$ $\textbf{\color{orange}Próximamente}$
 <p align="left">
-<img src="https://img.shields.io/badge/Piers-magenta">
+<img src="https://img.shields.io/badge/TVBAN-Piers-magenta">
 <img src="https://img.shields.io/badge/PROXIMAMENTE-plum"> 
 <p align="center">
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 

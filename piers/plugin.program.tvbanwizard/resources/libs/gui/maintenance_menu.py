@@ -183,9 +183,9 @@ class MaintenanceMenu:
         directory.add_file('[COLOR sandybrown]Cargar Archivo de Registro[/COLOR]', {'mode': 'uploadlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('Ver Errores en el Log: [COLOR azure][B]{0}[/B][/COLOR]'.format(errorsfound), {'mode': 'viewerrorlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         if errors > 0:
-            directory.add_file('Ver el Ultimo Error en el Log', {'mode': 'viewerrorlast'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME7)
-        directory.add_file('Ver Archivo de Registro', {'mode': 'viewlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME7)
-        directory.add_file('Ver Archivo de Registro del Wizard', {'mode': 'viewwizlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME7)
+            directory.add_file('Ver el Ultimo Error en el Log', {'mode': 'viewerrorlast'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_file('][COLOR yellowgreen]Ver Archivo de Registro[/COLOR]', {'mode': 'viewlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
+        directory.add_file('][COLOR yellowgreen]Ver Archivo de Registro del Wizard[/COLOR]', {'mode': 'viewwizlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
         directory.add_file('[COLOR tomato]Borrar Archivo de Registro del Wizard: [COLOR azure][B]{0}[/B][/COLOR]'.format(wizlogsize), {'mode': 'clearwizlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
    
         

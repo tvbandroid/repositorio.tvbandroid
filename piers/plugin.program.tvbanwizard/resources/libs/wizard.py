@@ -327,8 +327,6 @@ class Wizard:
                 gotoskin = CONFIG.get_setting('defaultskin')
                 skin.switch_to_skin(gotoskin, "Theme Installer")
                 skin.look_and_feel_data('restore')
-			if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
-				xbmc.executebuiltin('SendClick(11)')	
 				#if xbmc.getCondVisibility("Window.isVisible(yesnodialog)"):
                     #xbmc.executebuiltin('SendClick(yesnodialog, 11)')
             else:

@@ -1,0 +1,7 @@
+
+
+-BlackGhost 4.0:
+  - se hacen lo arreglos para que funcione correctamente con la version 20 de kodi
+
+-BlackGhost 3.0:
+  - se hacen lo arreglos para que funcione correctamente con la version 19 de kodi

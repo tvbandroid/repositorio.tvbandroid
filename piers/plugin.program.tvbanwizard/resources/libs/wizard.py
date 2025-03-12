@@ -317,7 +317,6 @@ class Wizard:
 			
             if test2:
                 skin.look_and_feel_data('save')
-				xbmc.log('test2= ' + str(test2), xbmc.LOGINFO)
                 skin.skin_to_default("Theme Install")
                 gotoskin = CONFIG.get_setting('defaultskin')
                 skin.switch_to_skin(gotoskin, "Theme Installer")

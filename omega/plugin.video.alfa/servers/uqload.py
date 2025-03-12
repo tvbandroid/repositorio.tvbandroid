@@ -23,7 +23,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     video_urls = []
     patron = 'sources:.?\["([^"]+)"\]'
     matches = scrapertools.find_multiple_matches(data.data, patron)
+    domain = httptools.obtain_domain(page_url, scheme=True)
     for url in matches:
-        url = url+'|Referer='+page_url
+        url = url+'|Referer='+domain
         video_urls.append(["[uqload]", url])
     return video_urls

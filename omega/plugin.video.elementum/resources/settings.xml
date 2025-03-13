@@ -97,7 +97,6 @@
         <setting id="library_sync_playback_enabled" label="30601" type="bool" default="true" />
         <setting id="library_update_delay" label="30059" type="slider" option="int" range="10,10,900" default="300" />
         <setting id="library_update_frequency" label="30060" type="slider" option="int" range="0,1,24" default="6" />
-        <setting id="library_auto_scan" type="bool" label="30089" default="true" />
         <setting type="action" label="30680" action="RunPlugin(plugin://plugin.video.elementum/library/unduplicate)" />
 
         <!-- General -->
@@ -185,6 +184,7 @@
         <setting id="disable_tcp" label="30328" type="bool" default="false" />
         <setting id="disable_utp" label="30329" type="bool" default="false" />
         <setting id="disable_upnp" label="30063" type="bool" default="false" />
+        <setting id="disable_natpmp" label="30713" type="bool" default="false" />
         <setting id="listen_autodetect_ip" label="30370" type="bool" default="true" />
         <setting id="listen_interfaces" label="30090" type="text" default="" enable="eq(-1,false)" />
         <setting type="action" label="30473" action="RunPlugin(plugin://plugin.video.elementum/cmd/select_interface/listen)" subsetting="true" enable="eq(-2,false)" />
@@ -356,6 +356,7 @@
           <setting id="use_proxy_http" label="30492" type="bool" default="true" subsetting="true" enable="eq(-6,true)" />
           <setting id="use_proxy_tracker" label="30493" type="bool" default="true" subsetting="true" enable="eq(-7,true)" />
           <setting id="use_proxy_download" label="30494" type="bool" default="true" subsetting="true" enable="eq(-8,true)" />
+          <setting id="proxy_force" label="30712" type="bool" default="false" subsetting="true" enable="eq(-9,true)" />
     </category>
 
     <!-- Subtitles -->

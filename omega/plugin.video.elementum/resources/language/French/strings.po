@@ -236,8 +236,8 @@ msgid "Library update frequency, hours"
 msgstr "Fréquence de mise à jour de la librairie (heures)"
 
 msgctxt "#30063"
-msgid "Disable UPNP & NATPMP"
-msgstr "Désactiver UPNP et NATPMP"
+msgid "Disable UPNP"
+msgstr "Désactiver UPNP"
 
 msgctxt "#30064"
 msgid "Encryption policy"
@@ -328,10 +328,6 @@ msgstr "Activer les réglages de stockage améliorés"
 msgctxt "#30088"
 msgid "Initial buffering timeout, seconds"
 msgstr "Délai d’attente maximum initial (secondes)"
-
-msgctxt "#30089"
-msgid "Automatically re-scan Kodi library after updates"
-msgstr "Re-parcourir la librairie Kodi automatiquement après les mises à jour"
 
 # interfaces réseau ?
 msgctxt "#30090"
@@ -2278,3 +2274,15 @@ msgstr ""
 msgctxt "#30710"
 msgid "BitTorrent ports"
 msgstr ""
+
+msgctxt "#30711"
+msgid "Delete torrent '%s'?"
+msgstr ""
+
+msgctxt "#30712"
+msgid "Force to always use proxy, can break download in some cases"
+msgstr ""
+
+msgctxt "#30713"
+msgid "Disable NATPMP"
+msgstr "Désactiver NATPMP"

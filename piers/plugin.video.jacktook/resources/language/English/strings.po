@@ -1,0 +1,1256 @@
+# Kodi Media Center language file
+# Addon Name: Jacktook
+# Addon id: plugin.video.jacktook
+# Addon Provider: Sam-Max
+#
+msgid ""
+msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-09-19 19:53+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# Settings
+msgctxt "#30000"
+msgid "Players"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Clients"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Torrent Client"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Indexers"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Indexer"
+msgstr ""
+
+msgctxt "#30022"
+msgid "Jackett Configuration:"
+msgstr ""
+
+msgctxt "#30023"
+msgid "Api Key"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Host"
+msgstr ""
+
+msgctxt "#30026"
+msgid "Description length"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Insecured connection"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Sort by"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Total Results"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Timeout"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Timeout"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Prowlarr Configuration:"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Api Key"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Host"
+msgstr ""
+
+msgctxt "#30053"
+msgid "Indexers-Ids"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Anime IndexersIds"
+msgstr ""
+
+msgctxt "#30100"
+msgid "TMDB"
+msgstr ""
+
+msgctxt "#30102"
+msgid "TMDB Configuration:"
+msgstr ""
+
+msgctxt "#30103"
+msgid "TMDB Api Key"
+msgstr ""
+
+msgctxt "#30104"
+msgid "Clear tmdb cache"
+msgstr ""
+
+msgctxt "#30105"
+msgid "Cache expiration hours"
+msgstr ""
+
+msgctxt "#30106"
+msgid "Clear cache"
+msgstr ""
+
+msgctxt "#30107"
+msgid "Enable cache"
+msgstr ""
+
+msgctxt "#30140"
+msgid "AniList"
+msgstr ""
+
+msgctxt "#30142"
+msgid "AniList Configuration:"
+msgstr ""
+
+msgctxt "#30143"
+msgid "Client ID"
+msgstr ""
+
+msgctxt "#30144"
+msgid "Client Secret"
+msgstr ""
+
+msgctxt "#30150"
+msgid "Debrid"
+msgstr ""
+
+msgctxt "#30152"
+msgid "Real Debrid Configuration"
+msgstr ""
+
+msgctxt "#30154"
+msgid "Token:"
+msgstr ""
+
+msgctxt "#30200"
+msgid "Fanart.TV"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Fanart.TV Configuration:"
+msgstr ""
+
+msgctxt "#30203"
+msgid "Client ID"
+msgstr ""
+
+msgctxt "#30221"
+msgid "No API key provided for"
+msgstr ""
+
+msgctxt "#30223"
+msgid "You need to configure"
+msgstr ""
+
+msgctxt "#30228"
+msgid "The request to Torrentio failed."
+msgstr ""
+
+msgctxt "#30229"
+msgid "The request to Jackett failed."
+msgstr ""
+
+msgctxt "#30230"
+msgid "The request to Prowlarr failed."
+msgstr ""
+
+msgctxt "#30231"
+msgid "The request to Elhosted failed."
+msgstr ""
+
+msgctxt "#30232"
+msgid "The request to Jackgram failed."
+msgstr ""
+
+msgctxt "#30233"
+msgid "The request to Mediafusion failed."
+msgstr ""
+
+msgctxt "#30234"
+msgid "The request to Peerflix failed."
+msgstr ""
+
+msgctxt "#30235"
+msgid "Stremio"
+msgstr ""
+
+msgctxt "#30236"
+msgid "Stremio add-ons"
+msgstr ""
+
+msgctxt "#30237"
+msgid "Import your config"
+msgstr ""
+
+msgctxt "#30238"
+msgid "Manage add-ons"
+msgstr ""
+
+msgctxt "#30240"
+msgid "TMDB cache cleared"
+msgstr ""
+
+msgctxt "#30241"
+msgid "Search on TMDB:"
+msgstr ""
+
+msgctxt "#30242"
+msgid "Search on AniList:"
+msgstr ""
+
+msgctxt "#30243"
+msgid "Search for torrents:"
+msgstr ""
+
+msgctxt "#30244"
+msgid "Cache cleared"
+msgstr ""
+
+msgctxt "#30250"
+msgid "Addon Torrest not found - (plugin.video.torrest)"
+msgstr ""
+
+msgctxt "#30251"
+msgid "No sources found to play"
+msgstr ""
+
+msgctxt "#30252"
+msgid "Addon Elementum not found - (plugin.video.elementum)"
+msgstr ""
+
+msgctxt "#30253"
+msgid "Addon Jacktorr not found - (plugin.video.jacktorr)"
+msgstr ""
+
+msgctxt "#30650"
+msgid "Queued"
+msgstr ""
+
+msgctxt "#30651"
+msgid "Checking"
+msgstr ""
+
+msgctxt "#30652"
+msgid "Finding"
+msgstr ""
+
+msgctxt "#30653"
+msgid "Downloading"
+msgstr ""
+
+msgctxt "#30654"
+msgid "Finished"
+msgstr ""
+
+msgctxt "#30655"
+msgid "Seeding"
+msgstr ""
+
+msgctxt "#30656"
+msgid "Allocating"
+msgstr ""
+
+msgctxt "#30657"
+msgid "Checking resume data"
+msgstr ""
+
+msgctxt "#30658"
+msgid "Paused"
+msgstr ""
+
+msgctxt "#30659"
+msgid "Buffering"
+msgstr ""
+
+msgctxt "#30660"
+msgid "Unknown"
+msgstr ""
+
+msgctxt "#30700"
+msgid "Buffer and play"
+msgstr ""
+
+msgctxt "#30701"
+msgid "Stop downloading"
+msgstr ""
+
+msgctxt "#30702"
+msgid "Download"
+msgstr ""
+
+msgctxt "#30703"
+msgid "Resume"
+msgstr ""
+
+msgctxt "#30704"
+msgid "Pause"
+msgstr ""
+
+msgctxt "#30705"
+msgid "Remove torrent"
+msgstr ""
+
+msgctxt "#30706"
+msgid "Remove torrent and files"
+msgstr ""
+
+msgctxt "#30707"
+msgid "Torrent status"
+msgstr ""
+
+msgctxt "#30708"
+msgid "Stop"
+msgstr ""
+
+msgctxt "#30709"
+msgid "Drop torrent"
+msgstr ""
+
+msgctxt "#30710"
+msgid "Filter TV Shows by Season and Episode"
+msgstr ""
+
+msgctxt "#30711"
+msgid "Torrent Settings"
+msgstr ""
+
+msgctxt "#30712"
+msgid "General"
+msgstr ""
+
+msgctxt "#30713"
+msgid "Use Torrent"
+msgstr ""
+
+msgctxt "#30714"
+msgid "Jacktorr"
+msgstr ""
+
+msgctxt "#30715"
+msgid "Torrest"
+msgstr ""
+
+msgctxt "#30716"
+msgid "Elementum"
+msgstr ""
+
+msgctxt "#30717"
+msgid "Playback"
+msgstr ""
+
+msgctxt "#30718"
+msgid "Auto-Play"
+msgstr ""
+
+msgctxt "#30719"
+msgid "Enable Next Episode Dialog"
+msgstr ""
+
+msgctxt "#30720"
+msgid "Seconds left before show Next Episode Dialog"
+msgstr ""
+
+msgctxt "#30721"
+msgid "Cache Enabled"
+msgstr ""
+
+msgctxt "#30722"
+msgid "Cache Expiration (hours)"
+msgstr ""
+
+msgctxt "#30723"
+msgid "Cache"
+msgstr ""
+
+msgctxt "#30724"
+msgid "Update"
+msgstr ""
+
+msgctxt "#30725"
+msgid "Indexers Configuration"
+msgstr ""
+
+msgctxt "#30726"
+msgid "Sort"
+msgstr ""
+
+msgctxt "#30727"
+msgid "Quality"
+msgstr ""
+
+msgctxt "#30728"
+msgid "Seeds"
+msgstr ""
+
+msgctxt "#30729"
+msgid "Size"
+msgstr ""
+
+msgctxt "#30730"
+msgid "Cached"
+msgstr ""
+
+msgctxt "#30731"
+msgid "Date"
+msgstr ""
+
+msgctxt "#30732"
+msgid "None"
+msgstr ""
+
+msgctxt "#30733"
+msgid "Torrentio Configuration"
+msgstr ""
+
+msgctxt "#30734"
+msgid "Enable"
+msgstr ""
+
+msgctxt "#30736"
+msgid "Priority Language"
+msgstr ""
+
+msgctxt "#30737"
+msgid "GB"
+msgstr ""
+
+msgctxt "#30738"
+msgid "JP"
+msgstr ""
+
+msgctxt "#30739"
+msgid "RU"
+msgstr ""
+
+msgctxt "#30740"
+msgid "IT"
+msgstr ""
+
+msgctxt "#30741"
+msgid "PT"
+msgstr ""
+
+msgctxt "#30742"
+msgid "ES"
+msgstr ""
+
+msgctxt "#30743"
+msgid "MX"
+msgstr ""
+
+msgctxt "#30744"
+msgid "KR"
+msgstr ""
+
+msgctxt "#30745"
+msgid "CN"
+msgstr ""
+
+msgctxt "#30746"
+msgid "TW"
+msgstr ""
+
+msgctxt "#30747"
+msgid "FR"
+msgstr ""
+
+msgctxt "#30748"
+msgid "DE"
+msgstr ""
+
+msgctxt "#30749"
+msgid "NL"
+msgstr ""
+
+msgctxt "#30750"
+msgid "IN"
+msgstr ""
+
+msgctxt "#30751"
+msgid "PL"
+msgstr ""
+
+msgctxt "#30752"
+msgid "LT"
+msgstr ""
+
+msgctxt "#30753"
+msgid "CZ"
+msgstr ""
+
+msgctxt "#30754"
+msgid "SK"
+msgstr ""
+
+msgctxt "#30755"
+msgid "SI"
+msgstr ""
+
+msgctxt "#30756"
+msgid "HU"
+msgstr ""
+
+msgctxt "#30757"
+msgid "RO"
+msgstr ""
+
+msgctxt "#30758"
+msgid "HR"
+msgstr ""
+
+msgctxt "#30759"
+msgid "UA"
+msgstr ""
+
+msgctxt "#30760"
+msgid "GR"
+msgstr ""
+
+msgctxt "#30761"
+msgid "DK"
+msgstr ""
+
+msgctxt "#30762"
+msgid "FI"
+msgstr ""
+
+msgctxt "#30763"
+msgid "SE"
+msgstr ""
+
+msgctxt "#30764"
+msgid "NO"
+msgstr ""
+
+msgctxt "#30765"
+msgid "TR"
+msgstr ""
+
+msgctxt "#30766"
+msgid "Torrentio Providers"
+msgstr ""
+
+msgctxt "#30767"
+msgid "Jackgram Configuration"
+msgstr ""
+
+msgctxt "#30768"
+msgid "Jackgram Host"
+msgstr ""
+
+msgctxt "#30769"
+msgid "Elfhosted/KnightCrawler Configuration"
+msgstr ""
+
+msgctxt "#30770"
+msgid "Language"
+msgstr ""
+
+msgctxt "#30771"
+msgid "Zilean Configuration"
+msgstr ""
+
+msgctxt "#30772"
+msgid "Zilean Host"
+msgstr ""
+
+msgctxt "#30774"
+msgid "Zilean Timeout"
+msgstr ""
+
+msgctxt "#30775"
+msgid "Jackett Configuration"
+msgstr ""
+
+msgctxt "#30776"
+msgid "Prowlarr Configuration"
+msgstr ""
+
+msgctxt "#30777"
+msgid "MediaFusion configuration"
+msgstr ""
+
+msgctxt "#30779"
+msgid "Manifest Url"
+msgstr ""
+
+msgctxt "#30780"
+msgid "Jacktook Burst Configuration"
+msgstr ""
+
+msgctxt "#30781"
+msgid "Burst Configuration"
+msgstr ""
+
+msgctxt "#30782"
+msgid "User"
+msgstr ""
+
+msgctxt "#30783"
+msgid "Authorize"
+msgstr ""
+
+msgctxt "#30784"
+msgid "Remove Authorization"
+msgstr ""
+
+msgctxt "#30785"
+msgid "Premiumize Configuration"
+msgstr ""
+
+msgctxt "#30786"
+msgid "Enabled"
+msgstr ""
+
+msgctxt "#30787"
+msgid "Token:"
+msgstr ""
+
+msgctxt "#30788"
+msgid "TorBox Configuration"
+msgstr ""
+
+msgctxt "#30789"
+msgid "EasyDebrid Configuration"
+msgstr ""
+
+msgctxt "#30790"
+msgid "Uncached"
+msgstr ""
+
+msgctxt "#30791"
+msgid "Show uncached torrents"
+msgstr ""
+
+msgctxt "#30792"
+msgid "Use Kodi Language"
+msgstr ""
+
+msgctxt "#30793"
+msgid "Trakt"
+msgstr ""
+
+msgctxt "#30794"
+msgid "Trakt Configuration"
+msgstr ""
+
+msgctxt "#30795"
+msgid "Expires"
+msgstr ""
+
+msgctxt "#30796"
+msgid "Refresh"
+msgstr ""
+
+msgctxt "#30797"
+msgid "Token"
+msgstr ""
+
+msgctxt "#30798"
+msgid "Trakt Client"
+msgstr ""
+
+msgctxt "#30800"
+msgid "Trakt Secret"
+msgstr ""
+
+msgctxt "#30802"
+msgid "Log out"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Menus"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Show Telegram Menu"
+msgstr ""
+
+msgctxt "#30806"
+msgid "Clear cache when update"
+msgstr ""
+
+msgctxt "#30807"
+msgid "Peerfix Configuration"
+msgstr ""
+
+msgctxt "#40000"
+msgid "Arabic (United Arab Emirates)"
+msgstr ""
+
+msgctxt "#40001"
+msgid "Arabic (Saudi Arabia)"
+msgstr ""
+
+msgctxt "#40002"
+msgid "Belarusian (Belarus)"
+msgstr ""
+
+msgctxt "#40003"
+msgid "Bulgarian (Bulgaria)"
+msgstr ""
+
+msgctxt "#40004"
+msgid "Bengali (Bangladesh)"
+msgstr ""
+
+msgctxt "#40005"
+msgid "Catalan (Spain)"
+msgstr ""
+
+msgctxt "#40006"
+msgid "Chamorro (Guam)"
+msgstr ""
+
+msgctxt "#40007"
+msgid "Czech (Czech Republic)"
+msgstr ""
+
+msgctxt "#40008"
+msgid "Danish (Denmark)"
+msgstr ""
+
+msgctxt "#40009"
+msgid "German (Austria)"
+msgstr ""
+
+msgctxt "#40010"
+msgid "German (Switzerland)"
+msgstr ""
+
+msgctxt "#40011"
+msgid "German (Germany)"
+msgstr ""
+
+msgctxt "#40012"
+msgid "Greek (Greece)"
+msgstr ""
+
+msgctxt "#40013"
+msgid "English (Australia)"
+msgstr ""
+
+msgctxt "#40014"
+msgid "English (Canada)"
+msgstr ""
+
+msgctxt "#40015"
+msgid "English (United Kingdom)"
+msgstr ""
+
+msgctxt "#40016"
+msgid "English (Ireland)"
+msgstr ""
+
+msgctxt "#40017"
+msgid "English (New Zealand)"
+msgstr ""
+
+msgctxt "#40018"
+msgid "English (United States of America)"
+msgstr ""
+
+msgctxt "#40019"
+msgid "Esperanto (None)"
+msgstr ""
+
+msgctxt "#40020"
+msgid "Spanish (Spain)"
+msgstr ""
+
+msgctxt "#40021"
+msgid "Spanish (Mexico)"
+msgstr ""
+
+msgctxt "#40022"
+msgid "Estonian (Estonia)"
+msgstr ""
+
+msgctxt "#40023"
+msgid "Basque (Spain)"
+msgstr ""
+
+msgctxt "#40024"
+msgid "Persian (Iran)"
+msgstr ""
+
+msgctxt "#40025"
+msgid "Finnish (Finland)"
+msgstr ""
+
+msgctxt "#40026"
+msgid "French (Canada)"
+msgstr ""
+
+msgctxt "#40027"
+msgid "French (France)"
+msgstr ""
+
+msgctxt "#40028"
+msgid "Galician (Spain)"
+msgstr ""
+
+msgctxt "#40029"
+msgid "Hebrew (Israel)"
+msgstr ""
+
+msgctxt "#40030"
+msgid "Hindi (India)"
+msgstr ""
+
+msgctxt "#40031"
+msgid "Hungarian (Hungary)"
+msgstr ""
+
+msgctxt "#40032"
+msgid "Indonesian (Indonesia)"
+msgstr ""
+
+msgctxt "#40033"
+msgid "Italian (Italy)"
+msgstr ""
+
+msgctxt "#40034"
+msgid "Japanese (Japan)"
+msgstr ""
+
+msgctxt "#40035"
+msgid "Georgian (Georgia)"
+msgstr ""
+
+msgctxt "#40036"
+msgid "Kazakh (Kazakhstan)"
+msgstr ""
+
+msgctxt "#40037"
+msgid "Kannada (India)"
+msgstr ""
+
+msgctxt "#40038"
+msgid "Korean (South Korea)"
+msgstr ""
+
+msgctxt "#40039"
+msgid "Lithuanian (Lithuania)"
+msgstr ""
+
+msgctxt "#40040"
+msgid "Latvian (Latvia)"
+msgstr ""
+
+msgctxt "#40041"
+msgid "Malayalam (India)"
+msgstr ""
+
+msgctxt "#40042"
+msgid "Malay (Malaysia)"
+msgstr ""
+
+msgctxt "#40043"
+msgid "Malay (Singapore)"
+msgstr ""
+
+msgctxt "#40044"
+msgid "Norwegian Bokmål (Norway)"
+msgstr ""
+
+msgctxt "#40045"
+msgid "Dutch (Netherlands)"
+msgstr ""
+
+msgctxt "#40046"
+msgid "Norwegian (Norway)"
+msgstr ""
+
+msgctxt "#40047"
+msgid "Polish (Poland)"
+msgstr ""
+
+msgctxt "#40048"
+msgid "Portuguese (Brazil)"
+msgstr ""
+
+msgctxt "#40049"
+msgid "Portuguese (Portugal)"
+msgstr ""
+
+msgctxt "#40050"
+msgid "Romanian (Romania)"
+msgstr ""
+
+msgctxt "#40051"
+msgid "Russian (Russia)"
+msgstr ""
+
+msgctxt "#40052"
+msgid "Sinhalese (Sri Lanka)"
+msgstr ""
+
+msgctxt "#40053"
+msgid "Slovak (Slovakia)"
+msgstr ""
+
+msgctxt "#40054"
+msgid "Slovenian (Slovenia)"
+msgstr ""
+
+msgctxt "#40055"
+msgid "Serbian (Serbia)"
+msgstr ""
+
+msgctxt "#40056"
+msgid "Swedish (Sweden)"
+msgstr ""
+
+msgctxt "#40057"
+msgid "Tamil (India)"
+msgstr ""
+
+msgctxt "#40058"
+msgid "Telugu (India)"
+msgstr ""
+
+msgctxt "#40059"
+msgid "Thai (Thailand)"
+msgstr ""
+
+msgctxt "#40060"
+msgid "Tagalog (Philippines)"
+msgstr ""
+
+msgctxt "#40061"
+msgid "Turkish (Turkey)"
+msgstr ""
+
+msgctxt "#40062"
+msgid "Ukrainian (Ukraine)"
+msgstr ""
+
+msgctxt "#40063"
+msgid "Vietnamese (Vietnam)"
+msgstr ""
+
+msgctxt "#40064"
+msgid "Mandarin (China)"
+msgstr ""
+
+msgctxt "#40065"
+msgid "Mandarin (Hong Kong)"
+msgstr ""
+
+msgctxt "#40066"
+msgid "Mandarin (Taiwan)"
+msgstr ""
+
+msgctxt "#40067"
+msgid "Zulu (South Africa)"
+msgstr ""
+
+msgctxt "#42418"
+msgid "Language and country"
+msgstr ""
+
+msgctxt "#42419"
+msgid "The language and country settings used when looking up data from TMDb"
+msgstr ""
+
+msgctxt "#42420"
+msgid "EN"
+msgstr ""
+
+msgctxt "#30801"
+msgid "Zilean server address (include port if required)."
+msgstr ""
+
+msgctxt "#30803"
+msgid "Display torrents not yet cached on your debrid service."
+msgstr ""
+
+msgctxt "#30808"
+msgid "Fanart.tv API client ID (for artwork)."
+msgstr ""
+
+msgctxt "#30809"
+msgid "Improve performance by caching metadata."
+msgstr ""
+
+msgctxt "#30810"
+msgid "Seconds before Jackett requests time out (e.g., 30)."
+msgstr ""
+
+msgctxt "#30811"
+msgid "Trakt client secret from OAuth application settings."
+msgstr ""
+
+msgctxt "#30812"
+msgid "Limit TV show results to specific seasons/episodes."
+msgstr ""
+
+msgctxt "#30813"
+msgid "Hours before cached data is automatically refreshed (e.g., 24)."
+msgstr ""
+
+msgctxt "#30814"
+msgid "Premiumize API token (get from account page)."
+msgstr ""
+
+msgctxt "#30815"
+msgid "Jackett server URL (e.g., http://localhost:9117)."
+msgstr ""
+
+msgctxt "#30816"
+msgid "Display Telegram integration options in UI."
+msgstr ""
+
+msgctxt "#30817"
+msgid "Your Real-Debrid account username/email."
+msgstr ""
+
+msgctxt "#30818"
+msgid "Trakt client ID from https://trakt.tv/oauth/apps."
+msgstr ""
+
+msgctxt "#30819"
+msgid "Connect Trakt.tv account to sync watch progress."
+msgstr ""
+
+msgctxt "#30820"
+msgid "Seconds before Zilean requests time out (e.g., 30)."
+msgstr ""
+
+msgctxt "#30821"
+msgid "Your Jackett API key (found in dashboard)."
+msgstr ""
+
+msgctxt "#30822"
+msgid "Sort results by criteria (e.g., 'date', 'title', 'size')."
+msgstr ""
+
+msgctxt "#30823"
+msgid "Configure Burst mode settings and providers."
+msgstr ""
+
+msgctxt "#30824"
+msgid "Enable Premiumize.me cloud service."
+msgstr ""
+
+msgctxt "#30825"
+msgid "Truncate descriptions after [X] characters (0 for full text)."
+msgstr ""
+
+msgctxt "#30826"
+msgid "Enable Prowlarr indexer management."
+msgstr ""
+
+msgctxt "#30827"
+msgid "Jackgram server URL (e.g., http://localhost:9117)."
+msgstr ""
+
+msgctxt "#30828"
+msgid "EasyDebrid API key for authentication."
+msgstr ""
+
+msgctxt "#30829"
+msgid "Delay (in seconds) before next episode dialog appears (e.g., 10)."
+msgstr ""
+
+msgctxt "#30830"
+msgid "Specify the torrent client."
+msgstr ""
+
+msgctxt "#30831"
+msgid "Enable EasyDebrid cached torrent support."
+msgstr ""
+
+msgctxt "#30832"
+msgid "Torbox API token (found in account settings)."
+msgstr ""
+
+msgctxt "#30833"
+msgid "Trakt refresh token (auto-managed)."
+msgstr ""
+
+msgctxt "#30834"
+msgid "Show confirmation dialog before playing next episode."
+msgstr ""
+
+msgctxt "#30835"
+msgid "Authorize add-on to access Real-Debrid account."
+msgstr ""
+
+msgctxt "#30836"
+msgid "Enable torrent-based downloads for media content."
+msgstr ""
+
+msgctxt "#30837"
+msgid "Indicates if Real-Debrid account is linked."
+msgstr ""
+
+msgctxt "#30838"
+msgid "Automatically play next media item when current playback ends."
+msgstr ""
+
+msgctxt "#30839"
+msgid "Check for and install the latest add-on updates."
+msgstr ""
+
+msgctxt "#30840"
+msgid "Comma-separated Prowlarr indexer IDs to use (e.g., 1,5,7)."
+msgstr ""
+
+msgctxt "#30841"
+msgid "Timeout (seconds) for Prowlarr requests (e.g., 20)."
+msgstr ""
+
+msgctxt "#30842"
+msgid "Trakt authorization expiration date (read-only)."
+msgstr ""
+
+msgctxt "#30843"
+msgid "Enable Torbox.de cloud torrent integration."
+msgstr ""
+
+msgctxt "#30844"
+msgid "Trakt API access token (auto-filled after auth)."
+msgstr ""
+
+msgctxt "#30845"
+msgid "Link Premiumize.me account to add-on."
+msgstr ""
+
+msgctxt "#30846"
+msgid "Clear cached data automatically after updating the add-on."
+msgstr ""
+
+msgctxt "#30847"
+msgid "Click to delete all cached data immediately."
+msgstr ""
+
+msgctxt "#30848"
+msgid "Real-Debrid API token (auto-filled after auth)."
+msgstr ""
+
+msgctxt "#30849"
+msgid "Enable Jackett torrent proxy support."
+msgstr ""
+
+msgctxt "#30850"
+msgid "Enable Jackgram integration for enhanced search."
+msgstr ""
+
+msgctxt "#30851"
+msgid "Prowlarr instance URL (e.g., http://localhost:9696)."
+msgstr ""
+
+msgctxt "#30852"
+msgid "Maximum number of search results to display (e.g., 50)."
+msgstr ""
+
+msgctxt "#30853"
+msgid "Revoke Real-Debrid account access."
+msgstr ""
+
+msgctxt "#30854"
+msgid "Prowlarr API key (found in Settings > General)."
+msgstr ""
+
+msgctxt "#30855"
+msgid "Trakt.tv username (auto-populated after auth)."
+msgstr ""
+
+msgctxt "#30856"
+msgid "Disconnect Trakt.tv account from add-on."
+msgstr ""
+
+msgctxt "#30857"
+msgid "Enable Zilean integration for metadata fetching."
+msgstr ""
+
+msgctxt "#30858"
+msgid "Your TMDB API key (required for metadata)"
+msgstr ""
+
+msgctxt "#30859"
+msgid "Enable Burst mode for accelerated searches."
+msgstr ""
+
+msgctxt "#30860"
+msgid "Others"
+msgstr ""
+
+msgctxt "#30861"
+msgid "Results"
+msgstr ""
+
+msgctxt "#30862"
+msgid "Torrent"
+msgstr ""
+
+msgctxt "#30863"
+msgid "Specify the torrent client"
+msgstr ""
+
+msgctxt "#30864"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30865"
+msgid "Result Filters and Sorting"
+msgstr ""
+
+msgctxt "#30866"
+msgid "Sign in to your Stremio account to access add-ons and personalized features."
+msgstr "Inicia sesión en tu cuenta de Stremio para acceder a complementos y características personalizadas."
+
+msgctxt "#30867"
+msgid "Sign out of your Stremio account. This will disconnect your account but won't delete your data."
+msgstr "Cierra sesión en tu cuenta de Stremio. Esto desconectará tu cuenta, pero no eliminará tus datos."
+
+msgctxt "#30868"
+msgid "Log Out of Stremio"
+msgstr "Cerrar sesión en Stremio"
+
+msgctxt "#30869"
+msgid "Enable Stremio add-ons integration."
+msgstr "Habilitar la integración de complementos de Stremio."
+
+msgctxt "#30870"
+msgid "Toggle Add-ons"
+msgstr "Alternar complementos"
+
+msgctxt "#30871"
+msgid "Log In to Stremio"
+msgstr "Iniciar sesión en Stremio"
+
+msgctxt "#30872"
+msgid "Enable or disable Stremio add-ons."
+msgstr "Habilitar o deshabilitar los complementos de Stremio."
+
+msgctxt "#30873"
+msgid "Prioritize results in the selected language"
+msgstr ""

@@ -250,8 +250,8 @@ msgid "Library update frequency, hours"
 msgstr "Učestalost nadopune videoteke (sati)"
 
 msgctxt "#30063"
-msgid "Disable UPNP & NATPMP"
-msgstr "Onemogući UPNP & NATPMP"
+msgid "Disable UPNP"
+msgstr "Onemogući UPNP"
 
 msgctxt "#30064"
 msgid "Encryption policy"
@@ -340,10 +340,6 @@ msgstr "Omogući podešene postavke pohrane"
 msgctxt "#30088"
 msgid "Initial buffering timeout, seconds"
 msgstr "Vrijeme čekanja pokretanja međuspremnika (sekunde)"
-
-msgctxt "#30089"
-msgid "Automatically re-scan Kodi library after updates"
-msgstr "Automatski ponovno pretraži Kodi videoteku nakon nadopuna"
 
 msgctxt "#30090"
 msgid "Listen interfaces"
@@ -2286,3 +2282,15 @@ msgstr ""
 msgctxt "#30710"
 msgid "BitTorrent ports"
 msgstr ""
+
+msgctxt "#30711"
+msgid "Delete torrent '%s'?"
+msgstr ""
+
+msgctxt "#30712"
+msgid "Force to always use proxy, can break download in some cases"
+msgstr ""
+
+msgctxt "#30713"
+msgid "Disable NATPMP"
+msgstr "Onemogući NATPMP"

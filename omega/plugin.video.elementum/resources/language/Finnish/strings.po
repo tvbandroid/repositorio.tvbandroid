@@ -232,8 +232,8 @@ msgid "Library update frequency, hours"
 msgstr "Kirjaston päivitysväli (tunteina)"
 
 msgctxt "#30063"
-msgid "Disable UPNP & NATPMP"
-msgstr "Älä käytä UPNP:tä ja NATPMP:tä"
+msgid "Disable UPNP"
+msgstr "Älä käytä UPNP:tä"
 
 msgctxt "#30064"
 msgid "Encryption policy"
@@ -322,10 +322,6 @@ msgstr "Käytä muokattuja tallennusasetuksia"
 msgctxt "#30088"
 msgid "Initial buffering timeout, seconds"
 msgstr "Puskuroinnin aikakatkaisu (sekunteina)"
-
-msgctxt "#30089"
-msgid "Automatically re-scan Kodi library after updates"
-msgstr "Päivitä Kodin kirjasto automaattisesti lisäysten jälkeen"
 
 msgctxt "#30090"
 msgid "Listen interfaces"
@@ -2268,3 +2264,15 @@ msgstr ""
 msgctxt "#30710"
 msgid "BitTorrent ports"
 msgstr ""
+
+msgctxt "#30711"
+msgid "Delete torrent '%s'?"
+msgstr ""
+
+msgctxt "#30712"
+msgid "Force to always use proxy, can break download in some cases"
+msgstr ""
+
+msgctxt "#30713"
+msgid "Disable NATPMP"
+msgstr "Älä käytä NATPMP:tä"

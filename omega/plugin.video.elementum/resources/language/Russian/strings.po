@@ -233,8 +233,8 @@ msgid "Library update frequency, hours"
 msgstr "Частота обновления библиотеки, часы"
 
 msgctxt "#30063"
-msgid "Disable UPNP & NATPMP"
-msgstr "Отключить UPNP & NATPMP"
+msgid "Disable UPNP"
+msgstr "Отключить UPNP"
 
 msgctxt "#30064"
 msgid "Encryption policy"
@@ -323,10 +323,6 @@ msgstr "Включить тонкие настройки хранилища"
 msgctxt "#30088"
 msgid "Initial buffering timeout, seconds"
 msgstr "Тайм-аут пре-буфферизации, сек"
-
-msgctxt "#30089"
-msgid "Automatically re-scan Kodi library after updates"
-msgstr "Пересканировать библиотеку после обновлений"
 
 msgctxt "#30090"
 msgid "Listen interfaces"
@@ -1396,7 +1392,7 @@ msgstr "Выполняется поиск"
 
 msgctxt "#30480"
 msgid "Run Kodi library update after add/delete"
-msgstr "Автоматически обновлять библиотеку Kodi"
+msgstr "Обновлять библиотеку Kodi после добавления/удаления"
 
 msgctxt "#30481"
 msgid "Automatically"
@@ -2269,3 +2265,15 @@ msgstr "Открыть [B]%s[/B]"
 msgctxt "#30710"
 msgid "BitTorrent ports"
 msgstr "BitTorrent порты"
+
+msgctxt "#30711"
+msgid "Delete torrent '%s'?"
+msgstr "Удалить торрент '%s'?"
+
+msgctxt "#30712"
+msgid "Force to always use proxy, can break download in some cases"
+msgstr "Форсировать использование прокси, может сломать скачивание в некоторых случаях"
+
+msgctxt "#30713"
+msgid "Disable NATPMP"
+msgstr "Отключить NATPMP"

@@ -393,10 +393,12 @@
         <definition>
             <control type="group">
                 <top>-320</top>
-                <include content="Dialog_Background_Blur">
-                    <param name="diffuse">diffuse/dialog_w480_h400.png</param>
-                    <param name="flipy">true</param>
-                </include>
+                <control type="group">
+                    <include content="Dialog_Background_Blur">
+                        <param name="diffuse">diffuse/dialog_w480_h400.png</param>
+                        <param name="flipy">true</param>
+                    </include>
+                </control>
                 <control type="image">
                     <texture colordiffuse="dialog_fg_12" border="20">common/dialog.png</texture>
                 </control>

@@ -355,10 +355,12 @@
                 <bottom>0</bottom>
                 <right>240</right>
                 <left>1020</left>
-                <include content="Dialog_Background_Blur">
+                <control type="group">
+                    <include content="Dialog_Background_Blur">
+                    </include>
                     <animation effect="fade" end="90" condition="true">Conditional</animation>
                     <param name="diffuse">diffuse/card_w800_h294.png</param>
-                </include>
+                </control>
                 <control type="image">
                     <texture colordiffuse="panel_fg_12" border="20">common/dialog.png</texture>
                 </control>

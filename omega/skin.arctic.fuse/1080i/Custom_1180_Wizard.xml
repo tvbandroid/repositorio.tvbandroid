@@ -21,7 +21,8 @@
             <bottom>40</bottom>
             <width>1500</width>
             <centerleft>50%</centerleft>
-            <include content="Dialog_Background_Blur">
+            <control type="group">
+                <include>Dialog_Background_Blur</include>
                 <include>Animation_Right_Delay</include>
                 <include content="Dialog_Head">
                     <param name="top">40</param>
@@ -381,7 +382,7 @@
                         <visible>!String.IsEqual(Window(Home).Property(WizardStep),Dialog)</visible>
                     </control>
                 </control>
-            </include>
+            </control>
         </control>
 
 

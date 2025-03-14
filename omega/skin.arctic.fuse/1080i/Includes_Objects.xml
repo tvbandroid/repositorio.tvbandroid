@@ -559,7 +559,7 @@
             <control type="image">
                 <texture background="true" diffuse="$PARAM[diffuse]">$PARAM[icon]</texture>
                 <aspectratio scalediffuse="false">$PARAM[aspectratio]</aspectratio>
-                <visible>!String.StartsWith($PARAM[listitem].Icon,Default)</visible>
+                <visible>![String.IsEqual($PARAM[listitem].Art(thumb),$PARAM[listitem].Icon) | String.IsEmpty($PARAM[listitem].Art(thumb))] | !String.IsEmpty($PARAM[listitem].Art(fanart)) | !String.IsEmpty($PARAM[listitem].Art(poster)) | !String.StartsWith($PARAM[listitem].Icon,Default)</visible>
             </control>
             <control type="image">
                 <include content="Object_ColorDiffuse" condition="$PARAM[selected]">
@@ -568,8 +568,8 @@
                 <colordiffuse>main_fg_100</colordiffuse>
                 <texture background="true" diffuse="$PARAM[diffuse]">$PARAM[icon]</texture>
                 <aspectratio scalediffuse="false">$PARAM[aspectratio]</aspectratio>
-                <visible>String.StartsWith($PARAM[listitem].Icon,Default)</visible>
-                <visible>![String.IsEqual($PARAM[listitem].Icon,DefaultFolder.png) + String.IsEqual($PARAM[listitem].Label,$LOCALIZE[22082])]</visible>
+                <visible>String.StartsWith($PARAM[listitem].Icon,Default) + [String.IsEqual($PARAM[listitem].Art(thumb),$PARAM[listitem].Icon) | String.IsEmpty($PARAM[listitem].Art(thumb))] + String.IsEmpty($PARAM[listitem].Art(fanart)) + String.IsEmpty($PARAM[listitem].Art(poster))</visible>
+                <visible>!String.IsEqual($PARAM[listitem].Icon,DefaultFolder.png) | !String.IsEqual($PARAM[listitem].Label,$LOCALIZE[22082])</visible>
             </control>
             <control type="image">
                 <texture background="true" diffuse="$PARAM[diffuse]">fallback/more-items-wide.png</texture>

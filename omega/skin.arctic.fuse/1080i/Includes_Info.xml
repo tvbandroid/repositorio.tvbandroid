@@ -39,28 +39,23 @@
                 <control type="group">
                     <centertop>20</centertop>
                     <height>40</height>
-                    <!-- <control type="image">
+                    <control type="group">
+                        <left>-8</left>
                         <height>40</height>
                         <width>40</width>
-                        <bordersize>2</bordersize>
-                        <texture colordiffuse="main_fg_100">common/circle.png</texture>
-                    </control> -->
-                    <!-- <control type="image">
-                        <height>40</height>
-                        <width>40</width>
-                        <bordersize>-10</bordersize>
-                        <texture colordiffuse="$VAR[ColorHighlight]">special://skin/extras/icons/kodi.png</texture>
+                        <control type="image">
+                            <bordersize>-4</bordersize>
+                            <texture colordiffuse="$VAR[ColorHighlight]">special://skin/extras/icons/kodi.png</texture>
+                        </control>
+                        <control type="image">
+                            <bordersize>-4</bordersize>
+                            <texture colordiffuse="$VAR[ColorGradient]">special://skin/extras/icons/kodi.png</texture>
+                            <animation effect="fade" end="33" condition="true">Conditional</animation>
+                        </control>
                     </control>
-                    <control type="image">
-                        <height>40</height>
-                        <width>40</width>
-                        <bordersize>-10</bordersize>
-                        <texture colordiffuse="$VAR[ColorGradient]">special://skin/extras/icons/kodi.png</texture>
-                        <animation effect="fade" end="33" condition="true">Conditional</animation>
-                    </control> -->
                     <control type="label">
-                        <!-- <top>1</top> -->
-                        <!-- <left>50</left> -->
+                        <top>1</top>
+                        <left>36</left>
                         <height>40</height>
                         <textcolor>$PARAM[colordiffuse]_100</textcolor>
                         <font>font_logo</font>

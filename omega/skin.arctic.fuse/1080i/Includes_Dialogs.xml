@@ -55,23 +55,20 @@
     </include>
 
     <include name="Dialog_Background_Blur">
-        <control type="group">
-            <include content="Dialog_Background_Blur_Standard" condition="!$EXP[Exp_DialogTheme_IsAdaptive]">
-                <param name="shadow">$PARAM[shadow]</param>
-                <param name="flipy">$PARAM[flipy]</param>
-                <param name="flipx">$PARAM[flipx]</param>
-                <param name="diffuse">$PARAM[diffuse]</param>
-                <param name="border">$PARAM[border]</param>
-            </include>
-            <include content="Dialog_Background_Blur_Adaptive" condition="$EXP[Exp_DialogTheme_IsAdaptive]">
-                <param name="shadow">$PARAM[shadow]</param>
-                <param name="flipy">$PARAM[flipy]</param>
-                <param name="flipx">$PARAM[flipx]</param>
-                <param name="diffuse">$PARAM[diffuse]</param>
-                <param name="border">$PARAM[border]</param>
-            </include>
-            <nested />
-        </control>
+        <include content="Dialog_Background_Blur_Standard" condition="!$EXP[Exp_DialogTheme_IsAdaptive]">
+            <param name="shadow">$PARAM[shadow]</param>
+            <param name="flipy">$PARAM[flipy]</param>
+            <param name="flipx">$PARAM[flipx]</param>
+            <param name="diffuse">$PARAM[diffuse]</param>
+            <param name="border">$PARAM[border]</param>
+        </include>
+        <include content="Dialog_Background_Blur_Adaptive" condition="$EXP[Exp_DialogTheme_IsAdaptive]">
+            <param name="shadow">$PARAM[shadow]</param>
+            <param name="flipy">$PARAM[flipy]</param>
+            <param name="flipx">$PARAM[flipx]</param>
+            <param name="diffuse">$PARAM[diffuse]</param>
+            <param name="border">$PARAM[border]</param>
+        </include>
     </include>
 
     <include name="Dialog_Background_BlurDimension_DialogSideMenu">
@@ -537,7 +534,9 @@
         <include content="Animation_Fade_Out">
             <param name="type">WindowClose</param>
         </include>
-        <include content="Dialog_Background_Blur">
+        <control type="group">
+            <include content="Dialog_Background_Blur">
+            </include>
             <control type="image">
                 <texture colordiffuse="main_fg_12" border="20">common/dialog.png</texture>
             </control>
@@ -550,7 +549,7 @@
                     </control>
                 </include>
             </control>
-        </include>
+        </control>
     </include>
 
     <include name="Dialog_Outline">
@@ -627,8 +626,10 @@
         <param name="include_dimensions">Dimension_Dialog_VideoPIP_Smaller</param>
         <param name="visible">true</param>
         <definition>
-            <include content="Dialog_Background_Blur">
-                <param name="diffuse">diffuse/landscape_w720_h405.png</param>
+            <control type="group">
+                <include content="Dialog_Background_Blur">
+                    <param name="diffuse">diffuse/landscape_w720_h405.png</param>
+                </include>
                 <include>$PARAM[include_dimensions]</include>
                 <control type="image">
                     <texture colordiffuse="dialog_fg_12" border="20">common/dialog.png</texture>
@@ -725,7 +726,7 @@
                     </control>
 
                 </control>
-            </include>
+            </control>
         </definition>
     </include>
 </includes>

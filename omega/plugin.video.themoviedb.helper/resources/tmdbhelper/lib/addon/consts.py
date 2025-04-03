@@ -31,17 +31,19 @@ TMDB_PARAMS_EPISODES = {
     'episode': '{episode_number}'}
 
 IMAGEPATH_ORIGINAL = 'https://image.tmdb.org/t/p/original'
-IMAGEPATH_HIGH = 'https://image.tmdb.org/t/p/w1280'
-IMAGEPATH_LOW = 'https://image.tmdb.org/t/p/w780'
-IMAGEPATH_POSTER = 'https://image.tmdb.org/t/p/w500'
+IMAGEPATH_LARGEFANART = 'https://image.tmdb.org/t/p/w1280'
+IAMGEPATH_SMALLFANART = 'https://image.tmdb.org/t/p/w780'
+IMAGEPATH_LARGEPOSTER = 'https://image.tmdb.org/t/p/w780'
+IMAGEPATH_BASICPOSTER = 'https://image.tmdb.org/t/p/w500'
 IMAGEPATH_SMALLPOSTER = 'https://image.tmdb.org/t/p/w342'
+IMAGEPATH_LARGELOGO = 'https://image.tmdb.org/t/p/w500'
 IMAGEPATH_SMALLLOGO = 'https://image.tmdb.org/t/p/w300'
 IMAGEPATH_NEGATE = 'https://image.tmdb.org/t/p/h100_filter(negate,000,666)'
-IMAGEPATH_ALL = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER, IMAGEPATH_SMALLLOGO]
-IMAGEPATH_QUALITY_POSTER = [IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLPOSTER]
-IMAGEPATH_QUALITY_FANART = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_HIGH, IMAGEPATH_LOW]
-IMAGEPATH_QUALITY_THUMBS = [IMAGEPATH_ORIGINAL, IMAGEPATH_HIGH, IMAGEPATH_LOW, IMAGEPATH_LOW]
-IMAGEPATH_QUALITY_CLOGOS = [IMAGEPATH_ORIGINAL, IMAGEPATH_POSTER, IMAGEPATH_POSTER, IMAGEPATH_SMALLLOGO]
+IMAGEPATH_ALL = [IMAGEPATH_ORIGINAL, IMAGEPATH_LARGEFANART, IAMGEPATH_SMALLFANART, IMAGEPATH_BASICPOSTER, IMAGEPATH_SMALLPOSTER, IMAGEPATH_SMALLLOGO]
+IMAGEPATH_QUALITY_POSTER = [IMAGEPATH_LARGEPOSTER, IMAGEPATH_BASICPOSTER, IMAGEPATH_BASICPOSTER, IMAGEPATH_SMALLPOSTER]
+IMAGEPATH_QUALITY_FANART = [IMAGEPATH_ORIGINAL, IMAGEPATH_LARGEFANART, IMAGEPATH_LARGEFANART, IAMGEPATH_SMALLFANART]
+IMAGEPATH_QUALITY_THUMBS = [IMAGEPATH_ORIGINAL, IMAGEPATH_LARGEFANART, IAMGEPATH_SMALLFANART, IAMGEPATH_SMALLFANART]
+IMAGEPATH_QUALITY_CLOGOS = [IMAGEPATH_ORIGINAL, IMAGEPATH_LARGELOGO, IMAGEPATH_LARGELOGO, IMAGEPATH_SMALLLOGO]
 ARTWORK_BLACKLIST = [
     [],
     ['poster', 'season.poster', 'tvshow.poster'],
@@ -60,10 +62,14 @@ PLAYERS_PRIORITY = 1000
 PLAYERS_REQUIRED_IDS = ['{imdb}', '{tvdb}', '{trakt}', '{slug}', '{eptvdb}' '{epimdb}', '{eptrakt}', '{epslug}', '{epid}']
 PLAYERS_CHOSEN_DEFAULTS_FILENAME = 'player_defaults'
 
-NO_LABEL_FORMATTING = ['details', 'upcoming', 'trakt_calendar', 'trakt_myairing', 'trakt_anticipated', 'library_nextaired', 'library_airingnext', 'trakt_airingnext', 'videos', 'trakt_watchlist_anticipated']
+NO_UNAIRED_LABEL = ['details', 'trakt_calendar', 'library_nextaired', 'videos', 'trakt_watchlist_anticipated', 'trakt_anticipated']
+NO_UNAIRED_CHECK = ['upcoming', 'trakt_myairing', 'discover', 'library_airingnext', 'trakt_airingnext']
+REMOVE_EPISODE_COUNT = ['stars_in_tvshows', 'stars_in_both', 'crew_in_tvshows', 'crew_in_both']
 
 PARAM_WIDGETS_RELOAD = 'reload=$INFO[Window(Home).Property(TMDbHelper.Widgets.Reload)]'
 PARAM_WIDGETS_RELOAD_FORCED = 'reload=$INFO[System.Time(hh:mm:ss)]'
+
+LASTACTIVITIES_DATA = 'TraktNewSyncLastActivities'
 
 UPNEXT_EPISODE_ART = {
     'thumb': lambda li: li.art.get('thumb') or '',
@@ -198,6 +204,9 @@ TMDB_COMBO_LISTS_ROUTE = {
 TMDB_BASIC_LISTS_ROUTE = {
     'module_name': 'tmdbhelper.lib.api.tmdb.lists',
     'import_attr': 'ListBasic'}
+TMDB_LISTS_LISTS_ROUTE = {
+    'module_name': 'tmdbhelper.lib.api.tmdb.lists',
+    'import_attr': 'ListLists'}
 TMDB_BASIC_LISTS = {
     'popular': {
         'path': '{tmdb_type}/popular',
@@ -525,7 +534,55 @@ TMDB_BASIC_LISTS = {
         'route': TMDB_BASIC_LISTS_ROUTE,
         'plugin_category': '{localized} {plural}',
         'localized': 535
-    }
+    },
+    'tmdb_v4_recommendations': {
+        'path': 'account/{{account_id}}/{tmdb_type}/recommendations',
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 32223,
+        'tmdb_v4_user_list': True
+    },
+    'tmdb_v4_favorites': {
+        'path': 'account/{{account_id}}/{tmdb_type}/favorites',
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 1036,
+        'tmdb_v4_user_list': True
+    },
+    'tmdb_v4_watchlist': {
+        'path': 'account/{{account_id}}/{tmdb_type}/watchlist',
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 32193,
+        'tmdb_v4_user_list': True
+    },
+    'tmdb_v4_rated': {
+        'path': 'account/{{account_id}}/{tmdb_type}/rated',
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 32521,
+        'tmdb_v4_user_list': True
+    },
+    'tmdb_v4_lists': {
+        'path': 'account/{{account_id}}/lists',
+        'key': 'results',
+        'route': TMDB_LISTS_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 32211,
+        'tmdb_v4_user_list': True
+    },
+    'tmdb_v4_list': {
+        'path': 'list/{list_id}',
+        'key': 'results',
+        'route': TMDB_BASIC_LISTS_ROUTE,
+        'plugin_category': '{localized} {plural}',
+        'localized': 32211,
+        'tmdb_v4_user_list': True
+    },
 }
 
 
@@ -601,7 +658,6 @@ TRAKT_SYNC_LISTS = {
     },
     'trakt_watchlist': {
         'sync_type': 'watchlist',
-        'use_show_activity': True,
         'sort_by': 'unsorted',
         'route': TRAKT_SYNC_LISTS_ROUTE,
         'plugin_category': '{plural} {localized}',
@@ -609,7 +665,6 @@ TRAKT_SYNC_LISTS = {
     },
     'trakt_watchlist_released': {
         'sync_type': 'watchlist',
-        'use_show_activity': True,
         'sort_by': 'released',
         'sort_how': 'desc',
         'extended': 'full',
@@ -628,7 +683,6 @@ TRAKT_SYNC_LISTS = {
     },
     'trakt_watchlist_anticipated': {
         'sync_type': 'watchlist',
-        'use_show_activity': True,
         'sort_by': 'released',
         'sort_how': 'asc',
         'extended': 'full',
@@ -775,6 +829,9 @@ ROUTE_NOID = {
     'trakt_ondeck': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListOnDeck'}},
+    'trakt_ondeck_unwatched': {'route': {
+        'module_name': 'tmdbhelper.lib.api.trakt.lists',
+        'import_attr': 'ListOnDeckUnWatched'}},
     'trakt_nextepisodes': {'route': {
         'module_name': 'tmdbhelper.lib.api.trakt.lists',
         'import_attr': 'ListNextEpisodes'}},

@@ -1,4 +1,3 @@
-import os
 from lib.api.jacktook.kodi import kodilog
 from lib.api.trakt.trakt_api import (
     get_trakt_list_contents,
@@ -15,7 +14,6 @@ from lib.api.trakt.trakt_api import (
     trakt_tv_trending,
     trakt_watchlist,
 )
-from lib.tmdb import TMDB_BACKDROP_URL, TMDB_POSTER_URL
 from lib.utils.tmdb_utils import tmdb_get
 from lib.utils.utils import (
     Anime,
@@ -23,13 +21,11 @@ from lib.utils.utils import (
     add_next_button,
     execute_thread_pool,
     set_content_type,
-    set_media_infotag,
+    set_media_infoTag,
 )
-from lib.utils.kodi_utils import ADDON_HANDLE, ADDON_PATH, build_url, play_media
+from lib.utils.kodi_utils import ADDON_HANDLE, build_url, play_media
 from xbmcgui import ListItem
-from xbmcplugin import (
-    addDirectoryItem,
-)
+from xbmcplugin import addDirectoryItem, endOfDirectory
 from lib.utils.paginator import paginator_db
 
 
@@ -129,40 +125,22 @@ def process_trakt_result(results, query, category, mode, submode, api, page):
         submode=submode,
         api=api,
     )
+    endOfDirectory(ADDON_HANDLE)
 
 
 def show_anime_common(res, mode):
-    kodilog("trakt::show_anime_common")
     ids = extract_ids(res)
     title = res["show"]["title"]
 
-    tmdb_id = [id.strip() for id in ids.split(',')][0]
+    tmdb_id = ids["tmdb_id"]
     if mode == "tv":
         details = tmdb_get("tv_details", tmdb_id)
     else:
         details = tmdb_get("movie_details", tmdb_id)
 
-    poster_path = f"{TMDB_POSTER_URL}{details.poster_path or ''}"
-    backdrop_path = f"{TMDB_BACKDROP_URL}{details.backdrop_path or ''}"
-
     list_item = ListItem(title)
-    list_item.setArt(
-        {
-            "poster": poster_path,
-            "fanart": backdrop_path,
-        }
-    )
-    overview = details.get("overview", "")
 
-    set_media_infotag(
-        list_item,
-        mode,
-        title,
-        overview,
-        air_date="",
-        duration="",
-        ids=ids,
-    )
+    set_media_infoTag(list_item, metadata=details)
 
     add_dir_item(mode, list_item, ids, title)
 
@@ -171,65 +149,36 @@ def show_common_categories(res, mode):
     if mode == "tv":
         title = res["show"]["title"]
         ids = extract_ids(res, mode)
-        tmdb_id = [id.strip() for id in ids.split(',')][0]
+        tmdb_id = ids["tmdb_id"]
         details = tmdb_get("tv_details", tmdb_id)
-        duration = ""
     else:
         title = res["movie"]["title"]
         ids = extract_ids(res, mode)
-        tmdb_id = [id.strip() for id in ids.split(',')][0]
+        tmdb_id = ids["tmdb_id"]
         details = tmdb_get("movie_details", tmdb_id)
-        duration = details.runtime
-        
 
-    poster_path = TMDB_POSTER_URL + details.get("poster_path", "")
-    backdrop_path = TMDB_BACKDROP_URL + details.get("backdrop_path", "")
-    
     list_item = ListItem(label=title)
-    list_item.setArt(
-        {
-            "poster": poster_path,
-            "fanart": backdrop_path,
-        }
-    )
 
-    overview = details.get("overview", "")
-
-    set_media_infotag(
-        list_item,
-        mode,
-        title,
-        overview,
-        air_date="",
-        duration=duration,
-        ids=ids,
-    )
+    set_media_infoTag(list_item, metadata=details)
 
     add_dir_item(mode, list_item, ids, title)
 
 
 def show_watchlist(res, mode):
-    tmdb_id = res["media_ids"]["tmdb"]
-    tvdb_id = None
-    imdb_id = res["media_ids"]["imdb"]
-    ids = f"{tmdb_id}, {tvdb_id}, {imdb_id}"
     title = res["title"]
+    tmdb_id = res["media_ids"]["tmdb"]
+    imdb_id = res["media_ids"]["imdb"]
+   
+    ids = {"tmdb_id": tmdb_id, "tvdb_id": None, "imdb_id": imdb_id}
 
     if mode == "tv":
         details = tmdb_get("tv_details", tmdb_id)
     else:
         details = tmdb_get("movie_details", tmdb_id)
 
-    poster_path = f"{TMDB_POSTER_URL}{details.poster_path or ''}"
-    backdrop_path = f"{TMDB_BACKDROP_URL}{details.backdrop_path or ''}"
-
     list_item = ListItem(title)
-    list_item.setArt(
-        {
-            "poster": poster_path,
-            "fanart": backdrop_path,
-        }
-    )
+
+    set_media_infoTag(list_item, metadata=details)
 
     add_dir_item(mode, list_item, ids, title)
 
@@ -262,45 +211,25 @@ def show_trending_lists(res, mode):
 def show_recommendations(res, mode):
     title = res["title"]
     tmdb_id = res["ids"]["tmdb"]
-    tvdb_id = None
     imdb_id = res["ids"]["imdb"]
-    ids = f"{tmdb_id}, {tvdb_id}, {imdb_id}"
+    ids = {"tmdb_id": tmdb_id, "tvdb_id": None, "imdb_id": imdb_id}
 
     if mode == "tv":
         details = tmdb_get("tv_details", tmdb_id)
     else:
         details = tmdb_get("movie_details", tmdb_id)
 
-    poster_path = f"{TMDB_POSTER_URL}{details.poster_path or ''}"
-    backdrop_path = f"{TMDB_BACKDROP_URL}{details.backdrop_path or ''}"
-
     list_item = ListItem(title)
-    list_item.setArt(
-        {
-            "poster": poster_path,
-            "fanart": backdrop_path,
-            "icon": os.path.join(ADDON_PATH, "resources", "img", "trending.png"),
-        }
-    )
 
-    set_media_infotag(
-        list_item,
-        mode,
-        title,
-        overview="",
-        air_date="",
-        duration="",
-        ids=ids,
-    )
+    set_media_infoTag(list_item, metadata=details)
 
     add_dir_item(mode, list_item, ids, title)
 
 
 def show_lists_content_items(res):
     tmdb_id = res["media_ids"]["tmdb"]
-    tvdb_id = None
     imdb_id = res["media_ids"]["imdb"]
-    ids = f"{tmdb_id}, {tvdb_id}, {imdb_id}"
+    ids = {"tmdb_id": tmdb_id, "tvdb_id": None, "imdb_id": imdb_id}
     title = res["title"]
 
     if res["type"] == "show":
@@ -310,26 +239,9 @@ def show_lists_content_items(res):
         mode = "movies"
         details = tmdb_get("movie_details", tmdb_id)
 
-    poster_path = f"{TMDB_POSTER_URL}{details.poster_path or ''}"
-    backdrop_path = f"{TMDB_BACKDROP_URL}{details.backdrop_path or ''}"
-
     list_item = ListItem(title)
-    list_item.setArt(
-        {
-            "poster": poster_path,
-            "fanart": backdrop_path,
-        }
-    )
 
-    set_media_infotag(
-        list_item,
-        mode,
-        title,
-        overview=details.overview,
-        air_date="",
-        duration="",
-        ids=ids,
-    )
+    set_media_infoTag(list_item, metadata=details, mode=mode)
 
     if res["type"] == "show":
         addDirectoryItem(
@@ -363,12 +275,14 @@ def show_trakt_list_content(list_type, mode, user, slug, with_auth, page):
     items = paginator_db.get_page(page)
     execute_thread_pool(items, show_lists_content_items)
     add_next_button("list_trakt_page", page, mode=mode)
+    endOfDirectory(ADDON_HANDLE)
 
 
 def show_list_trakt_page(page, mode):
     items = paginator_db.get_page(page)
     execute_thread_pool(items, show_lists_content_items)
     add_next_button("list_trakt_page", page, mode=mode)
+    endOfDirectory(ADDON_HANDLE)
 
 
 def extract_ids(res, mode="tv"):
@@ -381,7 +295,7 @@ def extract_ids(res, mode="tv"):
         tvdb_id = None
         imdb_id = res["movie"]["ids"]["imdb"]
 
-    return f"{tmdb_id}, {tvdb_id}, {imdb_id}"
+    return {"tmdb_id": tmdb_id, "tvdb_id": tvdb_id, "imdb_id": imdb_id}
 
 
 def add_dir_item(mode, list_item, ids, title):

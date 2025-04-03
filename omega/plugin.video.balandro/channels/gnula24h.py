@@ -7,14 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wv5c.gnula.cc/'
+host = 'https://w5nl.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww.gnula.cc/',
              'https://ww-w.gnula.cc/', 'https://www1.gnula.cc/', 'https://w-w-w.gnula.cc/',
              'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/',
-             'https://w-v5n.gnula.cc/', 'https://wv-5n.gnula.cc/', 'https://kv5n.gnula.cc/']
+             'https://w-v5n.gnula.cc/', 'https://wv-5n.gnula.cc/', 'https://kv5n.gnula.cc/',
+             'https://wv5c.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula24h', default='')
@@ -585,6 +586,9 @@ def play(item):
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"): servidor = new_server
+
+        if '/bigwarp.' in url or '/bgwp.' in url:
+            url = url + '|Referer=' + host
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

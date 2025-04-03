@@ -23,8 +23,8 @@ class SourceSelect(BaseWindow):
         self.item_information = item_information
         self.playback_info = None
         self.resume = None
-        self.CACHE_KEY = (
-            self.item_information["tv_data"] or self.item_information["ids"]
+        self.CACHE_KEY = str(self.item_information["tv_data"]) or str(
+            self.item_information["ids"]
         )
         self.setProperty("instant_close", "false")
         self.setProperty("resolving", "false")
@@ -83,7 +83,7 @@ class SourceSelect(BaseWindow):
             else:
                 response = xbmcgui.Dialog().contextmenu(["Browse into"])
                 if response == 0:
-                    self._resolve_pack()
+                    self._resolve_item(pack_select=True)
 
         if action_id == 7:
             if control_id == 1000:
@@ -94,10 +94,7 @@ class SourceSelect(BaseWindow):
     def _download_into(self):
         pass
 
-    def _resolve_pack(self):
-        pass
-
-    def _resolve_item(self, pack_select):
+    def _resolve_item(self, pack_select=False):
         self.setProperty("resolving", "true")
 
         selected_source = self.sources[self.position]

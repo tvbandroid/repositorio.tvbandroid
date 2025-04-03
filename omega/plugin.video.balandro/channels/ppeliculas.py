@@ -1169,12 +1169,16 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title = title.replace('Ver ', '').replace(' Online', '').strip()
+
         title = title.replace('&#038;', '&').replace("&#8217;", "'").replace("&#8211;", "")
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="year">(.*?)</span>')
         if not year: year = '-'
+        else:
+           title = title.replace('(' + year + ')', '').strip()
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(match, '<p>(.*?)</p>'))
 

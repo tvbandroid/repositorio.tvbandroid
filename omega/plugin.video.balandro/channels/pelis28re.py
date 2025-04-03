@@ -450,6 +450,8 @@ def findvideos(item):
                     elif 'xupalace' in srv: continue
                     elif 'uploadfox' in srv: continue
 
+                    elif srv == 'download': continue
+
                     servidor = servertools.corregir_servidor(srv)
 
                     if servertools.is_server_available(servidor):

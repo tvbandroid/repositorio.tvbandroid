@@ -112,8 +112,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'peliculas-populares/', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -129,7 +130,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -157,28 +157,6 @@ def generos(item):
         title = title.replace('&amp;', '&')
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = text_color ))
-
-    return itemlist
-
-
-def anios(item):
-    logger.info()
-    itemlist = []
-
-    if item.search_type == 'movie':
-        text_color = 'deepskyblue'
-        top_year = 1929
-    else:
-        text_color = 'hotpink'
-        top_year = 1969
-
-    from datetime import datetime
-    current_year = int(datetime.today().year)
-
-    for x in range(current_year, top_year, -1):
-        url = host + 'estreno/' + str(x) + '/'
-
-        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -440,6 +418,8 @@ def findvideos(item):
                 elif 'xupalace' in srv: continue
                 elif 'uploadfox' in srv: continue
                 elif 'streamsito' in srv: continue
+
+                elif srv == 'download': continue
 
                 servidor = servertools.corregir_servidor(srv)
 

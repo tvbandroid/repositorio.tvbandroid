@@ -42,6 +42,17 @@ def mainlist(item):
         if config.get_setting('mnu_documentales', default=True):
             itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...', thumbnail=config.get_thumb('documentary'), plot = 'Indicar el título de un documental' ))
 
+    if not config.get_setting('mnu_simple', default=False):
+        itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, text_color='darkgoldenrod' ))
+
+        itemlist.append(item.clone( action='emmy_ediciones', title=' - Premios Emmy', url = host + 'award_data.php?award_id=emmy&year=', thumbnail = config.get_thumb('emmys'), search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = ' - Festivales', action = 'festivales', url = host + 'all_awards.php', search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = ' - Otros Premios', action = 'festivales', url = host + 'all_awards.php', group = 'awards', search_type = 'movie' ))
+
     por_plataforma = False
     por_tema = False
 
@@ -68,12 +79,6 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Por país', action = 'paises', thumbnail=config.get_thumb('idiomas'), search_type = 'movie' ))
         itemlist.append(item.clone( title = ' - Por año', action = 'anios', thumbnail=config.get_thumb('listyears'), search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
-
-        itemlist.append(item.clone( title = ' - Festivales', action = 'festivales', url = host + 'all_awards.php', search_type = 'movie' ))
-
-        itemlist.append(item.clone( title = ' - Otros Premios', action = 'festivales', url = host + 'all_awards.php', group = 'awards', search_type = 'movie' ))
-
         itemlist.append(item.clone( title = ' - Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1, thumbnail=config.get_thumb('bestsagas'), search_type = 'movie' ))
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1&nodoc=1', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
@@ -94,8 +99,6 @@ def mainlist(item):
         itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink', plot = '' ))
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE', thumbnail=config.get_thumb('besttvshows'), search_type = 'tvshow' ))
-
-        itemlist.append(item.clone( title = ' - Premios Emmy', action = 'emmy_ediciones', url = host + 'award_data.php?award_id=emmy&year=', thumbnail=config.get_thumb('emmys'), search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas', thumbnail=config.get_thumb('booklet'), search_type = 'tvshow' ))
         itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'tvshow' ))
@@ -207,7 +210,7 @@ def festivales(item):
 
         title = title.replace('(datos prox.)', '').strip()
 
-        itemlist.append(item.clone( action = 'festivales_ediciones', title = title, url = festival ))
+        itemlist.append(item.clone( action = 'festivales_ediciones', title = title, url = festival, text_color = 'moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -215,8 +218,6 @@ def festivales(item):
 def festivales_ediciones(item):
     logger.info()
     itemlist = []
-
-    text_color = 'moccasin'
 
     if item.search_type == 'movie': text_color = 'deepskyblue'
     elif item.search_type == 'tvshow': text_color = 'hotpink'
@@ -935,11 +936,15 @@ def list_premios_anyo(item):
                         elif item.edition == 'any_emmys': _search_type = 'tvshow'
                         elif item.edition == 'any_festss': _search_type = 'movie'
 
-                        thumb = scrapertools.find_single_match(bloque, 'title="' + title + '".*?data-srcset="(.*?).jpg')
+                        if 'data-srcset="' in bloque:
+                            thumb = scrapertools.find_single_match(bloque, 'title="' + title + '".*?data-srcset="(.*?).jpg')
+                        else: thumb = ''
 
                         if item.edition == 'any_fests':
                             if not item.group == 'awards':
-                                thumb = scrapertools.find_single_match(bloque, '<a class="fa-name-image position-relative type-pers".*?' + '".*?title="' + title + '".*?data-srcset="(.*?).jpg')
+                                if 'data-srcset="' in bloque:
+                                    thumb = scrapertools.find_single_match(bloque, '<a class="fa-name-image position-relative type-pers".*?' + '".*?title="' + title + '".*?data-srcset="(.*?).jpg')
+                                else: thumb = ''
 
                         if thumb:
                             thumb = thumb.replace('-msmall', '-large') + '.jpg' + '|User-Agent=Mozilla/5.0'
@@ -948,7 +953,8 @@ def list_premios_anyo(item):
                         itemlist.append(item.clone( action = 'list_names_anyo', title = title, url = url, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name ))
 
                     else:
-                        itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
+                        if not first_person:
+                            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
                 else:
                     itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': item.anyo} ))
 

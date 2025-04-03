@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-12-11 21:30+0000\n"
+"PO-Revision-Date: 2024-08-19 23:41+0000\n"
 "Last-Translator: queeup <queeup@zoho.com>\n"
 "Language-Team: Turkish <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/tr/>\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14.1\n"
+"X-Generator: Weblate 5.4.2\n"
 
 msgctxt "#30237"
 msgid "Start from beginning"
@@ -29,7 +29,7 @@ msgstr "Filmler"
 
 msgctxt "#30229"
 msgid "TV Shows"
-msgstr "TV Şovları"
+msgstr "Diziler"
 
 msgctxt "#30224"
 msgid "Interaction"
@@ -83,10 +83,9 @@ msgctxt "#30211"
 msgid "Transcode options"
 msgstr "Kod dönüştürme seçenekleri"
 
-#, fuzzy
 msgctxt "#30210"
 msgid "HTTP direct stream"
-msgstr "HTTP doğrudan akışı"
+msgstr "HTTP doğrudan akış"
 
 msgctxt "#30209"
 msgid "File direct path"
@@ -96,10 +95,9 @@ msgctxt "#30208"
 msgid "Max stream bitrate (Kbits)"
 msgstr "Maksimum akış bit hızı (Kbps)"
 
-#, fuzzy
 msgctxt "#30207"
 msgid "Playback"
-msgstr "Geri çalma"
+msgstr "Oynatma"
 
 msgctxt "#30206"
 msgid "Playback type"
@@ -161,6 +159,7 @@ msgctxt "#30125"
 msgid "Done"
 msgstr "Tamamlandı"
 
+#, fuzzy
 msgctxt "#30121"
 msgid "On resume"
 msgstr "Sürdürünce"
@@ -171,16 +170,15 @@ msgstr "Yükleme ilerlemesini göster"
 
 msgctxt "#30118"
 msgid "Add resume percent to names"
-msgstr "İsimlere özgeçmiş yüzdesi ekle"
+msgstr "İsimlere sürdürme yüzdesi ekle"
 
 msgctxt "#30116"
 msgid "Add unwatched counts to names"
 msgstr "İsimlere izlenmeyen sayılarını ekleyin"
 
-#, fuzzy
 msgctxt "#30114"
 msgid "Jump back seconds"
-msgstr "Saniyeler geri atla"
+msgstr "Geri atlama saniyesi"
 
 msgctxt "#30113"
 msgid "Retrieving Data"
@@ -210,7 +208,6 @@ msgctxt "#30063"
 msgid "N/A"
 msgstr "Yok"
 
-#, fuzzy
 msgctxt "#30053"
 msgid "Waiting for server to delete"
 msgstr "Sunucunun silmesi bekleniyor"
@@ -221,7 +218,7 @@ msgstr "Siliniyor"
 
 msgctxt "#30045"
 msgid "Username not found"
-msgstr "Kullanıcı bulunamadı"
+msgstr "Kullanıcı adı bulunamadı"
 
 msgctxt "#30044"
 msgid "Incorrect Username/Password"
@@ -231,10 +228,9 @@ msgctxt "#30027"
 msgid "Enable debug logging"
 msgstr "Hata ayıklama günlüğünü etkinleştir"
 
-#, fuzzy
 msgctxt "#30026"
 msgid "Widget item select action"
-msgstr "Widget öğesi seçme eylemi"
+msgstr "Pencere ögesi seçme eylemi"
 
 msgctxt "#30025"
 msgid "Password:"
@@ -242,11 +238,11 @@ msgstr "Parola:"
 
 msgctxt "#30024"
 msgid "Username:"
-msgstr "Kullanıcı:"
+msgstr "Kullanıcı adı:"
 
 msgctxt "#30023"
 msgid "Hide unwatched episode details"
-msgstr "İzlenmeyen bölüm ayrıntılarını gizle"
+msgstr "İzlenmemiş bölümlerin ayrıntılarını gizle"
 
 msgctxt "#30022"
 msgid "Advanced"
@@ -258,7 +254,7 @@ msgstr "Tüm bölümleri göster"
 
 msgctxt "#30020"
 msgid "Flatten single season"
-msgstr "Tek sezon düzleştirin"
+msgstr "Tek sezonu düzleştir"
 
 msgctxt "#30019"
 msgid "Filtered episode name format"
@@ -303,7 +299,7 @@ msgstr "Samba parolası"
 
 msgctxt "#30007"
 msgid "Samba username"
-msgstr "Samba Kullanıcı"
+msgstr "Samba kullanıcı adı"
 
 msgctxt "#30006"
 msgid "Password"
@@ -311,7 +307,7 @@ msgstr "Şifre"
 
 msgctxt "#30005"
 msgid "Username"
-msgstr "Kullanıcı"
+msgstr "Kullanıcı adı"
 
 msgctxt "#30003"
 msgid "Verify HTTPS certificate"
@@ -327,7 +323,7 @@ msgstr "Eklenti ayarlarını göster"
 
 msgctxt "#30271"
 msgid "Mark Unwatched"
-msgstr "İzlenmemiş işaretle"
+msgstr "İzlenmedi olarak işaretle"
 
 msgctxt "#30267"
 msgid " - In Progress"
@@ -335,7 +331,7 @@ msgstr "- Devam Eden"
 
 msgctxt "#30268"
 msgid " - Recently Added"
-msgstr "- Yeni Eklenen"
+msgstr "- Son Eklenen"
 
 msgctxt "#30001"
 msgid "Port"
@@ -347,20 +343,19 @@ msgstr "mpeg2 kod dönüştürmeyi zorla"
 
 msgctxt "#30241"
 msgid "Force transcode mpeg4"
-msgstr "mpeg4 kodlamayı zorla"
+msgstr "mpeg4 kod dönüştürmeyi zorla"
 
 msgctxt "#30240"
 msgid "Force transcode msmpeg4v3 (divx)"
-msgstr "msmpeg4v3 (divx) kodlamayı zorla"
+msgstr "msmpeg4v3 (divx) kod dönüştürmeyi zorla"
 
 msgctxt "#30246"
 msgid "Search"
 msgstr "Ara"
 
-#, fuzzy
 msgctxt "#30247"
 msgid "Custom Widget Content"
-msgstr "Özel Widget İçeriği"
+msgstr "Özel Pencere Ögesi İçeriği"
 
 msgctxt "#30252"
 msgid "Movies - A-Z"
@@ -388,7 +383,7 @@ msgstr "Bölümler - Devam eden"
 
 msgctxt "#30265"
 msgid "Episodes - Next Up"
-msgstr "Bölümler - Gelecek"
+msgstr "Bölümler - Sıradaki"
 
 msgctxt "#30266"
 msgid "Movies - Pages"
@@ -396,7 +391,7 @@ msgstr "Filmler - Sayfalar"
 
 msgctxt "#30270"
 msgid "Mark Watched"
-msgstr "İzlenmiş işaretle"
+msgstr "İzlendi olarak işaretle"
 
 msgctxt "#30269"
 msgid "Movies - Random"
@@ -414,10 +409,9 @@ msgctxt "#30274"
 msgid "Delete"
 msgstr "Sil"
 
-#, fuzzy
 msgctxt "#30276"
 msgid "Extra Resume Prompt Detected"
-msgstr "Ekstra Devam İstemi Algılandı"
+msgstr "Çift Sürdürme İstemi Algılandı"
 
 msgctxt "#30225"
 msgid "Interface Mode"
@@ -431,10 +425,9 @@ msgctxt "#30227"
 msgid "Simple"
 msgstr "Basit"
 
-#, fuzzy
 msgctxt "#30238"
 msgid "Playback stream options"
-msgstr "Oynatma yayın ayarları"
+msgstr "Oynatma akış seçenekleri"
 
 msgctxt "#30250"
 msgid "Unknown"
@@ -446,7 +439,7 @@ msgstr "Filmler - Türler"
 
 msgctxt "#30257"
 msgid "Movies - Recently Added"
-msgstr "Filmler - Yeni Eklenen"
+msgstr "Filmler - Son Eklenen"
 
 msgctxt "#30258"
 msgid "Movies - In Progress"
@@ -462,7 +455,7 @@ msgstr "Bölümler - Son Eklenen"
 
 msgctxt "#30275"
 msgid "Force Transcode"
-msgstr "Kodlamaya Zorla"
+msgstr "Kod Dönüştürmeye Zorla"
 
 msgctxt "#30354"
 msgid "Go To Series"
@@ -495,3 +488,265 @@ msgstr "Ses Akışını Seçin"
 msgctxt "#30292"
 msgid "Select Subtitle Stream"
 msgstr "Altyazı Akışını Seçin"
+
+msgctxt "#30348"
+msgid "Add user ratings"
+msgstr "Kullanıcı puanı ekleyin"
+
+msgctxt "#30311"
+msgid "Library - "
+msgstr "Kütüphane -"
+
+msgctxt "#30418"
+msgid "Audio bitrate (Kbits)"
+msgstr "Ses bit hızı (Kbps)"
+
+msgctxt "#30289"
+msgid "TV Shows - Genres"
+msgstr "Diziler - Türler"
+
+msgctxt "#30325"
+msgid " - Genres"
+msgstr "- Türler"
+
+msgctxt "#30279"
+msgid "TV Shows - Unwatched"
+msgstr "Diziler - İzlenmemiş"
+
+msgctxt "#30350"
+msgid "Music - Recently Added"
+msgstr "Müzik - Son Eklenen"
+
+msgctxt "#30445"
+msgid "Continue Watching"
+msgstr "İzlemeye Devam Et"
+
+msgctxt "#30450"
+msgid "Next Up Rewatching"
+msgstr "Sıradaki Bölümü Tekrar İzle"
+
+msgctxt "#30447"
+msgid "Max Play Queue Size"
+msgstr "Maksimum Oynatma Kuyruğu Boyutu"
+
+msgctxt "#30449"
+msgid "Instant Mix"
+msgstr "Anlık Mix"
+
+msgctxt "#30277"
+msgid "JellyCon needs to prompt for resume on partily played items, Kodi can also prompt, this can cause a double prompt. Do you want to remove the double prompt?"
+msgstr ""
+"JellyCon'un kısmen oynatılan ögelerde sürdürmeyi istemesi gerekir. Bunu Kodi "
+"de isteyebilir ve bu çift isteme neden olabilir. Çift istemi kaldırmak "
+"istiyor musunuz?"
+
+msgctxt "#30286"
+msgid "Movies - Unwatched"
+msgstr "Filmler - İzlenmemiş"
+
+msgctxt "#30287"
+msgid "TV Shows - Latest"
+msgstr "Diziler - En Son"
+
+msgctxt "#30322"
+msgid "Auto resume"
+msgstr "Otomatik sürdür"
+
+msgctxt "#30351"
+msgid "Music - Recently Played"
+msgstr "Müzik - Son Çalınan"
+
+msgctxt "#30432"
+msgid "Hide watched items in lists"
+msgstr "Listelerdeki izlenmiş içerikleri gizle"
+
+msgctxt "#30242"
+msgid "Force transcode av1"
+msgstr "av1 kod dönüştürmeyi zorla"
+
+msgctxt "#30428"
+msgid "Rating"
+msgstr "Puan"
+
+msgctxt "#30309"
+msgid "Select Media Source"
+msgstr "Medya Kaynağını Seçin"
+
+msgctxt "#30278"
+msgid " - Next Up"
+msgstr "- Sıradaki Bölümler"
+
+msgctxt "#30285"
+msgid " - Unwatched"
+msgstr "- İzlenmemiş"
+
+msgctxt "#30349"
+msgid " - Recently Played"
+msgstr "- Son Oynatılan"
+
+msgctxt "#30288"
+msgid " - Latest"
+msgstr "- Sonuncu"
+
+#, fuzzy
+msgctxt "#30260"
+msgid "BoxSets"
+msgstr "Kutu Setleri"
+
+msgctxt "#30283"
+msgid "Play Next Episode?"
+msgstr "Sonraki Bölüm Oynatılsın mı?"
+
+msgctxt "#30305"
+msgid "Not Found"
+msgstr "Bulunamadı"
+
+msgctxt "#30315"
+msgid "Suppress notifications for connection errors"
+msgstr "Bağlantı hatalarına ilişkin bildirimleri bastır"
+
+msgctxt "#30317"
+msgid "Play All"
+msgstr "Hepsini Oynat"
+
+msgctxt "#30280"
+msgid "Missing Title"
+msgstr "Eksik Başlık"
+
+msgctxt "#30294"
+msgid "Notice"
+msgstr "Uyarı"
+
+msgctxt "#30295"
+msgid "To use this feature you need HTTP control enabled"
+msgstr ""
+"Bu özelliği kullanmak için HTTP kontrolünün etkinleştirilmiş olması gerekir"
+
+msgctxt "#30296"
+msgid "Delete"
+msgstr "Sil"
+
+msgctxt "#30302"
+msgid "Existing images : "
+msgstr "Mevcut resimler:"
+
+msgctxt "#30303"
+msgid "Missing Jellyfin images : "
+msgstr "Eksik Jellyfin görselleri:"
+
+msgctxt "#30306"
+msgid "Playback starting"
+msgstr "Oynatma başlatılıyor"
+
+msgctxt "#30307"
+msgid "Play Trailer"
+msgstr "Fragmanı Oynat"
+
+msgctxt "#30308"
+msgid "Select Trailer"
+msgstr "Fragman Seç"
+
+msgctxt "#30310"
+msgid "Enable Jellyfin remote control"
+msgstr "Jellyfin uzaktan kumandasını etkinleştir"
+
+msgctxt "#30312"
+msgid "All - "
+msgstr "Hepsi -"
+
+msgctxt "#30313"
+msgid "Menu"
+msgstr "Menü"
+
+msgctxt "#30314"
+msgid "Play"
+msgstr "Oynat"
+
+msgctxt "#30316"
+msgid "Connection Error"
+msgstr "Bağlantı Hatası"
+
+msgctxt "#30318"
+msgid "Music - Albums"
+msgstr "Müzik - Albümler"
+
+msgctxt "#30282"
+msgid "No Jellyfin servers detected on your local network."
+msgstr "Yerel ağınızda Jellyfin sunucusu algılanmadı."
+
+msgctxt "#30290"
+msgid "All"
+msgstr "Hepsi"
+
+msgctxt "#30281"
+msgid "Refresh Cached Images"
+msgstr "Önbelleğe Alınmış Görüntüleri Yenile"
+
+msgctxt "#30293"
+msgid "Cache images"
+msgstr "Resimleri önbelleğe al"
+
+msgctxt "#30297"
+msgid "Delete unused images?"
+msgstr "Kullanılmayan görseller silinsin mi?"
+
+msgctxt "#30298"
+msgid "Deleting Kodi Images"
+msgstr "Kodi Görüntülerini Silme"
+
+msgctxt "#30299"
+msgid "Cache Images"
+msgstr "Görüntüleri Önbelleğe Al"
+
+msgctxt "#30300"
+msgid "Cache all Jellyfin images as local Kodi images?"
+msgstr ""
+"Tüm Jellyfin görselleri yerel Kodi görselleri olarak önbelleğe alınsın mı?"
+
+msgctxt "#30301"
+msgid "Caching Images"
+msgstr "Görüntüleri Önbelleğe Alma"
+
+msgctxt "#30304"
+msgid "Cached Jellyfin images : "
+msgstr "Önbelleğe alınmış Jellyfin görüntüleri:"
+
+msgctxt "#30406"
+msgid "Jellyfin Libraries"
+msgstr "Jellyfin Kütüphaneleri"
+
+msgctxt "#30410"
+msgid " - Collections"
+msgstr "- Koleksiyonlar"
+
+msgctxt "#30414"
+msgid " - Favorites"
+msgstr "- Favoriler"
+
+msgctxt "#30415"
+msgid " - Favorite Collections"
+msgstr "- Favori Koleksiyonlar"
+
+msgctxt "#30328"
+msgid "Show empty folders (shows, seasons, collections)"
+msgstr "Boş klasörleri göster (diziler, sezonlar, koleksiyonlar)"
+
+msgctxt "#30340"
+msgid "Group movies into collections"
+msgstr "Filmleri koleksiyonlar halinde grupla"
+
+msgctxt "#30437"
+msgid "Playback options"
+msgstr "Oynatma seçenekleri"
+
+msgctxt "#30453"
+msgid "Hide number of items to show on entry title"
+msgstr "Giriş başlığında gösterilecek öge sayısını gizle"
+
+msgctxt "#30441"
+msgid "Use cached widget data"
+msgstr "Önbelleğe alınmış pencere ögesi verilerini kullan"
+
+msgctxt "#30408"
+msgid "Custom Widgets"
+msgstr "Özel Pencere Ögesi"

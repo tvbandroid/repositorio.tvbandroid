@@ -7,11 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.veronline.mov/'
+host = 'https://www.veronline.bond/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/']
+ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/',
+             'https://www.veronline.mov/', 'https://www.veronline.cfd/']
 
 domain = config.get_setting('dominio', 'veronline', default='')
 
@@ -158,7 +159,7 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&amp;', '&').strip()
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title, text_color = 'hotpink' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'hotpink' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -197,9 +198,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Veronline.mov</span>(.*?)>mas vistas<')
+    bloque = scrapertools.find_single_match(data, '<span>Veronline.bond</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.mov</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.bond</span>(.*?)>mas vistas<')
 
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline</span>(.*?)>mas vistas<')
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline</span>(.*?)>mas vistas<')

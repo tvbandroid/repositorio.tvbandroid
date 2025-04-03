@@ -2,7 +2,7 @@ import re
 from tmdbhelper.lib.items.artselect import _ArtworkSelector
 from tmdbhelper.lib.addon.plugin import get_setting
 from tmdbhelper.lib.items.listitem import ListItem
-from tmdbhelper.lib.files.bcache import BasicCacheMem
+from tmdbhelper.lib.files.bcache import BasicCache, BasicCacheService
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.api.fanarttv.api import FanartTV
 from tmdbhelper.lib.addon.tmdate import set_timestamp, get_timestamp
@@ -38,21 +38,20 @@ BACKFILL_BLACKLIST = ['poster']
 
 
 class ItemBuilder(_ArtworkSelector):
+    _basic_cache_cls = BasicCache
+
     def __init__(self, tmdb_api=None, ftv_api=None, trakt_api=None, cache_only=False, log_timers=False, timer_lists: dict = None):
         self.parent_tv = {}
         self.parent_season = {}
         self.tmdb_api = tmdb_api or TMDb()
         self.ftv_api = ftv_api or FanartTV()
         self.trakt_api = trakt_api
-        self._cache = BasicCacheMem(filename='ItemBuilder.db')
+        self._cache = self._basic_cache_cls(filename='ItemBuilder.db')
         self._regex = re.compile(r'({})'.format('|'.join(IMAGEPATH_ALL)))
         self.parent_params = None
         self.cache_only = cache_only
         self.timer_lists = timer_lists if isinstance(timer_lists, dict) else {}
         self.log_timers = log_timers
-        self._yy = 0
-        self.override = False if self.tmdb_api.iso_language == 'en' else True  # Override titles with TMDb translated data
-        # self.__dict__.update(kwargs)
 
     def _timestamp(self, days=14):
         return set_timestamp(days * 24 * 3600)
@@ -96,7 +95,7 @@ class ItemBuilder(_ArtworkSelector):
 
     def get_ftv_typeid(self, tmdb_type, item, season=None, tmdb_id=None):
         unique_ids = item['listitem'].get('unique_ids', {}) if item else {}
-        if tmdb_type == 'movie':
+        if tmdb_type in ('movie', 'collection'):
             return (tmdb_id or unique_ids.get('tmdb'), 'movies')
         if tmdb_type == 'tv':
             if season is None:
@@ -276,6 +275,10 @@ class ItemBuilder(_ArtworkSelector):
             return li
         if not use_iterprops:
             item = self._undo_iterprops(item, tmdb_type, tmdb_id, season, episode)
-        li.set_details(item['listitem'], override=self.override)
+        li.set_details(item['listitem'], override=True)  # Old method for override checked (if self.tmdb_api.iso_language == 'en') to override only for non-English but lets standardise behaviour
         li.art = self.get_item_artwork(item['artwork'], is_season=mediatype in ['season', 'episode'])
         return li
+
+
+class ItemBuilderService(ItemBuilder):
+    _basic_cache_cls = BasicCacheService  # Use a different mem cache queue level for service to write out more frequently since it runs continuously

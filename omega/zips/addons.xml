@@ -233,14 +233,14 @@
 	</extension>
 </addon>
 
-<addon id="plugin.program.autowidget" name="AutoWidget" version="3.6.1" provider-name="drinfernoo">
+<addon id="plugin.program.autowidget" name="AutoWidget" version="3.7.0" provider-name="drinfernoo">
     <requires>
         <import addon="script.module.pil" />
         <import addon="script.module.six" />
     </requires>
 
     <extension point="xbmc.python.pluginsource" library="main.py">
-        <provides>executable video music</provides>
+        <provides>executable</provides>
     </extension>
 
     <extension point="xbmc.service" library="service.py" />
@@ -277,6 +277,10 @@
         <website>https://www.github.com/drinfernoo/</website>
         <source>https://www.github.com/drinfernoo/plugin.program.autowidget/</source>
         <news>
+3.7.0
+ - Optimize caching for performance and reliability
+ - Fix direct shortcuts
+ - Fix Settings Shortcuts for dependency add-ons
 3.6.1
  - Fix playing direct shortcuts for some items
  - Fix cache clearing again
@@ -661,7 +665,7 @@
         <assets><icon>icon.png</icon></assets> </extension>
 </addon>
 
-<addon id="plugin.video.alfa" name="Alfa" version="3.10.6" provider-name="Alfa Addon">
+<addon id="plugin.video.alfa" name="Alfa" version="3.10.8" provider-name="Alfa Addon">
     <requires>
         <import addon="script.module.requests" />
         <import addon="script.module.beautifulsoup4" version="4.5.3" />
@@ -711,12 +715,8 @@
         <news>
     [B]Estos son los cambios para esta versión:[/B]
     • +18                                         • Don Torrent
-    • HenaoJara                              • Nuevo: Osjonosu
-    • Playdede                                • SeriesKao
-
-    Agradecemos:
-    • A [B]Llavesuke[/B] por su [I]colaboración[/I] en esta versión
-    • A [B]chinocudeiro1985[/B] por su sugerencia de web</news>
+    • HDFull                                    • Nuevo: Yaske
+    • Osjonosu                                • Playdede</news>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>
@@ -774,7 +774,7 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.15" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.16" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -794,7 +794,7 @@
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.15[/COLOR][COLOR chartreuse]  Febrero de 2025[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.16[/COLOR][COLOR chartreuse]  Marzo de 2025[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]
@@ -827,7 +827,7 @@
         Sin Novedades
     </news>
     <summary>Balandro es un Navegador de Páginas Webs</summary>
-    <description>[COLOR moccasin][B]Navega con Kodi por Páginas Webs para poder ver sus contenidos de manera fácil. [COLOR yellow]Balandro es desde el año [COLOR cyan]2018[COLOR yellow] un MOD derivado de [COLOR yellowgreen]Pelisalacarta y Alfa[COLOR yellow],[COLOR mediumaquamarine] y tiene como objeto, permitir visualizar [COLOR deepskyblue]Películas[COLOR mediumaquamarine], [COLOR hotpink]Series[COLOR mediumaquamarine], [COLOR darkcyan]Documentales[COLOR mediumaquamarine], etc., todo a través de Internet y directamente desde su sistema Media Center. [COLOR orchid]Este Add-On es tan solo un mero Ejercicio de Aprendizaje del Lenguaje de Programación Python y se distribuye sin Ningún Contenido Multimedia adjunto al mismo [COLOR lightgrey][I]En consecuencia solo las Webs son Plenamente Responsables de los contenidos que publiquen.[/I][/B][/COLOR]</description>
+    <description>[COLOR moccasin][B]Navega con Kodi por Páginas Webs para poder ver sus contenidos de manera fácil. [COLOR yellow]Balandro es desde el año [COLOR cyan]2018[COLOR yellow] un MOD derivado de [COLOR yellowgreen]Pelisalacarta y Alfa[COLOR yellow],[COLOR mediumaquamarine] y tiene como objeto, permitir visualizar [COLOR deepskyblue]Películas[COLOR mediumaquamarine], [COLOR hotpink]Series[COLOR mediumaquamarine], [COLOR aquamarine]Documentales[COLOR mediumaquamarine], etc., todo a través de Internet y directamente desde su sistema Media Center. [COLOR orchid]Este Add-On es tan solo un mero Ejercicio de Aprendizaje del Lenguaje de Programación Python y se distribuye sin Ningún Contenido Multimedia adjunto al mismo [COLOR red][I]En consecuencia solo las Webs son los Plenamente Responsables de los contenidos que publiquen.[/I][/B][/COLOR]</description>
     <disclaimer>[COLOR aqua][B]Los Propietarios y Distribuidores de este Add-On no Proveen ni Distribuyen Ningún Contenido Mostrado por el Add-On, ni Tienen Afiliación alguna con los Proveedores/Webs de contenidos. [COLOR tan]Está Prohibida su distribución, solo ó junto con Contenidos Multimedia Protegidos por los Derechos de Autor. [COLOR chocolate]Si este tipo de contenido está Prohibido en su País, solamente Usted será el Responsable de su uso. [COLOR white]La vulneración de estas prohibiciones Exonerarán de cualquier Culpa a sus Autores, [COLOR red]Siendo el unico Responsable quien lo haya Distribuido ó Utilizado Ilegalmente.[/B][/COLOR]</disclaimer>
     <platform>all</platform>
     <license>GNU GPL v3</license>
@@ -1097,7 +1097,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.elementum" name="Elementum" version="0.1.109" provider-name="elgatito">
+<addon id="plugin.video.elementum" name="Elementum" version="0.1.110" provider-name="elgatito">
     <requires>
         <import addon="xbmc.addon" version="16.0.0" />
         <import addon="repository.elementumorg" optional="true" />
@@ -1190,7 +1190,7 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.jacktook" name="Jacktook" version="0.4.10" provider-name="Sam-Max">
+<addon id="plugin.video.jacktook" name="Jacktook" version="0.5.1" provider-name="Sam-Max">
   <requires>
     <import addon="xbmc.python" version="3.00.0"/>
     <import addon="script.module.requests" version="2.25.1"/>
@@ -1216,7 +1216,7 @@
  </extension>
 </addon>
 
-<addon id="plugin.video.jellycon" name="JellyCon" version="0.8.0+py3" provider-name="Jellyfin Contributors">
+<addon id="plugin.video.jellycon" name="JellyCon" version="0.8.3+py3" provider-name="Jellyfin Contributors">
   <requires>
     <import addon="xbmc.python" version="3.0.0" />
     <import addon="script.module.requests" version="2.22.0+matrix.1" />
@@ -1743,15 +1743,15 @@ No se acepta ninguna responsabilidad por el uso de este addon.
 </addon>
 
 <addon id="plugin.video.themoviedb.helper"
-version="5.2.25~nexus"
-name="TheMovieDb Helper"
+version="6.0.3"
+name="TMDb Helper"
 provider-name="jurialmunkey">
 <requires>
   <import addon="xbmc.python" version="3.0.1"/>
   <import addon="script.module.requests" version="2.9.1"/>
   <import addon="script.module.pil" version="1.1.7"/>
   <import addon="script.module.addon.signals" version="0.0.6" />
-  <import addon="script.module.jurialmunkey" version="0.1.14" />
+  <import addon="script.module.jurialmunkey" version="0.2.24" />
   <import addon="script.module.infotagger" version="0.0.5" />
   <import addon="script.module.beautifulsoup4" version="4.9.3" />
 </requires>
@@ -1763,9 +1763,9 @@ provider-name="jurialmunkey">
 <extension point="xbmc.python.module" library="resources/modules"/>
 <extension point="xbmc.addon.metadata">
   <reuselanguageinvoker>false</reuselanguageinvoker>
-  <summary lang="en_GB">TheMovieDb Helper</summary>
-  <description lang="en_GB">TheMovieDb Helper provides details about movies, tvshows and actors from TMDb. Users can access a variety of lists from TMDb TVDb MDbList and Trakt.</description>
-  <disclaimer lang="en_GB">Data provided by TheMovieDb TVDb MDbList OMDb FanartTV and Trakt. Some of the information is provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe</disclaimer>
+  <summary lang="en_GB">TMDb Helper</summary>
+  <description lang="en_GB">TMDb Helper provides details about movies, tvshows and actors from TMDb. Users can access a variety of lists from TMDb TVDb MDbList and Trakt.</description>
+  <disclaimer lang="en_GB">Data provided by TMDb TVDb MDbList OMDb FanartTV and Trakt. Some of the information is provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe</disclaimer>
   <license>GPL-3.0-or-later</license>
   <website>https://github.com/jurialmunkey/plugin.video.themoviedb.helper</website>
   <forum>https://forum.kodi.tv/showthread.php?tid=345847</forum>

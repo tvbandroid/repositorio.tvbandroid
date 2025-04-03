@@ -1,5 +1,5 @@
-from ast import literal_eval
 from datetime import timedelta
+import json
 import os
 from threading import Thread
 from urllib.parse import quote
@@ -20,6 +20,7 @@ from lib.gui.custom_dialogs import (
 )
 
 from lib.player import JacktookPLayer
+from lib.stremio.catalogs import list_stremio_catalogs
 from lib.utils.seasons import show_episode_info, show_season_info
 from lib.utils.tmdb_utils import get_tmdb_media_details
 from lib.utils.torrentio_utils import open_providers_selection
@@ -38,7 +39,7 @@ from lib.trakt import (
     show_list_trakt_page,
 )
 
-from lib.utils.rd_utils import get_rd_info
+from lib.utils.rd_utils import RealDebridHelper
 from lib.utils.items_menus import tv_items, movie_items, anime_items, animation_items
 from lib.utils.debrid_utils import check_debrid_cached
 
@@ -116,7 +117,7 @@ if JACKTORR_ADDON:
     )
 
 tmdb = TMDb()
-tmdb.api_key = get_setting("tmdb_apikey", "b70756b7083d9ee60f849d82d94a0d80")
+tmdb.api_key = get_setting("tmdb_api_key", "b70756b7083d9ee60f849d82d94a0d80")
 
 try:
     language_index = get_setting("language")
@@ -158,6 +159,13 @@ def root_menu():
         ADDON_HANDLE,
         build_url("animation_menu"),
         list_item("Animation", "anime.png"),
+        isFolder=True,
+    )
+
+    addDirectoryItem(
+        ADDON_HANDLE,
+        build_url("tv_menu"),
+        list_item("Live TV", "tv.png"),
         isFolder=True,
     )
 
@@ -319,6 +327,7 @@ def tv_shows_items(params):
             list_item(item["name"], item["icon"]),
             isFolder=True,
         )
+    list_stremio_catalogs(menu_type="series", sub_menu_type="series")
     endOfDirectory(ADDON_HANDLE)
 
 
@@ -332,6 +341,7 @@ def movies_items(params):
             list_item(item["name"], item["icon"]),
             isFolder=True,
         )
+    list_stremio_catalogs(menu_type="movie", sub_menu_type="movie")
     endOfDirectory(ADDON_HANDLE)
 
 
@@ -413,6 +423,7 @@ def anime_item(params):
                 list_item(item["name"], item["icon"]),
                 isFolder=True,
             )
+        list_stremio_catalogs(menu_type="anime", sub_menu_type="series")
     if mode == "movies":
         for item in anime_items:
             if item["api"] == "tmdb":
@@ -428,6 +439,12 @@ def anime_item(params):
                     list_item(item["name"], item["icon"]),
                     isFolder=True,
                 )
+        list_stremio_catalogs(menu_type="anime", sub_menu_type="movie")
+    endOfDirectory(ADDON_HANDLE)
+
+
+def tv_menu(params):
+    list_stremio_catalogs(menu_type="tv")
     endOfDirectory(ADDON_HANDLE)
 
 
@@ -517,8 +534,8 @@ def search(params):
     query = params["query"]
     mode = params["mode"]
     media_type = params.get("media_type", "")
-    ids = params.get("ids", "")
-    tv_data = params.get("tv_data", "")
+    ids = json.loads(params.get("ids", "{}"))
+    tv_data = json.loads(params.get("tv_data", "{}"))
     direct = params.get("direct", False)
     rescrape = params.get("rescrape", False)
 
@@ -527,10 +544,7 @@ def search(params):
 
     episode, season, ep_name = (0, 0, "")
     if tv_data:
-        try:
-            ep_name, episode, season = tv_data.split("(^)")
-        except ValueError:
-            pass
+        ep_name, episode, season = tv_data.values()
 
     with DialogListener() as listener:
         results = search_client(
@@ -548,7 +562,7 @@ def search(params):
             season,
         )
         if not pre_results:
-            notification("No results found for episode")
+            notification("No results found")
             return
 
     if get_setting("torrent_enable"):
@@ -586,11 +600,14 @@ def search(params):
 
 
 def handle_results(results, mode, ids, tv_data, direct=False):
-    if direct:
+    if ids:
+        tmdb_id, tvdb_id, _ = ids.values()
+    else:
+        tmdb_id = None
+
+    if direct or not tmdb_id:
         item_info = {"tv_data": tv_data, "ids": ids, "mode": mode}
     else:
-        tmdb_id, tvdb_id, _ = [id.strip() for id in ids.split(",")]
-
         details = get_tmdb_media_details(tmdb_id, mode)
         poster = f"{TMDB_POSTER_URL}{details.poster_path or ''}"
         overview = details.overview or ""
@@ -640,7 +657,7 @@ def handle_debrid_client(
 
 
 def play_torrent(params):
-    data = literal_eval(params["data"])
+    data = json.loads(params["data"])
     player = JacktookPLayer(db=bookmark_db)
     player.run(data=data)
     del player
@@ -718,7 +735,7 @@ def cloud(params):
 
 
 def rd_info(params):
-    get_rd_info()
+    RealDebridHelper().get_rd_info()
 
 
 def get_rd_downloads(params):
@@ -811,7 +828,7 @@ def play_url(params):
 
 
 def tv_seasons_details(params):
-    ids = params["ids"]
+    ids = json.loads(params.get("ids", "{}"))
     mode = params["mode"]
     media_type = params.get("media_type", None)
 
@@ -822,7 +839,7 @@ def tv_seasons_details(params):
 
 
 def tv_episodes_details(params):
-    ids = params["ids"]
+    ids = json.loads(params.get("ids", "{}"))
     mode = params["mode"]
     tv_name = params["tv_name"]
     season = params["season"]
@@ -835,7 +852,7 @@ def tv_episodes_details(params):
 
 
 def play_from_pack(params):
-    data = eval(params.get("data"))
+    data = json.loads(params.get("data"))
     data = get_playback_info(data)
     list_item = make_listing(data)
     setResolvedUrl(ADDON_HANDLE, True, list_item)
@@ -918,7 +935,7 @@ def addon_update(params):
 
 
 def donate(params):
-    msg = "If you like Jacktook and appreciate the time and effort invested by me developing this addon you can support me by making a one time payment to:"
+    msg = "If you enjoy using Jacktook and appreciate the time and effort we are investing in developing this addon, you can support us with a contribution at:"
     dialog = CustomDialog(
         "customdialog.xml",
         ADDON_PATH,

@@ -46,7 +46,8 @@ def get_video_url(page_url, url_referer=''):
 
     if 'amdahost' in page_url: txt_server = 'Amdahost'
     elif 'allviid' in page_url: txt_server = 'Allviid'
-    elif 'bigwarp' in page_url: txt_server = 'Bigwarp'
+    elif 'asianload' in page_url: txt_server = 'Asianload'
+    elif 'bigwarp' in page_url or 'bgwp' in page_url: txt_server = 'Bigwarp'
     elif 'cloudfile' in page_url: txt_server = 'Cloudfile'
     elif 'cloudmail' in page_url: txt_server = 'Cloudmail'
     elif 'dailyuploads' in page_url: txt_server = 'Dailyuploads'
@@ -100,6 +101,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'videa' in page_url: txt_server = 'Videa'
     elif 'swiftload' in page_url: txt_server = 'SwiftLoad'
     elif 'vidtube' in page_url: txt_server = 'Vidtube'
+    elif 'wecima' in page_url: txt_server = 'Wecima'
 
     elif txt_server == 'Unknow': return 'Desconocido'
 
@@ -147,8 +149,11 @@ def get_video_url(page_url, url_referer=''):
             if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                 return 'Archivo inexistente ó eliminado'
 
-            elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
+            elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace or 'Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
+
+        elif 'HTTP Error 404: Not Found' in traceback.format_exc():
+            return 'Archivo inexistente'
 
         elif '<urlopen error' in traceback.format_exc():
             return 'No se puede establecer la conexión'

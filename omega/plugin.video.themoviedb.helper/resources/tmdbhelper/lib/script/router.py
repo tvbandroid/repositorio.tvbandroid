@@ -12,6 +12,13 @@ REGEX_WINPROP_FINDALL = r'\$WINPROP\[(.*?)\]'  # $WINPROP[key] = Window(10000).g
 REGEX_WINPROP_SUB = r'\$WINPROP\[{}\]'
 
 
+def test_func():
+    from tmdbhelper.lib.api.trakt.api import TraktAPI
+    data = TraktAPI().trakt_episodedata.sync_all_episodes(1396)
+    import xbmcgui
+    xbmcgui.Dialog().textviewer('TEST', f'{data}')
+
+
 class Script(object):
     def __init__(self, *args):
         self.params = {}
@@ -30,6 +37,9 @@ class Script(object):
         self.params = reconfigure_legacy_params(**self.params)
 
     routing_table = {
+        'test_func':
+            lambda **kwargs: test_func(),
+
         # Node Maker
         'make_node':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.make_node', 'make_node')(**kwargs),
@@ -52,6 +62,10 @@ class Script(object):
         'related_lists':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.context_menu', 'related_lists')(**kwargs),
 
+        # TMDb Utils
+        'sync_tmdb':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.tmdb', 'sync_tmdb')(**kwargs),
+
         # Trakt Utils
         'like_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'like_list')(**kwargs),
@@ -63,6 +77,8 @@ class Script(object):
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sync_trakt')(**kwargs),
         'sort_list':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'sort_list')(**kwargs),
+        'refresh_trakt_sync':
+            lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'refresh_trakt_sync')(**kwargs),
         'get_trakt_stats':
             lambda **kwargs: importmodule('tmdbhelper.lib.script.method.trakt', 'get_stats')(**kwargs),
         'authenticate_trakt':

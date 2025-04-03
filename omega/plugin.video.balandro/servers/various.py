@@ -70,7 +70,7 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('terabox.app/', 'terabox.com/')
 
-    elif 'streamruby' in page_url or 'sruby' in page_url or 'rubystream' in page_url or 'stmruby' in page_url or 'rubystm' in page_url: txt_server = 'Streamruby'
+    elif 'streamruby' in page_url or 'sruby' in page_url or 'rubystream' in page_url or 'stmruby' in page_url or 'rubystm' in page_url or 'rubyvid' in page_url: txt_server = 'Streamruby'
 
     elif 'goodstream' in page_url:
           txt_server = 'Goodstream'
@@ -83,11 +83,12 @@ def get_video_url(page_url, url_referer=''):
           if not '/video/embed/' in page_url:
               page_url = page_url.replace('/goodstream.uno/', '/goodstream.uno/video/embed/')
               page_url = page_url.replace('/goodstream.one/', '/goodstream.uno/video/embed/')
+              page_url = page_url.replace('.html', '')
 
-    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url:
+    elif 'filemoon' in page_url or 'fmoonembed' in page_url or 'embedmoon' in page_url or 'moonjscdn' in page_url or 'l1afav' in page_url:
           txt_server = 'Filemoon'
           page_url = page_url.replace('/filemoon.to/', '/filemoon.sx/').replace('/filemoon.in/', '/filemoon.sx/').replace('/filemoon.nl/', '/filemoon.sx/').replace('/filemoon.wf/', '/filemoon.sx/').replace('/filemoon.eu/', '/filemoon.sx/').replace('/filemoon.art/', '/filemoon.sx/').replace('/filemoon.link/', '/filemoon.sx/').replace('/filemoon.top/', '/filemoon.sx/').replace('/filemoon.lat/', '/filemoon.sx/').replace('/filemoon.org/', '/filemoon.sx/').replace('/filemoon.online/', '/filemoon.sx/')
-          page_url = page_url.replace('/fmoonembed.pro/', '/filemoon.sx/').replace('/embedmoon.xyz/', '/filemoon.sx/').replace('/moonjscdn.info/', '/filemoon.sx/')
+          page_url = page_url.replace('/fmoonembed.pro/', '/filemoon.sx/').replace('/embedmoon.xyz/', '/filemoon.sx/').replace('/moonjscdn.info/', '/filemoon.sx/').replace('/l1afav.net/', '/filemoon.sx/')
 
     elif 'streamhub' in page_url:
           txt_server = 'Streamhub'
@@ -111,7 +112,7 @@ def get_video_url(page_url, url_referer=''):
           txt_server = 'Yandex'
           page_url = page_url.replace('/yadi.sk/', '/disk.yandex.ru/')
 
-    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url:
+    elif 'streamwish' in page_url or 'strwish' in page_url or 'embedwish' in page_url or 'wishembed' in page_url or 'awish' in page_url or 'dwish' in page_url or 'mwish' in page_url or 'wishfast' in page_url or 'sfastwish' in page_url or 'doodporn' in page_url or 'flaswish' in page_url or 'obeywish' in page_url or 'cdnwish' in page_url or 'asnwish' in page_url or 'flastwish' in page_url or 'jodwish' in page_url or 'swhoi' in page_url or 'fsdcmo' in page_url or 'swdyu' in page_url or 'wishonly' in page_url or 'playerwish' in page_url or 'hlswish' in page_url or 'wish' in page_url or 'iplayerhls' in page_url or 'hlsflast' in page_url or 'ghbrisk' in page_url or 'cybervynx' in page_url or 'streamhg' in page_url:
           txt_server = 'Streamwish'
           page_url = page_url.replace('/streamwish.com/', '/streamwish.to/').replace('/streamwish.top/', '/streamwish.to/').replace('/streamwish.site/', '/streamwish.to/').replace('/strwish.xyz/', '/streamwish.to/').replace('/strwish.com/', '/streamwish.to/').replace('/embedwish.com/', '/streamwish.to/').replace('/wishembed.pro/', '/streamwish.to/')
           page_url = page_url.replace('/awish.pro/', '/streamwish.to/').replace('/dwish.pro/', '/streamwish.to/').replace('/mwish.pro/', '/streamwish.to/').replace('/wishfast.top/', '/streamwish.to/').replace('/sfastwish.com/', '/streamwish.to/').replace('/doodporn.xyz/', '/streamwish.to/')
@@ -121,11 +122,13 @@ def get_video_url(page_url, url_referer=''):
 
           page_url = page_url.replace('/iplayerhls.com/', '/streamwish.to/').replace('/hlsflast.com/', '/streamwish.to/').replace('/ghbrisk.com/', '/streamwish.to/')
 
+          page_url = page_url.replace('/cybervynx.com/', '/streamwish.to/').replace('/streamhg.com/', '/streamwish.to/')
+
     elif 'desiupload' in page_url:
           txt_server = 'Desiupload'
           page_url = page_url.replace('/desiupload.to/', '/desiupload.co/').replace('/desiupload.in/', '/desiupload.co/')
 
-    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url:
+    elif 'filelions' in page_url or 'azipcdn' in page_url or 'alions' in page_url or 'dlions' in page_url or 'mlions' in page_url or 'fviplions' in page_url or 'javlion' in page_url or 'fdewsdc' in page_url or 'peytonepre' in page_url or 'ryderjet' in page_url or 'smoothpre' in page_url:
           txt_server = 'Filelions'
 
           page_url = page_url.replace('/embed/', '/')
@@ -134,7 +137,7 @@ def get_video_url(page_url, url_referer=''):
           page_url = page_url.replace('/azipcdn.com/', '/filelions.to/')
           page_url = page_url.replace('/alions.pro/', '/filelions.to/').replace('/dlions.pro/', '/filelions.to/').replace('/mlions.pro/', '/filelions.to/').replace('/fviplions.com/', '/filelions.to/')
           page_url = page_url.replace('/javlion.xyz/', '/filelions.to/').replace('/fdewsdc.sbs/', '/filelions.to/')
-          page_url = page_url.replace('/peytonepre.com/', '/filelions.to/').replace('/ryderjet.com/', '/filelions.to/')
+          page_url = page_url.replace('/peytonepre.com/', '/filelions.to/').replace('/ryderjet.com/', '/filelions.to/').replace('/smoothpre.com/', '/filelions.to/')
 
     elif 'youdbox' in page_url or 'yodbox' in page_url or 'youdboox' in page_url: 
           txt_server = 'Youdbox'
@@ -253,6 +256,9 @@ def get_video_url(page_url, url_referer=''):
 
             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
+
+        elif 'HTTP Error 404: Not Found' in traceback.format_exc():
+            return 'Archivo inexistente'
 
         elif '<urlopen error' in traceback.format_exc():
             return 'No se puede establecer la conexión'

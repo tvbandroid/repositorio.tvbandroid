@@ -32,6 +32,7 @@ search_no_accesibles = config.get_setting('search_no_accesibles', default=False)
 srv_pending = ''
 con_incidencias = ''
 no_accesibles = ''
+con_problemas = ''
 
 try:
     with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
@@ -40,6 +41,7 @@ except:
     except: txt_status = ''
 
 if txt_status:
+    # ~ Pending
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION SERVIDORES(.*?)SITUACION CANALES')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -49,6 +51,7 @@ if txt_status:
 
         if '[COLOR orchid]' in match: srv_pending += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ Incidencias
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -58,6 +61,7 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ No Accesibles
     bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -66,6 +70,16 @@ if txt_status:
         match = match.strip()
 
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 no_results_proxies = config.get_setting('search_no_results_proxies', default=True)
@@ -165,6 +179,17 @@ def mainlist(item):
 
         itemlist.append(item.clone( channel='filmaffinitylists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet]Filmaffinity[/COLOR]', thumbnail=thumb_filmaffinity, plot = 'Buscar personas y ver listas de películas, series ó documentales de Filmaffinity' ))
 
+    if config.get_setting('search_extra_main', default=False):
+         itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, thumbnail=thumb_filmaffinity, text_color='darkgoldenrod' ))
+
+         itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title=' - Premios Emmy', thumbnail = config.get_thumb('emmys'), origen='mnu_esp', search_type = 'tvshow' ))
+
+         itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Premios Oscar', action = 'oscars', url =  'https://www.filmaffinity.com/es/oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
+
+         itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Festivales', action = 'festivales', url =  'https://www.filmaffinity.com/es/all_awards.php', search_type = 'movie', thumbnail=thumb_filmaffinity ))
+
+         itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Otros Premios', action = 'festivales', url =  'https://www.filmaffinity.com/es/all_awards.php', group = 'awards', search_type = 'movie', thumbnail=thumb_filmaffinity ))
+
     if config.get_setting('search_extra_proxies', default=True):
         itemlist.append(item.clone( action='', title= '[B]Búsquedas en canales con Proxies:[/B]', folder=False, thumbnail=config.get_thumb('stack'), text_color='red' ))
 
@@ -229,11 +254,19 @@ def show_infos(item):
     itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' - [COLOR green][B]Información[/B][/COLOR] Resumen y Distribución Canales', thumbnail=config.get_thumb('stack') ))
 
     if txt_status:
+        if con_incidencias:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title=' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
         if no_accesibles:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= ' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
+        if con_problemas:
+            itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title=' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR tomato][B] Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
         if srv_pending:
             itemlist.append(item.clone( channel='submnuteam', action='resumen_pending', title='[COLOR fuchsia][B]Servidores [COLOR tan]Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+
+    itemlist.append(item.clone( channel='helper', action='show_channels_list_temporaries', title= ' - Qué canales están [COLOR darkcyan][B]Temporalmente[/B][/COLOR] inactivos', thumbnail=config.get_thumb('stack') ))
 
     return itemlist
 
@@ -261,8 +294,18 @@ def show_help_parameters(item):
     else: txt = 'Los canales que tenga marcados como [B][COLOR cyan]Desactivados[/COLOR][/B] nunca intervendrán en las búsquedas[CR][CR]'
 
     txt += ' - [B][COLOR gold]Canales[/COLOR][/B] que Nunca intervienen en las busquedas:'
+
+    if con_incidencias:
+        txt += '[CR][COLOR tan][B]    Hay Canales Con Incidencias[/COLOR] [COLOR darkorange]vea Últimos Cambios de Dominios en la Ayuda[/B][/COLOR][CR]'
+
+    if no_accesibles:
+        txt += '[CR][COLOR indianred][B]    Hay Canales No Accesibles[/COLOR] [COLOR darkorange]vea Últimos Cambios de Dominios en la Ayuda[/B][/COLOR][CR]'
+
+    if con_problemas:
+        txt += '[CR][COLOR tomato][B]    Hay Canales Con Problemas[/COLOR] [COLOR darkorange]vea Últimos Cambios de Dominios en la Ayuda[/B][/COLOR][CR]'
+
     txt += '[CR][COLOR darkorange][B]    DocumentaryHeaven,  CineDeAntes,  CineLibreOnline,  CineMatteFlix,'
-    txt += '[CR]    Frozenlayer,  SeriesBiblicas,  SigloXX,  Trailers,  TvSeries,'
+    txt += '[CR]    SeriesBiblicas,  SigloXX,  Trailers,  TvSeries,'
     txt += '[CR]    YouTubeDocs,  TopDocumentaryFilms[/B][/COLOR]'
 
     if not config.get_setting('mnu_documentales', default=True): txt += '[CR][CR] - Los canales de [B][COLOR cyan]Documentales[/COLOR][/B] jamás intervendrán en las busquedas'
@@ -502,7 +545,7 @@ def show_help(item):
 
     txt += '[CR][CR]En cada web/canal el [COLOR cyan][B]Tiempo de Respuesta[/B][/COLOR] puede ser elevado y más aún si tiene [COLOR red][B]Proxies Configurados[/B][/COLOR].'
 
-    txt += '[CR][CR]Según cada web/canal su buscador puede permitir diferenciar por [COLOR yellow][B]Películas y/ó Series[/B][/COLOR] [COLOR teal]ó No[/B][/COLOR].'
+    txt += '[CR][CR]Según cada web/canal su buscador puede permitir diferenciar por [COLOR yellow][B]Películas y/ó Series[/COLOR] [COLOR teal]ó No[/B][/COLOR].'
 
     txt += '[CR][CR][COLOR yellowgreen][B]También es variable la sensibilidad de la búsqueda (si busca sólo en el Título ó también en la Sinopsis, el tratamiento si hay varias palabras, si devuelve muchos ó pocos resultados, etc.)[/B][/COLOR]'
 
@@ -865,8 +908,20 @@ def do_search(item, tecleado):
 
                     if no_accesibles:
                         if ch['name'] in str(no_accesibles):
-                           if search_no_accesibles: name += '[I][COLOR tan] (no accesible)[/COLOR][/I]'
-                           else: continue
+                            if search_no_accesibles: name += '[I][COLOR tan] (no accesible)[/COLOR][/I]'
+                            else: continue
+
+                    if con_problemas:
+                        if ch['name'] in str(con_problemas):
+                            hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+                            channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
+                            for channel_con_problema in channels_con_problemas:
+                                channel_con_problema = channel_con_problema.strip()
+
+                                if not channel_con_problema == ch['name']: continue
+
+                                name += '[I][COLOR tomato] (con problema)[/COLOR][/I]'
 
                     it.title = '[B][COLOR ' + color + ']' + name + '[/B][/COLOR] ' + it.title
 
@@ -913,6 +968,17 @@ def do_search(item, tecleado):
                                 titulo = titulo + '[I][COLOR tan] (no accesible) [/COLOR][/I]'
                             else: continue
 
+                        if ch['name'] in str(con_problemas):
+                            hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+                            channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
+                            for channel_con_problema in channels_con_problemas:
+                                channel_con_problema = channel_con_problema.strip()
+
+                                if not channel_con_problema == ch['name']: continue
+
+                                titulo = titulo + '[I][COLOR tomato] (con problema) [/COLOR][/I]'
+
                         if no_results_proxies:
                             if config.get_setting(cfg_proxies_channel, default=''):
                                 if 'notice' in ch['clusters']: titulo = titulo + ' [COLOR goldenrod]Posible cloudflare[/COLOR]'
@@ -929,7 +995,8 @@ def do_search(item, tecleado):
                                 if titulo == ch['name']:
                                     titulo = titulo + '  [COLOR coral]sin resultados[/COLOR]'
                                 else:
-                                   if not 'quizás' in titulo: continue
+                                    if not 'quizás' in titulo: continue
+
                     else:
                         if config.get_setting(cfg_proxies_channel, default=''):
                             if no_results_proxies:
@@ -938,6 +1005,17 @@ def do_search(item, tecleado):
                                 if ch['name'] in str(no_accesibles):
                                     if search_no_accesibles: titulo = titulo + '[I][COLOR tan] (no accesible) [/COLOR][/I]'
                                     else: continue
+
+                                if ch['name'] in str(con_problemas):
+                                    hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+                                    channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
+                                    for channel_con_problema in channels_con_problemas:
+                                        channel_con_problema = channel_con_problema.strip()
+
+                                        if not channel_con_problema == ch['name']: continue
+
+                                        titulo = titulo + '[I][COLOR tomato] (con problema) [/COLOR][/I]'
 
                                 channels_new_proxies.append(ch['id'])
                                 if 'notice' in ch['clusters']: titulo = titulo + ' [COLOR goldenrod]Posible cloudflare[/COLOR]'
@@ -973,6 +1051,18 @@ def do_search(item, tecleado):
                             if search_no_accesibles:
                                 name += '[I][COLOR tan] (no accesible)[/COLOR][/I]'
                             else: continue
+
+                    if con_problemas:
+                        if ch['name'] in str(con_problemas):
+                            hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+                            channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
+                            for channel_con_problema in channels_con_problemas:
+                                channel_con_problema = channel_con_problema.strip()
+
+                                if not channel_con_problema == ch['name']: continue
+
+                                name += '[I][COLOR tomato] (con problema)[/COLOR][/I]'
 
                     titulo = '%s [COLOR %s]- %d %s' % (name, color, len(ch['itemlist_search']), texto)
             else:
@@ -1169,21 +1259,23 @@ def do_search(item, tecleado):
 
             cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
-            if not ' resultado' in titulo:
-                if desde_lists: pass
-                else:
-                   if item.similar:
-                        if not no_results:
-                           if not config.get_setting(cfg_proxies_channel, default=''): continue
+            if ' (con problema)' in titulo: pass
+            else:
+               if not ' resultado' in titulo:
+                   if desde_lists: pass
+                   else:
+                      if item.similar:
+                           if not no_results:
+                              if not config.get_setting(cfg_proxies_channel, default=''): continue
 
-                        if not no_results_proxies:
-                            if not config.get_setting(cfg_proxies_channel, default=''): continue
+                           if not no_results_proxies:
+                               if not config.get_setting(cfg_proxies_channel, default=''): continue
 
-                   if not no_results:
-                        if not config.get_setting(cfg_proxies_channel, default=''): titulo = ''
+                      if not no_results:
+                           if not config.get_setting(cfg_proxies_channel, default=''): titulo = ''
 
-                   if not no_results_proxies:
-                       if not config.get_setting(cfg_proxies_channel, default=''): titulo = ''
+                      if not no_results_proxies:
+                          if not config.get_setting(cfg_proxies_channel, default=''): titulo = ''
 
             if titulo:
                 sip =+ 1

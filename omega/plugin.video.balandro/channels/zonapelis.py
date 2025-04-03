@@ -47,10 +47,16 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'movies/', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Cine clásico', action = 'list_all', url = host + 'genre/cine-clasico/', search_type = 'movie', text_color = 'moccasin' ))
+
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'imdb/', group = 'imdb', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'movie' ))
 
     return itemlist
 
@@ -63,10 +69,14 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tvshows/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', search_type='tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'imdb/', group = 'imdb', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por plataforma', action= 'plataformas', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -84,7 +94,7 @@ def calidades(item):
     for url, title in matches:
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='moccasin' ))
 
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def plataformas(item):
@@ -144,31 +154,59 @@ def anios(item):
     return itemlist
 
 
+def alfabetico(item):
+    logger.info()
+    itemlist = []
+
+    if item.search_type == 'movie':
+        search_type = 'movies'
+        text_color = 'deepskyblue'
+    else:
+        search_type = 'tvshows'
+        text_color = 'hotpink'
+
+    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        url = host + 'wp-json/dooplay/glossary/?term=%s&nonce=ab6f027a0d&type=%s' % (letra.lower(), search_type)
+
+        itemlist.append(item.clone( action = 'list_alfa', title = letra, url = url, text_color = text_color ))
+
+    return itemlist
+
+
 def list_all(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Popular<')
-    if not bloque: bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)>Popular<')
+    if item.group:
+        bloque = scrapertools.find_single_match(data, '>Ranking IMDb <span>(.*?)>Popular<')
+    else:
+        bloque = scrapertools.find_single_match(data, '>Añadido recientemente<(.*?)>Popular<')
+        if not bloque: bloque = scrapertools.find_single_match(data, '>Resultados encontrados(.*?)>Popular<')
 
-    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
+    if item.group:
+        matches = re.compile("id='top-(.*?)</div></div>", re.DOTALL).findall(bloque)
+    else:
+        matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
+        if not url: url = scrapertools.find_single_match(article, " href='(.*?)'")
 
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
         if not title: title = scrapertools.find_single_match(article, '<h3 class="title">(.*?)</h3>')
+        if not title: title = scrapertools.find_single_match(article, " alt='(.*?)'")
 
         if not url or not title: continue
 
-        title = title.replace('&#038;', '&').replace('&#8216;', '& ')
+        title = title.replace('&#038;', '&').replace('&#8216;', '& ').replace('&#8230;', '')
 
         tipo = 'tvshow' if '/tvshows/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
-        thumb = scrapertools.find_single_match(article, ' src="(.*?)')
+        thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
+        if not thumb: thumb = scrapertools.find_single_match(article, " src='(.*?)'")
 
         year = scrapertools.find_single_match(article, '</h3><span>(\d+)</span>')
         if not year: year = '-'
@@ -202,6 +240,52 @@ def list_all(item):
             if next_page:
                if '/page/' in next_page:
                    itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def list_alfa(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    matches = scrapertools.find_multiple_matches(str(data), '"(.*?)"imdb":')
+
+    for match in matches:
+        url = scrapertools.find_single_match(match, '"url":"(.*?)"')
+
+        title = scrapertools.find_single_match(match, '"title":"(.*?)"')
+
+        if not url or not title: continue
+
+        title = title.replace('&#038;', '&').replace('&#8216;', '& ').replace('&#8230;', '')
+
+        thumb = scrapertools.find_single_match(match, '"img":"(.*?)"')
+
+        thumb = thumb.replace('\\/', '/')
+
+        title = clean_title(title)
+
+        year = scrapertools.find_single_match(match, '"year":"(.*?)"')
+        if not year: year = '-'
+
+        tipo = 'movie' if item.search_type == 'movie' else 'tvshow'
+
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        url = url.replace('\\/', '/')
+
+        if tipo == 'tvshow':
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+
+        if tipo == 'movie':
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+
+    tmdb.set_infoLabels(itemlist)
 
     return itemlist
 
@@ -375,6 +459,16 @@ def play(item):
             itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
+
+
+def clean_title(title):
+    logger.info()
+
+    title = title.replace('\\u00e1', 'a').replace('\\u00c1', 'a').replace('\\u00e9', 'e').replace('\\u00c9', 'e').replace('\\u00ed', 'i').replace('\\u00f3', 'o').replace('\\u00fa', 'u')
+    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
+    title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
+
+    return title
 
 
 def search(item, texto):

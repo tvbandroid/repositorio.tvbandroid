@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wc5n.series24.cc/'
+host = 'https://cv5w.series24.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.series24.cc/', 'https://www1.series24.cc/', 'https://ww3.series24.cc/',
             'https://ww2.series24.cc/', 'https://www11.series24.cc/', 'https://w-ww.series24.cc/',
             'https://ww-w.series24.cc/', 'https://www.series24.cc/', 'https://wv5n.series24.cc/',
-            'https://wv5b.series24.cc/']
+            'https://wv5b.series24.cc/', 'https://wc5n.series24.cc/']
 
 
 domain = config.get_setting('dominio', 'series24', default='')
@@ -580,6 +580,9 @@ def play(item):
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"): servidor = new_server
+
+        if '/bigwarp.' in url or '/bgwp.' in url:
+            url = url + '|Referer=' + host
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

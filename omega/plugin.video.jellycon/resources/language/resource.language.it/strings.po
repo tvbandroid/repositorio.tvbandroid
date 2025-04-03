@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2023-08-30 13:40+0000\n"
-"Last-Translator: Nicolò Carcagnì <nicolo.carcagni@mail.com>\n"
+"PO-Revision-Date: 2024-03-21 14:30+0000\n"
+"Last-Translator: VitoFe <vito-7@hotmail.it>\n"
 "Language-Team: Italian <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/it/>\n"
 "Language: it\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14.1\n"
+"X-Generator: Weblate 5.4.2\n"
 
 msgctxt "#30120"
 msgid "Show load progress"
@@ -994,3 +994,155 @@ msgstr "- Decenni"
 msgctxt "#30423"
 msgid "NotSet"
 msgstr "Non impostato"
+
+msgctxt "#30446"
+msgid "There was an error logging in"
+msgstr "Si è verificato un errore al login"
+
+msgctxt "#30443"
+msgid "Quick Connect"
+msgstr "Connessione rapida"
+
+msgctxt "#30445"
+msgid "Continue Watching"
+msgstr "Continua a guardare"
+
+msgctxt "#30448"
+msgid "Shuffle"
+msgstr "Casuale"
+
+msgctxt "#30447"
+msgid "Max Play Queue Size"
+msgstr "Dimensione massima della coda di riproduzione"
+
+msgctxt "#30242"
+msgid "Force transcode av1"
+msgstr "Forza transcodifica AV1"
+
+msgctxt "#30356"
+msgid "Loading existing image list"
+msgstr "Caricamento lista di immagini esistenti"
+
+msgctxt "#30384"
+msgid "Random movies interval minutes (0 = disabled)"
+msgstr "Intervallo, in minuti, di film casuali (0 = disabilitato)"
+
+msgctxt "#30385"
+msgid "Existing images before delete : "
+msgstr "Immagini esistenti prima della cancellazione:"
+
+msgctxt "#30386"
+msgid "Unused Jellyfin images : "
+msgstr "Immagini Jellyfin inutilizzate:"
+
+msgctxt "#30387"
+msgid "Unused images removed : "
+msgstr "Immagini inutilizzate rimosse:"
+
+msgctxt "#30393"
+msgid "Clear Cache Result"
+msgstr "Cancella la cache dei risultati"
+
+msgctxt "#30440"
+msgid "Play next"
+msgstr "Riproduci prossimo"
+
+msgctxt "#30441"
+msgid "Use cached widget data"
+msgstr "Utilizza dati widget in cache"
+
+msgctxt "#30444"
+msgid "Login using Quick Connect"
+msgstr "Loggati con la Connessione Rapida"
+
+msgctxt "#30452"
+msgid "Combine instead of replace (might cause slow-down)"
+msgstr "Combina invece di sostituire (può causare rallentamenti)"
+
+msgctxt "#30342"
+msgid "New content check interval (0 = disabled)"
+msgstr "Intervallo di verifica di nuovi contenuti (0 = disabilitato)"
+
+msgctxt "#30357"
+msgid "Processing existing image list"
+msgstr "Analizzando la lista di immagini esistenti"
+
+msgctxt "#30400"
+msgid "Cache images interval minutes (0 = disabled)"
+msgstr "Intervallo, in minuti, della cache delle immagini (0 = disabilitato)"
+
+msgctxt "#30435"
+msgid "Connection speed test"
+msgstr "Test di velocità della connessione"
+
+msgctxt "#30436"
+msgid "Speed test data size (MB)"
+msgstr "Dimensioni dati per il test di velocità (MB)"
+
+msgctxt "#30437"
+msgid "Playback options"
+msgstr "Opzioni di riproduzione"
+
+msgctxt "#30225"
+msgid "Interface Mode"
+msgstr "Modalità interfaccia"
+
+msgctxt "#30226"
+msgid "Default"
+msgstr "Predefinito"
+
+msgctxt "#30227"
+msgid "Simple"
+msgstr "Semplice"
+
+msgctxt "#30121"
+msgid "On resume"
+msgstr "Riprendi"
+
+msgctxt "#30442"
+msgid "Simple new content check"
+msgstr "Ricerca dei contenuti nuovi semplice"
+
+msgctxt "#30215"
+msgid "On playback stop (100% = disabled)"
+msgstr "A riproduzione ferma (100% = disabilitato)"
+
+msgctxt "#30379"
+msgid "External subtitle prompt"
+msgstr "Prompt sottotitolo esterno"
+
+msgctxt "#30434"
+msgid "Force transcode stream bitrate (Kbits)"
+msgstr "Forza transcodifica del bitrate dello stream (Kbps)"
+
+msgctxt "#30345"
+msgid "Cache Jellyfin server data requests"
+msgstr "Stiva dati richieste del server Jellyfin"
+
+msgctxt "#30439"
+msgid "Show play next episode at time left in seconds"
+msgstr "Mostra riproduci il prossimo episodio a tempo rimasto in secondi"
+
+msgctxt "#30367"
+msgid "Allow fast user switching password saving"
+msgstr "Consenti salvataggio veloce della password utente cambiata"
+
+msgctxt "#30438"
+msgid "Play cinema intros"
+msgstr "Riproduci introduzioni cinema"
+
+msgctxt "#30449"
+msgid "Instant Mix"
+msgstr "Mix Istantaneo"
+
+msgctxt "#30451"
+msgid "Rewatch Days (0 = Disabled)"
+msgstr "Giorni da Riguardare (0 = Disabilitato)"
+
+msgctxt "#30276"
+msgid "Extra Resume Prompt Detected"
+msgstr "Finestra di Ripresa Duplicata Rilevata"
+
+msgctxt "#30450"
+msgid "Next Up Rewatching"
+msgstr "Prossimo da Riguardare"

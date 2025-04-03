@@ -466,9 +466,11 @@ def episodios(item):
         c_season = scrapertools.find_single_match(url, '-temporada-(.*?)-')
         if c_season:
             if not c_season == season: season = c_season
-	
+
         epis = scrapertools.find_single_match(url, '-capitulo-(.*?)-')
         if not epis: epis = scrapertools.find_single_match(url, '-capitulo-(.*?)/')
+
+        if not epis: epis = scrapertools.find_single_match(url, '-cap(.*?)/')
 
         if not epis: epis = scrapertools.find_single_match(match, '<span class="episodes-number.*?E(.*?)<')
 
@@ -482,6 +484,8 @@ def episodios(item):
         title = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         titulo = str(season) + 'x' + str(epis) + ' ' + title
+
+        titulo = clean_title(titulo)
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -548,6 +552,7 @@ def findvideos(item):
             elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
 
             elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://sr.ennovelas.watch/'): url = url.replace('/sr.ennovelas.watch/', '/waaw.to/')
             elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
             elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
             elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
@@ -584,6 +589,7 @@ def findvideos(item):
             elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
 
             elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://sr.ennovelas.watch/'): url = url.replace('/sr.ennovelas.watch/', '/waaw.to/')
             elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
             elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
             elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')

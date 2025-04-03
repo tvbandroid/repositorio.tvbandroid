@@ -3,16 +3,35 @@ from tmdbhelper.lib.addon.plugin import convert_type, get_plugin_category, get_s
 from tmdbhelper.lib.items.container import Container
 
 
+class ListLists(Container):
+    def get_items(self, info, page=None, limit=None, **kwargs):
+        from tmdbhelper.lib.api.tmdb.users import TMDbUser
+
+        items = TMDbUser().get_list_of_lists()
+
+        self.library = 'video'
+        self.plugin_category = ''
+
+        return items
+
+
 class ListBasic(Container):
     def get_items(self, info, tmdb_type, tmdb_id=None, page=None, limit=None, sort_key=None, sort_key_order=None, length=None, **kwargs):
         info_model = TMDB_BASIC_LISTS.get(info)
         info_tmdb_type = info_model.get('tmdb_type') or tmdb_type
-        self.tmdb_api.mapper.imagepath_quality = info_model.get('imagepath_quality', 'IMAGEPATH_ORIGINAL')
-        items = self.tmdb_api.get_basic_list(
+
+        tmdb_api = self.tmdb_api
+        if info_model.get('tmdb_v4_user_list'):
+            from tmdbhelper.lib.api.tmdb.users import TMDbUser
+            tmdb_api = TMDbUser()
+
+        tmdb_api.mapper.imagepath_quality = info_model.get('imagepath_quality', 'IMAGEPATH_ORIGINAL')
+
+        items = tmdb_api.get_basic_list(
             path=info_model.get('path', '').format(
                 tmdb_type=tmdb_type,
                 tmdb_id=tmdb_id,
-                iso_country=self.tmdb_api.iso_country,
+                iso_country=tmdb_api.iso_country,
                 **kwargs),
             sort_key=sort_key or info_model.get('sort_key'),
             sort_key_order=sort_key_order or info_model.get('sort_key_order'),
@@ -26,8 +45,10 @@ class ListBasic(Container):
             limit=limit or info_model.get('limit'),
             length=length or info_model.get('length'),
             page=page)
+
         if 'tmdb_cache_only' in info_model:
             self.tmdb_cache_only = info_model['tmdb_cache_only']
+
         self.kodi_db = self.get_kodi_database(info_tmdb_type)
         self.sort_by_dbid = True if self.kodi_db and info_model.get('dbid_sorting') else False
         self.library = convert_type(info_tmdb_type, 'library')

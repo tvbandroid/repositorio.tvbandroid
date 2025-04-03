@@ -1,5 +1,6 @@
 from json import dumps as json_dumps
 from threading import Thread
+import traceback
 from lib.api.jacktook.kodi import kodilog
 from lib.api.trakt.trakt_api import make_trakt_slug
 from lib.utils.kodi_utils import (
@@ -60,6 +61,7 @@ class JacktookPLayer(xbmc.Player):
                 self.build_playlist()
             self.play_video(list_item)
         except Exception as e:
+            kodilog(traceback.print_exc())
             kodilog(f"Error in run: {e}")
             self.run_error()
 
@@ -195,38 +197,44 @@ class JacktookPLayer(xbmc.Player):
         if self.data["mode"] == "tv":
             ids = self.data.get("ids")
             if ids:
-                tmdb_id, _, _ = [id.strip() for id in ids.split(',')]
-
-                details = tmdb_get("tv_details", tmdb_id)
-                name = details.name
+                details = tmdb_get("tv_details", ids["tmdb_id"])
                 tv_data = self.data["tv_data"]
-                _, episode_number, season_number = tv_data.split("(^)")
+                season = tv_data["season"]
+                episode = tv_data["episode"]
 
                 season_details = tmdb_get(
-                    "season_details", {"id": tmdb_id, "season": season_number}
+                    "season_details", {"id": ids["tmdb_id"], "season": season}
                 )
-                for episode in season_details.episodes:
-                    episode_name = episode.name
-                    _episode_number = episode.episode_number
-                    if _episode_number <= int(episode_number):
-                        continue
-                    label = f"{season_number}x{_episode_number}. {episode_name}"
-                    tv_data = f"{episode_name}(^){_episode_number}(^){season_number}"
 
-                    url = build_url(
-                        "search",
-                        mode=self.data["mode"],
-                        query=name,
-                        ids=ids,
-                        tv_data=tv_data,
-                        rescrape=True,
-                    )
+                if season_details:
+                    for e in season_details.episodes:
+                        episode_name = e.name
+                        episode_number = e.episode_number
 
-                    list_item = ListItem(label=label)
-                    list_item.setPath(url)
-                    list_item.setProperty("IsPlayable", "true")
+                        if episode_number <= int(episode):
+                            continue
 
-                    self.PLAYLIST.add(url=url, listitem=list_item)
+                        label = f"{season}x{episode_number}. {episode_name}"
+                        tv_data = {
+                            "name": episode_name,
+                            "episode": episode_number,
+                            "season": season,
+                        }
+
+                        url = build_url(
+                            "search",
+                            mode=self.data["mode"],
+                            query=details.name,
+                            ids=ids,
+                            tv_data=tv_data,
+                            rescrape=True,
+                        )
+
+                        list_item = ListItem(label=label)
+                        list_item.setPath(url)
+                        list_item.setProperty("IsPlayable", "true")
+
+                        self.PLAYLIST.add(url=url, listitem=list_item)
 
     def media_watched_marker(self):
         self.media_marked = True
@@ -267,7 +275,7 @@ class JacktookPLayer(xbmc.Player):
         mode = self.data.get("mode")
 
         if ids:
-            tmdb_id, tvdb_id, imdb_id = [id.strip() for id in ids.split(',')]
+            tmdb_id, tvdb_id, imdb_id = ids.values()
             trakt_ids = {
                 "tmdb": tmdb_id,
                 "imdb": imdb_id,

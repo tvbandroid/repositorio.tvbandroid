@@ -433,7 +433,23 @@ def findvideos(item):
     data = do_downloadpage(embeds)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    if '//embed69.' in embeds:
+    if '/waaw.' in embeds:
+        ses += 1
+
+        lang = '?'
+
+        url = embeds
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        other = ''
+
+        if servidor == 'various': other = servertools.corregir_other(url)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
+
+    elif '//embed69.' in embeds:
         ses += 1
 
         datae = data
@@ -475,6 +491,8 @@ def findvideos(item):
                 elif 'disable' in srv: continue
                 elif 'xupalace' in srv: continue
                 elif 'uploadfox' in srv: continue
+
+                elif srv == 'download': continue
 
                 servidor = servertools.corregir_servidor(srv)
 

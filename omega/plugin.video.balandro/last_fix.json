@@ -1,30 +1,40 @@
 {
-    "addon_version": "4.0.15",
+    "addon_version": "4.0.16",
     "files": {
         "channels": [
-            "cuevana3pro",
+            "cinemitas",
+            "detodo",
             "dontorrents",
-            "entrepeliculasyseries",
-            "estrenoscinesaa",
+            "dpeliculas",
+            "ennovelaspl",
+            "ennovelastv",
+            "genteclic",
+            "gnula24",
+            "gnula24h",
+            "hacktorrent",
             "hdfull",
-            "hdfullse",
             "henaojaran",
-            "latanime",
+            "kiriasian",
+            "kissasian",
             "masnovelas",
             "mejortorrentapp",
-            "pelis28re",
-            "pelisforte",
-            "pelisgratishd",
-            "pelisplushdnz",
+            "netnovelas",
+            "novelas360",
+            "onlinetv",
+            "pelispanda",
             "pgratishd",
-            "playdede",
+            "ppeliculas",
+            "series24",
+            "serieses",
             "serieskao",
-            "sololatino",
-            "tioanime",
-            "tiodonghua",
-            "torrenflix",
-            "zonaleros",
-            "zonapelis"
+            "seriesonline",
+            "seriestv",
+            "srnovelas",
+            "star",
+            "todopeliculas",
+            "tusnovelas",
+            "veronline",
+            "verseries"
         ],
         "core": [
             "httptools",
@@ -34,32 +44,26 @@
         "modules": [
             "actions",
             "domains",
-            "filmaffinitylists",
+            "filters",
             "generos",
             "helper",
-            "mainmenu",
-            "proxysearch",
+            "search",
             "submnuctext",
             "submnuteam",
             "tester"
         ],
         "platformcode": [
-            "platformtools"
+            "updater"
         ],
         "resources": [
+            "Lista-proxies",
             "settings"
         ],
         "root dir": [
             "dominios",
             "version"
-        ],
-        "servers": [
-            "tiwi",
-            "various",
-            "waaw",
-            "zures"
         ]
     },
-    "fix_version": 4,
-    "hash": "98da24b9eea386bfbf2341bf6853d5d0"
+    "fix_version": 2,
+    "hash": "3eb0be11fe8330b6f9a9881c171f2cc7"
 }

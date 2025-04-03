@@ -17,6 +17,7 @@ color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 con_incidencias = ''
 no_accesibles = ''
+con_problemas = ''
 
 try:
     with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
@@ -25,6 +26,7 @@ except:
     except: txt_status = ''
 
 if txt_status:
+    # ~ Incidencias
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -34,6 +36,7 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ No Accesibles
     bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -42,6 +45,16 @@ if txt_status:
         match = match.strip()
 
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 cfg_search_excluded_movies = 'search_excludes_movies'
@@ -57,6 +70,11 @@ channels_search_excluded_documentaries = config.get_setting(cfg_search_excluded_
 channels_search_excluded_torrents = config.get_setting(cfg_search_excluded_torrents, default='')
 channels_search_excluded_mixed = config.get_setting(cfg_search_excluded_mixed, default='')
 channels_search_excluded_all = config.get_setting(cfg_search_excluded_all, default='')
+
+
+cfg_search_included = 'search_included_all'
+
+channels_search_included = config.get_setting(cfg_search_included, default='')
 
 
 thumb_filmaffinity = os.path.join(config.get_runtime_path(), 'resources', 'media', 'channels', 'thumb', 'filmaffinity.jpg')
@@ -172,6 +190,17 @@ def submnu_news(item):
             itemlist.append(item.clone( channel='groups', action = 'ch_groups', title = ' - De [COLOR hotpink][B]Series[/B][/COLOR] con Episodios Nuevos y/ó Últimos', thumbnail=config.get_thumb('tvshow'), group = 'lasts', extra = 'tvshows' ))
 
     if config.get_setting('search_extra_main', default=False):
+        itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, thumbnail=thumb_filmaffinity, text_color='darkgoldenrod' ))
+
+        itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title=' - Premios Emmy', thumbnail = config.get_thumb('emmys'), origen='mnu_esp', search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Premios Oscar', action = 'oscars', url = 'https://www.filmaffinity.com/es/oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
+
+        itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Festivales', action = 'festivales', url = 'https://www.filmaffinity.com/es/all_awards.php', search_type = 'movie', thumbnail=thumb_filmaffinity ))
+
+        itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Otros Premios', action = 'festivales', url = 'https://www.filmaffinity.com/es/all_awards.php', group = 'awards', search_type = 'movie', thumbnail=thumb_filmaffinity ))
+
+
         itemlist.append(item.clone( action='', title= '[B]Búsquedas Especiales:[/B]', folder=False, text_color='yellowgreen' ))
 
         itemlist.append(item.clone( channel='tmdblists', action='mainlist', title= ' - Búsquedas y listas en [COLOR violet]TMDB[/COLOR]', thumbnail=thumb_tmdb, plot = 'Buscar personas y ver listas de películas y series de la base de datos de The Movie Database' ))
@@ -265,6 +294,18 @@ def submnu_special(item):
 
                 itemlist.append(item.clone( channel='filmaffinitylists', action='listas', search_type='person', stype='director', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail = config.get_thumb('search'), plot = 'Indicar el nombre de una persona para listar todas las películas y series que ha dirigido.'))
 
+        if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies' or item.extra == 'tvshows':
+            if not config.get_setting('mnu_simple', default=False):
+                itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, thumbnail=thumb_filmaffinity, text_color='darkgoldenrod' ))
+
+                itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title=' - Premios Emmy', thumbnail = config.get_thumb('emmys'), origen='mnu_esp', search_type = 'tvshow' ))
+
+                itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Premios Oscar', action = 'oscars', url =  'https://www.filmaffinity.com/es/oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
+
+                itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Festivales', action = 'festivales', url =  'https://www.filmaffinity.com/es/all_awards.php', search_type = 'movie', thumbnail=thumb_filmaffinity ))
+
+                itemlist.append(item.clone( channel='filmaffinitylists', title = ' - Otros Premios', action = 'festivales', url =  'https://www.filmaffinity.com/es/all_awards.php', group = 'awards', search_type = 'movie', thumbnail=thumb_filmaffinity ))
+
         if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies' or item.extra == 'infantil' or item.extra == 'torrents':
             itemlist.append(item.clone( action='', title='[COLOR deepskyblue][B]Películas[/COLOR] a través de Listas en TMDB:[/B]', thumbnail=thumb_tmdb, folder=False, text_color='violet' ))
 
@@ -279,7 +320,7 @@ def submnu_special(item):
             itemlist.append(item.clone( action='', title='[COLOR deepskyblue][B]Películas[/COLOR] a través de Listas en Filmaffinity:[/B]', thumbnail=thumb_filmaffinity, folder=False, text_color='violet' ))
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='list_all', title= ' - En Cartelera', url = 'https://www.filmaffinity.com/es/cat_new_th_es.html', thumbnail = config.get_thumb('novedades'), search_type = 'movie' ))
-            itemlist.append(item.clone( channel='filmaffinitylists', action='_oscars', title=' - Premios Oscar', thumbnail = config.get_thumb('oscars'), search_type = 'movie' ))
+
             itemlist.append(item.clone( channel='filmaffinitylists', action='_sagas', title=' - Sagas y colecciones', thumbnail = config.get_thumb('bestsagas'), search_type = 'movie' ))
             itemlist.append(item.clone( channel='filmaffinitylists', action='_bestmovies', title=' - Recomendadas', thumbnail = config.get_thumb('bestmovies'), search_type = 'movie' ))
             itemlist.append(item.clone( channel='filmaffinitylists', action='plataformas', title='   - Por plataforma', thumbnail = config.get_thumb('booklet'), search_type = 'movie' ))
@@ -302,7 +343,7 @@ def submnu_special(item):
             itemlist.append(item.clone( action='', title = '[COLOR hotpink][B]Series[/COLOR] a través de Listas en Filmaffinity:[/B]', thumbnail=thumb_filmaffinity, folder=False, text_color='violet' ))
 
             itemlist.append(item.clone( channel='filmaffinitylists', action='_besttvshows', title=' - Recomendadas', thumbnail = config.get_thumb('besttvshows'), search_type = 'tvshow' ))
-            itemlist.append(item.clone( channel='filmaffinitylists', action='_emmys', title=' - Premios Emmy', thumbnail = config.get_thumb('emmys'), origen='mnu_esp', search_type = 'tvshow' ))
+
             itemlist.append(item.clone( channel='filmaffinitylists', action='plataformas', title='   - Por plataforma', thumbnail = config.get_thumb('booklet'), search_type = 'tvshow' ))
             itemlist.append(item.clone( channel='filmaffinitylists', action='_themes', title=' - Por tema', thumbnail = config.get_thumb('listthemes'), search_type = 'tvshow' ))
             itemlist.append(item.clone( channel='filmaffinitylists', action='_genres', title=' - Por género', thumbnail = config.get_thumb('listgenres'), search_type = 'tvshow' ))
@@ -452,8 +493,16 @@ def show_infos(item):
 
     itemlist.append(item.clone( channel='submnuteam', action='resumen_canales', title= ' - [COLOR green][B]Información[/B][/COLOR] Resumen y Distribución Canales', thumbnail=config.get_thumb('stack') ))
 
+    if con_incidencias:
+        itemlist.append(item.clone( channel='submnuteam', action='resumen_incidencias', title=' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     if no_accesibles:
         itemlist.append(item.clone( channel='submnuteam', action='resumen_no_accesibles', title= ' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    if con_problemas:
+        itemlist.append(item.clone( channel='submnuteam', action='resumen_con_problemas', title=' - [COLOR green][B]Información[/B][/COLOR] Canales[COLOR tomato][B] Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( channel='helper', action='show_channels_list_temporaries', title= ' - Qué canales están [COLOR darkcyan][B]Temporalmente[/B][/COLOR] inactivos', thumbnail=config.get_thumb('stack') ))
 
     return itemlist
 
@@ -504,9 +553,19 @@ def _channels_included(item):
     from modules import filters
 
     item.extra = 'included'
-    item.only_one = False
+    item.settings = True
 
-    filters.channels_excluded(item)
+    incluidos = filters.channels_excluded(item)
+
+    if incluidos:
+        import time
+        time.sleep(5)
+
+        platformtools.itemlist_refresh()
+
+        if str(incluidos) == '[]': incluidos = ''
+
+        config.set_setting(cfg_search_included, incluidos)
 
 def _channels_included_del(item):
     logger.info()
@@ -534,10 +593,21 @@ def _channels_excluded(item):
 
     from modules import filters
 
-    item.extra = 'all'
-    item.only_one = False
+    item.extra = 'excludded'
 
-    filters.channels_excluded(item)
+    item.settings = True
+
+    excluidos = filters.channels_excluded(item)
+
+    if excluidos:
+        import time
+        time.sleep(5)
+
+        platformtools.itemlist_refresh()
+
+        if str(excluidos) == '[]': excluidos = ''
+
+        config.set_setting(cfg_search_excluded_all, excluidos)
 
 def _channels_excluded_del(item):
     logger.info()
@@ -898,12 +968,26 @@ def _proxies(item):
 
         if config.get_setting('channel_cinecalidad_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'cinecalidadla':
+        from channels import cinecalidadla
+        item.channel = 'cinecalidadla'
+        cinecalidadla.configurar_proxies(item)
+
+        if config.get_setting('channel_cinecalidadla_proxies') is None: refrescar = False
+
     elif item.from_channel == 'cinecalidadlol':
         from channels import cinecalidadlol
         item.channel = 'cinecalidadlol'
         cinecalidadlol.configurar_proxies(item)
 
         if config.get_setting('channel_cinecalidadlol_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'cinemitas':
+        from channels import cinemitas
+        item.channel = 'cinemitas'
+        cinemitas.configurar_proxies(item)
+
+        if config.get_setting('channel_cinemitas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'cineplay':
         from channels import cineplay
@@ -954,6 +1038,13 @@ def _proxies(item):
 
         if config.get_setting('channel_cuevana3video_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'detodo':
+        from channels import detodo
+        item.channel = 'detodo'
+        detodo.configurar_proxies(item)
+
+        if config.get_setting('channel_detodo_proxies') is None: refrescar = False
+
     elif item.from_channel == 'divxatope':
         from channels import divxatope
         item.channel = 'divxatope'
@@ -967,13 +1058,6 @@ def _proxies(item):
         divxtotal.configurar_proxies(item)
 
         if config.get_setting('channel_divxtotal_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'documaniatv':
-        from channels import documaniatv
-        item.channel = 'documaniatv'
-        documaniatv.configurar_proxies(item)
-
-        if config.get_setting('channel_documaniatv_proxies') is None: refrescar = False
 
     elif item.from_channel == 'dontorrents':
         from channels import dontorrents
@@ -995,6 +1079,13 @@ def _proxies(item):
         doramasyt.configurar_proxies(item)
 
         if config.get_setting('channel_doramasyt_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'dpeliculas':
+        from channels import dpeliculas
+        item.channel = 'dpeliculas'
+        dpeliculas.configurar_proxies(item)
+
+        if config.get_setting('channel_dpeliculas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'elifilms':
         from channels import elifilms
@@ -1164,6 +1255,13 @@ def _proxies(item):
 
         if config.get_setting('channel_mejortorrentnz_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'moviesdvdr':
+        from channels import moviesdvdr
+        item.channel = 'moviesdvdr'
+        moviesdvdr.configurar_proxies(item)
+
+        if config.get_setting('channel_moviesdvdr_proxies') is None: refrescar = False
+
     elif item.from_channel == 'mundodonghua':
         from channels import mundodonghua
         item.channel = 'mundodonghua'
@@ -1220,6 +1318,13 @@ def _proxies(item):
 
         if config.get_setting('channel_pelispanda_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'pelispediais':
+        from channels import pelispediais
+        item.channel = 'pelispediais'
+        pelispediais.configurar_proxies(item)
+
+        if config.get_setting('channel_pelispediais_proxies') is None: refrescar = False
+
     elif item.from_channel == 'pelisplus':
         from channels import pelisplus
         item.channel = 'pelisplus'
@@ -1254,6 +1359,13 @@ def _proxies(item):
         pelisxd.configurar_proxies(item)
 
         if config.get_setting('channel_pelisxd_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'pgratishd':
+        from channels import pgratishd
+        item.channel = 'pgratishd'
+        pgratishd.configurar_proxies(item)
+
+        if config.get_setting('channel_pgratishd_proxies') is None: refrescar = False
 
     elif item.from_channel == 'playdede':
         from channels import playdede
@@ -1311,13 +1423,6 @@ def _proxies(item):
 
         if config.get_setting('channel_series24_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'seriesmovil':
-        from channels import seriesmovil
-        item.channel = 'seriesmovil'
-        seriesmovil.configurar_proxies(item)
-
-        if config.get_setting('channel_seriesmovil_proxies') is None: refrescar = False
-
     elif item.from_channel == 'seriesonline':
         from channels import seriesonline
         item.channel = 'seriesonline'
@@ -1353,6 +1458,13 @@ def _proxies(item):
 
         if config.get_setting('channel_seriestv_proxies') is None: refrescar = False
 
+    elif item.from_channel == 'sololatino':
+        from channels import sololatino
+        item.channel = 'sololatino'
+        sololatino.configurar_proxies(item)
+
+        if config.get_setting('channel_sololatino_proxies') is None: refrescar = False
+
     elif item.from_channel == 'srnovelas':
         from channels import srnovelas
         item.channel = 'srnovelas'
@@ -1380,6 +1492,13 @@ def _proxies(item):
         tiodonghua.configurar_proxies(item)
 
         if config.get_setting('channel_tiodonghua_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'todopeliculas':
+        from channels import todopeliculas
+        item.channel = 'todopeliculas'
+        todopeliculas.configurar_proxies(item)
+
+        if config.get_setting('channel_todopeliculas_proxies') is None: refrescar = False
 
     elif item.from_channel == 'todotorrents':
         from channels import todotorrents
@@ -1415,6 +1534,13 @@ def _proxies(item):
         veronline.configurar_proxies(item)
 
         if config.get_setting('channel_veronline_proxies') is None: refrescar = False
+
+    elif item.from_channel == 'verseries':
+        from channels import verseries
+        item.channel = 'verseries'
+        verseries.configurar_proxies(item)
+
+        if config.get_setting('channel_verseries_proxies') is None: refrescar = False
 
     elif item.from_channel == 'zonaleros':
         from channels import zonaleros

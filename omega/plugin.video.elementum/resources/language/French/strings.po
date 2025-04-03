@@ -1132,7 +1132,7 @@ msgid "Remove from history"
 msgstr "Retirer de l'historique"
 
 msgctxt "#30408"
-msgid "Plugin Connectivity"
+msgid "Addon Connectivity"
 msgstr "Connectivité plugin"
 
 msgctxt "#30409"
@@ -1148,7 +1148,7 @@ msgid "Remote host"
 msgstr "Hôte distant"
 
 msgctxt "#30412"
-msgid "Do not start binary"
+msgid "Do not start binary (client mode)"
 msgstr "Ne pas démarrer le binaire"
 
 msgctxt "#30413"
@@ -1800,7 +1800,7 @@ msgid "Speed limiting"
 msgstr "Limitation de vitesse"
 
 msgctxt "#30590"
-msgid "Torrents autoload on plugin startup"
+msgid "Torrents autoload on addon startup"
 msgstr "Charger automatiquement les torrents au démarrage du plugin"
 
 msgctxt "#30591"
@@ -1844,7 +1844,7 @@ msgid "Enable synchronization while playback"
 msgstr "Activer la synchronisation pendant la lecture"
 
 msgctxt "#30602"
-msgid "Retry requests to plugin after timeout, seconds"
+msgid "Retry requests to addon after timeout, seconds"
 msgstr ""
 
 msgctxt "#30603"
@@ -2286,3 +2286,7 @@ msgstr ""
 msgctxt "#30713"
 msgid "Disable NATPMP"
 msgstr "Désactiver NATPMP"
+
+msgctxt "#30714"
+msgid "Re-check torrent's data"
+msgstr ""

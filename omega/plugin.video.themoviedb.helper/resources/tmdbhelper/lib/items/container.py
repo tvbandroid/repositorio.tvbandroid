@@ -1,5 +1,5 @@
 from jurialmunkey.parser import try_int, boolean
-from tmdbhelper.lib.addon.consts import NO_LABEL_FORMATTING
+from tmdbhelper.lib.addon.consts import NO_UNAIRED_LABEL, NO_UNAIRED_CHECK, REMOVE_EPISODE_COUNT
 from tmdbhelper.lib.addon.plugin import get_setting, executebuiltin, get_localized, get_condvisibility
 from tmdbhelper.lib.api.contains import CommonContainerAPIs
 from tmdbhelper.lib.addon.logger import TimerList
@@ -140,16 +140,16 @@ class Container(CommonContainerAPIs):
             return self._is_excluded
 
     @property
-    def trakt_method(self):
+    def trakt_playdata(self):
         try:
-            return self._trakt_method
+            return self._trakt_playdata
         except AttributeError:
-            from tmdbhelper.lib.items.trakt import TraktMethods
-            self._trakt_method = TraktMethods(
+            from tmdbhelper.lib.items.trakt import TraktPlayData
+            self._trakt_playdata = TraktPlayData(
                 watchedindicators=get_setting('trakt_watchedindicators'),
                 pauseplayprogress=get_setting('trakt_playprogress'),
-                unwatchedepisodes=get_setting('trakt_watchedinprogress'))
-            return self._trakt_method
+                traktepisodetypes=get_setting('trakt_episodetypes'))
+            return self._trakt_playdata
 
     @property
     def ib(self):
@@ -218,11 +218,18 @@ class Container(CommonContainerAPIs):
             return
 
         with TimerList(self.timer_lists, 'item_abc', log_threshold=0.05, logging=self.log_timers):
+
+            # Remove episode counts for some types of lists (eg stars_in_tvshows) where API uses episode_count for appearances instead of totalepisodes
+            if self.remove_episode_counts:
+                li.infolabels.pop('episode', None)
+
             # Reformat ListItem.Label for episodes to match Kodi default 1x01.Title
-            # Check if unaired and either apply special formatting or hide item depending on user settings
             li.set_episode_label()
-            if self.format_episode_labels and not li.infoproperties.get('specialseason'):
-                if li.is_unaired(no_date=self.nodate_is_unaired):
+
+            # Check if unaired and either apply special formatting or hide item depending on user settings
+            if self.format_unaired_labels and not li.infoproperties.get('specialseason'):
+                is_unaired = li.is_unaired(no_date=self.nodate_is_unaired)
+                if self.remove_unaired_object and is_unaired:
                     return
 
             # Add details from Kodi library
@@ -237,7 +244,7 @@ class Container(CommonContainerAPIs):
 
         with TimerList(self.timer_lists, 'item_xyz', log_threshold=0.05, logging=self.log_timers):
             # Add Trakt playcount and watched status
-            li.set_playcount(playcount=self.trakt_method.get_playcount(li))
+            li.set_playcount(playcount=self.trakt_playdata.get_playcount(li))
             if self.hide_watched and try_int(li.infolabels.get('playcount')) != 0:
                 return
 
@@ -251,7 +258,8 @@ class Container(CommonContainerAPIs):
                 li.infolabels.pop('dbid', None)  # Need to pop the DBID if overriding thumb to prevent Kodi overwriting
             if li.next_page:
                 li.params['plugin_category'] = self.plugin_category  # Carry the plugin category to next page in plugin:// path
-            self.trakt_method.set_playprogress(li)
+            self.trakt_playdata.set_episode_type(li)
+            self.trakt_playdata.set_playprogress(li)
             return li
 
     def precache_parent(self, tmdb_id, season=None):
@@ -270,11 +278,14 @@ class Container(CommonContainerAPIs):
 
         # Wait for sync thread
         with TimerList(self.timer_lists, '--sync', log_threshold=0.05, logging=self.log_timers):
-            self._pre_sync.join()
+            self.trakt_playdata.pre_sync_join()
 
         # Finalise listitems in parallel threads
         with TimerList(self.timer_lists, '--make', log_threshold=0.05, logging=self.log_timers):
-            self.format_episode_labels = self.parent_params.get('info') not in NO_LABEL_FORMATTING
+            info = self.parent_params.get('info')
+            self.remove_unaired_object = info not in NO_UNAIRED_CHECK
+            self.format_unaired_labels = info not in NO_UNAIRED_LABEL
+            self.remove_episode_counts = info in REMOVE_EPISODE_COUNT
             with ParallelThread(all_listitems, self._make_item) as pt:
                 item_queue = pt.queue
 
@@ -355,10 +366,8 @@ class Container(CommonContainerAPIs):
         return
 
     def get_directory(self, items_only=False, build_items=True):
-        from threading import Thread
         with TimerList(self.timer_lists, 'total', logging=self.log_timers):
-            self._pre_sync = Thread(target=self.trakt_method.pre_sync, kwargs=self.params)
-            self._pre_sync.start()
+            self.trakt_playdata.pre_sync_start(**self.params)
             with TimerList(self.timer_lists, 'get_list', logging=self.log_timers):
                 items = self.get_items(**self.params)
             if not items:

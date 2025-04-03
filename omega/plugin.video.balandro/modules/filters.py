@@ -98,7 +98,7 @@ def mainlist2(item):
 
     itemlist.append(item.clone( action='', title= '[COLOR greenyellow][B]EFECTUAR Búsquedas [COLOR gold](solo en determinados canales)[/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( action = 'channels_excluded', title='Pulsar para acceder a la Lista de Canales', extra = 'included', folder = False ))
+    itemlist.append(item.clone( action = 'channels_excluded', title='Pulsar para acceder a la Lista de Canales', extra = 'included', folder = False, text_color='cyan' ))
 
     if channels_search_included:
         itemlist.append(item.clone( title = '[COLOR coral][B]Anular Todos los canales[COLOR greenyellow][B] para efectuar las búsquedas[/B][/COLOR]', action = 'channels_excluded_del', extra = 'included', folder = False, text_color='yellow' ))
@@ -786,6 +786,10 @@ def channels_excluded(item):
         cabecera = 'Todos (Solo determinados canales)'
         filtros = {'searchable': True}
 
+    elif item.extra == 'excluded':
+        cabecera = 'Todos'
+        filtros = {'searchable': True}
+
     elif item.extra == 'movies':
         cabecera = 'Películas'
         filtros = {'categories': 'movie', 'searchable': True}
@@ -812,7 +816,10 @@ def channels_excluded(item):
     if item.extra == 'included':
         cfg_excludes = 'search_included_all'
     else:
-        cfg_excludes = 'search_excludes_' + item.extra
+        excludes_extra = item.extra
+        if excludes_extra == 'excluded': excludes_extra = 'all'
+
+        cfg_excludes = 'search_excludes_' + excludes_extra
 
     channels_search = config.get_setting(cfg_excludes, default='')
 
@@ -934,8 +941,13 @@ def channels_excluded(item):
 
     seleccionados = channels_excluded_list(ret, channels_ids, channels_search)
 
-    if str(seleccionados) == '[]': seleccionados = ''
     config.set_setting(cfg_excludes, str(seleccionados))
+
+    incluidos_excluidos = str(seleccionados)
+
+    if incluidos_excluidos:
+       if item.settings:
+           return incluidos_excluidos
 
     platformtools.itemlist_refresh()
 
@@ -1033,6 +1045,9 @@ def channels_excluded_del(item):
 
 def channels_excluded_list(ret, channels_ids, channels_search):
     logger.info()
+
+    if str(ret) == '[]':
+        return ret
 
     channel_sel = []
     seleccionados = []
@@ -1237,6 +1252,7 @@ def show_channels_list(item):
 
     else:
         if item.no_active == True or item.temp_no_active == True: filtros = {'active': False}
+        elif item.closed == True or item.voided == True: filtros = {'active': False}
         elif item.no_stable == True: filtros = {'clusters': 'inestable'}
         elif item.cta_register == True: filtros = {'clusters': 'register'}
         elif item.suggesteds == True: filtros = {'clusters': 'suggested'}
@@ -1262,6 +1278,10 @@ def show_channels_list(item):
             if not 'temporary' in ch['clusters']: continue
         elif item.no_active:
             if 'temporary' in ch['clusters']: continue
+        elif item.closed:
+            if not 'web cerrada' in ch['notes'].lower(): continue
+        elif item.voided:
+            if not 'web anulada' in ch['notes'].lower(): continue
         elif item.var_domains:
             if not 'dominios' in ch['notes'].lower(): continue
         elif item.last_domain:
@@ -1371,6 +1391,8 @@ def show_channels_list(item):
     else:
         if item.no_active == True: cabecera = 'Canales [COLOR yellow]Inactivos[/COLOR]'
         elif item.temp_no_active == True: cabecera = 'Canales [COLOR yellow]Temporalmente Inactivos[/COLOR]'
+        elif item.closed == True: cabecera = 'Canales [COLOR yellow]Cerrados[/COLOR]'
+        elif item.voided == True: cabecera = 'Canales [COLOR yellow]Anulados[/COLOR]'
         elif item.no_stable == True: cabecera = 'Canales [COLOR yellow]Inestables[/COLOR]'
         elif item.cta_register == True: cabecera = 'Canales [COLOR yellow]con Cuenta[/COLOR]'
         elif item.var_domains == True: cabecera = 'Canales [COLOR yellow]con varios Dominios[/COLOR]'

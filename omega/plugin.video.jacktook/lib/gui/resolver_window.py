@@ -84,7 +84,7 @@ class ResolverWindow(BaseWindow):
             magnet = ""
             is_torrent = False
 
-        if self.source.get("isPack"):
+        if self.source.get("isPack") or self.pack_select:
             self.resolve_pack()
         else:
             self.resolve_single_source(url, magnet, is_torrent)
@@ -108,6 +108,8 @@ class ResolverWindow(BaseWindow):
                 "tv_data": self.item_information["tv_data"],
             }
         )
+        if self.playback_info.get("is_pack"):
+            self.resolve_pack()
 
     def resolve_pack(self):
         self.pack_data = get_pack_info(

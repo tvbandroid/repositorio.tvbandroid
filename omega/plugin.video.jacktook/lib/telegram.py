@@ -1,16 +1,17 @@
-from lib.api.tmdbv3api.exceptions import TMDbException
+import json
+import traceback
+from lib.api.jacktook.kodi import kodilog
 from lib.clients.jackgram import Jackgram
 from lib.utils.client_utils import validate_host
 from lib.utils.tmdb_utils import tmdb_get
 
 from lib.utils.utils import (
-    TMDB_POSTER_URL,
     Indexer,
     add_next_button,
     execute_thread_pool,
     list_item,
     set_content_type,
-    set_media_infotag,
+    set_media_infoTag,
 )
 
 from lib.utils.kodi_utils import (
@@ -22,6 +23,7 @@ from lib.utils.kodi_utils import (
 )
 
 from xbmcplugin import addDirectoryItem, endOfDirectory
+from xbmcgui import ListItem
 
 
 def check_jackgram_active():
@@ -33,17 +35,18 @@ def check_jackgram_active():
 
 
 def get_telegram_files(params):
-    if check_jackgram_active():
-        page = int(params.get("page"))
-        host = get_setting("jackgram_host")
-        if not validate_host(host, Indexer.TELEGRAM):
-            return
-        jackgram_client = Jackgram(host, notification)
-        results = jackgram_client.get_files(page=page)
-        execute_thread_pool(results, telegram_files)
-        add_next_button("get_telegram_files", page=page)
-        endOfDirectory(ADDON_HANDLE)
-        set_view("widelist")
+    if not check_jackgram_active():
+        return
+    page = int(params.get("page"))
+    host = get_setting("jackgram_host")
+    if not validate_host(host, Indexer.TELEGRAM):
+        return
+    jackgram_client = Jackgram(host, notification)
+    results = jackgram_client.get_files(page=page)
+    execute_thread_pool(results, telegram_files)
+    add_next_button("get_telegram_files", page=page)
+    endOfDirectory(ADDON_HANDLE)
+    set_view("widelist")
 
 
 def telegram_files(info):
@@ -58,17 +61,18 @@ def telegram_files(info):
 
 
 def get_telegram_latest(params):
-    if check_jackgram_active():
-        page = int(params.get("page"))
-        host = get_setting("jackgram_host")
-        if not validate_host(host, Indexer.TELEGRAM):
-            return
-        jackgram_client = Jackgram(host, notification)
-        results = jackgram_client.get_latest(page=page)
-        execute_thread_pool(results, telegram_latest_items)
-        add_next_button("get_telegram_latest", page=page)
-        endOfDirectory(ADDON_HANDLE)
-        set_view("widelist")
+    if not check_jackgram_active():
+        return
+    page = int(params.get("page"))
+    host = get_setting("jackgram_host")
+    if not validate_host(host, Indexer.TELEGRAM):
+        return
+    jackgram_client = Jackgram(host, notification)
+    results = jackgram_client.get_latest(page=page)
+    execute_thread_pool(results, telegram_latest_items)
+    add_next_button("get_telegram_latest", page=page)
+    endOfDirectory(ADDON_HANDLE)
+    set_view("widelist")
 
 
 def telegram_latest_items(info):
@@ -84,27 +88,23 @@ def telegram_latest_items(info):
     imdb_id = details.external_ids.get("imdb_id")
     tvdb_id = details.external_ids.get("tvdb_id")
 
-    info["ids"] = f"{tmdb_id}, {tvdb_id}, {imdb_id}"
+    info["ids"] = {"tmdb_id": tmdb_id, "tvdb_id": tvdb_id, "imdb_id": imdb_id}
 
-    poster_path = f"{TMDB_POSTER_URL}{details.poster_path or ''}"
-    overview = details.overview or ""
+    list_item = ListItem(label=title)
 
-    item = list_item(title, poster_path=poster_path, icon="trending.png")
-    set_media_infotag(item, mode, title, overview=overview)
+    set_media_infoTag(list_item, metadata=details, mode=mode)
 
     addDirectoryItem(
         ADDON_HANDLE,
-        build_url("get_telegram_latest_files", data=info),
-        item,
+        build_url("get_telegram_latest_files", data=json.dumps(info)),
+        list_item,
         isFolder=True,
     )
 
 
 def get_telegram_latest_files(params):
-    data = eval(params["data"])
-    mode = data["type"]
-
-    set_content_type(mode)
+    data = json.loads(params["data"])
+    set_content_type(data["type"])
     execute_thread_pool(data["files"], telegram_latest_files, data)
     endOfDirectory(ADDON_HANDLE)
 
@@ -112,51 +112,28 @@ def get_telegram_latest_files(params):
 def telegram_latest_files(info, data):
     mode = info["mode"]
     title = info["title"]
-    tmdb_id = data["tmdb_id"]
+
+    list_item = ListItem(label=title)
 
     if mode == "tv":
-        try:
-            details = tmdb_get(
-                "episode_details",
-                params={
-                    "id": tmdb_id,
-                    "season": info["season"],
-                    "episode": info["episode"],
-                },
-            )
-            poster_path = TMDB_POSTER_URL + details.still_path
-            overview = details.overview or ""
-            episode_name = details.name
-        except (
-            TMDbException
-        ):  # Cause of anime tmdb id fails when getting episode details
-            poster_path = ""
-            overview = ""
-            episode_name = ""
-
-        item = list_item(title, poster_path=poster_path)
-
-        set_media_infotag(
-            item,
-            mode,
-            title,
-            ids=data["ids"],
-            ep_name=episode_name,
-            season=info["season"],
-            episode=info["episode"],
-            overview=overview,
+        details = tmdb_get(
+            "episode_details",
+            params={
+                "id": data["tmdb_id"],
+                "season": info["season"],
+                "episode": info["episode"],
+            },
         )
-    else:
-        details = tmdb_get("movie_details", tmdb_id)
-        poster_path = TMDB_POSTER_URL + details.poster_path
-        item = list_item(title, poster_path=poster_path)
-        overview = details.overview or ""
-        set_media_infotag(item, mode, title, ids=data["ids"], overview=overview)
 
-    item.setProperty("IsPlayable", "true")
+    else:
+        details = tmdb_get("movie_details", data["tmdb_id"])
+    
+    list_item.setProperty("IsPlayable", "true")
+    set_media_infoTag(list_item, metadata=details, mode=mode)
+    
     addDirectoryItem(
         ADDON_HANDLE,
         build_url("play_torrent", data=info),
-        item,
+        list_item,
         isFolder=False,
     )

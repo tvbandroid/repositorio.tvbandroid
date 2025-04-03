@@ -24,9 +24,8 @@ def get_playback_info(data):
     type = data.get("type", "")
     url = data.get("url", "")
     magnet = data.get("magnet", "")
-    info_hash = data.get("info_hash", "")
     is_torrent = data.get("is_torrent", "")
-    ids = data.get("ids", [])
+    ids = data.get("ids", "")
     is_pack = data.get("is_pack", False)
 
     torrent_enable = get_setting("torrent_enable")
@@ -66,8 +65,8 @@ def get_playback_info(data):
                 else:
                     _url = url
             else:
-                _url = get_debrid_direct_url(info_hash, type)
-
+                _url = get_debrid_direct_url(type, data)
+                
     if _url:
         data["url"] = _url
     else:
@@ -95,8 +94,9 @@ def get_elementum_url(magnet, url, mode, ids):
     if not is_elementum_addon():
         notification(translation(30252))
         return
+    
     if ids:
-        tmdb_id, _, _ = [id.strip() for id in ids.split(",")]
+        tmdb_id = ids["tmdb_id"]
     else:
         tmdb_id = ""
 

@@ -98,6 +98,9 @@ def get_video_url(page_url, url_referer=''):
         elif "AttributeError: 'int'" in traceback.format_exc():
             return 'AttributeError [COLOR red][B]get_int[/COLOR]'
 
+        elif 'HTTP Error 404: Not Found' in traceback.format_exc():
+            return 'Archivo inexistente'
+
         elif '<urlopen error' in traceback.format_exc():
             return 'No se puede establecer la conexión'
 

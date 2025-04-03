@@ -10,7 +10,7 @@ from core import httptools, scrapertools, servertools, tmdb
 from lib.pyberishaes import GibberishAES
 
 
-host = 'https://gx.cuevana3.vip'
+host = 'https://tv8.cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
@@ -25,7 +25,7 @@ ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://w
              'https://ww3u.cuevana3.vip', 'https://wl3v.cuevana3.vip', 'https://wv3n.cuevana3.vip',
              'https://wl3r.cuevana3.vip', 'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip',
              'https://mia.cuevana3.vip', 'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip',
-             'https://zz.cuevana3.vip']
+             'https://zz.cuevana3.vip', 'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -172,7 +172,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/biblioteca-peliculas/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/movies/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
@@ -187,7 +187,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catalogo', action = 'list_all', url = host + '/biblioteca-series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catalogo', action = 'list_all', url = host + '/series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + '/episodios/', search_type = 'tvshow', text_color = 'cyan' ))
 
@@ -270,7 +270,10 @@ def list_all(item):
         if not year: year = scrapertools.find_single_match(article, '<span class=Year>(.*?)</span>').strip()
         if not year: year = scrapertools.find_single_match(article, '<span class="Date">(.*?)</span>').strip()
 
-        if year: title = title.replace('(' + year + ')', '').strip()
+        if year:
+            title = title.replace('(' + year + ')', '').strip()
+            c_year = scrapertools.find_single_match(title, '(\d{4})')
+            if c_year: title = title.replace('(' + c_year + ')', '').strip()
         else:
             year = scrapertools.find_single_match(title, '(\d{4})')
             if year: title = title.replace('(' + year + ')', '').strip()
@@ -836,6 +839,8 @@ def findvideos(item):
                     elif 'xupalace' in srv: continue
                     elif 'uploadfox' in srv: continue
 
+                    elif srv == 'download': continue
+
                     servidor = servertools.corregir_servidor(srv)
 
                     if servertools.is_server_available(servidor):
@@ -1153,7 +1158,10 @@ def list_search(item):
         if not year: year = scrapertools.find_single_match(article, '<span class=Year>(.*?)</span>').strip()
         if not year: year = scrapertools.find_single_match(article, '<span class="Date">(.*?)</span>').strip()
 
-        if year: title = title.replace('(' + year + ')' , '').strip()
+        if year:
+            title = title.replace('(' + year + ')' , '').strip()
+            c_year = scrapertools.find_single_match(title, '(\d{4})')
+            if c_year: title = title.replace('(' + c_year + ')', '').strip()
         else: year ='-'
 
         tipo = 'tvshow' if '/series/' in url else 'movie'

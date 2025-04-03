@@ -33,10 +33,10 @@
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>
 
-# `Kodi 22` $\textbf{\color{magenta}Piers}$ $\textbf{\color{orange}Próximamente}$
+# `Kodi 22` $\textbf{\color{magenta}Piers}$ $\textbf{\color{darkorange}Próximamente}$
 <p align="left">
 <img src="https://img.shields.io/badge/TVBAN-Piers-magenta">
-<img src="https://img.shields.io/badge/PROXIMAMENTE-plum"> 
+<img src="https://img.shields.io/badge/PROXIMAMENTE-saddlebrown"> 
 <p align="center">
 <img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>

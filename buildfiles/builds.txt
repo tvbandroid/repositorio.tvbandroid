@@ -1,5 +1,6 @@
 
 name="TVban matnexom"
+text="Parche"
 version="1.0"
 url="https://github.com/tvbandroid/repositorio.tvbandroid/releases/download/1/TVban.matnexom.zip"
 minor="http://"

@@ -200,7 +200,9 @@ def episodios(item):
 
         title = scrapertools.find_single_match(epi, '<div class="epl-title">(.*?)</div>')
 
-        titulo = '%sx%s - %s' % (str(item.contentSeason), str(epis), title)
+        title = title.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        titulo = '%sx%s %s' % (str(item.contentSeason), str(epis), title)
 
         if url:
             itemlist.append(item.clone( action='findvideos', url = url, title = titulo,

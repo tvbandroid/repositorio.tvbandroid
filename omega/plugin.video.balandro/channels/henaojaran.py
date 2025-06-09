@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import ast, re
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -8,6 +8,7 @@ from core import httptools, scrapertools, servertools, tmdb
 
 
 from lib.pyberishaes import GibberishAES
+from lib import decrypters
 
 
 host = 'https://vwv.henaojara.net/'
@@ -459,8 +460,10 @@ def findvideos(item):
         elif 'filemoon' in url: servidor = 'various'
         elif 'streamvid' in url: servidor = 'various'
         elif 'vidhide' in url: servidor = 'various'
-        elif 'lulustream' in url: servidor = 'various'
+        elif 'lulustream' in url or 'lulu' in url: servidor = 'various'
         elif 'listeamed' in url or 'vidguard' in url: servidor = 'various'
+        elif 'goodstream' in url: servidor = 'various'
+        elif 'smoothpre' in url or 'movearnpre' in url: servidor = 'various'
 
         elif 'ok' in url: servidor = 'okru'
         elif 'dood' in url: servidor = 'doodstream'
@@ -499,19 +502,18 @@ def play(item):
         bytes = str(item.bytes)
 
         try:
-            cripto = ast.literal_eval(cripto)
-        except:
-            crypto = str(item.crypto)
-
-        try:
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
 
         if not url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
-        elif not 'http' in url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+            url = decrypters.decode_decipher(crypto, bytes)
+
+        if not url:
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+        elif not url.startswith("http"):
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     elif '/?trdownload=' in url:
            url = httptools.downloadpage(url, follow_redirects=False, timeout=timeout).headers['location']

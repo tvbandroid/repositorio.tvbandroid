@@ -139,8 +139,6 @@ def acciones(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
-
     itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
                                 from_channel='detodo', folder=False, text_color='chartreuse' ))
 
@@ -335,6 +333,8 @@ def findvideos(item):
                 if 'powvideo' in link: continue
                 elif '1fichier' in link: continue
 
+                elif '/multiup.' in link: continue
+
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
                 if enlace:
@@ -378,6 +378,8 @@ def findvideos(item):
                 if 'powvideo' in link: continue
                 elif '1fichier' in link: continue
 
+                elif '/multiup.' in link: continue
+
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
                 if enlace:
@@ -420,6 +422,8 @@ def findvideos(item):
 
                 if 'powvideo' in link: continue
                 elif '1fichier' in link: continue
+
+                elif '/multiup.' in link: continue
 
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
@@ -470,6 +474,9 @@ def play(item):
         url = scrapertools.find_single_match(data, "var url = '(.*?)'")
 
     if url:
+        if '/multiup.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 

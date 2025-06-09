@@ -83,8 +83,6 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('veronlie'), text_color='turquoise' ))
-
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -222,7 +220,7 @@ def list_all(item):
             if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url = url, title = title, thumbnail = thumb,
-                                        contentType='tvshow', contentSerieName=title,  infoLabels = {'year': year} ))
+                                        contentType='tvshow', contentSerieName=title, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 

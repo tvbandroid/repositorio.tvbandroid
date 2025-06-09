@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from six.moves import urllib_parse
 from resolveurl.lib import helpers
 from resolveurl import common
 from resolveurl.resolver import ResolveUrl, ResolverError
@@ -24,8 +25,8 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 
 class SendResolver(ResolveUrl):
     name = 'Send'
-    domains = ['send.cm', 'sendit.cloud']
-    pattern = r'(?://|\.)(send(?:it)?\.(?:cm|cloud))/(?:f/embed/)?([0-9a-zA-Z]+)'
+    domains = ['send.cm', 'sendit.cloud', 'send.now']
+    pattern = r'(?://|\.)(send(?:it)?\.(?:cm|cloud|now))/(?:f/embed/|d/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
@@ -37,7 +38,7 @@ class SendResolver(ResolveUrl):
             url = helpers.get_redirect_url(burl, headers=headers, form_data=data)
             if url != burl:
                 headers.update({'Referer': web_url})
-                return url + helpers.append_headers(headers)
+                return urllib_parse.quote(url, '/:') + helpers.append_headers(headers)
             else:
                 raise ResolverError('Unable to locate File')
         else:
@@ -45,4 +46,4 @@ class SendResolver(ResolveUrl):
         return
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://send.cm/{media_id}')
+        return self._default_get_url(host, media_id, template='https://send.now/{media_id}')

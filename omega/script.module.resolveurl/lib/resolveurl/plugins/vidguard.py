@@ -28,13 +28,22 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 class VidGuardResolver(ResolveUrl):
     name = 'VidGuard'
     domains = ['vidguard.to', 'vgfplay.com', 'vgembed.com', 'moflix-stream.day',
-               'v6embed.xyz', 'vid-guard.com', 'vembed.net', 'embedv.net', 'fslinks.org']
-    pattern = r'(?://|\.)((?:vid-?guard|vgfplay|fslinks|moflix-stream|v?[g6]?embedv?)' \
-              r'\.(?:to|com|day|xyz|org|net))/(?:e|v|d)/([0-9a-zA-Z]+)'
+               'v6embed.xyz', 'vid-guard.com', 'vembed.net', 'embedv.net', 'fslinks.org',
+               'bembed.net', 'listeamed.net', 'gsfjzmqu.sbs', 'go-streamer.net', '6tnutl8knw.sbs',
+               'dhmu4p2hkp.sbs']
+    pattern = r'(?://|\.)((?:vid-?guard|vgfplay|fslinks|moflix-stream|listeamed|go-streamer|gsfjzmqu|' \
+              r'dhmu4p2hkp|6tnutl8knw|v?[g6b]?embedv?)'\
+              r'\.(?:to|com|day|xyz|org|net|sbs))/(?:e|v|d)/([0-9a-zA-Z:$/.]+)'
 
     def get_media_url(self, host, media_id):
+        if '$$' in media_id:
+            media_id, referer = media_id.split('$$')
+            referer = urllib_parse.urljoin(referer, '/')
+        else:
+            referer = False
         web_url = self.get_url(host, media_id)
-        headers = {'User-Agent': common.FF_USER_AGENT}
+        headers = {'User-Agent': common.FF_USER_AGENT,
+                   'Referer': referer}
         try:
             html = self.net.http_GET(web_url, headers=headers).content
         except urllib_error.HTTPError:
@@ -62,9 +71,9 @@ class VidGuardResolver(ResolveUrl):
         raise ResolverError('Video Link Not Found')
 
     def get_url(self, host, media_id):
-        hosts = ['vidguard', 'vid-guard', 'vgfplay', 'vgembed', 'vembed.net']
+        hosts = ['vidguard', 'vid-guard', 'vgfplay', 'vgembed', 'vembed.net', 'embedv.net', 'go-streamer.net']
         if any(x in host for x in hosts):
-            host = 'embedv.net'
+            host = 'listeamed.net'
         return self._default_get_url(host, media_id, 'https://{host}/e/{media_id}')
 
     # Adapted from PHP code by vb6rocod

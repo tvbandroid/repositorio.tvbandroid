@@ -665,7 +665,7 @@
         <assets><icon>icon.png</icon></assets> </extension>
 </addon>
 
-<addon id="plugin.video.alfa" name="Alfa" version="3.10.8" provider-name="Alfa Addon">
+<addon id="plugin.video.alfa" name="Alfa" version="3.10.9" provider-name="Alfa Addon">
     <requires>
         <import addon="script.module.requests" />
         <import addon="script.module.beautifulsoup4" version="4.5.3" />
@@ -714,9 +714,19 @@
         <source>https://github.com/alfa-addon/addon</source>
         <news>
     [B]Estos son los cambios para esta versión:[/B]
-    • +18                                         • Don Torrent
-    • HDFull                                    • Nuevo: Yaske
-    • Osjonosu                                • Playdede</news>
+    - +18
+    - Don Torrent
+    - Gran Torrent
+    - Hack Torrent
+    - HDFull
+    - HDFullS: Desactivado
+    - Mejortorrent
+    - Osjonosu: Desactivado
+    - Pelispanda
+    - Pelitorrent
+    - Playdede
+    - SeriesKao
+    - Yaske</news>
         <assets>
             <icon>resources/icon.png</icon>
             <fanart>resources/fanart.jpg</fanart>
@@ -774,7 +784,7 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.balandro" name="Balandro" version="4.0.16" provider-name="Team Balandro">
+<addon id="plugin.video.balandro" name="Balandro" version="4.0.17" provider-name="Team Balandro">
   <requires>
      <import addon="script.module.requests"/>
   </requires>
@@ -794,7 +804,7 @@
       <screenshot>resources/screenshots/4.jpg</screenshot>
     </assets>
     <news>
-    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.16[/COLOR][COLOR chartreuse]  Marzo de 2025[/B][/COLOR]
+    [COLOR darkorange][B]Versión  [/COLOR][COLOR yellow]4.0.17[/COLOR][COLOR chartreuse]  Mayo de 2025[/B][/COLOR]
 
     [COLOR goldenrod][B]Media Centers:[/B][/COLOR]
         [COLOR tan][B]Kodi Versiones Oficiales Soportadas:[/B][/COLOR]
@@ -1190,7 +1200,7 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.jacktook" name="Jacktook" version="0.5.1" provider-name="Sam-Max">
+<addon id="plugin.video.jacktook" name="Jacktook" version="0.5.3" provider-name="Sam-Max">
   <requires>
     <import addon="xbmc.python" version="3.00.0"/>
     <import addon="script.module.requests" version="2.25.1"/>
@@ -1200,8 +1210,6 @@
     <provides>video</provides>
   </extension>
   <extension point="xbmc.service" library="service.py" />
-  <extension point="xbmc.python.module" library="lib/api"/>
-  <extension point="xbmc.python.module" library="lib/bencodepy"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="en">jacktook</summary>
     <description lang="en">Kodi addon for torrent streaming</description>
@@ -3002,7 +3010,7 @@ provider-name="jurialmunkey">
     </extension>
 </addon>
 
-<addon id="script.module.resolveurl" name="ResolveURL" version="5.1.130" provider-name="gujal">
+<addon id="script.module.resolveurl" name="ResolveURL" version="5.1.174" provider-name="gujal">
     <requires>
         <!-- <import addon="xbmc.python" version="3.0.0" /> -->
         <import addon="script.module.six" />

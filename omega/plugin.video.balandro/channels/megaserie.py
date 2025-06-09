@@ -289,7 +289,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '(.*?)<p>MegaxSerie')
+    bloque = scrapertools.find_single_match(data, '(.*?)<p class="copy">MegaSerie')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 

@@ -155,7 +155,7 @@ def parse_smil_source_list(smil):
     return sources
 
 
-def scrape_sources(html, result_blacklist=None, scheme='http', patterns=None, generic_patterns=True):
+def scrape_sources(html, result_blacklist=None, scheme='http', patterns=None, generic_patterns=True, url=None):
     if patterns is None:
         patterns = []
 
@@ -166,14 +166,21 @@ def scrape_sources(html, result_blacklist=None, scheme='http', patterns=None, ge
         labels = []
         for r in re.finditer(regex, _html, re.DOTALL):
             match = r.groupdict()
-            stream_url = match['url'].replace('&amp;', '&')
+            stream_url = match['url']
+            if not (stream_url.startswith('http') or stream_url.startswith('/')):
+                if re.search("^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$", stream_url):
+                    stream_url = b64decode(stream_url).strip()
+            if stream_url.startswith('//'):
+                stream_url = scheme + ':' + stream_url
+            elif not stream_url.startswith('http'):
+                stream_url = urllib_parse.urljoin(url, stream_url)
+            stream_url = stream_url.replace('&amp;', '&')
+
             file_name = urllib_parse.urlparse(stream_url[:-1]).path.split('/')[-1] if stream_url.endswith("/") else urllib_parse.urlparse(stream_url).path.split('/')[-1]
             label = match.get('label', file_name)
             if label is None:
                 label = file_name
             blocked = not file_name or any(item in file_name.lower() for item in _blacklist) or any(item in label for item in _blacklist)
-            if stream_url.startswith('//'):
-                stream_url = scheme + ':' + stream_url
             if '://' not in stream_url or blocked or (stream_url in streams) or any(stream_url == t[1] for t in source_list):
                 continue
             labels.append(label)
@@ -229,7 +236,7 @@ def scrape_subtitles(html, rurl='', scheme='http', patterns=None, generic_patter
                 subs_url = scheme + ':' + subs_url
             elif subs_url.startswith('/'):
                 subs_url = urllib_parse.urljoin(rurl, subs_url)
-            if '://' not in subs_url or (subs_url in subs):
+            if ('://' not in subs_url) or (subs_url in subs) or ('empty' in subs_url):
                 continue
             labels.append(label)
             subs.append(subs_url)
@@ -248,6 +255,7 @@ def scrape_subtitles(html, rurl='', scheme='http', patterns=None, generic_patter
         subtitles.update(__parse_to_dict(html, r'''<track\s*kind=['"]?(?:captions|subtitles)['"]?\s*src=['"](?P<url>[^'"]+)['"]\s*srclang=['"](?P<label>[^'"]+)'''))
         subtitles.update(__parse_to_dict(html, r'''<track\s*kind="(?:captions|subtitles)"\s*label="(?P<label>[^"]+)"\s*srclang="[^"]+"\s*src="(?P<url>[^"]+)'''))
         subtitles.update(__parse_to_dict(html, r'''"tracks":.+?"kind":\s*"captions",\s*"file":\s*"(?P<url>[^"]+).+?"label":\s*"(?P<label>[^"]+)'''))
+        subtitles.update(__parse_to_dict(html, r'''"file":\s*"(?P<url>[^"]+).+?"label":\s*"(?P<label>[^"]+)","kind":"(?:captions|subtitles)"'''))
 
     for regex in patterns:
         subtitles.update(__parse_to_dict(html, regex))
@@ -259,7 +267,8 @@ def get_media_url(
         url, result_blacklist=None, subs=False,
         patterns=None, generic_patterns=True,
         subs_patterns=None, generic_subs_patterns=True,
-        referer=True, redirect=True, verifypeer=True):
+        referer=True, redirect=True,
+        ssl_verify=True, verifypeer=True):
     if patterns is None:
         patterns = []
     if subs_patterns is None:
@@ -271,10 +280,9 @@ def get_media_url(
         result_blacklist = [result_blacklist]
 
     result_blacklist = list(set(result_blacklist + ['.smil']))  # smil(not playable) contains potential sources, only blacklist when called from here
-    net = common.Net()
+    net = common.Net(ssl_verify=ssl_verify)
     headers = {'User-Agent': common.RAND_UA}
-    u = urllib_parse.urlparse(url)
-    rurl = '{0}://{1}/'.format(u.scheme, u.netloc)
+    rurl = urllib_parse.urljoin(url, '/')
     if isinstance(referer, six.string_types):
         headers.update({'Referer': referer})
     elif referer:
@@ -288,8 +296,9 @@ def get_media_url(
     headers.update({'Referer': rurl, 'Origin': rurl[:-1]})
     if not verifypeer:
         headers.update({'verifypeer': 'false'})
-    source_list = scrape_sources(html, result_blacklist, scheme, patterns, generic_patterns)
-    source = (pick_source(source_list)).replace(' ', '%20') + append_headers(headers)
+    source_list = scrape_sources(html, result_blacklist, scheme, patterns, generic_patterns, rurl)
+    source = pick_source(source_list)
+    source = urllib_parse.quote(source, '/:?=&!') + append_headers(headers)
     if subs:
         subtitles = scrape_subtitles(html, rurl, scheme, subs_patterns, generic_subs_patterns)
         return source, subtitles
@@ -445,6 +454,25 @@ def girc(page_data, url, co=None):
             return gtoken.group(1)
 
     return ''
+
+
+def arc4(t, n):
+    n = base64.b64decode(n)
+    u = 0
+    h = ''
+    s = list(range(256))
+    for e in range(256):
+        x = t[e % len(t)]
+        u = (u + s[e] + (x if isinstance(x, int) else ord(x))) % 256
+        s[e], s[u] = s[u], s[e]
+
+    e = u = 0
+    for c in range(len(n)):
+        e = (e + 1) % 256
+        u = (u + s[e]) % 256
+        s[e], s[u] = s[u], s[e]
+        h += chr((n[c] if isinstance(n[c], int) else ord(n[c])) ^ s[(s[e] + s[u]) % 256])
+    return h
 
 
 def xor_string(encurl, key):
@@ -792,9 +820,11 @@ def Tdecode(vidurl):
 
 
 def b64decode(t, binary=False):
+    if len(t) % 4 != 0:
+        t += '=' * (-len(t) % 4)
     r = base64.b64decode(t)
     return r if binary else six.ensure_str(r)
 
 
 def b64encode(b):
-    return six.ensure_str(base64.b64encode(six.ensure_binary(b)))
+    return six.ensure_str(base64.b64encode(b if isinstance(b, bytes) else six.b(b)))

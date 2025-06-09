@@ -25,11 +25,11 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 class StreamRubyResolver(ResolveUrl):
     name = 'StreamRuby'
     domains = ['streamruby.com', 'sruby.xyz', 'rubystream.xyz', 'tuktukcimamulti.buzz',
-               'stmruby.com', 'rubystm.com']
-    pattern = r'(?://|\.)((?:s?(?:tream|tm)?ruby(?:stream|stm)?|tuktukcimamulti)\.' \
+               'stmruby.com', 'rubystm.com', 'rubyvid.com']
+    pattern = r'(?://|\.)((?:s?(?:tream|tm)?ruby(?:stream|stm|vid)?|tuktukcimamulti)\.' \
               r'(?:com|xyz|buzz))/(?:embed-|e/|d/)?(\w+)'
 
-    def get_media_url(self, host, media_id):
+    def get_media_url(self, host, media_id, subs=False):
         web_url = self.get_url(host, media_id)
         headers = {'User-Agent': common.FF_USER_AGENT, 'Accept-Language': 'en-US,en;q=0.5'}
         html = self.net.http_GET(web_url, headers=headers).content
@@ -38,10 +38,11 @@ class StreamRubyResolver(ResolveUrl):
         if master_url:
             rurl = 'https://{}/'.format(host)
             headers.update({'Origin': rurl[:-1], 'Referer': rurl})
-            master_html = self.net.http_GET(master_url.group(1), headers=headers).content
-            sources = re.findall(r'[A-Z]{10}=\d+x(?P<label>[\d]+).+\n(?!#)(?P<url>[^\n]+)', master_html)
-            if sources:
-                return helpers.pick_source(helpers.sort_sources_list(sources)) + helpers.append_headers(headers)
+            stream_url = master_url.group(1) + helpers.append_headers(headers)
+            if subs:
+                subtitles = helpers.scrape_subtitles(html, web_url)
+                return stream_url, subtitles
+            return stream_url
 
         raise ResolverError('File Not Found or removed')
 

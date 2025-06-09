@@ -1,69 +1,90 @@
 {
-    "addon_version": "4.0.16",
+    "addon_version": "4.0.17",
     "files": {
         "channels": [
-            "cinemitas",
-            "detodo",
+            "animemix",
+            "animeonline",
+            "animesenlatino",
+            "animeyt",
+            "asialive",
+            "cineplay",
+            "cinequinqui",
+            "cuevana3pro",
+            "documentaleson",
             "dontorrents",
-            "dpeliculas",
-            "ennovelaspl",
+            "dontorrentsin",
+            "doramasmp4dev",
+            "doramasyt",
             "ennovelastv",
-            "genteclic",
+            "entrepeliculasyseries",
+            "estrenosdoramases",
+            "filmoves",
+            "frozenlayer",
+            "gnula",
             "gnula24",
             "gnula24h",
-            "hacktorrent",
-            "hdfull",
+            "henaojara",
             "henaojaran",
-            "kiriasian",
             "kissasian",
-            "masnovelas",
+            "legalmentegratis",
+            "mega1link",
+            "megaserie",
             "mejortorrentapp",
-            "netnovelas",
-            "novelas360",
-            "onlinetv",
-            "pelispanda",
+            "pelis28re",
+            "pelisgratishd",
+            "pelisplushdlat",
+            "pelisplushdnz",
+            "pelisxd",
+            "pelisyseries",
             "pgratishd",
             "ppeliculas",
+            "pplus",
             "series24",
             "serieses",
             "serieskao",
-            "seriesonline",
-            "seriestv",
-            "srnovelas",
-            "star",
-            "todopeliculas",
-            "tusnovelas",
-            "veronline",
-            "verseries"
+            "seriesplus",
+            "sololatino",
+            "telenovela",
+            "tgx",
+            "trailers",
+            "verflix",
+            "zoowomaniacos"
         ],
         "core": [
             "httptools",
             "requeststools",
             "servertools"
         ],
+        "lib": [
+            "decrypters"
+        ],
         "modules": [
             "actions",
-            "domains",
             "filters",
             "generos",
+            "groups",
             "helper",
+            "mainmenu",
             "search",
             "submnuctext",
             "submnuteam",
             "tester"
         ],
         "platformcode": [
-            "updater"
+            "platformtools"
         ],
         "resources": [
-            "Lista-proxies",
             "settings"
         ],
         "root dir": [
             "dominios",
             "version"
+        ],
+        "servers": [
+            "various",
+            "zures"
         ]
     },
-    "fix_version": 2,
-    "hash": "3eb0be11fe8330b6f9a9881c171f2cc7"
+    "fix_version": 5,
+    "hash": "81a34374d9307825615200d17e2a7e4a"
 }

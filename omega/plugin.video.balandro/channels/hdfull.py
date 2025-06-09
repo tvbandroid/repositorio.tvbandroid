@@ -54,6 +54,7 @@ dominios = [
          'https://hd-full.biz/',
          'https://hdfull.sbs/',
 
+         'https://hdfull.help/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
          'https://hdfull.cfd/',

@@ -30,14 +30,21 @@ class StreamWishResolver(ResolveGeneric):
                'tuktukcinema.store', 'doodporn.xyz', 'ankrzkz.sbs', 'volvovideo.top', 'streamwish.site',
                'wishfast.top', 'ankrznm.sbs', 'sfastwish.com', 'eghjrutf.sbs', 'eghzrutw.sbs',
                'playembed.online', 'egsyxurh.sbs', 'egtpgrvh.sbs', 'flaswish.com', 'obeywish.com',
-               'cdnwish.com']
-    pattern = r'(?://|\.)((?:(?:stream|flas|obey|sfast|embed|[mad]|cdn)?wish(?:embed|fast)?|ajmidyad|' \
+               'cdnwish.com', 'javsw.me', 'cinemathek.online', 'trgsfjll.sbs', 'fsdcmo.sbs',
+               'anime4low.sbs', 'mohahhda.site', 'ma2d.store', 'dancima.shop', 'swhoi.com',
+               'gsfqzmqu.sbs', 'jodwish.com', 'swdyu.com', 'strwish.com', 'asnwish.com',
+               'wishonly.site', 'playerwish.com', 'katomen.store', 'hlswish.com', 'streamwish.fun',
+               'swishsrv.com', 'iplayerhls.com', 'hlsflast.com', '4yftwvrdz7.sbs', 'ghbrisk.com',
+               'eb8gfmjn71.sbs', 'cybervynx.com', 'edbrdl7pab.sbs', 'stbhg.click', 'dhcplay.com']
+    pattern = r'(?://|\.)((?:(?:stream|flas|obey|sfast|str|embed|[mads]|cdn|asn|player|hls)?wish(?:embed|fast|only|srv)?|ajmidyad|' \
               r'atabkhha|atabknha|atabknhk|atabknhs|abkrzkr|abkrzkz|vidmoviesb|kharabnahs|hayaatieadhab|' \
               r'cilootv|tuktukcinema|doodporn|ankrzkz|volvovideo|strmwis|ankrznm|yadmalik|khadhnayad|' \
-              r'eghjrutf|eghzrutw|playembed|egsyxurh|egtpgrvh|uqloads)' \
-              r'\.(?:com|to|sbs|pro|xyz|store|top|site|online))/(?:e/|f/)?([0-9a-zA-Z$:/.]+)'
+              r'eghjrutf|eghzrutw|playembed|egsyxurh|egtpgrvh|uqloads|javsw|cinemathek|trgsfjll|fsdcmo|' \
+              r'anime4low|mohahhda|ma2d|dancima|swhoi|gsfqzmqu|jodwish|swdyu|katomen|iplayerhls|hlsflast|' \
+              r'4yftwvrdz7|ghbrisk|eb8gfmjn71|cybervynx|edbrdl7pab|stbhg|dhcplay)' \
+              r'\.(?:com|to|sbs|pro|xyz|store|top|site|online|me|shop|fun|click))/(?:e/|f/|d/)?([0-9a-zA-Z$:/.]+)'
 
-    def get_media_url(self, host, media_id):
+    def get_media_url(self, host, media_id, subs=False):
         if '$$' in media_id:
             media_id, referer = media_id.split('$$')
             referer = urllib_parse.urljoin(referer, '/')
@@ -45,9 +52,13 @@ class StreamWishResolver(ResolveGeneric):
             referer = False
         return helpers.get_media_url(
             self.get_url(host, media_id),
-            patterns=[r'''sources:\s*\[{file:\s*["'](?P<url>[^"']+)'''],
+            patterns=[
+                r'''sources:\s*\[{file:\s*["'](?P<url>[^"']+)''',
+                r'''links\s*=.+?hls[24]":\s*"(?P<url>[^"]+)'''
+            ],
             generic_patterns=False,
-            referer=referer
+            referer=referer,
+            subs=subs
         )
 
     def get_url(self, host, media_id):

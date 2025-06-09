@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import ast, re
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -8,24 +8,26 @@ from core import httptools, scrapertools, servertools, tmdb
 
 
 from lib.pyberishaes import GibberishAES
+from lib import decrypters
 
 
-host = 'https://tv8.cuevana3.vip'
+host = 'https://cuevana3.vip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://wwa3.cuevana3.vip', 'https://wlw.cuevana3.vip', 'https://wlv.cuevana3.vip',
              'https://wli3.cuevana3.vip', 'https://wnv3.cuevana3.vip', 'https://wn3.cuevana3.vip',
              'https://wv3i.cuevana3.vip', 'https://wmi.cuevana3.vip', 'https://wi3v.cuevana3.vip',
-             'https://wev3.cuevana3.vip', 'https://wl3n.cuevana3.vip', 'https://cuevana3.vip',
-             'https://wiw3.cuevana3.vip', 'https://wmi3.cuevana3.vip', 'https://wn3l.cuevana3.vip', 
-             'https://imu.cuevana3.vip', 'https://wni3.cuevana3.vip', 'https://mvi.cuevana3.vip',
-             'https://wi3n.cuevana3.vip', 'https://wi3m.cuevana3.vip', 'https://im3.cuevana3.vip',
-             'https://iv3.cuevana3.vip', 'https://lm3.cuevana3.vip', 'https://ww3v.cuevana3.vip',
-             'https://ww3u.cuevana3.vip', 'https://wl3v.cuevana3.vip', 'https://wv3n.cuevana3.vip',
-             'https://wl3r.cuevana3.vip', 'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip',
-             'https://mia.cuevana3.vip', 'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip',
-             'https://zz.cuevana3.vip', 'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip']
+             'https://wev3.cuevana3.vip', 'https://wl3n.cuevana3.vip', 'https://wiw3.cuevana3.vip', 
+             'https://wmi3.cuevana3.vip', 'https://wn3l.cuevana3.vip', 'https://imu.cuevana3.vip',
+             'https://wni3.cuevana3.vip', 'https://mvi.cuevana3.vip', 'https://wi3n.cuevana3.vip',
+             'https://wi3m.cuevana3.vip', 'https://im3.cuevana3.vip', 'https://iv3.cuevana3.vip',
+             'https://lm3.cuevana3.vip', 'https://ww3v.cuevana3.vip', 'https://ww3u.cuevana3.vip', 
+             'https://wl3v.cuevana3.vip', 'https://wv3n.cuevana3.vip', 'https://wl3r.cuevana3.vip',
+             'https://me3.cuevana3.vip', 'https://me4.cuevana3.vip', 'https://mia.cuevana3.vip',
+             'https://max.cuevana3.vip', 'https://zx1.cuevana3.vip', 'https://zz.cuevana3.vip',
+             'https://gx.cuevana3.vip', 'https://tv.cuevana3.vip', 'https://tv8.cuevana3.vip',
+             'https://b1.cuevana3.vip']
 
 
 domain = config.get_setting('dominio', 'cuevana3pro', default='')
@@ -174,8 +176,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/movies/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
-
     return itemlist
 
 
@@ -190,50 +190,6 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catalogo', action = 'list_all', url = host + '/series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + '/episodios/', search_type = 'tvshow', text_color = 'cyan' ))
-
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-
-    return itemlist
-
-
-def generos(item):
-    logger.info()
-    itemlist = []
-
-    if item.search_type == 'movie': text_color = 'deepskyblue'
-    else: text_color = 'hotpink'
-
-    generos = [
-       'accion',
-       'action-adventure',
-       'animacion',
-       'anime',
-       'aventura',
-       'belica',
-       'ciencia-ficcion',
-       'comedia',
-       'crimen',
-       'dc-comics',
-       'documental',
-       'doramas',
-       'drama',
-       'familia',
-       'fantasia',
-       'historia',
-       'misterio',
-       'musica',
-       'pelicula-de-tv',
-       'romance',
-       'sci-fi-fantasy',
-       'suspense',
-       'terror',
-       'western'
-       ]
-
-    for genero in generos:
-        url = host + '/category/' + genero + '/'
-
-        itemlist.append(item.clone( title = genero.capitalize(), url = url, action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -805,9 +761,12 @@ def findvideos(item):
             if not dataLink: dataLink = scrapertools.find_single_match(datae, 'dataLink(.*?);')
 
             e_bytes = scrapertools.find_single_match(datae, "const bytes =.*?'(.*?)'")
-            if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "encrypted.*?'(.*?)'")
+            if not e_bytes: e_bytes = scrapertools.find_single_match(datae, "const safeServer =.*?'(.*?)'")
 
             e_links = dataLink.replace(']},', '"type":"file"').replace(']}]', '"type":"file"')
+
+            age = ''
+            if not dataLink or not e_bytes: age = 'crypto'
 
             langs = scrapertools.find_multiple_matches(str(e_links), '"video_language":(.*?)"type":"file"')
 
@@ -858,7 +817,7 @@ def findvideos(item):
                            other = url.split("/")[2]
                            other = other.replace('https:', '').strip()
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes,
+                    itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', crypto=link, bytes=e_bytes, age=age,
                                           language=lang, other=other ))
 
         elif '/xupalace.' in match:
@@ -972,6 +931,8 @@ def findvideos(item):
                     elif 'xupalace' in srv: continue
                     elif 'uploadfox' in srv: continue
 
+                    elif srv == 'download': continue
+
                     servidor = servertools.corregir_servidor(srv)
 
                     if servertools.is_server_available(servidor):
@@ -1061,17 +1022,22 @@ def play(item):
         bytes = str(item.bytes)
 
         try:
-            cripto = ast.literal_eval(cripto)
-        except:
-            crypto = str(item.crypto)
-
-        try:
             url = GibberishAES.dec(GibberishAES(), string = crypto, pass_ = bytes)
         except:
             url = ''
 
         if not url:
-            return '[COLOR cyan]No se pudo [COLOR red]Desencriptar[/COLOR]'
+            url = decrypters.decode_decipher(crypto, bytes)
+
+        if not url:
+            if crypto.startswith("http"):
+                url = crypto.replace('\\/', '/')
+
+            if not url:
+                return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
+
+        elif not url.startswith("http"):
+            return '[COLOR cyan]No se pudo [COLOR goldenrod]Descifrar[/COLOR]'
 
     elif item.server == 'directo':
         item.url = url

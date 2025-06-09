@@ -45,11 +45,11 @@ except:
    except: pass
 
 
-host = 'https://srnovelas.org/'
+host = 'https://srnovelas.com/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.srnovelas.cc/', 'https://srnovelas.com/', 'https://meganovelas.online/']
+ant_hosts = ['https://www.srnovelas.cc/', 'https://meganovelas.online/', 'https://srnovelas.org/']
 
 domain = config.get_setting('dominio', 'srnovelas', default='')
 
@@ -319,6 +319,8 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         title = title.capitalize()
+
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))

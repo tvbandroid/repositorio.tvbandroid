@@ -1,17 +1,26 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import sys
+
+if sys.version_info[0] >= 3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time
 
 from platformcode import config, logger, platformtools
-from core import httptools, scrapertools
+from core import filetools, httptools, scrapertools
 
 
 espera = config.get_setting('servers_waiting', default=6)
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -47,7 +56,19 @@ def get_video_url(page_url, url_referer=''):
     if 'amdahost' in page_url: txt_server = 'Amdahost'
     elif 'allviid' in page_url: txt_server = 'Allviid'
     elif 'asianload' in page_url: txt_server = 'Asianload'
-    elif 'bigwarp' in page_url or 'bgwp' in page_url: txt_server = 'Bigwarp'
+
+    elif 'bigwarp' in page_url or 'bgwp' in page_url:
+          txt_server = 'Bigwarp'
+
+          page_url = page_url.replace('/bigwarp.io/d/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.io/e/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.io/v/', '/bigwarp.io/dl?op=embed&file_code=').replace('/bigwarp.io/embed-', '/bigwarp.io/dl?op=embed&file_code=')
+
+          if not '/dl?op=embed&file_code=' in page_url:
+              page_url = page_url.replace('/bigwarp.io/', '/bigwarp.io/dl?op=embed&file_code=')
+
+          if '.html' in page_url: page_url = page_url.replace('.html', '')
+
+          ini_page_url = page_url
+
     elif 'cloudfile' in page_url: txt_server = 'Cloudfile'
     elif 'cloudmail' in page_url: txt_server = 'Cloudmail'
     elif 'dailyuploads' in page_url: txt_server = 'Dailyuploads'
@@ -65,6 +86,14 @@ def get_video_url(page_url, url_referer=''):
     elif 'oneupload' in page_url: txt_server = 'Oneupload'
     elif 'pandafiles' in page_url: txt_server = 'Pandafiles'
     elif 'rovideo' in page_url: txt_server = 'Rovideo'
+
+    elif 'savefiles' in page_url:
+          txt_server = 'Savefiles'
+
+          page_url = page_url.replace('/savefiles.top/', '/savefiles.com/')
+
+          ini_page_url = page_url
+
     elif 'send' in page_url: txt_server = 'Send'
     elif 'streamable' in page_url: txt_server = 'Streamable'
     elif 'streamdav' in page_url: txt_server = 'Streamdav'
@@ -102,12 +131,19 @@ def get_video_url(page_url, url_referer=''):
     elif 'swiftload' in page_url: txt_server = 'SwiftLoad'
     elif 'vidtube' in page_url: txt_server = 'Vidtube'
     elif 'wecima' in page_url: txt_server = 'Wecima'
+    elif 'vidbasic' in page_url: txt_server = 'Vidbasic'
 
     elif txt_server == 'Unknow': return 'Desconocido'
 
     if config.get_setting('servers_time', default=True):
         platformtools.dialog_notification('Cargando ' + '[COLOR cyan][B]' + txt_server + '[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
+
+    path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', txt_server.lower() + '.py'))
+
+    existe = filetools.exists(path)
+    if not existe:
+        return 'El Plugin No existe en Resolveurl'
 
     try:
         import_libs('script.module.resolveurl')

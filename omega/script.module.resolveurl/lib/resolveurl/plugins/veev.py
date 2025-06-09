@@ -27,31 +27,39 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 
 class VeevResolver(ResolveUrl):
     name = 'Veev'
-    domains = ['veev.to']
-    pattern = r'(?://|\.)(veev\.to)/(?:e|d)/([0-9a-zA-Z]+)'
+    domains = ['veev.to', 'kinoger.pw', 'poophq.com', 'doods.to']
+    pattern = r'(?://|\.)((?:veev|kinoger|poophq|doods)\.(?:to|pw|com))/(?:e|d)/([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
         headers = {'User-Agent': common.CHROME_USER_AGENT, 'Referer': web_url}
-        html = self.net.http_GET(web_url, headers=headers).content
-        f = re.search(r'{\s*fc:\s*"([^"]+)', html)
-        if f:
-            ch = veev_decode(f.group(1))
-            params = {
-                'op': 'player_api',
-                'cmd': 'gi',
-                'file_code': media_id,
-                'ch': ch,
-                'ie': 1
-            }
-            durl = urllib_parse.urljoin(web_url, '/dl') + '?' + urllib_parse.urlencode(params)
-            jresp = self.net.http_GET(durl, headers=headers).content
-            jresp = json.loads(jresp).get('file')
-            if jresp.get('file_status') == 'OK':
-                str_url = decode_url(veev_decode(jresp.get('dv')[0].get('s')), build_array(ch)[0])
-                return str_url + helpers.append_headers(headers)
-            raise ResolverError('Video removed')
-        raise ResolverError('Unable to locate video')
+        r = self.net.http_GET(web_url, headers=headers)
+        if r.get_url() != web_url:
+            media_id = r.get_url().split('/')[-1]
+        # Still dancing
+        items = re.findall(r'''[\.\s'](?:fc|_vvto\[[^\]]*)(?:['\]]*)?\s*[:=]\s*['"]([^'"]+)''', r.content)
+        if items:
+            for f in items[::-1]:
+                ch = veev_decode(f)
+                if ch != f:
+                    params = {
+                        'op': 'player_api',
+                        'cmd': 'gi',
+                        'file_code': media_id,
+                        'ch': ch,
+                        'ie': 1
+                    }
+                    durl = urllib_parse.urljoin(web_url, '/dl') + '?' + urllib_parse.urlencode(params)
+                    jresp = self.net.http_GET(durl, headers=headers).content
+                    jresp = json.loads(jresp).get('file')
+                    if jresp and jresp.get('file_status') == 'OK':
+                        str_url = decode_url(veev_decode(jresp.get('dv')[0].get('s')), build_array(ch)[0])
+                        return str_url + helpers.append_headers(headers)
+                    raise ResolverError('Video removed')
+
+            raise ResolverError('Unable to locate video')
+
+        raise ResolverError('Video removed')
 
     def get_url(self, host, media_id):
         return self._default_get_url(host, media_id, template='https://{host}/e/{media_id}')

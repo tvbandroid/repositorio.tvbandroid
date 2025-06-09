@@ -27,18 +27,21 @@ from resolveurl.resolver import ResolveUrl, ResolverError
 
 class DoodStreamResolver(ResolveUrl):
     name = 'DoodStream'
-    domains = ['dood.watch', 'doodstream.com', 'dood.to', 'dood.so', 'dood.cx', 'dood.la', 'dood.ws',
-               'dood.sh', 'doodstream.co', 'dood.pm', 'dood.wf', 'dood.re', 'dood.yt', 'dooood.com',
-               'dood.stream', 'ds2play.com', 'doods.pro', 'ds2video.com', 'd0o0d.com', 'do0od.com',
-               'd0000d.com', 'd000d.com']
-    pattern = r'(?://|\.)((?:do*0*o*0*ds?(?:tream)?|ds2(?:play|video))\.' \
-              r'(?:com?|watch|to|s[ho]|cx|la|w[sf]|pm|re|yt|stream|pro))/(?:d|e)/([0-9a-zA-Z]+)'
+    domains = [
+        'dood.watch', 'doodstream.com', 'dood.to', 'dood.so', 'dood.cx', 'dood.la', 'dood.ws',
+        'dood.sh', 'doodstream.co', 'dood.pm', 'dood.wf', 'dood.re', 'dood.yt', 'dooood.com',
+        'dood.stream', 'ds2play.com', 'doods.pro', 'ds2video.com', 'd0o0d.com', 'do0od.com',
+        'd0000d.com', 'd000d.com', 'dood.li', 'dood.work', 'dooodster.com', 'vidply.com',
+        'all3do.com', 'do7go.com', 'doodcdn.io', 'doply.net'
+    ]
+    pattern = r'(?://|\.)((?:do*0*o*0*ds?(?:tream|ter|cdn)?|ds2(?:play|video)|vidply|all3do|do(?:7go|ply))\.' \
+              r'(?:[cit]om?|watch|s[ho]|cx|l[ai]|w[sf]|pm|re|yt|stream|pro|work|net))/(?:d|e)/([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id, subs=False):
         if any(host.endswith(x) for x in ['.cx', '.wf']):
             host = 'dood.so'
         web_url = self.get_url(host, media_id)
-        headers = {'User-Agent': common.RAND_UA,
+        headers = {'User-Agent': common.IPAD_USER_AGENT,
                    'Referer': 'https://{0}/'.format(host)}
 
         r = self.net.http_GET(web_url, headers=headers)
@@ -69,7 +72,10 @@ class DoodStreamResolver(ResolveUrl):
             token = match.group(2)
             url = 'https://{0}{1}'.format(host, match.group(1))
             html = self.net.http_GET(url, headers=headers).content
-            vid_src = self.dood_decode(html) + token + str(int(time.time() * 1000)) + helpers.append_headers(headers)
+            if 'cloudflarestorage.' in html:
+                vid_src = html.strip() + helpers.append_headers(headers)
+            else:
+                vid_src = self.dood_decode(html) + token + str(int(time.time() * 1000)) + helpers.append_headers(headers)
             if subs:
                 return vid_src, subtitles
             return vid_src
@@ -77,6 +83,8 @@ class DoodStreamResolver(ResolveUrl):
         raise ResolverError('Video Link Not Found')
 
     def get_url(self, host, media_id):
+        if host not in ['doodstream.com', 'vidply.com', 'all3do.com']:
+            host = 'doodstream.com'
         return self._default_get_url(host, media_id, template='https://{host}/d/{media_id}')
 
     def dood_decode(self, data):

@@ -246,7 +246,7 @@ def check_addon_updates(verbose=False, force=False):
 
             if addon_update_verbose:
                 from modules import helper
-                helper.show_last_fix('')
+                helper.resumen_fix('')
 
             if addon_update_domains:
                 from modules import actions
@@ -290,24 +290,20 @@ def get_last_chrome_list():
 
 
 def put_proxies_list():
-    if not config.get_setting('proxies_list', default=False):
-        path_data = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
+    path_data = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
 
-        existe = filetools.exists(path_data)
+    path_resources = os.path.join(filetools.translatePath("special://home/addons/plugin.video.balandro/resources/Lista-proxies.txt"))
 
-        if not existe:
-            path_resources = os.path.join(filetools.translatePath("special://home/addons/plugin.video.balandro/resources/Lista-proxies.txt"))
+    existe = filetools.exists(path_resources)
 
-            existe = filetools.exists(path_resources)
+    if existe:
+        origen = filetools.join(path_resources)
+        destino = filetools.join(path_data)
 
-            if existe:
-                origen = filetools.join(path_resources)
-                destino = filetools.join(path_data)
+        if filetools.copy(origen, destino, silent=False):
+            if not config.get_setting('proxies_list', default=False): config.set_setting('proxies_list', True)
 
-                if filetools.copy(origen, destino, silent=False):
-                    config.set_setting('proxies_list', True)
-
-                    filetools.remove(origen)
+            if not config.get_setting('developer_mode', default=False): filetools.remove(origen)
 
 
 def check_addon_version():
@@ -339,6 +335,7 @@ def check_zip_hash(localfilename):
         check_zip_hash = md5.hexdigest()
 
     return check_zip_hash
+
 
 def erase_cookies():
     logger.info()

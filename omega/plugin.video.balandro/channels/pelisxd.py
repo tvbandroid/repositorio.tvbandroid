@@ -44,9 +44,10 @@ except:
    except: pass
 
 
-host = 'https://www.pelisxd.com/'
+# ~ En la web: Solo hay 42 series se desestiman  /series-y-novelas/
 
-# ~ En la web: Solo hay 42 series se desetiman  /series-y-novelas/
+
+host = 'https://www.pelisxd.com/'
 
 
 def item_configurar_proxies(item):

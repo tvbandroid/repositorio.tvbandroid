@@ -7,14 +7,14 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cv5w.series24.cc/'
+host = 'https://c5vw.series24.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.series24.cc/', 'https://www1.series24.cc/', 'https://ww3.series24.cc/',
             'https://ww2.series24.cc/', 'https://www11.series24.cc/', 'https://w-ww.series24.cc/',
             'https://ww-w.series24.cc/', 'https://www.series24.cc/', 'https://wv5n.series24.cc/',
-            'https://wv5b.series24.cc/', 'https://wc5n.series24.cc/']
+            'https://wv5b.series24.cc/', 'https://wc5n.series24.cc/', 'https://cv5w.series24.cc/']
 
 
 domain = config.get_setting('dominio', 'series24', default='')
@@ -253,6 +253,10 @@ def list_all(item):
 
         if '/ver-pelicula-online/' in url: continue
 
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
+
+        title = re.sub(r" \(.*?\)| \| .*", "", title)
+
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         year = scrapertools.find_single_match(match, '<span class="imdb".*?</span>.*?<span>(.*?)</span>')
@@ -263,13 +267,8 @@ def list_all(item):
 
         if '/series-de/' in item.url: year = scrapertools.find_single_match(item.url, "/series-de/(.*?)/")
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
-
-        titulo = title
-
-        if " | " in titulo: titulo = titulo.split(" | ")[0]
-
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = titulo, infoLabels={'year': year} ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -581,9 +580,6 @@ def play(item):
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"): servidor = new_server
 
-        if '/bigwarp.' in url or '/bgwp.' in url:
-            url = url + '|Referer=' + host
-
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
@@ -608,6 +604,8 @@ def list_search(item):
 
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
 
+        title = re.sub(r" \(.*?\)| \| .*", "", title)
+
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 
         year = scrapertools.find_single_match(article, '<span class="year">(\d{4})</span>')
@@ -616,7 +614,8 @@ def list_search(item):
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<div class="contenido"><p>(.*?)</p>'))
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                    contentType='tvshow', contentSerieName=title, infoLabels={'year': year, 'plot': plot} ))
 
     tmdb.set_infoLabels(itemlist)
 

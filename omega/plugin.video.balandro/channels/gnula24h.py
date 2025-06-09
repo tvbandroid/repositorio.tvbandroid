@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w5nl.gnula.cc/'
+host = 'https://w5cv.gnula.cc/'
 
 
 # ~ por si viene de enlaces guardados
@@ -15,7 +15,7 @@ ant_hosts = ['https://ww3.gnula2h.cc/', 'https://www11.gnula.cc/', 'https://w-ww
              'https://ww-w.gnula.cc/', 'https://www1.gnula.cc/', 'https://w-w-w.gnula.cc/',
              'https://wv5n.gnula.cc/', 'https://wv5h.gnula.cc/', 'https://wv5l.gnula.cc/',
              'https://w-v5n.gnula.cc/', 'https://wv-5n.gnula.cc/', 'https://kv5n.gnula.cc/',
-             'https://wv5c.gnula.cc/']
+             'https://wv5c.gnula.cc/', 'https://w5nl.gnula.cc/', 'https://w5nv.gnula.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula24h', default='')
@@ -70,11 +70,15 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     hay_proxies = False
     if config.get_setting('channel_gnula24h_proxies', default=''): hay_proxies = True
 
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         if hay_proxies:
-            data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -85,7 +89,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -94,7 +98,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
         else:
             if hay_proxies:
-                data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                data = httptools.downloadpage_proxy('gnula24h', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
             else:
                 data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -273,6 +277,8 @@ def list_all(item):
         if '/ver-pelicula/' in url: continue
 
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
+
+        title = re.sub(r" \(.*?\)| \| .*", "", title)
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
@@ -587,9 +593,6 @@ def play(item):
             new_server = servertools.corregir_other(url).lower()
             if new_server.startswith("http"): servidor = new_server
 
-        if '/bigwarp.' in url or '/bgwp.' in url:
-            url = url + '|Referer=' + host
-
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
@@ -613,6 +616,8 @@ def list_search(item):
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
 
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
+
+        title = re.sub(r" \(.*?\)| \| .*", "", title)
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

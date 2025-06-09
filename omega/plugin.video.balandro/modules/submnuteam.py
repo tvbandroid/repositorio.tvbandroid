@@ -222,6 +222,9 @@ if 'fix' in last_fix:
     tit = '[COLOR %s]Información Fix[/COLOR]' % color_infor
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_last_fix'})
 
+    tit = '[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]'
+    context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'resumen_fix'})
+
 tit = '[COLOR %s]Comprobar Actualizaciones Fix[/COLOR]' % color_avis
 context_ayuda.append({'title': tit, 'channel': 'actions', 'action': 'check_addon_updates'})
 
@@ -260,7 +263,18 @@ def submnu_team(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]DESARROLLO:[/B]', thumbnail=config.get_thumb('team'), text_color='darkorange' ))
+    avisar = False
+
+    if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): avisar = True
+
+    if not avisar:
+        titulo = '[B]DESARROLLO:[/B]'
+    else:
+        titulo = '[B]FALSO DESARROLLO:[/B]'
+
+    itemlist.append(item.clone( action='', title=titulo, thumbnail=config.get_thumb('team'), text_color='darkorange' ))
 
     itemlist.append(item.clone( action='submnu_team_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
@@ -352,14 +366,18 @@ def submnu_team_info(item):
         if con_problemas:
             itemlist.append(item.clone( action='resumen_con_problemas', title=' - [COLOR tomato][B] Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
+    itemlist.append(item.clone( channel='helper', action='channels_with_crypto', title= ' - [COLOR darksalmon][B] Descifrar Enlaces[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     if config.get_setting('memorize_channels_proxies', default=True):
         itemlist.append(item.clone( channel='helper',  action='channels_with_proxies_memorized', title= ' - [COLOR red][B] Con Proxies[/B][/COLOR]', new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='resumen_canales', title=' - Resúmenes y Distribución', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='test_one_channel', title= ' - [COLOR springgreen][B] Temporalmente Inactivos[/B][/COLOR]', temp_no_active = True, thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( action='resumen_canales', title=' - [COLOR gold][B] Resúmenes y Distribución[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='', title='[COLOR fuchsia][I][B]SERVIDORES:[/B][/I][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( action='resumen_servidores', title=' - Resúmenes y Distribución', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='resumen_servidores', title=' - [COLOR fuchsia][B]Resúmenes y Distribución[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if txt_status:
         if srv_pending:
@@ -804,7 +822,11 @@ def submnu_sistema_info(item):
         else:
             itemlist.append(item.clone( action='', title= ' - Comprobar Fixes al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center [COLOR red][B]Des-Activado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
+
         itemlist.append(item.clone( channel='helper', action='show_last_fix', title= ' - [COLOR green][B]Información[/B][/COLOR] Fix instalado', thumbnail=config.get_thumb('news') ))
+
+        itemlist.append(item.clone( channel='helper',  action='resumen_fix', title= ' - [COLOR darkcyan][B]Resumen[/B][/COLOR] Fix Instalado', thumbnail=config.get_thumb('news') ))
+
         itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar fichero control 'Fix'", thumbnail=config.get_thumb('news'), text_color='red' ))
 
     itemlist.append(item.clone( channel='helper',  action='show_sets', title= 'Visualizar sus [COLOR chocolate][B]Ajustes[/B][/COLOR] Personalizados', thumbnail=config.get_thumb('folder') ))
@@ -1308,32 +1330,33 @@ def test_tplus(item):
     if config.get_setting('proxies_tplus_proces'): tplus_actual = config.get_setting('proxies_tplus_proces', default='32')
 
     opciones_tplus = [
-            'Openproxy.space http',
-            'Openproxy.space socks4',
-            'Openproxy.space socks5',
-            'Vpnoverview.com',
-            'Proxydb.net http',
-            'Proxydb.net https',
-            'Proxydb.net socks4',
-            'Proxydb.net socks5',
-            'Netzwelt.de',
+            'Openproxy http',
+            'Openproxy socks4',
+            'Openproxy socks5',
+            'Vpnoverview',
+            'Fyvri all',
+            'Fyvri http',
+            'Fyvri https',
+            'Fyvri socks4',
+            'Fyvri socks5',
+            'Netzwelt',
             'Proxy-list.download http',
             'Proxy-list.download https',
             'Proxy-list.download socks4',
             'Proxy-list.download socks5',
-            'Freeproxy.world',
-            'Freeproxy.world anonymity',
-            'Hidemyna.me.en',
-            'List.proxylistplus.com',
-            'Proxyservers.pro',
+            'Freeproxy',
+            'Freeproxy anonymity',
+            'Hidemyna',
+            'Proxylistplus',
+            'Niek',
             'TheSpeedX',
-            'Proxyscan.io http',
-            'Proxyscan.io all',
-            'Proxyscan.io socks4',
-            'Proxyscan.io socks5',
-            'Openproxylist.xyz http',
-            'Openproxylist.xyz socks4',
-            'Openproxylist.xyz socks5',
+            'Proxyscan http',
+            'Proxyscan all',
+            'Proxyscan socks4',
+            'Proxyscan socks5',
+            'Openproxylist http',
+            'Openproxylist socks4',
+            'Openproxylist socks5',
             'Proxy-list.download v1 socks4',
             'Proxy-list.download v1 socks5',
             'Monosans',
@@ -1363,7 +1386,12 @@ def test_tplus(item):
             'Proxyscrape elite',
             'Proxyscrape transparent',
             'Proxyscrape https',
-            'Markavale'
+            'Markavale',
+            'MuRongPIG',
+            'Vakhov http',
+            'Vakhov https',
+            'Vakhov socks4',
+            'Vakhov socks5'
             ]
 
     preselect = tplus_actual
@@ -1373,30 +1401,31 @@ def test_tplus(item):
     ret = platformtools.dialog_select('[COLOR cyan][B]Proveedores Proxies Tplus[/B][/COLOR]', opciones_tplus, preselect=preselect)
     if ret == -1: return -1
 
-    if opciones_tplus[ret] == 'Openproxy.space http': proxies_tplus = '0'
-    elif opciones_tplus[ret] == 'Openproxy.space socks4': proxies_tplus = '1'
-    elif opciones_tplus[ret] == 'Openproxy.space socks5': proxies_tplus = '2'
-    elif opciones_tplus[ret] == 'Vpnoverview.com': proxies_tplus = '3'
-    elif opciones_tplus[ret] == 'Proxydb.net http': proxies_tplus = '4'
-    elif opciones_tplus[ret] == 'Proxydb.net https': proxies_tplus = '5'
-    elif opciones_tplus[ret] == 'Proxydb.net socks4': proxies_tplus = '6'
-    elif opciones_tplus[ret] == 'Proxydb.net socks5': proxies_tplus = '7'
-    elif opciones_tplus[ret] == 'Netzwelt.de': proxies_tplus = '8'
+    if opciones_tplus[ret] == 'Openproxy http': proxies_tplus = '0'
+    elif opciones_tplus[ret] == 'Openproxy socks4': proxies_tplus = '1'
+    elif opciones_tplus[ret] == 'Openproxy socks5': proxies_tplus = '2'
+    elif opciones_tplus[ret] == 'Vpnoverview': proxies_tplus = '3'
+    elif opciones_tplus[ret] == 'Fyvri all': proxies_tplus = '4'
+    elif opciones_tplus[ret] == 'Fyvri http': proxies_tplus = '5'
+    elif opciones_tplus[ret] == 'Fyvri https': proxies_tplus = '6'
+    elif opciones_tplus[ret] == 'Fyvri socks4': proxies_tplus = '7'
+    elif opciones_tplus[ret] == 'Fyvri socks5': proxies_tplus = '56'
+    elif opciones_tplus[ret] == 'Netzwelt': proxies_tplus = '8'
     elif opciones_tplus[ret] == 'Proxy-list.download http': proxies_tplus = '9'
     elif opciones_tplus[ret] == 'Proxy-list.download https': proxies_tplus = '10'
     elif opciones_tplus[ret] == 'Proxy-list.download socks4': proxies_tplus = '11'
     elif opciones_tplus[ret] == 'Proxy-list.download socks5': proxies_tplus = '12'
-    elif opciones_tplus[ret] == 'Freeproxy.world': proxies_tplus = '13'
-    elif opciones_tplus[ret] == 'Freeproxy.world anonymity': proxies_tplus = '14'
-    elif opciones_tplus[ret] == 'Hidemyna.me.en': proxies_tplus = '15'
-    elif opciones_tplus[ret] == 'List.proxylistplus.com': proxies_tplus = '16'
-    elif opciones_tplus[ret] == 'Proxyservers.pro': proxies_tplus = '17'
+    elif opciones_tplus[ret] == 'Freeproxy': proxies_tplus = '13'
+    elif opciones_tplus[ret] == 'Freeproxy anonymity': proxies_tplus = '14'
+    elif opciones_tplus[ret] == 'Hidemyna': proxies_tplus = '15'
+    elif opciones_tplus[ret] == 'Proxylistplus': proxies_tplus = '16'
+    elif opciones_tplus[ret] == 'Niek': proxies_tplus = '17'
     elif opciones_tplus[ret] == 'TheSpeedX': proxies_tplus = '18'
-    elif opciones_tplus[ret] == 'Proxyscan.io http': proxies_tplus = '19'
-    elif opciones_tplus[ret] == 'Proxyscan.io all': proxies_tplus = '20'
-    elif opciones_tplus[ret] == 'Openproxylist.xyz http': proxies_tplus = '21'
-    elif opciones_tplus[ret] == 'Openproxylist.xyz socks4': proxies_tplus = '22'
-    elif opciones_tplus[ret] == 'Openproxylist.xyz socks5': proxies_tplus = '23'
+    elif opciones_tplus[ret] == 'Proxyscan http': proxies_tplus = '19'
+    elif opciones_tplus[ret] == 'Proxyscan all': proxies_tplus = '20'
+    elif opciones_tplus[ret] == 'Openproxylist http': proxies_tplus = '21'
+    elif opciones_tplus[ret] == 'Openproxylist socks4': proxies_tplus = '22'
+    elif opciones_tplus[ret] == 'Openproxylist socks5': proxies_tplus = '23'
     elif opciones_tplus[ret] == 'Proxy-list.download v1 socks4': proxies_tplus = '24'
     elif opciones_tplus[ret] == 'Proxy-list.download v1 socks5': proxies_tplus = '25'
     elif opciones_tplus[ret] == 'Monosans': proxies_tplus = '26'
@@ -1427,8 +1456,13 @@ def test_tplus(item):
     elif opciones_tplus[ret] == 'Proxyscrape transparent': proxies_tplus = '51'
     elif opciones_tplus[ret] == 'Proxyscrape https': proxies_tplus = '52'
     elif opciones_tplus[ret] == 'Markavale': proxies_tplus = '53'
-    elif opciones_tplus[ret] == 'Proxyscan.io socks4': proxies_tplus = '54'
-    elif opciones_tplus[ret] == 'Proxyscan.io socks5': proxies_tplus = '55'
+    elif opciones_tplus[ret] == 'Proxyscan socks4': proxies_tplus = '54'
+    elif opciones_tplus[ret] == 'Proxyscan socks5': proxies_tplus = '55'
+    elif opciones_tplus[ret] == 'MuRongPIG': proxies_tplus = '57'
+    elif opciones_tplus[ret] == 'Vakhov http': proxies_tplus = '58'
+    elif opciones_tplus[ret] == 'Vakhov https': proxies_tplus = '59'
+    elif opciones_tplus[ret] == 'Vakhov socks4': proxies_tplus = '60'
+    elif opciones_tplus[ret] == 'Vakhov socks': proxies_tplus = '61'
 
     else: proxies_tplus = '32'
 
@@ -1442,7 +1476,7 @@ def test_alfabetico(item):
     logger.info()
     itemlist = []
 
-    if 'canal' in item.title:
+    if 'Canal' in item.title:
         text_color = 'gold'
         accion = 'test_all_webs'
     else:
@@ -1496,19 +1530,19 @@ def test_all_webs(item):
             if 'clone' in ch['clusters']: continue
 
         if config.get_setting('mnu_simple', default=False):
-            if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
-            elif 'exclusivamente al dorama' in ch['notes'].lower(): continue
-            elif 'exclusivamente al anime' in ch['notes'].lower(): continue
+            if 'enlaces torrent exclusivamente' in ch['notes']: continue
+            elif 'exclusivamente al dorama' in ch['notes']: continue
+            elif 'exclusivamente al anime' in ch['notes']: continue
             elif '+18' in ch['notes']: continue
         else:
             if not config.get_setting('mnu_torrents', default=False) or config.get_setting('search_no_exclusively_torrents', default=False):
-                if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+                if 'enlaces torrent exclusivamente' in ch['notes']: continue
 
             if not config.get_setting('mnu_doramas', default=True):
-                if 'exclusivamente al dorama' in ch['notes'].lower(): continue
+                if 'exclusivamente al dorama' in ch['notes']: continue
 
             if not config.get_setting('mnu_animes', default=True):
-                if 'exclusivamente al anime' in ch['notes'].lower(): continue
+                if 'exclusivamente al anime' in ch['notes']: continue
 
             if not config.get_setting('mnu_adultos', default=True):
                 if '+18' in ch['notes']: continue
@@ -1819,7 +1853,9 @@ def test_all_webs(item):
                         channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
                         config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
-    if i > 0:
+    if i == 0:
+        platformtools.dialog_ok(config.__addon_name, 'Sin Canales Testeados')
+    else:
         if not tests_all_webs:
             platformtools.dialog_ok(config.__addon_name, 'Canales Testeados ' + str(i))
         else:
@@ -1879,8 +1915,8 @@ def test_all_srvs(item):
 
     if item.unsatisfactory: config.set_setting('developer_test_servers', 'unsatisfactory')
 
-    from core import jsontools
 
+    from core import jsontools
     from modules import tester
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -2199,8 +2235,6 @@ def show_sistema(item):
 
     if config.get_setting('chrome_last_version', default=''): txt += '[CR][COLOR yellow][B] - Versión Chrome/Chromium: [/COLOR][COLOR cyan]' + config.get_setting('chrome_last_version') + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Timeout [/B](tiempo máximo de espera en los Accesos, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
-
     txt += '[CR] - Confirmar con el Botón pulsar [OK] en ciertas Notificaciones: '
 
     if config.get_setting('notification_d_ok', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
@@ -2211,9 +2245,13 @@ def show_sistema(item):
     if config.get_setting('notification_beep', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Tiempo de espera en los Reintentos [/B](en el acceso a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos a CANALES, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Tiempo de espera [/B](en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('search_timeout', default='3'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos BUSCAR, por defecto 5)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('search_timeout')) + ' [/B][/COLOR][CR]'
+
+    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera al Reintentar acceder a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+
+    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Time[/B] Tiempo de espera (en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
 
     txt += '[CR][COLOR goldenrod][B]PREFERENCIAS NOTIFICACIONES CANALES:[/B][/COLOR][CR]'
 
@@ -2245,6 +2283,20 @@ def show_sistema(item):
     else: tex_niv = 'Máxima Información'
 
     txt += '[COLOR yellow][B] - Nivel de información del fichero [COLOR aqua][B]LOG[/B][/COLOR] (por defecto Error): [COLOR cyan][B]' + tex_niv + ' [/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR goldenrod][B]DESARROLLO:[/B][/COLOR][CR]'
+
+    avisar = False
+
+    if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): avisar = True
+
+    if config.get_setting('developer_mode', default=False):
+        if not avisar:
+            txt += '- [COLOR crimson][B]Opción Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Activada[/B][/COLOR]'
+        else:
+            txt += '- [COLOR crimson][B]Falso Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Activada[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Ajustes del Sistema', txt)
 
@@ -2342,17 +2394,18 @@ def resumen_canales(item):
     clons = 0
     clones = 0
     notices = 0
+    cryptos = 0
     proxies = 0
     registers = 0
     dominios = 0
     currents = 0
     onlyones = 0
-    searchables = 0
+    nosearchables = 0
     status_access = 0
     status_problems = 0
     con_proxies = 0
 
-    bus_pelisyseries = 0
+    bus_pelisyoseries = 0
     bus_pelis = 0
     bus_series = 0
     bus_documentaryes = 0
@@ -2362,6 +2415,7 @@ def resumen_canales(item):
     bus_torrents = 0
     bus_doramas = 0
     bus_animes = 0
+    bus_trailers = 0
 
     disponibles = 0
     suggesteds = 0
@@ -2377,9 +2431,12 @@ def resumen_canales(item):
     doramas = 0
     animes = 0
     adults = 0
+    trailers = 0
     privates = 0
     others = 0
     no_actives = 0
+
+    temas_adults = 0
 
     filtros = {'active': False}
     ch_list = channeltools.get_channels_list(filtros=filtros)
@@ -2429,6 +2486,7 @@ def resumen_canales(item):
         if 'clons' in ch['clusters']: clons += 1
         if 'clone' in ch['clusters']: clones += 1
         if 'notice' in ch['clusters']: notices += 1
+        if 'crypto' in ch['clusters']: cryptos += 1
         if 'proxies' in ch['notes'].lower(): proxies += 1
         if 'register' in ch['clusters']: registers += 1
         if 'dominios' in ch['notes'].lower(): dominios += 1
@@ -2436,79 +2494,96 @@ def resumen_canales(item):
         if 'onlyone' in ch['clusters']: onlyones += 1
         if 'suggested' in ch['clusters']: suggesteds += 1
 
-        if ch['searchable'] == False: searchables += 1
+        if ch['searchable'] == False: nosearchables += 1
 
-        tipos = ch['categories']
+        tipos = ch['search_types']
 
-        if not 'tráilers' in ch['notes'].lower():
-            if not '+18' in ch['notes']:
+        tipos_torrent = ch['categories']
 
-                if not 'exclusivamente al dorama' in ch['notes'].lower():
-                    if not 'exclusivamente al anime' in ch['notes'].lower():
-                        if 'movie' in tipos:
-                            peliculas += 1
-                            if ch['searchable']: bus_pelis += 1
+        if 'exclusivamente a los tráilers' in ch['notes']:
+            trailers += 1
+            bus_trailers += 1
+        else:
+            if '+18' in ch['notes']: pass
+            elif 'exclusivamente al dorama' in ch['notes']: pass
+            elif 'exclusivamente al anime' in ch['notes']: pass
+            else:
+                if 'movie' in tipos:
+                    peliculas += 1
+                    if ch['searchable']: bus_pelis += 1
 
-                        if 'tvshow' in tipos:
-                            if not 'animes, ovas, doramas y mangas' in ch['notes'].lower():
-                               series += 1
-                               if ch['searchable']: bus_series += 1
+                if 'tvshow' in tipos:
+                    if not 'mangas' in ch['notes'].lower():
+                        series += 1
+                        if ch['searchable']: bus_series += 1
 
             if 'movie' in tipos:
                 if 'tvshow' in tipos:
-                    pelisyseries += 1
-                    if ch['searchable']: bus_pelisyseries += 1
+                    if not 'documentary' in tipos:
+                        pelisyseries += 1
+
+            if 'movie' in tipos:
+                if ch['searchable']: bus_pelisyoseries += 1
+            elif 'tvshow' in tipos:
+                if ch['searchable']: bus_pelisyoseries += 1
 
         if 'documentary' in tipos:
             documentarys += 1
-            bus_documentaryes += 1
+            if ch['searchable']: bus_documentaryes += 1
         else:
            if 'docs' in ch['clusters']:
-               if ch['searchable']: bus_documentales += 1
+               if ch['searchable']: bus_documentales += 1 
 
-        if 'infantil' in ch['clusters']: infantiles += 1
+        if 'infantil' in ch['clusters']:
+             infantiles += 1
+             if ch['searchable']: bus_infantiles += 1
         else:
             if 'kids' in ch['clusters']:
-               if ch['searchable']: bus_kids += 1
+                if ch['searchable']: bus_kids += 1
 
         if 'tales' in ch['clusters']: tales += 1
 
         if 'bibles' in ch['clusters']: bibles += 1
 
-        if 'torrent' in tipos:
-            torrents += 1
-            bus_torrents += 1
+        if 'torrent' in tipos_torrent:
+            if not 'Streaming y Torrent' in ch['notes']: torrents += 1
+
+            if ch['searchable']: bus_torrents += 1
         else:
            if 'torrents' in ch['clusters']:
                if ch['searchable']: bus_torrents += 1
 
-        if 'exclusivamente al dorama' in ch['notes'].lower():
+        if 'exclusivamente al dorama' in ch['notes']:
             doramas += 1
             bus_doramas += 1
-        elif 'exclusivamente' in ch['notes'].lower():
-            if 'doramas' in ch['notes'].lower():
+        elif 'exclusivamente' in ch['notes']:
+            if 'dorama' in ch['notes']:
                 doramas += 1
-                bus_doramas += 1
+                if ch['searchable']: bus_doramas += 1
         else:
            if 'dorama' in ch['clusters']: bus_doramas += 1
 
-        if 'exclusivamente al anime' in ch['notes'].lower():
+        if 'exclusivamente al anime' in ch['notes']:
             animes += 1
             bus_animes += 1
-        elif 'exclusivamente' in ch['notes'].lower():
-            if 'animes' in ch['notes'].lower():
+        elif 'exclusivamente' in ch['notes']:
+            if 'anime' in ch['notes']:
                 animes += 1
-                bus_animes += 1
+                if ch['searchable']: bus_animes += 1
         else:
            if 'anime' in ch['clusters']: bus_animes += 1
 
-        if '+18' in ch['notes']: adults += 1
+        if config.get_setting('mnu_adultos', default=True):
+            if '+18' in ch['notes']: adults += 1
+
+        if 'adults' in ch['clusters']:
+            if not config.get_setting('descartar_xxx', default=False): temas_adults += 1
 
         if 'privates' in ch['clusters']:
             el_canal = ch['id']
             if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal + '.py')): privates += 1
 
-    txt = '[COLOR yellow][B]RESÚMENES CANALES:[/B][/COLOR][CR]'
+    txt = '[COLOR yellow][B]RESUMEN SITUACIÓN CANALES:[/B][/COLOR][CR]'
 
     txt += '  ' + str(total) + ' [COLOR darkorange][B]Canales[/B][/COLOR][CR][CR]'
 
@@ -2516,16 +2591,16 @@ def resumen_canales(item):
         txt += '     ' + str(inactives) + ' [COLOR coral][B]Inactivos[/B][/COLOR][CR]'
 
     if not cerrados == 0:
-        txt += '           ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
+        txt += '            ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
 
     if not anulados == 0:
-        txt += '           ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
+        txt += '            ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
 
-    if not privates == 0: txt += '             ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
+    if not privates == 0: txt += '              ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
 
-    if not others == 0: txt += '             ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
+    if not others == 0: txt += '              ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
 
-    if not temporarys == 0: txt += '             ' + str(temporarys) + ' [COLOR mediumaquamarine]Temporalmente[/COLOR][CR]'
+    if not temporarys == 0: txt += '              ' + str(temporarys) + ' [COLOR mediumaquamarine]Temporalmente[/COLOR][CR]'
 
     activos = (total - inactives)
 
@@ -2547,6 +2622,9 @@ def resumen_canales(item):
     if not notices == 0:
         txt += '     ' + str(notices) + ' [COLOR olivedrab]Control CloudFlare Protection[/COLOR][CR]'
 
+    if not cryptos == 0:
+        txt += '       ' + str(cryptos) + ' [COLOR darksalmon]Descifrar Enlaces[/COLOR][CR]'
+
     if not proxies == 0:
         txt += '     ' + str(proxies) + ' [COLOR red]Pueden Usar Proxies[/COLOR][CR]'
 
@@ -2559,7 +2637,7 @@ def resumen_canales(item):
 
     if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Un Único Servidor[/COLOR][CR]'
 
-    if not searchables == 0: txt += '     ' + str(searchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
+    if not nosearchables == 0: txt += '     ' + str(nosearchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
 
     if txt_status:
         if no_accesibles:
@@ -2609,54 +2687,90 @@ def resumen_canales(item):
 
         if con_proxies > 0: txt += '          [COLOR red][B]Con Proxies Informados[/COLOR] ' +  str(con_proxies) + '[/B][CR]'
 
-    txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN CANALES DISPONIBLES:[/B][/COLOR][CR]'
+    txt += '[CR][COLOR dodgerblue][B]CANALES DISPONIBLES:[/B][/COLOR]'
 
-    txt += '    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
+    if config.get_setting('mnu_sugeridos', default=True):
+        txt += '[CR]    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
 
-    txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+    if config.get_setting('mnu_simple', default=False):
+        canales = (disponibles - no_actives)
+        txt += '[CR]  ' + str(canales) + ' [COLOR aqua][B]Canales[/B][/COLOR][CR]'
+    else:
+        if config.get_setting('mnu_pelis', default=True):
+            txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
 
-    txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+        if config.get_setting('mnu_series', default=True):
+            txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
 
-    txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+        if config.get_setting('channels_link_pyse', default=False):
+            txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
 
-    txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
-    txt += '      ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
+        if config.get_setting('mnu_generos', default=True):
+            txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
 
-    if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
+        if config.get_setting('mnu_documentales', default=True):
+            txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
 
-    txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
+        if config.get_setting('mnu_infantiles', default=True):
+            if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
 
-    if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
+        if config.get_setting('mnu_novelas', default=True):
+            txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
 
-    txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '      ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
-    txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
-    txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+        if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
 
-    txt += '[CR][COLOR powderblue][B]DISTRIBUCIÓN CANALES DISPONIBLES PARA BÚSQUEDAS:[/B][/COLOR][CR]'
+        if config.get_setting('mnu_torrents', default=True):
+            txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
 
-    txt += '   ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
-    txt += '   ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
-    txt += '     ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+        if config.get_setting('mnu_doramas', default=True):
+            txt += '      ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
 
-    txt += '[CR]'
-    txt += '       ' + str(bus_documentaryes) + ' [COLOR cyan]Documentales[/COLOR][CR]'
+        if config.get_setting('mnu_animes', default=True):
+            if not config.get_setting('descartar_anime', default=False):
+                txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
+
+        if not trailers == 0: txt += '       ' + str(trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR][CR]'
+
+        if config.get_setting('mnu_adultos', default=True):
+            if not adults == 0: txt += '[CR]    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+
+    txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO CANALES DISPONIBLES:[/B][/COLOR][CR]'
+
+    txt += '   ' + str(bus_pelisyoseries) + ' [COLOR yellow]Películas y/ó Series[/COLOR][CR]'
 
     bus_tematica_documentales = bus_documentales + bus_documentaryes
-    txt += '   ' + str(bus_tematica_documentales) + ' [COLOR darkcyan]Temática Documental[/COLOR][CR]'
+    txt += '           ' + str(bus_tematica_documentales) + ' [COLOR darkcyan]Temática Documental[/COLOR][CR]'
 
-    txt += '[CR]'
     bus_tematica_infantil = bus_kids + bus_infantiles
-    txt += '     ' + str(bus_tematica_infantil) + ' [COLOR lightyellow]Temática Infantil[/COLOR][CR]'
+    txt += '             ' + str(bus_tematica_infantil) + ' [COLOR lightyellow]Temática Infantil[/COLOR][CR]'
 
-    txt += '[CR]'
-    txt += '     ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '[CR]'
+    if not bus_torrents == 0: txt += '             ' + str(bus_torrents) + ' [COLOR blue]Contenido Torrent[/COLOR][CR]'
 
-    txt += '     ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
-    txt += '     ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+    if not bus_doramas == 0: txt += '             ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
 
-    platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución', txt)
+    if not bus_animes == 0:
+        if not config.get_setting('descartar_anime', default=True):
+            txt += '             ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+
+    if not temas_adults == 0: txt += '             ' + str(temas_adults) + ' [COLOR orange]Temática Adultos[/COLOR][CR]'
+
+    if config.get_setting('mnu_pelis', default=True):
+        txt += '[CR]   ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+
+    if config.get_setting('mnu_series', default=True):
+        txt += '   ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+
+    if config.get_setting('mnu_documentales', default=True):
+        txt += '[CR]     ' + str(bus_documentaryes) + ' [COLOR cyan]Documentales[/COLOR][CR]'
+
+    if config.get_setting('mnu_torrents', default=True):
+        txt += '[CR]     ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+
+    if not bus_trailers == 0:
+        if config.get_setting('search_extra_trailers', default=False):
+           txt += '        ' + str(bus_trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR]'
+
+    platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución (según sus Ajustes)', txt)
 
 
 def resumen_incidencias(item):
@@ -2735,7 +2849,7 @@ def resumen_servidores(item):
 
     aditionals = 0
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-         aditionals = 97  # ~ 44 Various  y  53 Zures
+         aditionals = 99  # ~ 44 Various  y  55 Zures
 
     pending = 0
 
@@ -2768,7 +2882,7 @@ def resumen_servidores(item):
         if not dict_server['name'] in ['Various', 'Youtube', 'Zures']:
             if "alternative" in notes.lower(): alternatives += 1
 
-    txt = '[COLOR yellow][B]RESÚMENES SERVIDORES:[/B][/COLOR][CR]'
+    txt = '[COLOR yellow][B]RESUMEN SITUACIÓN SERVIDORES:[/B][/COLOR][CR]'
 
     txt += '  ' + str(total) + ' [COLOR darkorange][B]Servidores[/B][/COLOR][CR][CR]'
 
@@ -2784,51 +2898,68 @@ def resumen_servidores(item):
 
     disponibles = (total - inactivos)
 
-    txt += '[CR]     ' + str(disponibles) + ' [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+    txt += '[CR]     ' + str(disponibles) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR]'
 
-    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
-        tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+    presentar = False
 
-        txt += '[CR][COLOR goldenrod][B]RESOLVEURL:[/B][/COLOR][CR]'
-
-        txt += '    Versión' + tex_mr + '[CR]'
-
-        txt += '    ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
-        txt += '    ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
-
-    cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
-
-    if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): presentar = True
+    elif xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): presentar = True
     else:
-       tex_tor = cliente_torrent
-       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
-       if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-           cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-           tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+       cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
-    if not cliente_torrent == 'Ninguno':
-        txt += '[CR][COLOR goldenrod][B]TORRENTS:[/B][/COLOR][CR]'
+       if not cliente_torrent == 'Ninguno':  presentar = True
 
-        txt += '      1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
+    if presentar:
+        txt += '[COLOR yellow][B][CR]SERVIDORES VÍAS ALTERNATIVAS, ADICIONALES, TORRENTS, YOUTUBE:[/B][/COLOR]'
 
-        aditionals += 1
+        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
 
-    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
-        tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            txt += '[CR]  [COLOR goldenrod][B]Resolveurl:[/B][/COLOR][CR]'
 
-        txt += '[CR][COLOR goldenrod][B]YOUTUBE:[/B][/COLOR][CR]'
+            txt += '      Versión' + tex_mr + '[CR]'
 
-        txt += '      1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
+            txt += '      ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
+            txt += '      ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
 
-        aditionals += 1
+        cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
-    txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN SERVIDORES DISPONIBLES:[/B][/COLOR]'
+        if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+        else:
+           tex_tor = cliente_torrent
+           cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
+           if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+        if not cliente_torrent == 'Ninguno':
+            txt += '[CR]  [COLOR goldenrod][B]Torrents:[/B][/COLOR][CR]'
+
+            txt += '        1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
+
+            aditionals += 1
+
+        if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+            txt += '[CR]  [COLOR goldenrod][B]Youtube:[/B][/COLOR][CR]'
+
+            txt += '        1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
+
+            aditionals += 1
 
     accesibles = (disponibles + aditionals + alternatives)
 
-    txt += '[CR]  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
+    txt += '[CR][COLOR cyan][B]SERVIDORES DISPONIBLES[/B][/COLOR][CR]'
+
+    txt += '  ' + str(accesibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR dodgerblue][B]SERVIDORES ACCESIBLES:[/B][/COLOR][CR]'
+
+    txt += '  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
 
     if txt_status:
         if srv_pending:
@@ -2839,7 +2970,13 @@ def resumen_servidores(item):
 
                 txt += '           [COLOR tan][B]Con Incidencias[/COLOR] ' + str(status) + '[/B][CR]'
 
-    platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución', txt)
+    servers_discarded = config.get_setting('servers_discarded', default='')
+
+    if servers_discarded:
+        txt += '[CR][COLOR cyan][B]Descartados:[/B][/COLOR][CR]'
+        txt += '   ' + str(servers_discarded)
+
+    platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución  (según sus Ajustes)', txt)
 
 
 def resumen_pending(item):
@@ -3001,6 +3138,7 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Oneupload[/COLOR][CR]'
         txt += '   [COLOR yellow]Pandafiles[/COLOR][CR]'
         txt += '   [COLOR yellow]Rovideo[/COLOR][CR]'
+        txt += '   [COLOR yellow]Savefiles[/COLOR][CR]'
         txt += '   [COLOR yellow]Send[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamable[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamdav[/COLOR][CR]'
@@ -3019,8 +3157,9 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Upvid[/COLOR][CR]'
         txt += '   [COLOR yellow]Veev[/COLOR][CR]'
         txt += '   [COLOR yellow]Veoh[/COLOR][CR]'
-        txt += '   [COLOR yellow]Videa[/COLOR][CR]'
+        txt += '   [COLOR yellow]Vidbasic[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidbob[/COLOR][CR]'
+        txt += '   [COLOR yellow]Videa[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidlook[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidmx[/COLOR][CR]'
         txt += '   [COLOR yellow]Vido[/COLOR][CR]'

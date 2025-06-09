@@ -7,14 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://wvvn.seriesgod.cc/'
+host = 'https://wvvc.seriesgod.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.gnula24.xyz/', 'https://www3.gnula24.xyz/', 'https://ww2.gnula24.xyz/',
              'https://www11.gnula24.xyz/', 'https://w-ww.gnula24.xyz/', 'https://c1.gnula24.xyz/',
              'https://www.seriesgod.cc/', 'https://ww-w.seriesgod.cc/', 'https://w-ww.seriesgod.cc/',
-             'https://www.seriesgod.cc/', 'https://wv5u.seriesgod.cc/', 'https://w-v5u.seriesgod.cc/']
+             'https://www.seriesgod.cc/', 'https://wv5u.seriesgod.cc/', 'https://w-v5u.seriesgod.cc/',
+             'https://wvvn.seriesgod.cc/']
 
 
 domain = config.get_setting('dominio', 'gnula24', default='')
@@ -69,11 +70,15 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     hay_proxies = False
     if config.get_setting('channel_gnula24_proxies', default=''): hay_proxies = True
 
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         if hay_proxies:
-            data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
@@ -84,9 +89,23 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                 timeout = config.get_setting('channels_repeat', default=30)
 
                 if hay_proxies:
-                    data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+                    data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
+        if not url.startswith(host):
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('gnula24', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -113,6 +132,8 @@ def acciones(item):
     itemlist.append(item.clone( channel='domains', action='manto_domain_gnula24', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_gnula24', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('gnula24') ))
 
     itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('gnula24'), text_color='turquoise' ))
 
@@ -582,9 +603,6 @@ def play(item):
             new_server = servertools.corregir_other(url).lower()
             if not new_server.startswith("http"): servidor = new_server
 
-        if '/bigwarp.' in url or '/bgwp.' in url:
-            url = url + '|Referer=' + host
-
         itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
@@ -608,6 +626,8 @@ def list_search(item):
         title = scrapertools.find_single_match(article, ' alt="(.*?)"')
 
         title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&#8217;', '')
+
+        title = re.sub(r" \(.*?\)| \| .*", "", title)
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 

@@ -58,8 +58,11 @@ def mainlist(item):
         itemlist.append(item.clone( action = 'channels_excluded', title=' - Excluir canales de [COLOR yellow][B]Películas y/ó Series[/B][/COLOR]', extra = 'mixed', folder = False ))
 
     itemlist.append(item.clone( action = 'channels_excluded', title=' - Excluir canales de [COLOR deepskyblue][B]Películas[/B][/COLOR]', extra = 'movies', folder = False, thumbnail=config.get_thumb('movie') ))
+
     itemlist.append(item.clone( action = 'channels_excluded', title=' - Excluir canales de [COLOR hotpink][B]Series[/B][/COLOR]', extra = 'tvshows', folder = False, thumbnail=config.get_thumb('tvshow') ))
+
     itemlist.append(item.clone( action = 'channels_excluded', title=' - Excluir canales de [COLOR cyan][B]Documentales[/B][/COLOR]', extra = 'documentaries', folder = False, thumbnail=config.get_thumb('documentary') ))
+
     itemlist.append(item.clone( action = 'channels_excluded', title=' - Excluir canales de [COLOR blue][B]Torrents[/B][/COLOR]', extra = 'torrents', folder = False, thumbnail=config.get_thumb('torrents') ))
 
     if config.get_setting('channels_link_main', default=True):
@@ -157,7 +160,7 @@ def only_animes(item):
         info = ''
 
         if item.exclusively_animes:
-            if not 'exclusivamente al anime' in ch['notes'].lower(): continue
+            if not 'exclusivamente al anime' in ch['notes']: continue
 
         if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
         elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
@@ -409,7 +412,7 @@ def no_actives(item):
     logger.info()
 
     if item.no_searchables:
-        cabecera = 'Canales que Nunca intervendrán en las búsquedas'
+        cabecera = 'Canales que Nunca intervendrán en las búsquedas (segun sus Ajustes)'
         filtros = {'searchable': False}
     else:
         cabecera = 'Canales Desactivados (No actuan en las búsquedas)'
@@ -422,6 +425,7 @@ def no_actives(item):
 
     if not item.no_searchables:
         i = 0
+
         for ch in ch_list:
             if not ch['status'] == -1: continue
 
@@ -443,9 +447,20 @@ def no_actives(item):
 
         if not item.no_searchables: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
         else:
-            if 'adults' in ch['clusters']: info = info + '[COLOR darkorange][B] +18 [/B][/COLOR]'
-            elif 'anime' in ch['clusters']: info = info + '[COLOR springgreen][B] Animes [/B][/COLOR]'
-            elif 'dorama' in ch['clusters']: info = info + '[COLOR firebrick][B] Doramas [/B][/COLOR]'
+            if not config.get_setting('mnu_adultos', default=True):
+                if '+18' in ch['notes']: continue
+
+            if 'adults' in ch['clusters']:
+                if config.get_setting('descartar_xxx', default=False): continue
+                info = info + '[COLOR darkorange][B] +18 [/B][/COLOR]'
+            elif 'anime' in ch['clusters']:
+                if 'dedicada exclusivamente al anime' in ch['notes']:
+                    if config.get_setting('descartar_anime', default=False): continue
+                    info = info + '[COLOR springgreen][B] Animes [/B][/COLOR]'
+            elif 'dorama' in ch['clusters']:
+                if 'dedicada exclusivamente al dorama' in ch['notes']:
+                    if not config.get_setting('mnu_doramas', default=True): continue
+                    info = info + '[COLOR firebrick][B] Doramas [/B][/COLOR]'
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
@@ -599,7 +614,7 @@ def only_torrents(item):
 
     for ch in ch_list:
         if item.exclusively_torrents:
-            if not 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+            if not 'enlaces torrent exclusivamente' in ch['notes']: continue
 
         info = ''
 
@@ -933,7 +948,7 @@ def channels_excluded(item):
         opciones.append(it)
 
     if item.extra == 'included': cab = 'Incluir canales en las búsquedas de [COLOR yellow]'
-    else: cab = 'Excluir canales en las búsquedas de  [COLOR yellow]'
+    else: cab = 'Excluir canales en las búsquedas de [COLOR yellow]'
 
     ret = xbmcgui.Dialog().multiselect(cab + cabecera + '[/COLOR]', opciones, preselect=preselect, useDetails=True)
 
@@ -1262,6 +1277,7 @@ def show_channels_list(item):
         elif item.clons == True: filtros = {'clusters': 'clons'}
         elif item.clones == True: filtros = {'clusters': 'clone'}
         elif item.notices == True: filtros = {'clusters': 'notice'}
+        elif item.cryptos == True: filtros = {'clusters': 'crypto'}
         elif item.onlyone == True: filtros = {'clusters': 'onlyone'}
         else: filtros = {}
 
@@ -1300,6 +1316,8 @@ def show_channels_list(item):
             if not 'clone' in ch['clusters']: continue
         elif item.notices:
             if not 'notice' in ch['clusters']: continue
+        elif item.cryptos:
+            if not 'crypto' in ch['clusters']: continue
         elif item.onlyone:
             if not 'onlyone' in ch['clusters']: continue
 
@@ -1356,6 +1374,18 @@ def show_channels_list(item):
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
 
+        if not config.get_setting('mnu_adultos', default=True):
+            if '+18' in ch['notes']: continue
+
+        if 'adults' in ch['clusters']:
+             if config.get_setting('descartar_xxx', default=False): continue
+        elif 'anime' in ch['clusters']:
+             if 'dedicada exclusivamente al anime' in ch['notes']:
+                 if config.get_setting('descartar_anime', default=False): continue
+        elif 'dorama' in ch['clusters']:
+             if 'dedicada exclusivamente al dorama' in ch['notes']:
+                 if not config.get_setting('mnu_doramas', default=True): continue
+
         if ch['searchable'] == False:
             if "'movie'" in str(ch['categories']): tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]')
             else: tipos = str(tipos).replace('movie', '[COLOR violet]Vídeos[/COLOR]')
@@ -1386,7 +1416,7 @@ def show_channels_list(item):
         return
 
     if item.tipo == 'all':
-        cabecera = 'Canales [COLOR yellow]Todos[/COLOR]'
+        cabecera = 'Canales [COLOR yellow]Todos[/COLOR] (segun sus Ajustes)'
         if item.privates == True: cabecera = 'Canales [COLOR yellow]Privados[/COLOR]'
     else:
         if item.no_active == True: cabecera = 'Canales [COLOR yellow]Inactivos[/COLOR]'
@@ -1406,8 +1436,9 @@ def show_channels_list(item):
         elif item.clons == True: cabecera = 'Canales que son [COLOR yellow]Principales[/COLOR] con Clones Asociados'
         elif item.clones == True: cabecera = 'Canales que son [COLOR yellow]Clones[/COLOR]'
         elif item.notices == True: cabecera = 'Canales con [COLOR yellow]Aviso CloudFlare Protection[/COLOR]'
+        elif item.cryptos == True: cabecera = 'Canales que requieren [COLOR yellow]Descifrar Enlaces[/COLOR]'
         elif item.onlyone == True: cabecera = 'Canales con [COLOR yellow]Un Único Servidor[/COLOR]'
-        else: cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR]'
+        else: cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR] (segun sus Ajustes)'
 
     ret = platformtools.dialog_select(cabecera, opciones_channels, useDetails=True)
 
@@ -1470,7 +1501,7 @@ def show_clients_torrent(item):
     ret = platformtools.dialog_select(txt, opciones_torrent, useDetails=True)
 
     if ret == -1: return ret
-	
+
     torrent = torrents[ret]
 
     name = torrent[0]

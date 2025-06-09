@@ -322,11 +322,16 @@ def last_epis(item):
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
-        title = title.replace('&#039;', '')
+        title = title.replace('&#039;', '').replace('Ver ', '').replace(' Online', '').strip()
 
         title = title.strip()
 
-        if "capitulo" in title: SerieName = title.split("capitulo")[0]
+        SerieName = title
+
+        if "capitulo" in title:SerieName = title.split("capitulo")[0]
+        elif "Capitulo" in title:SerieName = title.split("Capitulo")[0]
+        elif "episodio" in title:SerieName = title.split("episodio")[0]
+        elif "Episodio" in title:SerieName = title.split("Episodio")[0]
         else: titulo = SerieName
 
         SerieName = SerieName.strip()
@@ -337,7 +342,7 @@ def last_epis(item):
 
         if not epis: epis = 1
 
-        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -433,7 +438,7 @@ def episodios(item):
     for match in matches[item.page * item.perpage:]:
         url = _url + '-episodio-' + match
 
-        title = 'Epis. ' + match
+        title = '[COLOR goldenrod]Epis.[/COLOR] ' + match
 
         if item.search_type == 'movie': titulo = item.contentTitle + ' ' + title
         else: titulo = '1x'+ str(match) + ' ' + title + ' ' + item.contentSerieName
@@ -571,6 +576,7 @@ def play(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     url = scrapertools.find_single_match(data, 'var redir = "(.*?)"')
+    if not url: url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)".*?</iframe>')
 
     if url:
         servidor = servertools.get_server_from_url(url)

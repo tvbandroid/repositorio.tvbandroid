@@ -551,11 +551,13 @@ def episodios(item):
         if not title: title = scrapertools.find_single_match(epi, '<div class="episodiotitle">.*?">(.*?)</a>')
 
         if item.contentSerieName: 
-            titulo = '%sx%s - %s' % (str(item.contentSeason), str(epis), title)
+            titulo = '%sx%s %s' % (str(item.contentSeason), str(epis), title)
 
             titulo = titulo + ' ' + item.contentSerieName
 
         else: titulo = item.title
+
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if '.' in epis: epis = epis.split(".")[0]
 
@@ -625,6 +627,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(dat_server, "to_player.*?'(.*?)'")
 
             if '/saikoudane.' in url: continue
+            elif '/saidochesto.' in url: continue
 
             if url:
                 if url == 'undefined': continue

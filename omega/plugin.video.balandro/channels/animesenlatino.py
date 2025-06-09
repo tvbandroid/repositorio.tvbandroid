@@ -304,6 +304,8 @@ def findvideos(item):
 
         srv = srv.lower()
 
+        if srv == 'embedsito': continue
+
         servidor = servertools.corregir_servidor(srv)
 
         other = ''

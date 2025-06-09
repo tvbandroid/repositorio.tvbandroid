@@ -5,7 +5,7 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
-import re, base64
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -683,36 +683,15 @@ def findvideos(item):
 
             data2 = do_downloadpage(url2)
 
-            players = scrapertools.find_single_match(data2, 'src="(.*?)"')
+            player = scrapertools.find_single_match(data2, 'src="(.*?)"')
 
-            if players:
-                players = players.replace('embed.php', 'player.php')
-
-                if '?' in players:
-                    path, queryString = players.split('?', 1)
-
-                    if '&' in queryString:
-                        queries_out = []
-                        queries_in = queryString.split('&')
-
-                        for query in queries_in:
-                            if '=' in query:
-                                key, val = query.split('=')
-                                val = val+'ionA#as9ng849fg'
-                                val = base64.b64encode(val.encode("utf-8")).decode('utf8')
-                                queries_out.append('{}={}'.format(key, val))
-                                queryString = '&'.join(queries_out)
-
-                    players = '{}?{}'.format(path, queryString)
-
-                    if players:
-                        players = players.replace('', '')
-
-                players = players.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
+            if player:
+                player = player.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&').strip()
 
                 headers = {'Referer': host}
+                if player: headers = {'Referer': player}
 
-                data3 = do_downloadpage(players, headers=headers)
+                data3 = do_downloadpage(player, headers=headers)
 
                 matches3 = scrapertools.find_multiple_matches(data3, "loadVideo.*?'(.*?)'" + '.*?alt="(.*?)"')
 
@@ -720,6 +699,8 @@ def findvideos(item):
                     srv = srv.strip().lower()
 
                     servidor = srv
+
+                    other = ''
 
                     if srv == 'fembed': continue
                     elif srv == 'streamsb': continue
@@ -736,6 +717,10 @@ def findvideos(item):
                     elif srv == 'vidhide': servidor = 'various'
                     elif srv == 'lulustream': servidor = 'various'
 
+                    elif srv == 'savefiles':
+                          servidor = 'zures'
+                          other = srv
+
                     elif srv == 'ok': servidor = 'okru'
                     elif srv == 'dood': servidor = 'doodstream'
 
@@ -746,11 +731,12 @@ def findvideos(item):
                            if not config.get_setting('developer_mode', default=False): continue
                            servidor = 'directo'
 
-                    other = ''
-                    if servidor == 'various': other = servertools.corregir_other(srv).capitalize()
-                    elif not servidor == 'directo': other = ''
+                    if not servidor == 'zures':
+                        if servidor == 'various': other = servertools.corregir_other(srv)
+                        elif not servidor == 'directo': other = ''
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = player, language = lang, other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = player,
+                                          language = lang, other = other.capitalize() ))
 
         else:
             servidor = other
@@ -768,6 +754,9 @@ def findvideos(item):
             elif other == 'vidhide': servidor = 'various'
             elif other == 'lulustream': servidor = 'various'
 
+            elif other == 'savefiles':
+                  servidor = 'zures'
+
             elif other == 'ok': servidor = 'okru'
             elif other == 'dood': servidor = 'doodstream'
 
@@ -778,10 +767,12 @@ def findvideos(item):
                    if not config.get_setting('developer_mode', default=False): continue
                    servidor = 'directo'
 
-            if servidor == 'various': other = servertools.corregir_other(other)
-            elif not servidor == 'directo': other = ''
+            if not servidor == 'zures':
+                if servidor == 'various': other = servertools.corregir_other(other)
+                elif not servidor == 'directo': other = ''
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                                  language = lang, other = other.capitalize() ))
 
     # Descargas
     matches = re.compile('<td><span class="Num">(.*?)</span>.*?href="(.*?)".*?alt="Descargar(.*?)"', re.DOTALL).findall(data)
@@ -808,6 +799,10 @@ def findvideos(item):
         elif srv == 'vidhide': servidor = 'various'
         elif srv == 'lulustream': servidor = 'various'
 
+        elif srv == 'savefiles':
+              servidor = 'zures'
+              other = srv
+
         elif srv == 'ok': servidor = 'okru'
         elif srv == 'dood': servidor = 'doodstream'
 
@@ -824,6 +819,10 @@ def findvideos(item):
                elif srv == 'vidhide': servidor = 'various'
                elif srv == 'lulustream': servidor = 'various'
 
+               elif srv == 'savefiles':
+                     servidor = 'zures'
+                     other = srv
+
                else:
                   servidor = 'directo'
                   other = 'D' + str(nro)
@@ -833,7 +832,10 @@ def findvideos(item):
            if servidor == 'directo':
                if not other: other = other + ' D' + str(nro)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+               if not config.get_setting('developer_mode', default=False): continue
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                              language = lang, other = other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

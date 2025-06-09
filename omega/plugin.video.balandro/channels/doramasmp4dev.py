@@ -130,7 +130,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;', "'").replace('&#8220;', '').replace('&#8221;', '').strip()
+        title = title.replace('&#8217;', "'").replace('&#8220;', '').replace('&#8221;', '').replace('&#8211;', '').strip()
 
         SerieName = title
 
@@ -148,11 +148,11 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+        titulo = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
-        titulo = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodie', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if item.group == 'last':
             season = 1
@@ -301,13 +301,13 @@ def episodios(item):
 
         if len(orden) == 1: orden = '0' + orden
 
-        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+        titulo = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
-        titulo = title.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodie', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + titulo
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, orden = orden,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))

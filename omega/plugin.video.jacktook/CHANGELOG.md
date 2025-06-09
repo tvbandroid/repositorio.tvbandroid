@@ -1,3 +1,17 @@
+## 0.5.3
+- Added support to downloasd subtitles using Stremio OpenSubtitle addon.
+- Added support for subtitle translation using DeepL (AI translation).
+- Added auto-play with quality selection.
+- Added auto-subtitle activation and selection on playback.
+
+## 0.5.2
+- Added download functionality
+- Added Trakt scrobbling
+- Added new menu item to add to Trakt watchlist.
+- Added new menu item to mark as watched/unwatched on Trakt.
+- Added new window to filter fetched results (right arrow or button to show).
+- Many other improvements.
+
 ## 0.5.1
 - UI Improvements 
 - TMDB Helper json updated

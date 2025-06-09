@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.cinehdplus.cc/'
+host = 'https://wv5n.cinehdplus.cc/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://w-ww.gnula2h.cc/', 'https://wl3v.gnula2h.cc/', 'https://wv3l.gnula2h.cc/',
-             'https://wv7n.gnula2h.cc/']
+             'https://wv7n.gnula2h.cc/', 'https://www.cinehdplus.cc/']
 
 
 domain = config.get_setting('dominio', 'seriesplus', default='')

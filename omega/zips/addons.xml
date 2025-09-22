@@ -181,6 +181,26 @@
   </extension>
 </addon>
 
+<addon id="repository.greenball" name="GreenBall Repository" version="1.0.0" provider-name="ajsm90">
+    <extension point="xbmc.addon.repository" name="GreenBall Repository">
+        <dir>
+            <info compressed="true">https://ajsm90.github.io/greenball.repo/repo/zips/addons.xml</info>
+            <checksum>https://ajsm90.github.io/greenball.repo/repo/zips/addons.xml.md5</checksum>
+            <datadir zip="true">https://ajsm90.github.io/greenball.repo/repo/zips/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Repositorio GreenBall</summary>
+        <description>Repositorio con addons de GreenBall</description>
+        <disclaimer></disclaimer>
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.audio.mp3streams" name="MP3 Streams" version="2023.2.31" provider-name="Jon Bovi, Slamious, Diggz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -1537,6 +1557,33 @@ provider-name="ElSupremo">
   </extension>
 </addon>
 
+<addon id="plugin.video.Naranjitomatrix"
+       name="[COLOR orange]Naranjito[/COLOR]"
+       version="1.2.1+matrix"
+       provider-name="Naranjito">
+<requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.requests"/>
+    <import addon="script.module.simplejson"/>
+	<import addon="script.module.kodi-six" />
+</requires>
+<extension point="xbmc.python.pluginsource" library="default.py">
+	<provides>video</provides>
+</extension>
+<extension point="xbmc.addon.metadata">
+	 <summary lang="en">Creado por Naranjito</summary>
+    <description lang="en">Naranjito 2017</description>
+    <disclaimer lang="en"></disclaimer>
+	<platform>all</platform>
+	<assets>
+       <icon>icon.png</icon>
+       <fanart>fanart.jpg</fanart>
+</assets>
+	<news>news
+	</news>
+</extension>
+</addon>
+
 <addon id="plugin.video.next"
 	name="[COLOR blue]NEXT[/COLOR]"
 	version="2024"
@@ -2264,6 +2311,26 @@ provider-name="jurialmunkey">
     <disclaimer lang="zh_CN">作者不对播放失败、错误的电子节目单时间造成时间浪费或其它不良影响负责。</disclaimer>
     <disclaimer lang="zh_TW">這是測試中的軟體！原創作者無法針對以下情況負責：包括播放失敗，不正確的電子節目表，多餘的時數，或任何不可預期的不良影響。</disclaimer>
   </extension>
+</addon>
+
+<addon id="repository.acestream-channels" name="[COLOR FF00FFFF]Gunter25 Addons[/COLOR]" version="1.2.0" provider-name="Gunter25">
+    <extension point="xbmc.addon.repository" name="Gunter25 Addons">
+        <dir>
+            <info compressed="false">https://gunter257.github.io/repoachannels/addons.xml</info>
+            <checksum>https://gunter257.github.io/repoachannels/addons.xml.md5</checksum>
+            <datadir zip="true">https://gunter257.github.io/repoachannels/repo/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Repositorio oficial de addons de Gunter25</summary>
+        <description>
+            Este repositorio contiene los addons creados y mantenidos por Gunter25.
+        </description>
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
 </addon>
 
 <addon id="repository.alfa-addon" name="[COLOR red]Alfa Add-on[/COLOR] Repo" version="1.0.8" provider-name="Alfa Development Group">

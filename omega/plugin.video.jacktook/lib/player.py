@@ -1,8 +1,9 @@
-from json import dumps as json_dumps
+from json import dumps as json_dumps, loads
 import traceback
+
 from lib.api.trakt.trakt_utils import is_trakt_auth
-from lib.clients.aisubtrans.submanager import SubtitleManager
-from lib.clients.tmdb.utils import tmdb_get
+from lib.clients.aisubtrans.utils import get_language_code
+from lib.clients.tmdb.utils.utils import tmdb_get
 from lib.api.trakt.trakt import TraktAPI, TraktLists
 from lib.utils.kodi.utils import (
     ADDON_HANDLE,
@@ -24,7 +25,6 @@ from lib.utils.general.utils import (
     set_watched_file,
 )
 
-from lib.utils.localization.countries import LANGUAGE_NAME_TO_CODE
 import xbmc
 from xbmc import getCondVisibility as get_visibility
 from xbmcgui import ListItem
@@ -40,21 +40,21 @@ class JacktookPLayer(xbmc.Player):
     def __init__(self):
         xbmc.Player.__init__(self)
         self.url = None
-        self.kodi_monitor = None
+        self.kodi_monitor = xbmc.Monitor()
         self.playback_percent = 0.0
         self.playing_filename = ""
         self.media_marked = False
         self.playback_successful = None
         self.cancel_all_playback = False
         self.next_dialog = get_setting("playnext_dialog_enabled")
-        self.playing_next_time = int(get_setting("playnext_time"))
+        self.playing_next_time = int(get_setting("playnext_time", 50))
         self.PLAYLIST = PLAYLIST
-        self.data = None
+        self.data = {}
         self.notification = notification
-        self.subtitle_manager = SubtitleManager(self, self.notification)
         self.lang_code = "en"
+        self.subtitles_found = False
 
-    def run(self, data=None):
+    def run(self, data={}):
         self.set_constants(data)
         self.clear_playback_properties()
         self.add_external_trakt_scrolling()
@@ -117,19 +117,29 @@ class JacktookPLayer(xbmc.Player):
                 pass
 
     def handle_subtitles(self, list_item):
-        if get_setting("stremio_sub_enabled"):
-            subs_paths = self.subtitle_manager.fetch_subtitles()
+        self.subtitles_found = False
+        if get_setting("search_subtitles"):
+            list_item.setSubtitles(self.data.get("subtitles_path", []))
+            self.setSubtitleStream(0)
+            self.subtitles_found = True
+        elif get_setting("stremio_subtitle_enabled"):
+            from lib.clients.aisubtrans.submanager import SubtitleManager
+
+            subtitle_manager = SubtitleManager(self.data, self.notification)
+            subs_paths = subtitle_manager.fetch_subtitles()
             if not subs_paths:
                 kodilog("No subtitles found, skipping subtitle loading")
-            else:
-                list_item.setSubtitles(subs_paths)
-                self.setSubtitleStream(0)
+                self.subtitles_found = False
+                return
+            list_item.setSubtitles(subs_paths)
+            self.setSubtitleStream(0)
+            self.subtitles_found = True
+        elif get_setting("auto_subtitle"):
+            sub_language = str(get_setting("auto_subtitle_lang"))
+            if sub_language and sub_language.lower() != "None":
+                self.lang_code = get_language_code(sub_language)
         else:
-            if get_setting("auto_subtitle"):
-                sub_lang_code = get_setting("auto_sub_language")
-                kodilog(f"Selected subtitle language: {sub_lang_code}")
-                if sub_lang_code and sub_lang_code.lower() != "None":
-                    self.lang_code = sub_lang_code
+            kodilog("No subtitle handling method selected, skipping subtitle loading")
 
     def check_playback_start(self):
         resolve_percent = 0
@@ -157,6 +167,64 @@ class JacktookPLayer(xbmc.Player):
             resolve_percent = round(resolve_percent + 26.0 / 100, 1)
             sleep(50)
 
+    def handle_subtitle_selection(self):
+        """
+        Handles subtitle activation and selection logic after playback starts.
+        """
+        auto_sub_enabled = get_setting("auto_subtitle")
+        stremio_subtitle_enabled = get_setting("stremio_subtitle_enabled")
+        search_subtitles = get_setting("search_subtitles")
+
+        if stremio_subtitle_enabled or search_subtitles:
+            self.showSubtitles(True)
+            if self.subtitles_found:
+                self.notification("Subtitles Loaded", time=2000)
+                set_property("search_subtitles", "false")
+                return
+
+        if auto_sub_enabled:
+            _, _, subtitles = self.get_player_streams()
+            kodilog(f"Available subtitles: {subtitles}", level=xbmc.LOGDEBUG)
+            for sub in subtitles:
+                if (
+                    self.lang_code == sub.get("language")
+                    and sub.get("isforced") is False
+                ):
+                    self.setSubtitleStream(sub["index"])
+                    self.showSubtitles(True)
+                    break
+
+        elif not (stremio_subtitle_enabled or auto_sub_enabled):
+            kodilog("Auto subtitle selection disabled")
+            self.showSubtitles(False)
+
+    def select_audio_stream(self):
+        """
+        Handles automatic audio stream selection based on user settings.
+        """
+        auto_audio_enabled = get_setting("auto_audio")
+        auto_audio_language = str(get_setting("auto_audio_language"))
+        if (
+            auto_audio_enabled
+            and auto_audio_language
+            and auto_audio_language.lower() != "none"
+        ):
+            kodilog(f"Auto audio selection enabled: {auto_audio_language}")
+            sleep(500)
+            # Get audio streams
+            audio_streams = self.getAvailableAudioStreams()
+            kodilog(f"Available audio streams: {audio_streams}")
+            if audio_streams or len(audio_streams) > 0:
+                lang_code = get_language_code(auto_audio_language)
+                kodilog(f"Selected audio language code: {lang_code}")
+                for stream_lang in audio_streams:
+                    if stream_lang == lang_code:
+                        self.setAudioStream(audio_streams.index(stream_lang))
+                        kodilog(
+                            f"Audio stream set to {auto_audio_language} ({stream_lang})"
+                        )
+                        break
+
     def monitor(self):
         ensure_dialog_dead = False
         total_check_time = 0
@@ -169,25 +237,8 @@ class JacktookPLayer(xbmc.Player):
             close_busy_dialog()
             sleep(1000)
 
-            # Activate subtitles after playback starts
-            auto_sub_enabled = get_setting("auto_subtitle")
-            stremio_sub_enabled = get_setting("stremio_sub_enabled")
-
-            if stremio_sub_enabled or auto_sub_enabled:
-                if stremio_sub_enabled:
-                    self.showSubtitles(True)
-                    self.notification("Subtitles Loaded", time=2000)
-                if auto_sub_enabled:
-                    kodilog("Auto subtitle selection enabled")
-                    # Wait a bit to ensure subtitle streams are loaded
-                    sleep(500)
-                    kodilog(f"Trying to set subtitles to: {self.lang_code}")
-                    xbmc.executebuiltin(f'Player.SetSubtitleLanguage("{self.lang_code}")')
-                    self.showSubtitles(True)
-                    kodilog(f"Subtitles set to {self.lang_code}")
-            else:
-                kodilog("Auto subtitle selection disabled")
-                self.showSubtitles(False)
+            self.select_audio_stream()
+            self.handle_subtitle_selection()
 
             while self.isPlayingVideo():
                 try:
@@ -216,6 +267,7 @@ class JacktookPLayer(xbmc.Player):
 
                 except Exception as e:
                     kodilog(f"Error in monitor: {e}")
+                    kodilog(traceback.format_exc())
                     sleep(250)
 
             if (
@@ -261,7 +313,7 @@ class JacktookPLayer(xbmc.Player):
         if not season_details or not hasattr(season_details, "episodes"):
             return
 
-        for e in season_details.episodes:
+        for e in getattr(season_details, "episodes"):
             episode_name = getattr(e, "name", "")
             episode_number = getattr(e, "episode_number", 0)
 
@@ -301,7 +353,6 @@ class JacktookPLayer(xbmc.Player):
         self.PLAYLIST.clear()
         self.data = data
         self.url = self.data["url"]
-        self.kodi_monitor = xbmc.Monitor()
         self.watched_percentage = self.data.get("progress", 0.0)
 
     def clear_playback_properties(self):
@@ -321,6 +372,33 @@ class JacktookPLayer(xbmc.Player):
             if mode == "tv":
                 trakt_ids["tvdb"] = ids.get("tvdb_id")
             set_property("script.trakt.ids", json_dumps(trakt_ids))
+
+    def get_player_streams(self):
+        activePlayers = (
+            '{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": 1}'
+        )
+        json_query = xbmc.executeJSONRPC(activePlayers)
+        json_response = loads(json_query)
+        if not json_response.get("result"):
+            return None, {}, []
+        playerid = json_response["result"][0]["playerid"]
+        details_query = {
+            "jsonrpc": "2.0",
+            "method": "Player.GetProperties",
+            "params": {
+                "properties": ["currentsubtitle", "subtitles"],
+                "playerid": playerid,
+            },
+            "id": 1,
+        }
+        json_query = xbmc.executeJSONRPC(json_dumps(details_query))
+        details = loads(json_query).get("result", {})
+        kodilog(f"Player details: {details}", level=xbmc.LOGDEBUG)
+        return (
+            playerid,
+            details.get("currentsubtitle", {}),
+            details.get("subtitles", []),
+        )
 
     def mark_watched(self, data):
         set_watched_file(data)

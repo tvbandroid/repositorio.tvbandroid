@@ -1,3 +1,137 @@
+## 0.14.0
+- Updated menu icons for Telegram and Downloads.
+- Added filtering options setting for quality/source.
+- Improved initialization and handling of invalid tokens on Real Debrid
+- Simplified addon display name in jacktook.select.json.
+- Other minor improvements.
+
+Note: 
+Si disfrutas de este addon, por favor considera apoyar el proyecto con una donación. Tus contribuciones ayudan a seguir mejorándolo y manteniéndolo. ¡Gracias!
+
+If you enjoy this addon, please consider supporting the project with a donation. Your contributions helps keep improving and maintaining it. Thank you!
+
+## 0.13.0 
+- Added support for [MDBList](https://mdblist.com/)
+- Added people category for movies and TV shows.
+- Added context menu option to search people for movies and TV shows.
+- Added setting to include/exclude TV show specials.
+- Added metadata info to playback info for richer UI display.
+- Added subtitle download option from the source select window.
+- Added pagination to “last titles” view.
+- Added export Kodi logs to paste.kodi.tv.
+- Added excluded addons filter to Stremio toggle dialog to show only functional and manually tested addons.
+- Other minor improvements and fixes.
+
+Spanish:
+- Se añadió soporte para [MDBList](https://mdblist.com/)
+- Se añadió la categoría de personas para películas y series de TV.
+- Se añadió una opción en el menú contextual para buscar personas en películas y series de TV.
+- Se añadió la opción para incluir/excluir episodios especiales de series de TV.
+- Se añadió información de metadatos en la información de reproducción para una interfaz más completa.
+- Se añadió la opción de descarga de subtítulos desde la ventana de selección de fuente.
+- Se añadió paginación a la vista de “últimos títulos”.
+- Se añadió la exportación de registros de Kodi a paste.kodi.tv.
+- Se añadió un filtro interno de addons excluidos al cuadro de diálogo de seleccion de addons de Stremio para mostrar solo addons funcionales y testeados.
+- Otras mejoras y correcciones menores.
+
+Note: 
+Si disfrutas de este addon, por favor considera apoyar el proyecto con una donación. Tus contribuciones ayudan a seguir mejorándolo y manteniéndolo. ¡Gracias!
+
+If you enjoy this addon, please consider supporting the project with a donation. Your contributions helps keep improving and maintaining it. Thank you!
+
+## 0.12.0 
+- Added TMDB collections, languages, networks, and popular filters. 
+- Added QR code dialog to simplify authentication for debrid services
+- Updated Stremio community addons URL to stable version (https://stremio-addons.net/).
+- Added notification messages to users when no stremio addons or catalogs are selected.
+- Added plugin categories for clearer window identification
+- Other minor improvements and fixes.
+
+Spanish:
+- Se añadieron colecciones, idiomas, cadenas de televisión y filtros populares de TMDB.
+- Se añadió un diálogo de código QR para simplificar la autenticación de los servicios de debrid.
+- Se actualizó la URL de los addons de la comunidad de Stremio a la version estable (https://stremio-addons.net/).
+- Se añadieron mensajes de notificación a los usuarios cuando no se seleccionan addons o catálogos de Stremio.
+- Se añadieron categorías para una identificación más clara de las ventanas.
+- Otras mejoras y correcciones menores.
+
+Note: 
+Si disfrutas de este addon, por favor considera apoyar el proyecto con una donación. Tus contribuciones ayudan a seguir mejorándolo y manteniéndolo. ¡Gracias!
+
+If you enjoy this addon, please consider supporting the project with a donation. Your contributions helps keep improving and maintaining it. Thank you!
+
+## 0.11.0 
+- Added support for Debrider (https://debrider.app/)
+- Other minor improvements and fixes.
+
+## 0.10.0
+- Added external cached search support for Real-Debrid.
+- Updated URL for fetching community addons (migrated to beta.stremio-addons.net).
+- Added resumable downloads and active download status.
+- Added option for size range filtering.
+- Added option to view Kodi logs and Kodi old logs.
+- Added option to adjust number of threads.
+- Improved Stremio catalog fetching to shows more catalogs.
+- Other minor improvements and fixes.
+
+Spanish: 
+- Se añadió compatibilidad con búsqueda externa en caché para Real-Debrid.
+- Se actualizó la URL para obtener addons de la comunidad (migracion a beta.stremio-addons.net).
+- Se añadieron descargas reanudables y estado de descarga activa.
+- Se añadió la opción de filtrado por rango de tamaño.
+- Se añadió la opción de ver los registros de Kodi y los registros antiguos de Kodi.
+- Se añadió la opción de ajustar el número de hilos.
+- Se mejoró la obtención de catálogos de Stremio para mostrar más catálogos.
+- Otras mejoras y correcciones menores.
+
+Note: 
+Si disfrutas de este addon, por favor considera apoyar el proyecto con una donación. Tus contribuciones ayudan a seguir mejorándolo y manteniéndolo. ¡Gracias!
+
+If you enjoy this addon, please consider supporting the project with a donation. Your contributions helps keep improving and maintaining it. Thank you!
+
+## 0.9.0
+- Added Torrentio providers selection and settings UI. 
+- Episodes are now marked as playable in TMDB and calendar views. 
+- Replaced hardcoded context menu labels with translation entries (English and Spanish).
+- Replaced hardcoded menus labels with translation entries. (English and Spanish).
+
+Note: 
+Si disfrutas de este addon, por favor considera apoyar el proyecto con una donación. Tus contribuciones ayudan a seguir mejorándolo y manteniéndolo. ¡Gracias!
+
+If you enjoy this addon, please consider supporting the project with a donation. Your contributions helps keep improving and maintaining it. Thank you!
+
+## 0.8.0
+Features:
+- Implement TV calendar on History and TV Shows menus, to show weekly episodes.
+- Add context menu items for TMDB recommendations and similar content.
+- Add installation prompts for missing addons: Elementum, Jacktorr, and Torrest. 
+- Update filter options label to indicate usage of the left key.
+- Adjust thread pool max workers calculation for better performance on low end devices.
+Refactors:
+- Replace usage of main_db with PickleDatabase across the addon. 
+Fixes:
+- Handle empty Stremio addons to prevent crashes. 
+- Make Cache class thread-safe and more robust. 
+
+## 0.7.0
+- Add audio language selection for playback.
+- Add functionality to add custom Stremio addons via URL.
+- Add support for searching and filtering season packs (Jackett & Prowlarr).
+- Add 'Show Changelog' setting and functionality to display addon updates.
+- Renamed history menu items for clarity.
+- Enabled scrolling for the title label in source selection.
+- Implement token validation and adjust expiration time for Trakt authentication.
+- Enhance subtitle file naming and slugify paths for better organization.
+- Other minor improvements and fixes.
+
+## 0.6.0
+- Improve source select layout with clickable quality header. 
+- Add more filtering options on source select window (languages, sources)
+- Minor improvements and fixes
+
+## 0.5.4
+- HOTFIX: Fix Burst client not working.
+
 ## 0.5.3
 - Added support to downloasd subtitles using Stremio OpenSubtitle addon.
 - Added support for subtitle translation using DeepL (AI translation).

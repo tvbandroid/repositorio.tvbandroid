@@ -1,11 +1,11 @@
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 from lib.clients.base import BaseClient, TorrentStream
 from lib.utils.kodi.utils import convert_size_to_bytes, translation
 
 
 class Elfhosted(BaseClient):
-    def __init__(self, host: str, notification: callable) -> None:
+    def __init__(self, host: str, notification: Callable) -> None:
         super().__init__(host, notification)
 
     def search(
@@ -21,6 +21,10 @@ class Elfhosted(BaseClient):
                 url = f"{self.host}/stream/series/{imdb_id}:{season}:{episode}.json"
             elif mode == "movies" or media_type == "movies":
                 url = f"{self.host}/stream/{mode}/{imdb_id}.json"
+            else:
+                self.handle_exception(translation(30231))
+                return None
+            
             res = self.session.get(url, timeout=10)
             if res.status_code != 200:
                 return
@@ -29,7 +33,7 @@ class Elfhosted(BaseClient):
         except Exception as e:
             self.handle_exception(f"{translation(30231)}: {str(e)}")
 
-    def parse_response(self, res: any) -> List[TorrentStream]:
+    def parse_response(self, res: Any) -> List[TorrentStream]:
         res = res.json()
         results = []
         for item in res["streams"]:

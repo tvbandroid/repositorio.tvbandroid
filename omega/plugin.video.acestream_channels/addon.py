@@ -4,438 +4,578 @@ import xbmcplugin
 import xbmcaddon
 import sys
 import os
-import urllib.parse
-from urllib.parse import urlencode, parse_qsl
-import requests
-from bs4 import BeautifulSoup
-import json
+import urllib.request
 import zipfile
-import shutil
+import json
+import re 
+from urllib.parse import urlencode, parse_qsl, urljoin
+import xbmcvfs
 
-# Define el handle del addon
+# Configuración para la gestión de dependencias
+LIBRARIES_ZIP_URL = "https://github.com/Gunter257/repoachannels/raw/refs/heads/main/bibliotecas.zip"
+
+ADDON = xbmcaddon.Addon()
+# Define PROFILE_PATH para que todas las rutas persistentes usen este base
+PROFILE_PATH = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
+
+try:
+    ADDON.setSetting('addon_initialized_test', 'true')
+    xbmc.log("[Acestream Channels] INFO: Setting 'addon_initialized_test' saved.", xbmc.LOGINFO)
+    xbmc.sleep(1000)
+    xbmc.log("[Acestream Channels] INFO: Sleep finished after setting save.", xbmc.LOGINFO)
+except Exception as e:
+    xbmc.log(f"[Acestream Channels] ERROR: Failed to save initial setting with sleep: {e}", xbmc.LOGERROR)
+
+# La ruta del archivo ZIP descargado se mueve al perfil
+LIBRARIES_ZIP_PATH = os.path.join(PROFILE_PATH, 'bibliotecas.zip') 
+LIBRARIES_PATH = os.path.join(PROFILE_PATH, 'lib') 
+
 addon_handle = int(sys.argv[1])
 BASE_URL = sys.argv[0]
 
-# Obtener los parámetros enviados al addon
-params = dict(urllib.parse.parse_qsl(sys.argv[2][1:]))
-selected_category = params.get('category', '')
+addon_path = ADDON.getAddonInfo('path')
+RESOURCES_PATH = os.path.join(addon_path, 'resources')
 
-# Obtener la ruta del addon
-addon = xbmcaddon.Addon()
-addon_path = addon.getAddonInfo('path')
+COLOR_ORANGE = "FF00A5FF"
+COLOR_RED = "FFFF0000"
+COLOR_CYAN = "FF00FFFF"
+COLOR_BLUE = "FF0000FF"
+COLOR_GREEN = "FF00FF00"
+COLOR_YELLOW = "FFFFFF00"
+COLOR_WHITE = "FFFFFFFF"
 
-# Asegurarse de que la ruta del addon sea válida
-if not os.path.exists(addon_path):
-    raise Exception(f"La ruta del addon no se encuentra: {addon_path}")
+COLOR_TIME = "FF87CEEB"
+COLOR_SPORT_CATEGORY = "FF32CD32"
+COLOR_EVENT_DETAILS = "FFFFFFFF"
 
-# Ruta de las carpetas dentro del addon
-requests_path = os.path.join(addon_path, 'requests')
-urllib3_path = os.path.join(addon_path, 'urllib3')
-bs4_path = os.path.join(addon_path, 'bs4')
-idna_path = os.path.join(addon_path, 'idna')
-charset_normalizer_path = os.path.join(addon_path, 'charset_normalizer')
-certifi_path = os.path.join(addon_path, 'certifi')
-soupsieve_path = os.path.join(addon_path, 'soupsieve')
+SCRAPING_URL = "https://www.socialcreator.com/xupimarc2/?s=289267"
 
-# Verificar que las carpetas existan
-for path in [requests_path, urllib3_path, bs4_path, idna_path, charset_normalizer_path, certifi_path, soupsieve_path]:
-    if not os.path.exists(path):
-        raise Exception(f"La carpeta no se encuentra: {path}")
-
-# Añadir las carpetas al sys.path para importarlas correctamente
-sys.path.insert(0, requests_path)
-sys.path.insert(0, urllib3_path)
-sys.path.insert(0, bs4_path)
-sys.path.insert(0, idna_path)
-sys.path.insert(0, charset_normalizer_path)
-sys.path.insert(0, certifi_path)
-sys.path.insert(0, soupsieve_path)
-
-# Intentar importar los módulos
-try:
-    import requests
-    from bs4 import BeautifulSoup
-except ImportError as e:
-    raise Exception(f"Error al importar los módulos: {e}")
-
-# Obtener el handle del addon desde los argumentos
-addon_handle = int(sys.argv[1])  # Este es el handle del addon
-
-# Define the URL base of the plugin
-BASE_URL = sys.argv[0]
-HANDLE = int(sys.argv[1])
-
-# Get the addon path and define the resources path
-ADDON_PATH = xbmcaddon.Addon().getAddonInfo('path')
-RESOURCES_PATH = f"{ADDON_PATH}/resources"
-
-# Define categories with automatic icon path
-CATEGORIES = [
-    {"name": "AGENDA", "subcategories": [], "icon": f"{RESOURCES_PATH}/agenda.png"},
-    {"name": "DEPORTES", "subcategories": [], "icon": f"{RESOURCES_PATH}/deportes.png"},
-    {"name": "FÚTBOL", "subcategories": [], "icon": f"{RESOURCES_PATH}/futbol.png"},
-    {"name": "CHAMPIONS", "subcategories": [], "icon": f"{RESOURCES_PATH}/champions.png"},
-    {"name": "GOLF", "subcategories": [], "icon": f"{RESOURCES_PATH}/golf.png"},
-    {"name": "DAZN", "subcategories": [], "icon": f"{RESOURCES_PATH}/dazn.png"},
-    {"name": "F1", "subcategories": [], "icon": f"{RESOURCES_PATH}/f1.png"},
-    {"name": "BALONCESTO", "subcategories": [], "icon": f"{RESOURCES_PATH}/baloncesto.png"},
+# --- Configuración para la agenda (Con URL de respaldo) ---
+AGENDA_URLS = [
+    "https://fr.4everproxy.com/direct/aHR0cHM6Ly9jaXJpYWNvLWxpYXJ0LnZlcmNlbC5hcHAv",
+    "https://eventos-uvl7.vercel.app/" 
 ]
 
-# Define AceStream channels
-ACESTREAM_CHANNELS = [
-    # ... your existing AceStream channel definitions here ...
-    {"name": "F1 | DAZN F1 1080", "url": "acestream://d6281d4e6310269b416180442a470d23a4a99dc9"},
-    {"name": "F1 | DAZN F1 1080 | OPCION 2", "url": "acestream://2c6e4c897661e6b0257bfe931b66d20b2ec763b6"},
-    {"name": "F1 | DAZN F1 1080 | OPCION 3", "url": "acestream://71eef80158aa8b37f3dc59f6793c6696df9a2dfa"},
-    {"name": "F1 | DAZN F1 720", "url": "acestream://268289e7a3c5209960b53b4d43c8c65fab294b85"},
-    {"name": "FÚTBOL | M. LA LIGA 1080", "url": "acestream://94d34491106e00394835c8cb68aa94481339b53f"},
-    {"name": "FÚTBOL | M. LA LIGA 1080 | OPCION 2", "url": "acestream://d3de78aebe544611a2347f54d5796bd87f16c92d"},
-    {"name": "FÚTBOL | M. LA LIGA 1080 | OPCION 3", "url": "acestream://6d05b31e5e8fdae312fbd57897363a7b10ddb163"},
-    {"name": "FÚTBOL | M. LA LIGA 720", "url": "acestream://1bc437bce57b4b0450f6d1f8d818b7e97000745e"},
-    {"name": "FÚTBOL | M. LA LIGA 2 1080", "url": "acestream://83c6c4942d69f4aa324aa746c5d7dbfd7d1572b3"},
-    {"name": "FÚTBOL | M. LA LIGA 2 720", "url": "acestream://f31a586422c9244196c810c84b6c85da350318a5"},
-    {"name": "FÚTBOL | M. LA LIGA 3 1080", "url": "acestream://ebe14f1edeb49f2253e3b355a8beeadc9b4f0bc4"},
-    {"name": "FÚTBOL | LA LIGA BAR 1080", "url": "acestream://608b0faf7d3d25f6fe5dba13d5e4b4142949990e"},
-    {"name": "FÚTBOL | LA LIGA BAR 1080 | OPCION 2", "url": "acestream://94d34491106e00394835c8cb68aa94481339b53f"},
-    {"name": "FÚTBOL | DAZN LaLiga 1080", "url": "acestream://110d441ddc9713a7452588770d2bc85504672f47"},
-    {"name": "FÚTBOL | DAZN LaLiga 1080 | OPCION 2", "url": "acestream://ec29289b0b14756e686c03a501bae1efa05be70c"},
-    {"name": "FÚTBOL | DAZN LaLiga 1080 | OPCION 3", "url": "acestream://6de4794cd02f88f14354b5996823413a59a1de0f"},
-    {"name": "FÚTBOL | DAZN LaLiga 720", "url": "acestream://8c8c1e047a1c5ed213ba74722a5345dc55c3c0eb"},
-    {"name": "FÚTBOL | DAZN LaLiga 2 1080", "url": "acestream://97ba38d47680954be40e48bd8f43e17222fefecb"},
-    {"name": "FÚTBOL | DAZN LaLiga 2 720", "url": "acestream://51dbbfb42f8091e4ea7a2186b566a40e780953d9"},
-    {"name": "FÚTBOL | LaLiga Smartbank 1080", "url": "acestream://b2706a7ffbea236a3b398139a3a606ada664c0eb"},
-    {"name": "FÚTBOL | LaLiga Smartbank 720", "url": "acestream://121f719ebb94193c6086ef92865cf9b197750980"},
-    {"name": "FÚTBOL | LaLiga Smartbank 2 1080", "url": "acestream://0cfdfde1b70623b8c210b0f7301be2a87456481d"},
-    {"name": "FÚTBOL | LaLiga Smartbank 2 720", "url": "acestream://0a335406bad0b658aeddb2d38f8c0614b2e5623a"},
-    {"name": "FÚTBOL | LaLiga Smartbank 3", "url": "acestream://fefd45ed6ff415e05f1341b7d9da2988eacd13ea"},
-    {"name": "DEPORTES | M.Plus 1080", "url": "acestream://56ac8e227d526e722624675ccdd91b0cc850582f"},
-    {"name": "FÚTBOL | Copa 1080", "url": "acestream://f6beccbc4eea4bc0cda43b3e8ac14790a98b61b4"},
-    {"name": "FÚTBOL | Copa 720", "url": "acestream://b51f2d9a15b6956a44385b6be531bcabeb099d9d"},
-    {"name": "DEPORTES | #VAMOS 1080", "url": "acestream://d03c13b6723f66155d7a0df3692a3b073fe630f2"},
-    {"name": "DEPORTES| #VAMOS 720", "url": "acestream://12ba546d229bc39f01c3c18988a034b215fe6adb"},
-    {"name": "FÚTBOL | #ELLAS 1080", "url": "acestream://d8c2ed470e847154a88f011137cc206319f6bed5"},
-    {"name": "DEPORTES | M. DEPORTES 1080", "url": "acestream://55d4602cb22b0d8a33c10c2c2f42dae64a9e8895"},
-    {"name": "DEPORTES | M. DEPORTES 720", "url": "acestream://3a74d9869b13e763476800740c6625e715a39879"},
-    {"name": "DEPORTES | M. DEPORTES 2 1080", "url": "acestream://639c561dd57fa3fc91fde715caeb696c5efb7ce7"},
-    {"name": "DEPORTES | M. DEPORTES 3 1080", "url": "acestream://571bff4d12b1791eb99dbf20bec38e630693a6a3"},
-    {"name": "DEPORTES | M. DEPORTES 4 1080", "url": "acestream://b4d1308a61e4caf8c06ac3d6ce89d165c015c2fb"},
-    {"name": "DEPORTES | M. DEPORTES 5 1080", "url": "acestream://fcc0fd75bf1dba40b108fcf0d3514e0e549bfbac"},
-    {"name": "DEPORTES | M. DEPORTES 6 1080", "url": "acestream://cc5782d37ae6b6e0bab396dd64074982d0879046"},
-    {"name": "DEPORTES | M. DEPORTES 7 1080", "url": "acestream://070f82d6443a52962d6a2ed9954c979b29404932"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 1080 MULTIAUDIO", "url": "acestream://0a26e20f39845e928411e09a124374fccb6e1478"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 1080 MULTIAUDIO", "url": "acestream://775abd8697715c48a357906d40734ccd2a10513c"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 720", "url": "acestream://8edb264520569b2280c5e86b2dc734e120032903"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 2 1080", "url": "acestream://c070cdb701fc46bb79d17568d99fc64620443d63"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 2 720", "url": "acestream://abdf9058786a48623d0de51a3adb414ae10b6e72"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 3 1080", "url": "acestream://3618edda333dad5374ac2c801f5f14483934b97d"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 3 720", "url": "acestream://0b348cc1ae499e810729661878764a0fab88ab69"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 4 1080", "url": "acestream://65a18a6bd83918a9586b673fec12405aaf4e9f7d"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 5 1080", "url": "acestream://11744c25a594e17d587ed0871fe40ff21b4bd1e0"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 6 1080", "url": "acestream://fdda1f0dd8c33fbdc5a66ab98e291f570cae67cd"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 7 1080", "url": "acestream://b7f47db93dced60f54e8f89e2366ed061b534049"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 8 1080", "url": "acestream://d298c6e5c8be71f5995b45289c6388b225318b3c"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 9 SD", "url": "acestream://2d7c4cfb3987b652a779afc894cca2fccbbacf21"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 10 SD", "url": "acestream://c056f9e180cd7d40963129a17ff54f4ee8259353"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 11 SD", "url": "acestream://a12a16f74cf12799d4475ae867dc61eb60e1ba2e"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 12 SD", "url": "acestream://df7d145fcaf0566db4098d2f10236185d92bc9fd"},
-    {"name": "CHAMPIONS | M.L. CAMPEONES 13 SD", "url": "acestream://bdfe9ebe62d690c1b13eef4346d72e618cfbe804"},
-    {"name": "GOLF | M. GOLF 1080", "url": "acestream://f41f1096862767289620be5bd85727f946a434db"},
-    {"name": "GOLF | M. GOLF2 1080", "url": "acestream://e258e75e0e802afa5fcc53d46b47d8801a254ad5"},
-    {"name": "DAZN 1 1080", "url": "acestream://7cf0086fa7d478f51dbba952865c79e66cb9add5"},
-    {"name": "DAZN 1 720", "url": "acestream://35c7f0c966ecde3390f4510bb4caded40018c07a"},
-    {"name": "DAZN 2 1080", "url": "acestream://ca923c9873fd206a41c1e83ff8fc40e3cf323c9a"},
-    {"name": "DAZN 2 720", "url": "acestream://a929eeec1268d69d1556a2e3ace793b2577d8810"},
-    {"name": "DAZN 3 1080", "url": "acestream://19cd05c7ae26f22737ae5728b571ca36abd8a2e8"},
-    {"name": "DAZN 4 1080", "url": "acestream://4e83f23945ab3e43982045f88ec31daaa4683102"},
-    {"name": "DEPORTES | EUROSPORT 1 1080", "url": "acestream://16ffa1713f42aa27317ee039a2bd0cdbc89a1580"},
-    {"name": "DEPORTES | EUROSPORT 2 1080", "url": "acestream://98784fa0714190de289f42eb5b84e405df7e685a"},
-    {"name": "DEPORTES | REAL MADRID TV 1080", "url": "acestream://0ec3f3786318acd8dca2588f74c3759cda76cd11"},
-    {"name": "DEPORTES | REAL MADRID TV 720", "url": "acestream://0827cf7d290967985892965c6e61244a479d6dcd"},
-    {"name": "DEPORTES | WIMBLEDON UHD", "url": "acestream://78aa81aedb1e2b6a9ba178398148940857155f6a"},
-    {"name": "DEPORTES | MUNDO TORO HD", "url": "acestream://f763ab71f6f646e6c993f37e237be97baf2143ef"},
-    {"name": "BALONCESTO | NBA", "url": "acestream://e72d03fb9694164317260f684470be9ab781ed95"},
-    {"name": "BALONCESTO | NBA USA 1", "url": "acestream://39db49bc89dcc3c8797566231f869dca57f1a47e"},
-    {"name": "BALONCESTO | NBA USA 2", "url": "acestream://f1c84ec8ea0c0bfff8a24272b66c64354a522110"},
-    {"name": "DEPORTES | RED BULL TV", "url": "acestream://6994af284ecab2996f9b140ef44b8da8bfee0006"},
-    {"name": "DEPORTES | UFC CHANNEL", "url": "acestream://7cf437be950f3525e735be57c63f7824cab822c9"},
-    {"name": "DEPORTES | FOX SPORTS 2", "url": "acestream://ad6f4e8e329d6a97c7e7d7b0b8e5d04d8dd0bb48"},
-]
+CHANGELOG = {
+    "1.2.3": [
+        "Añadida una URL de respaldo para la Agenda en caso de que la URL principal no funcione.",
+        "Mejoras en el manejo de errores de conexión para la sección Agenda.",
+	"Sección de ajustes configurada con opción de reproductor externo sin HOURS.",
+    ],
+}
 
-# Define HTML5 channels
-HTML5_CHANNELS = [
-    # ... add more HTML5 channels here ...
-]
+def check_and_install_libraries():
+    if not os.path.exists(LIBRARIES_PATH):
+        xbmc.log("[Acestream Channels] INFO: Library folder not found. Starting download...", xbmc.LOGINFO)
+        xbmcgui.Dialog().notification("Descargando...", "Descargando librerías necesarias. Por favor, espere...", xbmcgui.NOTIFICATION_INFO)
+        try:
+            os.makedirs(LIBRARIES_PATH)
+            urllib.request.urlretrieve(LIBRARIES_ZIP_URL, LIBRARIES_ZIP_PATH)
+            
+            with zipfile.ZipFile(LIBRARIES_ZIP_PATH, 'r') as zip_ref:
+                zip_ref.extractall(LIBRARIES_PATH)
+            
+            os.remove(LIBRARIES_ZIP_PATH)
+            xbmc.log("[Acestream Channels] INFO: Librerías instaladas con éxito.", xbmc.LOGINFO)
+            xbmcgui.Dialog().notification("¡Listo!", "Librerías instaladas con éxito.", xbmcgui.NOTIFICATION_INFO)
+        except Exception as e:
+            xbmc.log(f"[Acestream Channels] ERROR: Failed to download and extract libraries: {e}", xbmc.LOGERROR)
+            xbmcgui.Dialog().notification("Error", f"Fallo al instalar librerías: {e}", xbmc.NOTIFICATION_ERROR)
+            return False
+    return True
+
+if check_and_install_libraries():
+    sys.path.insert(0, LIBRARIES_PATH)
+    try:
+        import requests
+        from bs4 import BeautifulSoup
+    except ImportError as e:
+        xbmcgui.Dialog().notification("Error", f"No se pudieron importar los módulos: {e}", xbmc.NOTIFICATION_ERROR)
+        xbmc.log(f"[Acestream Channels] ERROR: Failed to import modules: {e}", xbmc.LOGERROR)
+        sys.exit()
+else:
+    xbmc.log("[Acestream Channels] ERROR: Failed to install libraries, exiting.", xbmc.LOGERROR)
+    sys.exit()
+
+def version_to_tuple(version_string):
+    try:
+        return tuple(map(int, version_string.split('.')))
+    except ValueError:
+        xbmc.log(f"[Acestream Channels] WARNING: Cadena de versión malformada detectada: {version_string}", xbmc.LOGWARNING)
+        return (0, 0, 0)
+
+def check_for_update_and_show_changelog():
+    show_changelog = ADDON.getSettingBool('show_changelog_on_update')
+    current_version = ADDON.getAddonInfo('version')
+    # Corregido: Usa el ID de configuración correcto que coincide con settings.xml
+    last_shown_version = ADDON.getSetting('last_changelog_version')
+    xbmc.log(f"[Acestream Channels] DEBUG: Versión actual del Addon: {current_version}", xbmc.LOGDEBUG)
+    xbmc.log(f"[Acestream Channels] DEBUG: Última versión del Changelog mostrada: {last_shown_version}", xbmc.LOGDEBUG)
+
+    if not last_shown_version:
+        last_shown_version = "0.0.0"
+
+    if show_changelog and version_to_tuple(current_version) > version_to_tuple(last_shown_version):
+        xbmc.log("[Acestream Channels] DEBUG: Nueva versión detectada. Mostrando registro de cambios.", xbmc.LOGDEBUG)
+        changelog_message = f"[COLOR {COLOR_RED}][B]¡El Addon de Canales se ha actualizado![/B][/COLOR]\n\n"
+        versions_to_display = []
+        for version_str, changes in CHANGELOG.items():
+            if version_to_tuple(version_str) > version_to_tuple(last_shown_version) and \
+               version_to_tuple(version_str) <= version_to_tuple(current_version):
+                versions_to_display.append((version_to_tuple(version_str), version_str, changes))
+        
+        versions_to_display.sort()
+
+        if not versions_to_display:
+            changelog_message += f"[COLOR {COLOR_YELLOW}]No hay cambios específicos documentados para esta actualización.[/COLOR]"
+        else:
+            for _, version_str, changes in versions_to_display:
+                changelog_message += f"[COLOR {COLOR_BLUE}][B]Versión {version_str}:[/B][/COLOR]\n"
+                for change in changes:
+                    if "mejoras" in change.lower() or "optimizaciones" in change.lower():
+                        changelog_message += f"- [COLOR {COLOR_GREEN}]{change}[/COLOR]\n"
+                    elif "errores" in change.lower() or "ajustes" in change.lower():
+                        changelog_message += f"- [COLOR {COLOR_ORANGE}]{change}[/COLOR]\n"
+                    else:
+                        changelog_message += f"- [COLOR {COLOR_WHITE}]{change}[/COLOR]\n"
+                changelog_message += "\n"
+        
+        xbmcgui.Dialog().textviewer(f"[COLOR {COLOR_RED}]Novedades del Addon de Canales[/COLOR]", changelog_message)
+        # Corregido: Usa el ID de configuración correcto que coincide con settings.xml
+        ADDON.setSetting('last_changelog_version', current_version)
+        xbmc.log(f"[Acestream Channels] DEBUG: 'last_changelog_version' actualizada a: {current_version}", xbmc.LOGDEBUG)
+    else:
+        xbmc.log("[Acestream Channels] DEBUG: El Addon está actualizado o el registro de cambios ya se mostró.", xbmc.LOGDEBUG)
+
+
+def clean_text_for_display(text):
+    if not isinstance(text, str):
+        return ""
+    text = text.replace('\xa0', ' ').replace('\u200b', '').replace('\uFEFF', '')
+    cleaned_text = re.sub(r'[^\w\s.,:;\'"!?¡¿ÁÉÍÓÚÜÑáéíóúüñ\(\)\[\]\{\}\-\+\=\*\/\&\#\@\$\%\^]', '', text)
+    return cleaned_text.strip()
 
 def build_url(query):
     return BASE_URL + '?' + urlencode(query)
 
-def buscar_enlace_por_nombre(nombre):
-    """
-    Busca en ACESTREAM_CHANNELS un canal cuyo nombre contenga palabras clave del nombre proporcionado.
-    """
-    nombre = nombre.lower()
-    for canal in ACESTREAM_CHANNELS:
-        canal_nombre = canal["name"].lower()
-        # Coincidencia parcial por palabras clave
-        if all(palabra in canal_nombre for palabra in nombre.split()):
-            return canal["url"]
-    return None
+def scrape_channels_from_url_new(url):
+    try:
+        try:
+            timeout = int(ADDON.getSetting('scraping_timeout'))
+        except (ValueError, TypeError):
+            timeout = 10
+            xbmc.log("[Acestream Channels] WARNING: No se pudo leer el 'scraping_timeout'. Usando valor por defecto.", xbmc.LOGWARNING)
+
+        xbmc.log(f"[Acestream Channels] DEBUG: Usando timeout de {timeout} segundos para el raspado.", xbmc.LOGDEBUG)
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        categorized_channels = {}
+        current_category = None
+        channel_name_counts = {}
+
+        tbody = soup.find('tbody')
+        if not tbody:
+            xbmc.log(f"[Acestream Channels] ERROR: No se encontró el elemento <tbody> en {url}", xbmc.LOGERROR)
+            return {}
+
+        rows = tbody.find_all('tr')
+        
+        start_processing = False
+        stop_processing_after_others = False 
+
+        for row in rows:
+            if stop_processing_after_others: 
+                break
+
+            td_header = row.find('td', {'colspan': '7'})
+            if td_header:
+                category_span = td_header.find('span', style=lambda value: value and 'background-color' in value)
+                if category_span:
+                    category_name = category_span.get_text(strip=True).replace('&nbsp;', ' ').strip()
+                    
+                    if category_name == "M+ LIGA":
+                        start_processing = True
+                    
+                    if start_processing:
+                        current_category = category_name
+                        if current_category not in categorized_channels:
+                            categorized_channels[current_category] = []
+                            channel_name_counts = {}
+                        xbmc.log(f"[Acestream Channels] DEBUG: Found category header: {current_category}", xbmc.LOGDEBUG)
+                    
+                    if category_name == "OTROS CANALES":
+                        stop_processing_after_others = True
+
+            if start_processing and current_category:
+                acestream_links = row.find_all('a', href=lambda href: href and href.startswith('acestream://'))
+                
+                for link in acestream_links:
+                    channel_url = link.get('href', '').strip()
+                    acestream_id = channel_url.replace("acestream://", "")
+                    
+                    channel_name = ""
+                    channel_icon_url = ""
+
+                    img_tag = link.find('img')
+                    if img_tag:
+                        if img_tag.has_attr('alt'):
+                            channel_name = img_tag['alt'].strip()
+                        if img_tag.has_attr('src'):
+                            channel_icon_url = urljoin(url, img_tag['src'])
+                    
+                    if not channel_name:
+                        channel_name_element = link.find(['b', 'span']) 
+                        if channel_name_element:
+                            channel_name = channel_name_element.get_text(strip=True)
+                        else:
+                            channel_name = link.get_text(strip=True)
+                    
+                    display_channel_name_base = channel_name.strip()
+                    
+                    option_part = ""
+                    if display_channel_name_base in channel_name_counts:
+                        channel_name_counts[display_channel_name_base] += 1
+                        option_part = f" | [COLOR {COLOR_CYAN}]OPCIÓN {channel_name_counts[display_channel_name_base]}[/COLOR]"
+                    else:
+                        channel_name_counts[display_channel_name_base] = 1
+                    
+                    status_part = ""
+                    color_element = link.find(['span', 'font'], style=True) or link.find(['span', 'font'], color=True) or link 
+                    
+                    if color_element:
+                        color_style = color_element.get('style', '')
+                        font_color = color_element.get('color')
+
+                        if 'color:#ff8c00;' in color_style or font_color == '#ff8c00':
+                            status_part = f" | [COLOR {COLOR_ORANGE}]Canal Eventual[/COLOR]"
+                        elif 'color:#ff0000;' in color_style or font_color == '#ff0000':
+                            status_part = f" | [COLOR {COLOR_RED}]Canal Caído[/COLOR]"
+
+                    full_channel_name = f"{display_channel_name_base}{option_part}{status_part}"
+                    
+                    if current_category:
+                        if not any(c["url"] == acestream_id for c in categorized_channels[current_category]):
+                            categorized_channels[current_category].append({
+                                "name": full_channel_name, 
+                                "url": acestream_id,
+                                "icon": channel_icon_url 
+                            })
+                            xbmc.log(f"[Acestream Channels] DEBUG: Added channel '{full_channel_name}' with icon '{channel_icon_url}' to category '{current_category}'", xbmc.LOGDEBUG)
+                
+        xbmc.log(f"[Acestream Channels] DEBUG: Scraped {sum(len(v) for v in categorized_channels.values())} channels across {len(categorized_channels)} categories from {url}", xbmc.LOGDEBUG)
+        return categorized_channels
+    except requests.exceptions.Timeout:
+        xbmcgui.Dialog().notification("Error de Conexión", "La solicitud de la página ha excedido el tiempo de espera.", xbmcgui.NOTIFICATION_ERROR)
+        xbmc.log(f"[Acestream Channels] ERROR: Timeout accessing URL: {url}", xbmc.LOGERROR)
+        return {}
+    except requests.exceptions.RequestException as e:
+        import traceback
+        xbmcgui.Dialog().notification("Error de Red", f"No se pudo acceder a la URL de raspado: {str(e)}", xbmc.NOTIFICATION_ERROR)
+        xbmc.log(f"[Acestream Channels] ERROR: Network error during scraping from {url}: {e}\n{traceback.format_exc()}", xbmc.LOGERROR)
+        return {}
+    except Exception as e:
+        import traceback
+        xbmcgui.Dialog().notification("Error de Scrapeo", f"Error al procesar la página: {str(e)}", xbmc.NOTIFICATION_ERROR)
+        xbmc.log(f"[Acestream Channels] ERROR: Error during scraping from {url}: {e}\n{traceback.format_exc()}", xbmc.LOGERROR)
+        return {}
+
+_cached_categorized_channels = None
+
+def get_categorized_channels_cached():
+    global _cached_categorized_channels
+    if _cached_categorized_channels is None:
+        xbmc.log("[Acestream Channels] DEBUG: Scraping channels for the first time or cache invalid.", xbmc.LOGDEBUG)
+        _cached_categorized_channels = scrape_channels_from_url_new(SCRAPING_URL)
+    else:
+        xbmc.log("[Acestream Channels] DEBUG: Using cached scraped channels.", xbmc.LOGDEBUG)
+    return _cached_categorized_channels
 
 def list_categories():
-    # Recorre cada categoría y la agrega a la interfaz de Kodi con su ícono
-    for category in CATEGORIES:
-        list_item = xbmcgui.ListItem(label=category["name"])
-        list_item.setArt({"icon": category["icon"]})  # Establece el ícono de la categoría
-        url = f"{BASE_URL}?action=list_channels&category={category['name']}"
-        xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=True)
+    check_for_update_and_show_changelog()
 
-    # Finaliza el listado del directorio
-    xbmcplugin.endOfDirectory(HANDLE)
+    agenda_list_item = xbmcgui.ListItem(label="AGENDA")
+    agenda_list_item.setArt({"icon": f"{RESOURCES_PATH}/agenda.png", "thumb": f"{RESOURCES_PATH}/agenda.png"})
+    agenda_url = build_url({"action": "list_channels", "category": "AGENDA"})
+    xbmcplugin.addDirectoryItem(handle=addon_handle, url=agenda_url, listitem=agenda_list_item, isFolder=True)
+
+    dynamic_categories = get_categorized_channels_cached()
+    sorted_category_names = sorted(dynamic_categories.keys())
+
+    for category_name in sorted_category_names:
+        icon_path = f"{RESOURCES_PATH}/default.png"
+        channels_in_category = dynamic_categories.get(category_name)
+        
+        if channels_in_category:
+            selected_channel_index = 0
+            if category_name in ["M+ VAMOS", "M+ ELLAS"]: 
+                selected_channel_index = 5
+            elif category_name in ["EUROSPORT", "FÓRMULA E", "DEPORTES M+"]:
+                selected_channel_index = 1
+            
+            if len(channels_in_category) > selected_channel_index:
+                selected_channel = channels_in_category[selected_channel_index]
+                if selected_channel.get("icon"):
+                    icon_path = selected_channel["icon"]
+                else:
+                    xbmc.log(f"[Acestream Channels] WARNING: Icono no encontrado para el canal {selected_channel_index+1} en la categoría '{category_name}'. Usando icono por defecto.", xbmc.LOGWARNING)
+            else:
+                xbmc.log(f"[Acestream Channels] WARNING: No hay suficientes canales en la categoría '{category_name}' para el índice de icono deseado {selected_channel_index}. Usando icono por defecto.", xbmc.LOGWARNING)
+
+        list_item = xbmcgui.ListItem(label=category_name)
+        list_item.setArt({"icon": icon_path, "thumb": icon_path})
+        url = build_url({"action": "list_channels", "category": category_name})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=list_item, isFolder=True)
+    xbmcplugin.endOfDirectory(addon_handle)
 
 def list_channels(category):
-    # Find the selected category
-    selected_category = next((cat for cat in CATEGORIES if cat["name"] == category), None)
+    if category == "AGENDA":
+        list_agenda_events()
+        return
 
-    if selected_category:
-        # Populate subcategories with appropriate channels
-        for channel in ACESTREAM_CHANNELS:
-            if channel["name"].upper().startswith(category.upper()):
-                selected_category["subcategories"].append(channel)
+    all_categorized_channels = get_categorized_channels_cached()
+    
+    channels_to_display = all_categorized_channels.get(category, [])
 
-        for channel in HTML5_CHANNELS:
-            if channel["name"].upper().startswith(category.upper()) and category.upper() == "OTROS":  # Only add m3u8 channel to "OTROS"
-                selected_category["subcategories"].append(channel)
+    if not channels_to_display:
+        xbmcgui.Dialog().notification("Canales", f"No se encontraron canales para la categoría: {category}", xbmcgui.NOTIFICATION_INFO)
+        list_item = xbmcgui.ListItem(label="No se encontraron canales")
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url="", listitem=list_item, isFolder=False)
+        
+    for channel in channels_to_display:
+        list_item = xbmcgui.ListItem(label=channel["name"])
+        if channel.get("icon"):
+            list_item.setArt({"icon": channel["icon"], "thumb": channel["icon"]})
+        else:
+            list_item.setArt({"icon": f"{RESOURCES_PATH}/default.png", "thumb": f"{RESOURCES_PATH}/default.png"})
+        
+        url = build_url({"action": "play_acestream", "url": channel["url"]})
+        list_item.setInfo("video", {"title": channel["name"]})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=list_item, isFolder=False)
+    xbmcplugin.endOfDirectory(addon_handle)
 
-        # Display channels within the category
-        for channel in selected_category["subcategories"]:
-            url = build_url({"action": "play_acestream" if "acestream://" in channel["url"] else "play_html5", "url": channel["url"]})
-            list_item = xbmcgui.ListItem(label=channel["name"])
-            list_item.setInfo("video", {"title": channel["name"]})
-            xbmcplugin.addDirectoryItem(handle=HANDLE, url=url, listitem=list_item, isFolder=False)
+def raspar_desde_url_respaldo(url):
+    eventos = []
+    try:
+        try:
+            timeout = int(ADDON.getSetting('scraping_timeout'))
+        except (ValueError, TypeError):
+            timeout = 10
+        
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        tabla_eventos = soup.find('table')
+        if not tabla_eventos:
+            xbmc.log(f"[Acestream Channels] ERROR: No se encontró la tabla de eventos en la agenda desde {url}", xbmc.LOGERROR)
+            return eventos
 
-    xbmcplugin.endOfDirectory(HANDLE)
+        for fila in tabla_eventos.find_all('tr')[1:]:
+            columnas = fila.find_all('td')
+            if len(columnas) >= 6:
+                hora = columnas[1].text.strip()
+                deporte = columnas[2].text.strip()
+                competicion = columnas[3].text.strip()
+                evento = columnas[4].text.strip()
+                
+                canales_html = columnas[5].find_all('a')
+                canales = []
+                for canal in canales_html:
+                    nombre = canal.text.strip()
+                    url_id = canal.get('href').replace("acestream://", "")
+                    canales.append({"name": nombre, "url": url_id})
+                
+                if canales:
+                    eventos.append({
+                        "hora": hora,
+                        "categoria": deporte,
+                        "evento": f"{competicion} - {evento}", 
+                        "enlaces": canales
+                    })
+        xbmc.log(f"[Acestream Channels] DEBUG: Se encontraron {len(eventos)} eventos en la agenda desde {url} (raspado de respaldo)", xbmc.LOGDEBUG)
+    except Exception as e:
+        xbmc.log(f"[Acestream Channels] ERROR: Error al procesar la URL de respaldo {url}: {e}", xbmc.LOGERROR)
 
-def play_acestream(url):
-    acestream_id = url.replace("acestream://", "")
-    play_url = f"plugin://script.module.horus/?action=play&id={acestream_id}"
+    return eventos
+
+def obtener_eventos_desde_html():
+    try:
+        url_principal = AGENDA_URLS[0]
+        try:
+            timeout = int(ADDON.getSetting('scraping_timeout'))
+        except (ValueError, TypeError):
+            timeout = 10
+        
+        xbmc.log(f"[Acestream Channels] DEBUG: Usando timeout de {timeout} segundos para la agenda desde {url_principal}.", xbmc.LOGDEBUG)
+        response = requests.get(url_principal, timeout=timeout)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        eventos = []
+        tabla_eventos = soup.find('table')
+        
+        if not tabla_eventos:
+            xbmc.log(f"[Acestream Channels] ERROR: No se encontró la tabla de eventos en la agenda desde {url_principal}", xbmc.LOGERROR)
+        else:
+            for fila in tabla_eventos.find_all('tr')[1:]:
+                columnas = fila.find_all('td')
+                if len(columnas) >= 5:
+                    hora = columnas[0].text.strip()
+                    deporte = columnas[1].text.strip()
+                    competicion = columnas[2].text.strip()
+                    evento = columnas[3].text.strip()
+                    canales_html = columnas[4].find_all('a')
+                    canales = []
+                    for canal in canales_html:
+                        nombre = canal.text.strip()
+                        url_id = canal.get('href').replace("acestream://", "")
+                        canales.append({"name": nombre, "url": url_id})
+                    if canales:
+                        eventos.append({
+                            "hora": hora,
+                            "categoria": deporte,
+                            "evento": evento,
+                            "enlaces": canales
+                        })
+            xbmc.log(f"[Acestream Channels] DEBUG: Se encontraron {len(eventos)} eventos en la agenda desde {url_principal}", xbmc.LOGDEBUG)
+        if eventos:
+            return eventos
+    except (requests.exceptions.RequestException, requests.exceptions.Timeout) as e:
+        xbmc.log(f"[Acestream Channels] ERROR: Fallo al acceder a la URL principal {url_principal}: {e}", xbmc.LOGERROR)
+    except Exception as e:
+        xbmc.log(f"[Acestream Channels] ERROR: Error al procesar la URL principal {url_principal}: {e}", xbmc.LOGERROR)
 
     try:
-        xbmc.Player().play(play_url)
+        url_respaldo = AGENDA_URLS[1]
+        xbmc.log(f"[Acestream Channels] DEBUG: Intentando con la URL de respaldo: {url_respaldo}.", xbmc.LOGDEBUG)
+        eventos = raspar_desde_url_respaldo(url_respaldo)
+        if eventos:
+            return eventos
     except Exception as e:
-        xbmcgui.Dialog().notification("Error", str(e), xbmcgui.NOTIFICATION_ERROR)
+        xbmc.log(f"[Acestream Channels] ERROR: Fallo al acceder a la URL de respaldo {url_respaldo}: {e}", xbmc.LOGERROR)
+
+    xbmcgui.Dialog().notification("Error AGENDA", "No se pudo acceder a ninguna URL de la agenda.", xbmcgui.NOTIFICATION_ERROR)
+    return []
+
+def list_agenda_events():
+    eventos = obtener_eventos_desde_html()
+    if not eventos:
+        xbmcgui.Dialog().notification("Agenda", "No hay eventos disponibles", xbmcgui.NOTIFICATION_INFO)
+        list_item = xbmcgui.ListItem(label="No hay eventos disponibles")
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url="", listitem=list_item, isFolder=False)
+        xbmcplugin.endOfDirectory(addon_handle)
+        return
+    
+    problematic_symbols_map = {
+        '⚽': 'Fútbol',
+        '🏀': 'Baloncesto',
+        '🎾': 'Tenis',
+        '🏈': 'Fútbol Americano',
+        '🏉': 'Rugby',
+        '⚾': 'Béisbol',
+        '🏐': 'Voleibol',
+        '🏎️': 'Fórmula 1',
+        '🏁': 'Carreras',
+        '🥊': 'Boxeo',
+        'MMA': 'MMA',
+        '🏆': '',
+    }
+
+    for evento in eventos:
+        hora = clean_text_for_display(evento['hora'])
+        categoria = clean_text_for_display(evento['categoria'])
+        evento_detalles = clean_text_for_display(evento['evento'])
+
+        for symbol, replacement in problematic_symbols_map.items():
+            categoria = categoria.replace(symbol, replacement)
+            evento_detalles = evento_detalles.replace(symbol, replacement)
+        
+        colored_hora = f"[COLOR {COLOR_TIME}]{hora}[/COLOR]"
+        colored_categoria = f"[COLOR {COLOR_SPORT_CATEGORY}]{categoria}[/COLOR]"
+        colored_evento_detalles = f"[COLOR {COLOR_EVENT_DETAILS}]{evento_detalles}[/COLOR]"
+
+        titulo_display = f"{colored_hora} | {colored_categoria}: {colored_evento_detalles}"
+        
+        list_item = xbmcgui.ListItem(label=titulo_display)
+        list_item.setArt({"icon": f"{RESOURCES_PATH}/agenda.png", "thumb": f"{RESOURCES_PATH}/agenda.png"})
+
+        url = build_url({"action": "mostrar_enlaces_evento", "enlaces": json.dumps(evento["enlaces"])})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=list_item, isFolder=True)
+    xbmcplugin.endOfDirectory(addon_handle)
+
+def mostrar_enlaces_evento(enlaces):
+    enlaces = json.loads(enlaces)
+    
+    base_channel_name_counts = {}
+    for enlace in enlaces:
+        cleaned_name = clean_text_for_display(enlace["name"])
+        base_channel_name_counts[cleaned_name] = base_channel_name_counts.get(cleaned_name, 0) + 1
+
+    current_counts_for_options = {}
+
+    for enlace in enlaces:
+        original_cleaned_name = clean_text_for_display(enlace["name"])
+        display_name = original_cleaned_name
+
+        if base_channel_name_counts[original_cleaned_name] > 1:
+            current_counts_for_options[original_cleaned_name] = current_counts_for_options.get(original_cleaned_name, 0) + 1
+            option_part = f" | [COLOR {COLOR_CYAN}]OPCIÓN {current_counts_for_options[original_cleaned_name]}[/COLOR]"
+            display_name = f"{original_cleaned_name}{option_part}"
+        
+        list_item = xbmcgui.ListItem(label=display_name)
+        list_item.setArt({"icon": f"{RESOURCES_PATH}/default.png", "thumb": f"{RESOURCES_PATH}/default.png"}) 
+        
+        url = build_url({"action": "play_acestream", "url": enlace["url"]})
+        list_item.setInfo("video", {"title": display_name})
+        xbmcplugin.addDirectoryItem(handle=addon_handle, url=url, listitem=list_item, isFolder=False)
+    xbmcplugin.endOfDirectory(addon_handle)
 
 def play_html5(url):
     try:
         xbmc.Player().play(url)
     except Exception as e:
-        xbmcgui.Dialog().notification("Error", str(e), xbmcgui.NOTIFICATION_ERROR)
+        xbmcgui.Dialog().notification("Error", str(e), xbmc.NOTIFICATION_ERROR)
 
-# Función para mostrar los eventos en la categoría "Agenda"
-def list_agenda_events(selected_category):
-    events = fetch_events_from_zeronet()
-
-    for event in events:
-        # Crear una cadena de texto con el formato deseado
-        event_line = f"{event['time']} | {event['category']} | {event['event']}"
-        list_item = xbmcgui.ListItem(label=event_line)
-
-        # Agregar propiedades y enlaces a los elementos de la lista (si es necesario)
-        # ...
-
-        xbmcplugin.addDirectoryItem(handle=addon_handle, url=event["links"][0], listitem=list_item, isFolder=False)
-    xbmcplugin.endOfDirectory(addon_handle)
-
-def obtener_eventos_desde_html():
-    url = "http://141.145.210.168"  # URL de la web
+def play_acestream(url_id):
     try:
-        response = requests.get(url)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, 'html.parser')
-        eventos = []
-
-        # Encuentra y extrae datos de la tabla
-        tabla_eventos = soup.find('table', class_='styled-table')
-        for fila in tabla_eventos.find_all('tr')[1:]:  # Ignora el encabezado
-            columnas = fila.find_all('td')
-            if len(columnas) >= 5:
-                hora = columnas[0].text.strip()
-                categoria = columnas[1].text.strip()
-                equipo_1 = columnas[2].text.strip()
-                equipo_2 = columnas[3].text.strip()
-
-                # Obtén enlaces únicos con nombres únicos
-                enlaces = []
-                urls_añadidas = set()  # Para evitar duplicados basados en la URL
-
-                for enlace_tag in columnas[4].find_all('a'):
-                    nombre_canal = enlace_tag.text.strip()
-                    url_canal = buscar_enlace_por_nombre(nombre_canal)
-                    enlace_web = enlace_tag['href']  # Enlace de la web
-
-                    # Añadir el enlace desde `ACESTREAM_CHANNELS` si existe
-                    if url_canal and url_canal not in urls_añadidas:
-                        enlaces.append({"name": nombre_canal, "url": url_canal})
-                        urls_añadidas.add(url_canal)
-
-                    # Añadir el enlace directo de la web si no es duplicado
-                    if enlace_web not in urls_añadidas:
-                        # Si ya existe un canal con el mismo nombre, agrega un sufijo de opción
-                        nombre_unico = nombre_canal
-                        if any(enlace['name'] == nombre_canal for enlace in enlaces):
-                            opcion_num = sum(1 for enlace in enlaces if enlace['name'].startswith(nombre_canal)) + 1
-                            nombre_unico = f"{nombre_canal} Opción {opcion_num}"
-
-                        enlaces.append({"name": nombre_unico, "url": enlace_web})
-                        urls_añadidas.add(enlace_web)
-
-                # Solo agregar el evento si tiene enlaces válidos
-                if enlaces:
-                    eventos.append({
-                        'hora': hora,
-                        'categoria': categoria,
-                        'evento': f"{equipo_1} vs {equipo_2}",
-                        'enlaces': enlaces
-                    })
-
-        eventos.sort(key=lambda x: x['hora'])
-        return eventos
-    except requests.exceptions.RequestException as e:
-        xbmcgui.Dialog().notification("Error", f"Error al obtener eventos: {e}", xbmcgui.NOTIFICATION_ERROR)
-        return []
-
-def mostrar_agenda():
-    eventos = obtener_eventos_desde_html()
-    if not eventos:
-        xbmcgui.Dialog().notification("Agenda", "No hay eventos disponibles", xbmcgui.NOTIFICATION_INFO, 3000)
-        return
-
-    for evento in eventos:
-        titulo = f"{evento['hora']} | {evento['categoria']} | {evento['evento']}"
-        list_item = xbmcgui.ListItem(label=titulo)
+        use_external = ADDON.getSettingBool('use_external_player')
         
-        # Serializar los enlaces como JSON
-        url = build_url({"action": "mostrar_enlaces_evento", "enlaces": json.dumps(evento['enlaces'])})
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=list_item, isFolder=True)
-
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
-
-def mostrar_enlaces_evento(enlaces):
-    import json
-
-    # Deserializar enlaces desde JSON si están en formato de cadena
-    if isinstance(enlaces, str):
-        enlaces = json.loads(enlaces)  # Convertir la cadena JSON a lista de diccionarios
-
-    # Iterar sobre los enlaces deserializados
-    for enlace in enlaces:
-        nombre_canal = enlace["name"]  # Nombre del canal
-        list_item = xbmcgui.ListItem(label=nombre_canal)
-        url = build_url({"action": "play_acestream", "url": enlace["url"]})
-        xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=url, listitem=list_item, isFolder=False)
-    
-    xbmcplugin.endOfDirectory(int(sys.argv[1]))
-
-def ejecutar_categoria(categoria):
-    if categoria == "AGENDA":
-        mostrar_agenda()
-    else:
-        xbmcgui.Dialog().notification("Error", f"Categoría '{categoria}' no encontrada", xbmcgui.NOTIFICATION_ERROR)
-
-# TEST BIBLIOTECAS
-
-def descargar_bibliotecas():
-    """
-    Descarga y extrae las bibliotecas necesarias para el addon.
-    """
-    bibliotecas_url = "https://hparlon6.github.io/bibliotecas.zip"  # Cambia esto por tu URL
-    bibliotecas_zip = os.path.join(addon_path, "bibliotecas.zip")
-    try:
-        # Descargar el ZIP de bibliotecas
-        response = requests.get(bibliotecas_url, stream=True)
-        response.raise_for_status()
-        with open(bibliotecas_zip, "wb") as archivo:
-            shutil.copyfileobj(response.raw, archivo)
-
-        # Extraer el ZIP en la ruta del addon
-        with zipfile.ZipFile(bibliotecas_zip, "r") as zip_ref:
-            zip_ref.extractall(addon_path)
-
-        # Eliminar el ZIP después de la extracción
-        os.remove(bibliotecas_zip)
-
-        xbmcgui.Dialog().notification("Addon", "Bibliotecas descargadas correctamente", xbmcgui.NOTIFICATION_INFO)
+        if use_external:
+            xbmc.log("[Acestream Channels] INFO: Usando reproductor externo para AceStream (API HTTP).", xbmc.LOGINFO)
+            # Usamos la API HTTP del motor de AceStream.
+            strm_content = f"http://127.0.0.1:6878/ace/getstream?id={url_id}"
+            strm_path = os.path.join(PROFILE_PATH, 'temp_acestream.strm')
+            
+            with open(strm_path, 'w') as f:
+                f.write(strm_content)
+            
+            xbmc.Player().play(strm_path)
+            
+        else:
+            xbmc.log("[Acestream Channels] INFO: Usando reproductor interno (Horus) para AceStream.", xbmc.LOGINFO)
+            horus_url = f"plugin://script.module.horus/?action=play&id={url_id}"
+            xbmc.Player().play(horus_url)
+            
     except Exception as e:
-        xbmcgui.Dialog().notification("Error", f"No se pudieron descargar las bibliotecas: {e}", xbmcgui.NOTIFICATION_ERROR)
-
-def verificar_bibliotecas():
-    """
-    Verifica si las bibliotecas necesarias están instaladas. Si no, las descarga.
-    """
-    bibliotecas_faltantes = [
-        requests_path,
-        urllib3_path,
-        bs4_path,
-        idna_path,
-        charset_normalizer_path,
-        certifi_path,
-        soupsieve_path,
-    ]
-
-    for path in bibliotecas_faltantes:
-        if not os.path.exists(path):
-            xbmcgui.Dialog().notification("Addon", "Descargando bibliotecas necesarias...", xbmcgui.NOTIFICATION_INFO)
-            descargar_bibliotecas()
-            break  # Descarga todo en una sola vez
-
-
-# FIN TEST BIBLIOTECA
-
-# Parsear argumentos desde Kodi
-args = urllib.parse.parse_qs(sys.argv[2][1:])
-categoria = args.get('categoria', [None])[0]
-
-# Llamar a la función para manejar la categoría
-if categoria:
-    ejecutar_categoria(categoria)
-else:
-    # Muestra categorías iniciales o manejo de errores
-    pass
-
-# Verificar bibliotecas antes de cualquier operación
-verificar_bibliotecas()
+        xbmc.log(f"[Acestream Channels] ERROR: Error al reproducir AceStream: {e}", xbmc.LOGERROR)
+        xbmcgui.Dialog().notification("Error", f"Error al reproducir: {e}", xbmc.NOTIFICATION_ERROR)
 
 if __name__ == '__main__':
     args = dict(parse_qsl(sys.argv[2][1:]))
     action = args.get("action")
-    category = args.get("category")  # Obtener la categoría, si aplica
-
     if action == "list_channels":
-        # Verificar la categoría seleccionada
+        category = args.get("category")
         if category == "AGENDA":
-            mostrar_agenda()
+            list_agenda_events()
         else:
             list_channels(category)
     elif action == "mostrar_enlaces_evento":
-        # Mostrar los enlaces para un evento deportivo
-        enlaces = args.get("enlaces")
-        if enlaces:
-            mostrar_enlaces_evento(enlaces)
-        else:
-            xbmcgui.Dialog().notification("Error", "No hay enlaces para mostrar", xbmcgui.NOTIFICATION_ERROR)
-    elif action == "play_acestream":
-        # Reproducir un enlace AceStream
-        url = args.get("url")
-        if url:
-            play_acestream(url)
-        else:
-            xbmcgui.Dialog().notification("Error", "URL no especificada para AceStream", xbmcgui.NOTIFICATION_ERROR)
+        mostrar_enlaces_evento(args["enlaces"])
     elif action == "play_html5":
-        # Reproducir un enlace HTML5
-        url = args.get("url")
-        if url:
-            play_html5(url)
-        else:
-            xbmcgui.Dialog().notification("Error", "URL no especificada para HTML5", xbmcgui.NOTIFICATION_ERROR)
+        play_html5(args["url"])
+    elif action == "play_acestream":
+        play_acestream(args["url"]) 
     else:
-        # Mostrar las categorías principales del addon
         list_categories()

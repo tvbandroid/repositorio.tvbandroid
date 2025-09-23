@@ -1,10 +1,10 @@
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Callable
 from lib.clients.base import BaseClient, TorrentStream
 from lib.utils.kodi.utils import kodilog, translation
 
 
 class Jackgram(BaseClient):
-    def __init__(self, host: str, notification: callable) -> None:
+    def __init__(self, host: str, notification: Callable) -> None:
         super().__init__(host, notification)
 
     def search(
@@ -31,7 +31,7 @@ class Jackgram(BaseClient):
             res = self.session.get(url, timeout=10)
             if res.status_code != 200:
                 return
-            
+
             if mode in ["tv", "movies"]:
                 return self.parse_response(res)
             else:
@@ -65,6 +65,13 @@ class Jackgram(BaseClient):
                     size=item["size"],
                     publishDate=item["date"],
                     url=item["url"],
+                    guid=item.get("guid", ""),
+                    infoHash=item.get("infoHash", ""),
+                    seeders=item.get("seeders", 0),
+                    languages=item.get("languages", []),
+                    fullLanguages=item.get("fullLanguages", ""),
+                    provider=item.get("provider", ""),
+                    peers=item.get("peers", 0),
                 )
             )
         return results

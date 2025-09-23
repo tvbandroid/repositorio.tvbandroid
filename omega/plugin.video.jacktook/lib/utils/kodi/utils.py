@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 import json
 import re
 import sys
 import time
 import sqlite3 as database
-from lib.db.cached import cache
-from urllib import parse
+from typing import Any, Union
+
 from urllib.parse import quote, urlencode
+from lib.db.cached import cache
 
 import xbmc
-import xbmcgui
 import xbmcaddon
+import xbmcgui
 
 from xbmcgui import Window, ListItem
 from xbmcplugin import setResolvedUrl
@@ -35,8 +36,9 @@ JACKTORR_ADDON_ID = "plugin.video.jacktorr"
 ELEMENTUM_ADDON_ID = "plugin.video.elementum"
 JACKTOOK_BURST_ADOON_ID = "script.jacktook.burst"
 
+
 try:
-    JACKTORR_ADDON = xbmcaddon.Addon("plugin.video.jacktorr")
+    JACKTORR_ADDON = xbmcaddon.Addon(JACKTORR_ADDON_ID)
 except:
     JACKTORR_ADDON = None
 
@@ -56,14 +58,20 @@ ADDON_VERSION = ADDON.getAddonInfo("version")
 ADDON_NAME = ADDON.getAddonInfo("name")
 PLAYLIST = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
 
+CHANGELOG_PATH = translate_path(
+    "special://home/addons/plugin.video.jacktook/CHANGELOG.md"
+)
+
 progressDialog = xbmcgui.DialogProgress()
 
 
 def get_jacktorr_setting(value, default=None):
+    if not JACKTORR_ADDON:
+        notification(translation(30253))
+        return
     value = JACKTORR_ADDON.getSetting(value)
     if not value:
         return default
-
     if value == "true":
         return True
     elif value == "false":
@@ -72,10 +80,12 @@ def get_jacktorr_setting(value, default=None):
         return value
 
 
-def get_setting(value, default=None):
-    val = ADDON.getSetting(value)
+def get_setting(id, default=None):
+    val = Window(10000).getProperty(id)
     if not val:
-        return default
+        val = ADDON.getSetting(id)
+        if not val:
+            return default
     if val.lower() == "true":
         return True
     if val.lower() == "false":
@@ -84,7 +94,8 @@ def get_setting(value, default=None):
 
 
 def set_setting(id, value):
-    ADDON.setSetting(id=id, value=value)
+    ADDON.setSetting(id, value)
+    Window(10000).setProperty(id, value)
 
 
 def get_property(prop: str):
@@ -95,13 +106,13 @@ def get_property(prop: str):
         kodilog(f"Get property from cache: {prop} = {value}", xbmc.LOGDEBUG)
         if not value:
             return None
-    return value    
+    return value
 
 
-def set_property(prop, value):
+def set_property(prop: str, value: Any):
     Window(10000).setProperty(prop, value)
     cache.set(prop, value, timedelta(days=30))
-    
+
 
 def clear_property(prop):
     return Window(10000).clearProperty(prop)
@@ -128,6 +139,10 @@ def is_jacktorr_addon():
 
 def is_elementum_addon():
     return xbmc.getCondVisibility(f"System.HasAddon({ELEMENTUM_ADDON_ID})")
+
+
+def is_burst_addon():
+    return xbmc.getCondVisibility(f"System.HasAddon({JACKTOOK_BURST_ADOON_ID})")
 
 
 def translation(id_value):
@@ -182,9 +197,14 @@ def dialog_ok(heading, line1, line2="", line3=""):
 def dialog_text(heading, content="", file=None):
     dialog = xbmcgui.Dialog()
     if file:
-        with open(file, encoding="utf-8") as r:
-            content = r.readlines()
-            content = "".join(content)
+        try:
+            with open(file, encoding="utf-8") as r:
+                content = r.readlines()
+                content = "".join(content)
+        except Exception as e:
+            logger(f"Error reading file {file}: {e}", xbmc.LOGERROR)
+            notification("Error reading file.")
+            return
     dialog.textviewer(heading, str(content), False)
     return dialog
 
@@ -227,7 +247,7 @@ def build_url(action, **params):
     for key, value in params.items():
         if isinstance(value, (dict, list)):
             params[key] = json.dumps(value)
-    query = parse.urlencode(params)
+    query = urlencode(params)
     return f"plugin://{ADDON_ID}/?action={action}&{query}"
 
 
@@ -257,10 +277,6 @@ def show_busy_dialog():
 
 def show_picture(url):
     xbmc.executebuiltin('ShowPicture("{}")'.format(url))
-
-
-def container_refresh():
-    execute_builtin("Container.Refresh")
 
 
 def close_busy_dialog():
@@ -311,7 +327,6 @@ def disable_enable_addon(addon_name=ADDON_NAME):
         pass
 
 
-
 def update_kodi_addons_db(addon_name=ADDON_NAME):
     try:
         date = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -328,7 +343,7 @@ def update_kodi_addons_db(addon_name=ADDON_NAME):
 
 
 def bytes_to_human_readable(size: int, unit: str = "B") -> str:
-    units: dict[str, int] = {"B": 0, "KB": 1, "MB": 2, "GB": 3, "TB": 4, "PB": 5}
+    units = {"B": 0, "KB": 1, "MB": 2, "GB": 3, "TB": 4, "PB": 5}
 
     while size >= 1024 and unit != "PB":
         size /= 1024
@@ -405,13 +420,18 @@ def copy2clip(txt):
             pass
 
 
-def get_datetime(string=False, dt=False):
-    d = datetime.now()
+def get_datetime(string: bool = False, dt: bool = False) -> Union[date, datetime]:
+    """
+    Returns the current date/time in various formats.
+
+    :param dt: If True, returns the full datetime object.
+    :return: By default, returns a date object.
+    """
+    now = datetime.now()
     if dt:
-        return d
-    if string:
-        return d.strftime("%Y-%m-%d")
-    return datetime.date(d)
+        return now
+    else:
+        return now.date()
 
 
 def list_dirs(location):
@@ -435,32 +455,3 @@ def cancel_playback():
 
 def kodilog(message, level=xbmc.LOGINFO):
     xbmc.log("[###JACKTOOKLOG###] " + str(message), level)
-
-
-def get_installed_addons(addon_type="", content="unknown", enabled="all"):
-    data = execute_json_rpc(
-        "Addons.GetAddons", type=addon_type, content=content, enabled=enabled
-    )
-    addons = data["result"].get("addons")
-    return [(a["addonid"], a["type"]) for a in addons] if addons else []
-
-
-def execute_json_rpc(method, rpc_version="2.0", rpc_id=1, **params):
-    return json.loads(
-        xbmc.executeJSONRPC(
-            json.dumps(
-                dict(jsonrpc=rpc_version, method=method, params=params, id=rpc_id)
-            )
-        )
-    )
-
-
-def run_script(script_id, *args):
-    xbmc.executebuiltin("RunScript({})".format(",".join((script_id,) + args)))
-
-
-def notify_all(sender, message, data=None):
-    params = {"sender": sender, "message": message}
-    if data is not None:
-        params["data"] = data
-    return execute_json_rpc("JSONRPC.NotifyAll", **params).get("result") == "OK"

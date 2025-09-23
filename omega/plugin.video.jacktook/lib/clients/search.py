@@ -2,7 +2,7 @@ from lib.clients.stremio import ui
 from lib.clients.stremio.stremio import StremioAddonClient
 from lib.clients.base import TorrentStream
 from lib.utils.clients.utils import get_client, update_dialog
-from lib.utils.kodi.utils import get_setting, kodilog
+from lib.utils.kodi.utils import get_setting, kodilog, notification
 from lib.utils.general.utils import Indexer, cache_results, get_cached_results
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Dict, Optional, Any
@@ -36,7 +36,10 @@ def search_client(
 ) -> List[TorrentStream]:
     def perform_search(indexer_key, dialog, *args, **kwargs):
         if indexer_key == Indexer.STREMIO:
-            stremio_addons = ui.get_selected_addons()
+            stremio_addons = ui.get_selected_stream_addons()
+            if not stremio_addons:
+                notification("No Stremio addons selected")
+                return []
             return [
                 result
                 for client in stremio_addon_generator(stremio_addons, dialog)
@@ -45,7 +48,7 @@ def search_client(
 
         if indexer_key != Indexer.BURST:
             update_dialog(indexer_key, f"Searching {indexer_key}", dialog)
-        
+
         client = get_client(indexer_key)
         if not client:
             return []
@@ -63,7 +66,9 @@ def search_client(
     total_results = []
     tasks = []
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(
+        max_workers=int(get_setting("thread_number", 8))
+    ) as executor:
         add_task_if_enabled(
             executor,
             tasks,
@@ -153,9 +158,8 @@ def search_client(
                     total_results.extend(results)
             except Exception as e:
                 import traceback
-
                 error_details = traceback.format_exc()
-                kodilog(f"Error: {e}\n{error_details}")
+                kodilog(f"Error in {e}\n{error_details}")
 
     cache_results(total_results, query, mode, media_type, episode)
     return total_results

@@ -1,3 +1,21 @@
+import re
+import unicodedata
+
+
+def slugify_title(title):
+    title = re.sub(r"\.[^.]+$", "", title)  # Remove extension
+    title = re.sub(r"[^\w\s.-]", "", title)  # Remove unwanted characters
+    return title.strip()
+
+
+def slugify(value):
+    # 1. Normaliza el texto para separar letras acentuadas (ñ → n, á → a, etc.)
+    value = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
+
+    # 3. Reemplaza espacios y guiones múltiples con un solo guion bajo
+    return re.sub(r"[-\s]+", "_", value)
+
+
 def get_deepl_language_code(language_name):
     language_mapping = {
         "None": "None",
@@ -41,6 +59,9 @@ def get_deepl_language_code(language_name):
 
 
 def get_language_code(language_name):
+    """
+    Convert full language names to ISO 639-1 or 639-2 language codes.
+    """
     language_map = {
         "None": "None",
         "Arabic": "ara",
@@ -61,7 +82,6 @@ def get_language_code(language_name):
         "Korean": "kor",
         "Lithuanian": "lit",
         "Latvian": "lav",
-        "Norwegian Bokmål": "nob",
         "Dutch": "nld",
         "Polish": "pol",
         "Portuguese": "por",

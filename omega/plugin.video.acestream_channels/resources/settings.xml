@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="30000">
+        <setting id="addon_initialized" type="boolean" label="30001" default="false" visible="false"/>
+        <setting id="last_changelog_version" type="string" label="30002" default="" visible="false"/>
+    </category>
+
+    <category label="Configuración General">
+        <setting id="use_external_player" type="bool" label="Usar reproductor externo Acestream (Sin Horus)" default="false" help="Activa esta opción para que el addon intente reproducir los enlaces de AceStream con un reproductor externo configurado."/>
+        <setting id="scraping_timeout" type="number" label="Tiempo de espera del raspador (segundos)" default="10" min="5" max="60" help="Ajusta el tiempo que el addon espera para cargar la página de canales."/>
+        <setting id="show_changelog_on_update" type="bool" label="Mostrar novedades al actualizar" default="true" help="Muestra la ventana de registro de cambios al iniciar el addon tras una actualización."/>
+    </category>
+</settings>

@@ -1,5 +1,6 @@
 import re
-from typing import List, Dict, Tuple, Optional, Any
+from typing import List, Dict, Tuple, Optional, Any, Callable
+
 from lib.clients.base import BaseClient, TorrentStream
 from lib.utils.localization.countries import find_language_by_unicode
 from lib.utils.kodi.utils import convert_size_to_bytes, kodilog, translation
@@ -7,7 +8,7 @@ from lib.utils.general.utils import USER_AGENT_HEADER, unicode_flag_to_country_c
 
 
 class Torrentio(BaseClient):
-    def __init__(self, host: str, notification: callable) -> None:
+    def __init__(self, host: str, notification: Callable) -> None:
         super().__init__(host, notification)
 
     def search(
@@ -20,13 +21,13 @@ class Torrentio(BaseClient):
     ) -> Optional[List[TorrentStream]]:
         try:
             kodilog(f"Searching for {imdb_id} on Torrentio")
-
             if mode == "tv" or media_type == "tv":
                 url = f"{self.host}/stream/series/{imdb_id}:{season}:{episode}.json"
             elif mode == "movies" or media_type == "movies":
                 url = f"{self.host}/stream/{mode}/{imdb_id}.json"
-
-            kodilog(f"URL: {url}")
+            else:
+                self.handle_exception(translation(30228))
+                return None
             
             res = self.session.get(url, headers=USER_AGENT_HEADER, timeout=10)
             if res.status_code != 200:

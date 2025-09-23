@@ -181,6 +181,26 @@
   </extension>
 </addon>
 
+<addon id="repository.greenball" name="GreenBall Repository" version="1.0.0" provider-name="ajsm90">
+    <extension point="xbmc.addon.repository" name="GreenBall Repository">
+        <dir>
+            <info compressed="true">https://ajsm90.github.io/greenball.repo/repo/zips/addons.xml</info>
+            <checksum>https://ajsm90.github.io/greenball.repo/repo/zips/addons.xml.md5</checksum>
+            <datadir zip="true">https://ajsm90.github.io/greenball.repo/repo/zips/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Repositorio GreenBall</summary>
+        <description>Repositorio con addons de GreenBall</description>
+        <disclaimer></disclaimer>
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.audio.mp3streams" name="MP3 Streams" version="2023.2.31" provider-name="Jon Bovi, Slamious, Diggz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -651,7 +671,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.acestream_channels" version="1.0.0" name="AceStream Channels" provider-name="Gunter25">
+<addon id="plugin.video.acestream_channels" version="1.2.3" name="AceStream Channels" provider-name="Gunter25">
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>
     </extension>
@@ -1200,7 +1220,31 @@
 	</extension>
 </addon>
 
-<addon id="plugin.video.jacktook" name="Jacktook" version="0.5.3" provider-name="Sam-Max">
+<addon id="plugin.video.GreenBall" version="1.0.7" name="Green Ball" provider-name="">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.9.3+matrix.1"/>
+        <import addon="script.module.requests" version="2.25.1+matrix.1"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es">--</summary>
+        <description lang="es">--</description>
+        <platform>all</platform>
+        <version>1.0.0</version>
+        <provider-name></provider-name>
+        <assets>
+            <icon>gballN.gif</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
+<addon id="plugin.video.jacktook" name="Jacktook" version="0.14.0" provider-name="Sam-Max">
   <requires>
     <import addon="xbmc.python" version="3.00.0"/>
     <import addon="script.module.requests" version="2.25.1"/>
@@ -1210,6 +1254,7 @@
     <provides>video</provides>
   </extension>
   <extension point="xbmc.service" library="service.py" />
+  <extension point="xbmc.python.module" library="lib"/>
   <extension point="xbmc.addon.metadata">
     <summary lang="en">jacktook</summary>
     <description lang="en">Kodi addon for torrent streaming</description>
@@ -1535,6 +1580,33 @@ provider-name="ElSupremo">
       [CR]- Versión inicial 0.0.7
     </news>
   </extension>
+</addon>
+
+<addon id="plugin.video.Naranjitomatrix"
+       name="[COLOR orange]Naranjito[/COLOR]"
+       version="1.2.1+matrix"
+       provider-name="Naranjito">
+<requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.requests"/>
+    <import addon="script.module.simplejson"/>
+	<import addon="script.module.kodi-six" />
+</requires>
+<extension point="xbmc.python.pluginsource" library="default.py">
+	<provides>video</provides>
+</extension>
+<extension point="xbmc.addon.metadata">
+	 <summary lang="en">Creado por Naranjito</summary>
+    <description lang="en">Naranjito 2017</description>
+    <disclaimer lang="en"></disclaimer>
+	<platform>all</platform>
+	<assets>
+       <icon>icon.png</icon>
+       <fanart>fanart.jpg</fanart>
+</assets>
+	<news>news
+	</news>
+</extension>
 </addon>
 
 <addon id="plugin.video.next"

@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from requests import Session
-from typing import List, Optional
+from typing import Any, List, Optional, Callable
 from lib.domain.torrent import TorrentStream
+from lib.utils.kodi.utils import notification
 
 
 class BaseClient(ABC):
-    def __init__(self, host: Optional[str], notification: Optional[callable]) -> None:
+    def __init__(self, host: Optional[str], notification: Optional[Callable]) -> None:
         self.host = host.rstrip("/") if host else ""
         self.notification = notification
         self.session = Session()
@@ -23,11 +24,11 @@ class BaseClient(ABC):
         pass
 
     @abstractmethod
-    def parse_response(self, res: any) -> List[TorrentStream]:
+    def parse_response(self, res: Any) -> List[TorrentStream]:
         pass
 
-    def handle_exception(self, exception: Exception) -> None:
+    def handle_exception(self, exception: str) -> None:
         exception_message = str(exception)
         if len(exception_message) > 70:
             exception_message = exception_message[:70] + "..."
-        raise Exception(exception_message)
+        notification(exception_message)

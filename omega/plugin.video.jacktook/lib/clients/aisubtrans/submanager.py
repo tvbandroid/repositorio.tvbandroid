@@ -2,7 +2,6 @@ import json
 import os
 
 from typing import Any, Dict, List, Optional
-
 from lib.clients.aisubtrans.deepl import DeepLTranslator
 from lib.clients.aisubtrans.opensubstremio import OpenSubtitleStremioClient
 from lib.utils.kodi.utils import (
@@ -34,8 +33,8 @@ class KodiJsonRpcClient:
 
 
 class SubtitleManager(KodiJsonRpcClient):
-    def __init__(self, kodi_player: Any, notification: Any):
-        self.player = kodi_player
+    def __init__(self, data: Any, notification: Any):
+        self.data = data
         self.notification = notification
         self.opensub_client = OpenSubtitleStremioClient(notification)
         self.translator = DeepLTranslator(notification)
@@ -53,7 +52,7 @@ class SubtitleManager(KodiJsonRpcClient):
             "Settings.GetSettingValue", {"setting": "locale.subtitlelanguage"}
         )
 
-        value = subtitle_language.get("value")
+        value = subtitle_language.get("value", "")
         if value in ["forced_only", "original", "default", "none"]:
             return value
         return self.convert_language_iso(value) if iso_format else value
@@ -74,20 +73,21 @@ class SubtitleManager(KodiJsonRpcClient):
         Download subtitles for the current video.
         Returns a list of subtitle file paths.
         """
-        data = self.player.data
-        mode = data.get("mode")
-        imdb_id = data.get("imdb_id")
-        episode = data.get("episode")
-        season = data.get("season")
+        mode = self.data.get("mode")
+        imdb_id = self.data.get("ids", {}).get("imdb_id")
+        tv_data = self.data.get("tv_data", {})
+        episode = tv_data.get("episode")
+        season = tv_data.get("season")
+        title = self.data.get("title")
 
         if not imdb_id:
             kodilog("No IMDb ID found for the current video")
             return
 
         folder_path = (
-            os.path.join(ADDON_PROFILE_PATH, imdb_id, str(season))
+            os.path.join(ADDON_PROFILE_PATH, "subtitles", imdb_id, str(season))
             if mode == "tv"
-            else os.path.join(ADDON_PROFILE_PATH, imdb_id)
+            else os.path.join(ADDON_PROFILE_PATH, "subtitles", imdb_id)
         )
 
         if not os.path.exists(folder_path):
@@ -107,13 +107,12 @@ class SubtitleManager(KodiJsonRpcClient):
                 return subtitle_files
 
         subtitles = self.opensub_client.get_subtitles(mode, imdb_id, season, episode)
-        kodilog(f"Subtitles: {subtitles}")
         if not subtitles:
             kodilog("No subtitles found for the current video")
             return
 
         subtitle_paths = self.opensub_client.download_subtitles_batch(
-            subtitles, imdb_id, season=season, episode=episode
+            subtitles, imdb_id, title=title, season=season, episode=episode
         )
 
         if get_setting("deepl_enabled"):
@@ -131,3 +130,5 @@ class SubtitleManager(KodiJsonRpcClient):
                 return translated_subtitles_paths
 
         return subtitle_paths
+
+

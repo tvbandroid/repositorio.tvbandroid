@@ -1,13 +1,18 @@
 import sys
 from urllib import parse
-
 from lib.clients.jackgram.utils import (
-    get_telegram_files,
-    get_telegram_latest,
-    get_telegram_latest_files,
+    list_telegram_files,
+    list_telegram_latest,
+    list_telegram_latest_files,
 )
-
-from lib.clients.tmdb.tmdb import TmdbClient
+from lib.clients.mdblist.mdblist import (
+    search_mdbd_lists,
+    show_mdblist_list,
+    top_mdbd_lists,
+    user_mdbd_lists,
+)
+from lib.clients.tmdb.people_client import PeopleClient
+from lib.clients.tmdb.tmdb import TmdbClient, TmdbCollections
 from lib.clients.trakt.trakt import TraktClient
 from lib.downloader import (
     handle_cancel_download,
@@ -26,13 +31,16 @@ from lib.navigation import (
     clear_history,
     cloud,
     cloud_details,
+    debrider_auth,
+    debrider_info,
+    debrider_remove_auth,
     direct_menu,
     donate,
-    ed_info,
     downloads_menu,
     files_history,
     get_rd_downloads,
     history_menu,
+    kodi_logs,
     list_trakt_page,
     movies_items,
     next_page_anime,
@@ -40,14 +48,16 @@ from lib.navigation import (
     play_from_pack,
     play_url,
     pm_auth,
-    rd_info,
+    real_debrid_info,
     search_tmdb_genres,
     search_tmdb_year,
+    show_changelog,
     telegram_menu,
     test_download_dialog,
     test_resume_dialog,
     test_run_next,
     test_source_select,
+    titles_calendar,
     titles_history,
     torrentio_selection,
     play_torrent,
@@ -68,7 +78,7 @@ from lib.navigation import (
     tv_shows_items,
 )
 from lib.clients.stremio.catalogs import (
-    list_stremio_catalog,
+    list_catalog,
     list_stremio_episodes,
     list_stremio_seasons,
     list_stremio_tv,
@@ -83,13 +93,16 @@ from lib.utils.torrent.torrserver_utils import (
     torrent_files,
 )
 from lib.clients.stremio.ui import (
+    add_custom_stremio_addon,
     stremio_login,
     stremio_toggle_addons,
     stremio_logout,
     stremio_toggle_catalogs,
     stremio_update,
+    torrentio_toggle_providers,
 )
 
+from lib.utils.views.last_titles import delete_last_title_entry
 import xbmc
 
 
@@ -108,11 +121,23 @@ def addon_router():
         "anime_search": anime_search,
         "search": search,
         "handle_tmdb_search": TmdbClient.handle_tmdb_search,
+        "handle_tmdb_query": TmdbClient.handle_tmdb_query,
+        "search_tmdb_lang": TmdbClient.show_lang_items,
+        "search_tmbd_network": TmdbClient.show_network_items,
         "search_tmdb_year": search_tmdb_year,
         "search_tmdb_genres": search_tmdb_genres,
-        "handle_tmdb_query": TmdbClient.handle_tmdb_query,
+        "search_tmdb_recommendations": TmdbClient.search_tmdb_recommendations,
+        "search_tmdb_similar": TmdbClient.search_tmdb_similar,
         "search_direct": search_direct,
-        "download_file": handle_download_file,
+        "search_mdbd_lists": search_mdbd_lists,
+        "search_people_by_id": PeopleClient.search_people_by_id,
+        "user_mdbd_lists": user_mdbd_lists,
+        "top_mdbd_lists": top_mdbd_lists,
+        "show_mdblist_list": show_mdblist_list,
+        "handle_collection_query": TmdbClient.handle_collection_query,
+        "handle_collection_details": TmdbCollections.add_collection_details,
+        "handle_tmdb_person_details": PeopleClient.handle_tmdb_person_details,
+        "handle_download_file": handle_download_file,
         "search_item": search_item,
         "next_page_anime": next_page_anime,
         "play_torrent": play_torrent,
@@ -125,18 +150,21 @@ def addon_router():
         "settings": settings,
         "files_history": files_history,
         "titles_history": titles_history,
+        "titles_calendar": titles_calendar,
         "history_menu": history_menu,
         "donate": donate,
-        "delete_file": handle_delete_file,
+        "handle_delete_file": handle_delete_file,
+        "handle_cancel_download": handle_cancel_download,
         "clear_all_cached": clear_all_cached,
         "clear_history": clear_history,
-        "cancel_download": handle_cancel_download,
         "addon_update": addon_update,
         "open_burst_config": open_burst_config,
         "rd_auth": rd_auth,
         "rd_remove_auth": rd_remove_auth,
-        "rd_info": rd_info,
-        "ed_info": ed_info,
+        "real_debrid_info": real_debrid_info,
+        "debrider_auth": debrider_auth,
+        "debrider_remove_auth": debrider_remove_auth,
+        "debrider_info": debrider_info,
         "get_rd_downloads": get_rd_downloads,
         "trakt_auth": trakt_auth,
         "trakt_auth_revoke": trakt_auth_revoke,
@@ -149,9 +177,9 @@ def addon_router():
         "torrent_action": torrent_action,
         "torrent_files": torrent_files,
         "torrentio_selection": torrentio_selection,
-        "get_telegram_files": get_telegram_files,
-        "get_telegram_latest": get_telegram_latest,
-        "get_telegram_latest_files": get_telegram_latest_files,
+        "list_telegram_files": list_telegram_files,
+        "list_telegram_latest": list_telegram_latest,
+        "list_telegram_latest_files": list_telegram_latest_files,
         "telegram_menu": telegram_menu,
         "display_picture": display_picture,
         "display_text": display_text,
@@ -164,7 +192,8 @@ def addon_router():
         "animation_item": animation_item,
         "stremio_toggle_addons": stremio_toggle_addons,
         "stremio_toggle_catalogs": stremio_toggle_catalogs,
-        "list_stremio_catalog": list_stremio_catalog,
+        "torrentio_toggle_providers": torrentio_toggle_providers,
+        "list_catalog": list_catalog,
         "list_stremio_seasons": list_stremio_seasons,
         "list_stremio_episodes": list_stremio_episodes,
         "list_stremio_tv_streams": list_stremio_tv_streams,
@@ -174,13 +203,17 @@ def addon_router():
         "stremio_login": stremio_login,
         "stremio_logout": stremio_logout,
         "stremio_update": stremio_update,
+        "show_changelog": show_changelog,
+        "add_custom_stremio_addon": add_custom_stremio_addon,
+        "delete_last_title_entry": delete_last_title_entry,
+        "kodi_logs": kodi_logs,
     }
 
     if param_string:
         kodilog(f"Param string: {param_string}", level=xbmc.LOGDEBUG)
         params = dict(parse.parse_qsl(param_string))
         kodilog(f"Parsed params: {params}", level=xbmc.LOGDEBUG)
-        action = params.get("action")
+        action = params.get("action", "")
         action_func = actions.get(action)
         if action_func:
             action_func(params)

@@ -1,22 +1,25 @@
+import base64
 from concurrent.futures import ThreadPoolExecutor
 import copy
+import json
 import requests
 from threading import Lock
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
-from lib.utils.debrid.ed_utils import EasyDebridHelper
-from lib.utils.debrid.pm_utils import PremiumizeHelper
-from lib.utils.debrid.torbox_utils import TorboxHelper
-from lib.utils.debrid.rd_utils import RealDebridHelper
+from lib.utils.debrid.debrider_helper import DebriderHelper
+from lib.utils.debrid.pm_helper import PremiumizeHelper
+from lib.utils.debrid.torbox_helper import TorboxHelper
+from lib.utils.debrid.rd_helper import RealDebridHelper
 from lib.utils.kodi.utils import get_setting, kodilog
 from lib.utils.torrent.torrserver_utils import extract_magnet_from_url
 from lib.utils.general.utils import (
     USER_AGENT_HEADER,
-    Debrids,
+    DebridType,
     Indexer,
     IndexerType,
     get_cached,
     get_info_hash_from_magnet,
+    is_debrider_enabled,
     is_ed_enabled,
     is_pm_enabled,
     is_rd_enabled,
@@ -27,7 +30,6 @@ from lib.utils.general.utils import (
 from lib.domain.torrent import TorrentStream
 
 from xbmcgui import Dialog
-
 
 
 def check_debrid_cached(
@@ -78,13 +80,13 @@ def get_cached_results(query: Optional[str], mode: str, media_type: str, episode
 def get_debrid_check_functions() -> List:
     check_functions = []
     if is_rd_enabled():
-        check_functions.append(RealDebridHelper().check_rd_cached)
+        check_functions.append(RealDebridHelper().check_cached)
     if is_tb_enabled():
-        check_functions.append(TorboxHelper().check_torbox_cached)
+        check_functions.append(TorboxHelper().check_cached)
     if is_pm_enabled():
-        check_functions.append(PremiumizeHelper().check_pm_cached)
-    if is_ed_enabled():
-        check_functions.append(EasyDebridHelper().check_ed_cached)
+        check_functions.append(PremiumizeHelper().check_cached)
+    if is_debrider_enabled():
+        check_functions.append(DebriderHelper().check_cached)
     return check_functions
 
 
@@ -96,7 +98,9 @@ def execute_debrid_checks(
     dialog: Dialog,
     lock: Lock,
 ):
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(
+        max_workers=int(get_setting("thread_number", 8))
+    ) as executor:
         futures = [
             executor.submit(
                 fn,
@@ -114,8 +118,8 @@ def execute_debrid_checks(
 
 
 def should_include_uncached() -> bool:
-    return any([is_tb_enabled(), is_pm_enabled(), is_ed_enabled()]) and get_setting(
-        "show_uncached"
+    return any([is_tb_enabled(), is_pm_enabled(), is_ed_enabled()]) and bool(
+        get_setting("show_uncached")
     )
 
 
@@ -132,51 +136,39 @@ def update_cache(
 
 
 def get_debrid_status(res: TorrentStream) -> str:
-    type = res.type
+    is_cached = res.isCached
 
     if res.isPack:
-        if type == Debrids.RD:
-            status_string = get_rd_status_pack(res)
+        if is_cached:
+            label = f"[B]Cached-[Pack][/B]"
         else:
-            status_string = f"[B]Cached-Pack[/B]"
+            label = f"[B]Download-[Pack][/B]"
     else:
-        if type == Debrids.RD:
-            status_string = get_rd_status(res)
+        if is_cached:
+            label = f"[B]Cached[/B]"
         else:
-            status_string = f"[B]Cached[/B]"
-
-    return status_string
-
-
-def get_rd_status(res: TorrentStream) -> str:
-    if res.isCached:
-        label = f"[B]Cached[/B]"
-    else:
-        label = f"[B]Download[/B]"
+            label = f"[B]Download[/B]"
     return label
 
 
-def get_rd_status_pack(res: TorrentStream) -> str:
-    if res.isCached:
-        label = f"[B]Pack-Cached[/B]"
+def get_pack_info(debrid_type, info_hash):
+    if debrid_type == DebridType.PM:
+        info = PremiumizeHelper().get_pack_info(info_hash)
+    elif debrid_type == DebridType.TB:
+        info = TorboxHelper().get_pack_info(info_hash)
+    elif debrid_type == DebridType.RD:
+        info = RealDebridHelper().get_pack_info(info_hash)
+    elif debrid_type == DebridType.DB:
+        info = DebriderHelper().get_pack_info(info_hash)
     else:
-        label = f"[B]Pack-Download[/B]"
-    return label
-
-
-def get_pack_info(type, info_hash):
-    if type == Debrids.PM:
-        info = PremiumizeHelper().get_pm_pack_info(info_hash)
-    elif type == Debrids.TB:
-        info = TorboxHelper().get_torbox_pack_info(info_hash)
-    elif type == Debrids.RD:
-        info = RealDebridHelper().get_rd_pack_info(info_hash)
-    elif type == Debrids.ED:
-        info = EasyDebridHelper().get_ed_pack_info(info_hash)
+        kodilog(f"Unknown debrid type: {debrid_type}")
+        info = {}
     return info
 
 
-def filter_results(results: List[TorrentStream], direct_results: List[dict]) -> None:
+def filter_results(
+    results: List[TorrentStream], direct_results: List[TorrentStream]
+) -> None:
     filtered_results = []
 
     for res in copy.deepcopy(results):
@@ -221,7 +213,7 @@ def get_magnet_from_uri(uri):
             if res.status_code == 200:
                 if res.is_redirect:
                     uri = res.headers.get("Location")
-                    if uri.startswith("magnet:"):
+                    if uri and uri.startswith("magnet:"):
                         magnet = uri
                         info_hash = get_info_hash_from_magnet(uri).lower()
                 elif res.headers.get("Content-Type") == "application/octet-stream":
@@ -231,20 +223,108 @@ def get_magnet_from_uri(uri):
     return magnet, info_hash
 
 
-def get_debrid_direct_url(type, data):
+def get_debrid_direct_url(debrid_type, data) -> Optional[Dict[str, Any]]:
     info_hash = data.get("info_hash", "")
-    if type == Debrids.RD:
-        return RealDebridHelper().get_rd_link(info_hash, data)
-    elif type == Debrids.PM:
-        return PremiumizeHelper().get_pm_link(info_hash, data)
-    elif type == Debrids.TB:
-        return TorboxHelper().get_torbox_link(info_hash)
-    elif type == Debrids.ED:
-        return EasyDebridHelper().get_ed_link(info_hash, data)
+    if debrid_type == DebridType.RD:
+        return RealDebridHelper().get_link(info_hash, data)
+    elif debrid_type == DebridType.PM:
+        return PremiumizeHelper().get_link(info_hash, data)
+    elif debrid_type == DebridType.TB:
+        return TorboxHelper().get_link(info_hash, data)
+    elif debrid_type == DebridType.DB:
+        return DebriderHelper().get_link(info_hash, data)
+    else:
+        kodilog(f"Unknown debrid type: {debrid_type}")
+        return None
 
 
-def get_debrid_pack_direct_url(file_id, torrent_id, type):
-    if type == Debrids.RD:
-        return RealDebridHelper().get_rd_pack_link(file_id, torrent_id)
-    elif type == Debrids.TB:
-        return TorboxHelper().get_torbox_pack_link(file_id, torrent_id)
+def get_debrid_pack_direct_url(debrid_type, data) -> Optional[Dict[str, Any]]:
+    if debrid_type == DebridType.RD:
+        return RealDebridHelper().get_pack_link(data)
+    elif debrid_type == DebridType.TB:
+        return TorboxHelper().get_pack_link(data)
+    else:
+        kodilog(f"Unknown debrid type for pack link: {type}")
+        return None
+
+
+def process_external_cache(data: dict, debrid: str, token: str, url: str):
+    try:
+        imdb_id = data.get("imdb_id")
+        season = data.get("season")
+        episode = data.get("episode")
+        mode = data.get("mode", data.get("media_type", "movie"))
+
+        if "torrentio" in url:
+            service = "torrentio"
+        elif "mediafusion" in url:
+            service = "mediafusion"
+        elif "comet" in url:
+            service = "comet"
+        else:
+            return None
+
+        if not imdb_id:
+            raise ValueError("Missing IMDb ID in input data")
+
+        if service == "mediafusion":
+            base_link = f"https://mediafusion.elfhosted.com/{debrid}={token}"
+            params = {
+                "enable_catalogs": False,
+                "max_streams_per_resolution": 99,
+                "torrent_sorting_priority": [],
+                "certification_filter": ["Disable"],
+                "nudity_filter": ["Disable"],
+                "streaming_provider": {
+                    "token": token,
+                    "service": debrid,
+                    "only_show_cached_streams": True,
+                },
+            }
+            headers = {
+                "encoded_user_data": base64.b64encode(
+                    json.dumps(params).encode("utf-8")
+                ).decode("utf-8")
+            }
+
+        elif service == "comet":
+            params = {
+                "maxResultsPerResolution": 0,
+                "maxSize": 0,
+                "cachedOnly": True,
+                "removeTrash": True,
+                "resultFormat": ["title", "size"],
+                "debridService": debrid,
+                "debridApiKey": token,
+                "debridStreamProxyPassword": "",
+                "languages": {"required": [], "exclude": [], "preferred": []},
+                "resolutions": {},
+                "options": {
+                    "remove_ranks_under": -10000000000,
+                    "allow_english_in_languages": False,
+                    "remove_unknown_languages": False,
+                },
+            }
+            params_encoded = base64.b64encode(
+                json.dumps(params).encode("utf-8")
+            ).decode("utf-8")
+            base_link = f"https://comet.elfhosted.com/{params_encoded}"
+            headers = {}
+
+        else:  # torrentio fallback
+            base_link = f"https://torrentio.strem.fun/{debrid}={token}"
+            headers = {"User-Agent": "Mozilla/5.0"}
+
+        # Choose endpoint based on media type
+        if mode == "tv":
+            endpoint = f"/stream/series/{imdb_id}:{season}:{episode}.json"
+        else:
+            endpoint = f"/stream/movie/{imdb_id}.json"
+
+        url = f"{base_link}{endpoint}"
+        response = requests.get(url, headers=headers, timeout=9)
+        response.raise_for_status()
+        return response
+    except Exception as e:
+        kodilog(f"Error checking cache for {url}: {e}")
+        return None

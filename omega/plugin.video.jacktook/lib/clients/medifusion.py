@@ -1,5 +1,5 @@
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Callable
 
 from lib.clients.base import BaseClient, TorrentStream
 from lib.utils.kodi.utils import convert_size_to_bytes, get_setting, translation
@@ -13,7 +13,7 @@ from requests.utils import urlparse
 
 
 class MediaFusion(BaseClient):
-    def __init__(self, host: str, notification: callable) -> None:
+    def __init__(self, host: str, notification: Callable) -> None:
         super().__init__(host, notification)
         self.encryption_url = "https://mediafusion.elfhosted.com/encrypt-user-data"
         self.api_key = self.extract_api_key()
@@ -66,6 +66,10 @@ class MediaFusion(BaseClient):
                 url = f"{self.host}/{self.api_key}/stream/series/{imdb_id}:{season}:{episode}.json"
             elif mode == "movies" or media_type == "movies":
                 url = f"{self.host}/{self.api_key}/stream/movie/{imdb_id}.json"
+            else:
+                self.handle_exception(translation(30233))
+                return None
+            
             res = self.session.get(url, headers=USER_AGENT_HEADER, timeout=10)
             if res.status_code != 200:
                 return

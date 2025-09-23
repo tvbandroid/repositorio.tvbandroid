@@ -231,6 +231,10 @@ msgctxt "#30244"
 msgid "Cache cleared"
 msgstr ""
 
+msgctxt #30249"
+msgid "Addon Jacktook Burst not found - (script.jacktook.burst)"
+msgstr ""
+
 msgctxt "#30250"
 msgid "Addon Torrest not found - (plugin.video.torrest)"
 msgstr ""
@@ -245,6 +249,22 @@ msgstr ""
 
 msgctxt "#30253"
 msgid "Addon Jacktorr not found - (plugin.video.jacktorr)"
+msgstr ""
+
+msgctxt "#30254"
+msgid "Do you want to install Elementum?"
+msgstr ""
+
+msgctxt "#30255"
+msgid "Do you want to install Jacktorr?"
+msgstr ""
+
+msgctxt "#30256"
+msgid "Do you want to install Torrest?"
+msgstr ""
+
+msgctxt "#30257"
+msgid "Do you want to install Jacktook Burst?"
 msgstr ""
 
 msgctxt "#30650"
@@ -332,7 +352,7 @@ msgid "Drop torrent"
 msgstr ""
 
 msgctxt "#30710"
-msgid "Filter TV Shows by Season and Episode"
+msgid "Include Season Packs"
 msgstr ""
 
 msgctxt "#30711"
@@ -636,7 +656,7 @@ msgid "TorBox Configuration"
 msgstr ""
 
 msgctxt "#30789"
-msgid "EasyDebrid Configuration"
+msgid "Debrider Configuration"
 msgstr ""
 
 msgctxt "#30790"
@@ -698,6 +718,14 @@ msgstr ""
 msgctxt "#30807"
 msgid "Peerfix Configuration"
 msgstr ""
+
+msgctxt "#30894"
+msgid "Show Changelog"
+msgstr "Show Changelog"
+
+msgctxt "#30895"
+msgid "View the latest changes and updates to the addon."
+msgstr "View the latest changes and updates to the addon."
 
 msgctxt "#40000"
 msgid "Arabic (United Arab Emirates)"
@@ -1072,7 +1100,7 @@ msgid "Jackgram server URL (e.g., http://localhost:9117)."
 msgstr ""
 
 msgctxt "#30828"
-msgid "EasyDebrid API key for authentication."
+msgid "Debrider API key for authentication."
 msgstr ""
 
 msgctxt "#30829"
@@ -1084,7 +1112,7 @@ msgid "Specify the torrent client."
 msgstr ""
 
 msgctxt "#30831"
-msgid "Enable EasyDebrid cached torrent support."
+msgid "Enable Debrider cached torrent support."
 msgstr ""
 
 msgctxt "#30832"
@@ -1104,7 +1132,7 @@ msgid "Authorize add-on to access Real-Debrid account."
 msgstr ""
 
 msgctxt "#30836"
-msgid "Enable torrent-based downloads for media content."
+msgid "Enable torrent-based media content. Disabling this restricts the addon to cached debrid content only."
 msgstr ""
 
 msgctxt "#30837"
@@ -1220,7 +1248,7 @@ msgid "Sources"
 msgstr ""
 
 msgctxt "#30865"
-msgid "Result Filters and Sorting"
+msgid "Filters and Sorting"
 msgstr ""
 
 msgctxt "#30866"
@@ -1240,8 +1268,8 @@ msgid "Enable Stremio add-ons integration."
 msgstr "Habilitar la integración de complementos de Stremio."
 
 msgctxt "#30870"
-msgid "Toggle Add-ons"
-msgstr "Alternar complementos"
+msgid "Select Addons"
+msgstr ""
 
 msgctxt "#30871"
 msgid "Log In to Stremio"
@@ -1252,7 +1280,7 @@ msgid "Enable or disable Stremio add-ons."
 msgstr "Habilitar o deshabilitar los complementos de Stremio."
 
 msgctxt "#30873"
-msgid "Prioritize results in the selected language"
+msgid "Select language for player subtitle selection"
 msgstr ""
 
 msgctxt "#30874"
@@ -1260,8 +1288,8 @@ msgid "Update Addons"
 msgstr ""
 
 msgctxt "#30875"
-msgid "Toggle Catalogs Add-ons"
-msgstr "Alternar complementos de catalogos"
+msgid "Select Catalogs Addons"
+msgstr ""
 
 msgctxt "#30876"
 msgid "Download directory"
@@ -1272,7 +1300,7 @@ msgid "Enable Trakt.tv Scrobbling"
 msgstr ""
 
 msgctxt "#30878"
-msgid "Auto select subtitle when playing"
+msgid "Auto-select subtitle when playing"
 msgstr ""
 
 msgctxt "#30879"
@@ -1333,4 +1361,395 @@ msgstr ""
 
 msgctxt "#30893"
 msgid "Stremio Subtitle Configuration"
+msgstr ""
+
+msgctxt "#90001"
+msgid "Add Custom Addon"
+msgstr "Add Custom Addon"
+
+msgctxt "#90002"
+msgid "Add a custom Stremio addon by entering its URL"
+msgstr "Agrega un complemento personalizado de Stremio ingresando su URL"
+
+msgctxt "#90003"
+msgid "Auto-select audio when playing"
+msgstr ""
+
+msgctxt "#90004"
+msgid "Audio Language"
+msgstr ""
+
+msgctxt "#90005"
+msgid "Select audio language for playing the video"
+msgstr ""
+
+msgctxt "#90006"
+msgid "Search"
+msgstr ""
+
+msgctxt "#90007"
+msgid "TV Shows"
+msgstr ""
+
+msgctxt "#90008"
+msgid "Movies"
+msgstr ""
+
+msgctxt "#90009"
+msgid "Anime"
+msgstr ""
+
+msgctxt "#90010"
+msgid "Live TV"
+msgstr ""
+
+msgctxt "#90011"
+msgid "Direct Search"
+msgstr ""
+
+msgctxt "#90012"
+msgid "Torrents"
+msgstr ""
+
+msgctxt "#90013"
+msgid "Telegram"
+msgstr ""
+
+msgctxt "#90014"
+msgid "Cloud"
+msgstr ""
+
+msgctxt "#90015"
+msgid "Downloads"
+msgstr ""
+
+msgctxt "#90016"
+msgid "Settings"
+msgstr ""
+
+msgctxt "#90017"
+msgid "History"
+msgstr ""
+
+msgctxt "#90018"
+msgid "Donate"
+msgstr ""
+
+msgctxt "#90019"
+msgid "Recently Watched Files"
+msgstr ""
+
+msgctxt "#90020"
+msgid "Recently Watched Titles"
+msgstr ""
+
+msgctxt "#90021"
+msgid "TV Calendar"
+msgstr ""
+
+msgctxt "#90022"
+msgid "If you enjoy using Jacktook and appreciate the time and effort that goes into developing this addon, please consider supporting me with a contribution:"
+msgstr ""
+
+msgctxt "#90023"
+msgid "Support Jacktook"
+msgstr ""
+
+msgctxt "#90024"
+msgid "Trending Recent"
+msgstr ""
+
+msgctxt "#90025"
+msgid "Genres"
+msgstr ""
+
+msgctxt "#90026"
+msgid "Calendar"
+msgstr ""
+
+msgctxt "#90027"
+msgid "Years"
+msgstr ""
+
+msgctxt "#90028"
+msgid "Trending"
+msgstr ""
+
+msgctxt "#90029"
+msgid "Most Watched"
+msgstr ""
+
+msgctxt "#90030"
+msgid "Most Favorited"
+msgstr ""
+
+msgctxt "#90031"
+msgid "Popular Lists"
+msgstr ""
+
+msgctxt "#90032"
+msgid "Trending Lists"
+msgstr ""
+
+msgctxt "#90033"
+msgid "Recomendations"
+msgstr ""
+
+msgctxt "#90034"
+msgid "Watched History"
+msgstr ""
+
+msgctxt "#90035"
+msgid "Watchlist"
+msgstr ""
+
+msgctxt "#90036"
+msgid "Top 10 BoxOffice"
+msgstr ""
+
+msgctxt "#90037"
+msgid "Popular"
+msgstr ""
+
+msgctxt "#90038"
+msgid "Popular Recent"
+msgstr ""
+
+msgctxt "#90039"
+msgid "Airing"
+msgstr ""
+
+msgctxt "#90040"
+msgid "Years"
+msgstr ""
+
+msgctxt "#90041"
+msgid "Genres"
+msgstr ""
+
+msgctxt "#90042"
+msgid "Top Rated"
+msgstr ""
+
+msgctxt "#90043"
+msgid "Most Watched"
+msgstr ""
+
+msgctxt "#90044"
+msgid "Torrentio Settings"
+msgstr ""
+
+msgctxt "#90045"
+msgid "Enable"
+msgstr ""
+
+msgctxt "#90046"
+msgid "Enable or disable the Torrentio settings"
+msgstr ""
+
+msgctxt "#90047"
+msgid "Select Torrentio Providers"
+msgstr ""
+
+msgctxt "#90048"
+msgid "Choose which providers to include in the stream request."
+msgstr ""
+
+# Context menus
+
+msgctxt "#90049"
+msgid "Scrape again"
+msgstr ""
+
+msgctxt "#90050"
+msgid "Recommendations"
+msgstr ""
+
+msgctxt "#90051"
+msgid "Similar"
+msgstr ""
+
+msgctxt "#90052"
+msgid "Thread Number"
+msgstr ""
+
+msgctxt "#90053"
+msgid "Select the number of threads (1-30)"
+msgstr ""
+
+msgctxt "#90054"
+msgid "Kodi logs"
+msgstr ""
+
+msgctxt "#90055"
+msgid "Kodi old logs"
+msgstr ""
+
+msgctxt "#90056"
+msgid "Displays Kodi logs to help diagnose issues."
+msgstr ""
+
+msgctxt "#90057"
+msgid "Logs"
+msgstr ""
+
+msgctxt "#90058"
+msgid "Filter by Size"
+msgstr ""
+
+msgctxt "#90059"
+msgid "Enable Size Filter"
+msgstr ""
+
+msgctxt "#90060"
+msgid "Minimum Size (MB)"
+msgstr ""
+
+msgctxt "#90061"
+msgid "Maximum Size (MB)"
+msgstr ""
+
+msgctxt "#90062"
+msgid "Enable Cached Search"
+msgstr ""
+
+msgctxt "#90063"
+msgid "Only show cached streams from external services"
+msgstr ""
+
+msgctxt "#90064"
+msgid "Popular"
+msgstr ""
+
+msgctxt "#90065"
+msgid "Languages"
+msgstr ""
+
+msgctxt "#90066"
+msgid "Networks"
+msgstr ""
+
+msgctxt "#90067"
+msgid "Collections"
+msgstr ""
+
+msgctxt "#90068"
+msgid "Search for collections:"
+msgstr ""
+
+msgctxt "#90069"
+msgid "Main Menu"
+msgstr ""
+
+msgctxt "#90070"
+msgid "Last Titles"
+msgstr ""
+
+msgctxt "#90071"
+msgid "Last Files"
+msgstr ""
+
+msgctxt "#90072"
+msgid "Trakt Lists"
+msgstr ""
+
+msgctxt "#90073"
+msgid "MDbList"
+msgstr ""
+
+msgctxt "#90074"
+msgid "Top Lists"
+msgstr ""
+
+msgctxt "#90075"
+msgid "User Lists"
+msgstr ""
+
+msgctxt "#90076"
+msgid "Search Lists"
+msgstr ""
+
+msgctxt "#90077"
+msgid "MDbList Configuration"
+msgstr ""
+
+msgctxt "#90078"
+msgid "People"
+msgstr ""
+
+msgctxt "#90079"
+msgid "Popular People"
+msgstr ""
+
+msgctxt "#90080"
+msgid "Latest People"
+msgstr ""
+
+msgctxt "#90081"
+msgid "Search People"
+msgstr ""
+
+msgctxt "#90082"
+msgid "Download subtitles"
+msgstr ""
+
+msgctxt "#90083"
+msgid "Download video"
+msgstr ""
+
+msgctxt "#90084"
+msgid "Browse into"
+msgstr ""
+
+msgctxt "#90085"
+msgid "Include TV show Specials"
+msgstr ""
+
+msgctxt "#90099"
+msgid "Filter by Source Type"
+msgstr ""
+
+# BluRay/UHD
+msgctxt "#90100"
+msgid "Include BluRay/UHD sources"
+msgstr ""
+
+msgctxt "#90105"
+msgid "Includes releases such as: BluRay, BluRay REMUX, BRRip, BDRip, UHDRip, REMUX"
+msgstr ""
+
+# WEB/HD
+msgctxt "#90101"
+msgid "Include WEB/HD sources"
+msgstr ""
+
+msgctxt "#90106"
+msgid "Includes releases such as: WEB-DL, WEB-DLRip, WEBRip, HDRip, WEBMux"
+msgstr ""
+
+# DVD/TV/SAT
+msgctxt "#90102"
+msgid "Include DVD/TV/SAT sources"
+msgstr ""
+
+msgctxt "#90107"
+msgid "Includes releases such as: DVD, DVDRip, HDTV, SATRip, TVRip, PPVRip, PDTV"
+msgstr ""
+
+# CAM/Screener
+msgctxt "#90103"
+msgid "Include CAM/Screener sources"
+msgstr ""
+
+msgctxt "#90108"
+msgid "Includes releases such as: CAM, TeleSync, TeleCine, SCR"
+msgstr ""
+
+# Unknown
+msgctxt "#90104"
+msgid "Include Unknown sources"
+msgstr ""
+
+msgctxt "#90109"
+msgid "Includes uncategorized or unidentified sources"
 msgstr ""

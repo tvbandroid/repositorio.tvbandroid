@@ -1,5 +1,5 @@
 import json
-from lib.clients.tmdb.utils import tmdb_get
+from lib.clients.tmdb.utils.utils import tmdb_get
 from lib.api.trakt.trakt import TraktAPI, TraktLists, TraktMovies, TraktTV
 from lib.api.trakt.trakt_utils import (
     add_trakt_watched_context_menu,
@@ -21,6 +21,7 @@ from lib.utils.kodi.utils import (
     kodilog,
     notification,
     play_media,
+    translation,
 )
 from .paginator import paginator_db
 
@@ -48,7 +49,7 @@ class BaseTraktClient:
             list_item.addContextMenuItems(
                 [
                     (
-                        "Rescrape item",
+                        translation(90049),
                         play_media(
                             name="search",
                             mode=mode,
@@ -305,7 +306,7 @@ class TraktPresentation:
             details = tmdb_get("movie_details", tmdb_id)
 
         list_item = ListItem(label=title)
-        set_media_infoTag(list_item, metadata=details, mode=mode)
+        set_media_infoTag(list_item, data=details, mode=mode)
 
         BaseTraktClient._add_media_directory_item(
             list_item=list_item,
@@ -332,7 +333,7 @@ class TraktPresentation:
             details = tmdb_get("movie_details", tmdb_id)
 
         list_item = ListItem(label=title)
-        set_media_infoTag(list_item, metadata=details, mode=mode)
+        set_media_infoTag(list_item, data=details, mode=mode)
 
         BaseTraktClient._add_media_directory_item(
             list_item=list_item,
@@ -356,7 +357,7 @@ class TraktPresentation:
             details = tmdb_get("movie_details", tmdb_id)
 
         list_item = ListItem(label=title)
-        set_media_infoTag(list_item, metadata=details, mode=mode)
+        set_media_infoTag(list_item, data=details, mode=mode)
 
         BaseTraktClient._add_media_directory_item(
             list_item=list_item,
@@ -406,7 +407,7 @@ class TraktPresentation:
             details = tmdb_get("movie_details", tmdb_id)
 
         list_item = ListItem(label=title)
-        set_media_infoTag(list_item, metadata=details, mode=mode)
+        set_media_infoTag(list_item, data=details, mode=mode)
 
         BaseTraktClient._add_media_directory_item(
             list_item=list_item,
@@ -452,7 +453,7 @@ class TraktPresentation:
             is_playable = True
 
         list_item = ListItem(title)
-        set_media_infoTag(list_item, metadata=details, mode=mode)
+        set_media_infoTag(list_item, data=details, mode=mode)
 
         add_kodi_dir_item(
             list_item,
@@ -476,7 +477,7 @@ class TraktPresentation:
             details = tmdb_get("movie_details", tmdb_id)
 
         list_item = ListItem(label=title)
-        set_media_infoTag(list_item, metadata=details, mode=mode)
+        set_media_infoTag(list_item, data=details, mode=mode)
 
         BaseTraktClient._add_media_directory_item(
             list_item=list_item,

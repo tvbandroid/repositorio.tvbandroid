@@ -1,11 +1,12 @@
 from lib.clients.base import BaseClient, TorrentStream
-from lib.utils.kodi.utils import translation
+from lib.utils.kodi.utils import get_setting, notification, translation
 from lib.utils.kodi.settings import get_prowlarr_timeout
-from typing import List, Optional, Any
+
+from typing import Dict, List, Optional, Any, Callable
 
 
 class Prowlarr(BaseClient):
-    def __init__(self, host: str, apikey: str, notification: callable) -> None:
+    def __init__(self, host: str, apikey: str, notification: Callable) -> None:
         super().__init__(host, notification)
         self.base_url = f"{self.host}/api/v1/search"
         self.apikey = apikey
@@ -24,10 +25,12 @@ class Prowlarr(BaseClient):
             "X-Api-Key": self.apikey,
         }
         try:
-            params = {"query": query, "type": "search"}
+            params: Dict[str, Any] = {"query": query, "type": "search"}
             if mode == "tv":
                 params["categories"] = [5000, 8000]
-                if season is not None and episode is not None:
+                if get_setting("include_season_packs"):
+                    params["query"] = f"{query} S{int(season):02d}"
+                else:
                     params["query"] = f"{query} S{int(season):02d}E{int(episode):02d}"
             elif mode == "movies":
                 params["categories"] = [2000, 8000]
@@ -47,7 +50,7 @@ class Prowlarr(BaseClient):
                 headers=headers,
             )
             if response.status_code != 200:
-                self.notification(f"{translation(30230)} {response.status_code}")
+                notification(f"{translation(30230)} {response.status_code}")
                 return None
             return self.parse_response(response)
         except Exception as e:

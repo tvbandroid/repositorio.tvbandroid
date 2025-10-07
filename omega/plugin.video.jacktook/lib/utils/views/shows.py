@@ -4,8 +4,9 @@ from lib.clients.tmdb.utils.utils import (
     add_tmdb_show_context_menu,
     tmdb_get,
 )
-from lib.utils.kodi.utils import ADDON_HANDLE, build_url, get_setting, kodilog
+from lib.utils.kodi.utils import ADDON_HANDLE, build_url, get_setting
 from lib.utils.general.utils import (
+    execute_thread_pool_collection,
     get_fanart_details,
     set_media_infoTag,
 )
@@ -31,47 +32,62 @@ def show_season_info(ids, mode, media_type):
     seasons = getattr(details, "seasons")
     fanart_details = get_fanart_details(tvdb_id=tvdb_id, mode=mode)
 
-    for season in seasons:
-        season_name = season.name
-        overview = season.overview
-        if not overview:
-            season.update({"overview": getattr(details, "overview", "")})
+    results = execute_thread_pool_collection(
+        seasons,
+        _process_season,
+        details,
+        name,
+        ids,
+        mode,
+        media_type,
+        fanart_details,
+    )
 
-        if "Miniseries" in season_name:
-            season_name = "Season 1"
+    # Sort by season number
+    results.sort(key=lambda x: x[0])
 
-        season_number = season.season_number
-        if season_number == 0 and not get_setting("include_tvshow_specials"):
-            continue
+    for _, url, list_item in results:
+        addDirectoryItem(ADDON_HANDLE, url, list_item, isFolder=True)
 
-        list_item = ListItem(label=season_name)
 
-        set_media_infoTag(list_item, data=season, fanart_data=fanart_details, mode=mode)
+def _process_season(season, details, name, ids, mode, media_type, fanart_details):
+    season_name = season.name
+    overview = season.overview
+    if not overview:
+        season.update({"overview": getattr(details, "overview", "")})
 
-        list_item.setProperty("IsPlayable", "false")
+    if "Miniseries" in season_name:
+        season_name = "Season 1"
 
-        context_menu = add_tmdb_show_context_menu(mode, ids)
+    season_number = season.season_number
+    if season_number == 0 and not get_setting("include_tvshow_specials"):
+        return  # skip specials if disabled
 
-        if is_trakt_auth():
-            context_menu += add_trakt_watched_context_menu(
-                "shows", season=season_number, ids=ids
-            )
+    list_item = ListItem(label=season_name)
 
-        list_item.addContextMenuItems(context_menu)
+    set_media_infoTag(list_item, data=season, fanart_data=fanart_details, mode=mode)
 
-        addDirectoryItem(
-            ADDON_HANDLE,
-            build_url(
-                "tv_episodes_details",
-                tv_name=name,
-                ids=ids,
-                mode=mode,
-                media_type=media_type,
-                season=season_number,
-            ),
-            list_item,
-            isFolder=True,
+    list_item.setProperty("IsPlayable", "false")
+
+    context_menu = add_tmdb_show_context_menu(mode, ids)
+
+    if is_trakt_auth():
+        context_menu += add_trakt_watched_context_menu(
+            "shows", season=season_number, ids=ids
         )
+
+    list_item.addContextMenuItems(context_menu)
+
+    url = build_url(
+        "tv_episodes_details",
+        tv_name=name,
+        ids=ids,
+        mode=mode,
+        media_type=media_type,
+        season=season_number,
+    )
+
+    return (season_number, url, list_item)
 
 
 def show_episode_info(tv_name, season, ids, mode, media_type):
@@ -80,39 +96,54 @@ def show_episode_info(tv_name, season, ids, mode, media_type):
     )
     fanart_details = get_fanart_details(tvdb_id=ids.get("tvdb_id"), mode=mode)
 
-    for episode in getattr(season_details, "episodes"):
-        ep_name = episode.name
-        episode_number = episode.episode_number
+    results = execute_thread_pool_collection(
+        getattr(season_details, "episodes"),
+        _process_episode,
+        tv_name,
+        season,
+        ids,
+        mode,
+        media_type,
+        fanart_details,
+    )
 
-        tv_data = {"name": ep_name, "episode": episode_number, "season": season}
+    # Sort by episode number
+    results.sort(key=lambda x: x[0])
 
-        list_item = ListItem(label=f"{season}x{episode_number}. {ep_name}")
+    for _, url, list_item in results:
+        addDirectoryItem(ADDON_HANDLE, url, list_item, isFolder=False)
 
-        set_media_infoTag(
-            list_item, data=episode, fanart_data=fanart_details, mode=mode
+
+def _process_episode(episode, tv_name, season, ids, mode, media_type, fanart_details):
+    ep_name = episode.name
+    episode_number = episode.episode_number
+
+    tv_data = {"name": ep_name, "episode": episode_number, "season": season}
+
+    list_item = ListItem(label=f"{season}x{episode_number}. {ep_name}")
+
+    set_media_infoTag(
+        list_item, data=episode, fanart_data=fanart_details, mode="episode"
+    )
+
+    list_item.setProperty("IsPlayable", "true")
+
+    context_menu = add_tmdb_episode_context_menu(mode, tv_name, tv_data, ids)
+
+    if is_trakt_auth():
+        context_menu += add_trakt_watched_context_menu(
+            "shows", season=season, episode=episode_number, ids=ids
         )
 
-        list_item.setProperty("IsPlayable", "true")
+    list_item.addContextMenuItems(context_menu)
 
-        context_menu = add_tmdb_episode_context_menu(mode, tv_name, tv_data, ids)
+    url = build_url(
+        "search",
+        mode=mode,
+        media_type=media_type,
+        query=tv_name,
+        ids=ids,
+        tv_data=tv_data,
+    )
 
-        if is_trakt_auth():
-            context_menu += add_trakt_watched_context_menu(
-                "shows", season=season, episode=episode_number, ids=ids
-            )
-
-        list_item.addContextMenuItems(context_menu)
-
-        addDirectoryItem(
-            ADDON_HANDLE,
-            build_url(
-                "search",
-                mode=mode,
-                media_type=media_type,
-                query=tv_name,
-                ids=ids,
-                tv_data=tv_data,
-            ),
-            list_item,
-            isFolder=False,
-        )
+    return (episode_number, url, list_item)

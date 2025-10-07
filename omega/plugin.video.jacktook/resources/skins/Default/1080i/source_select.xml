@@ -72,6 +72,8 @@
             <orientation>horizontal</orientation>
 			<ondown>1000</ondown> 
 			<itemgap>0</itemgap>
+			<visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
+
             <itemlayout width="200" height="60">
                 <control type="group">
                     <control type="label">
@@ -115,7 +117,6 @@
                     </control>
                 </control>
             </focusedlayout>
-            <visible>!String.IsEqual(Window().Property(instant_close),true)</visible>
         </control>
 
 		<!-- Filter Hint (right after quality header, before scrollbar) -->

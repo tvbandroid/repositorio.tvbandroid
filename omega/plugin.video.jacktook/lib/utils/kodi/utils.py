@@ -28,6 +28,7 @@ _URL = sys.argv[0]
 
 MOVIES_TYPE = "movies"
 SHOWS_TYPE = "tvshows"
+SEASONS_TYPE = "seasons"
 EPISODES_TYPE = "episodes"
 TITLES_TYPE = "titles"
 
@@ -98,6 +99,10 @@ def set_setting(id, value):
     Window(10000).setProperty(id, value)
 
 
+def get_property_no_fallback(prop: str):
+    return Window(10000).getProperty(prop)
+
+
 def get_property(prop: str):
     value = Window(10000).getProperty(prop)
     kodilog(f"Get property: {prop} = {value}", xbmc.LOGDEBUG)
@@ -107,6 +112,10 @@ def get_property(prop: str):
         if not value:
             return None
     return value
+
+
+def set_property_no_fallback(prop: str, value: Any):
+    Window(10000).setProperty(prop, value)
 
 
 def set_property(prop: str, value: Any):
@@ -137,12 +146,43 @@ def is_jacktorr_addon():
     return xbmc.getCondVisibility(f"System.HasAddon({JACKTORR_ADDON_ID})")
 
 
+def is_jacktorr_addon_enabled():
+    try:
+        addon = xbmcaddon.Addon(JACKTORR_ADDON_ID)
+        # If the addon is disabled, this will raise RuntimeError
+        return True
+    except RuntimeError:
+        # Addon exists but is disabled
+        return False
+
+
 def is_elementum_addon():
     return xbmc.getCondVisibility(f"System.HasAddon({ELEMENTUM_ADDON_ID})")
 
 
 def is_burst_addon():
     return xbmc.getCondVisibility(f"System.HasAddon({JACKTOOK_BURST_ADOON_ID})")
+
+
+def enable_addon(addon_id: str):
+    """
+    Enable a Kodi addon using JSON-RPC.
+    Returns True if successful, False otherwise.
+    """
+    request = {
+        "jsonrpc": "2.0",
+        "method": "Addons.SetAddonEnabled",
+        "params": {"addonid": addon_id, "enabled": True},
+        "id": 1,
+    }
+
+    try:
+        result = xbmc.executeJSONRPC(json.dumps(request))
+        response = json.loads(result)
+        return "error" not in response
+    except Exception as e:
+        xbmc.log(f"Failed to enable addon {addon_id}: {e}", level=xbmc.LOGERROR)
+        return False
 
 
 def translation(id_value):
@@ -194,18 +234,17 @@ def dialog_ok(heading, line1, line2="", line3=""):
     return xbmcgui.Dialog().ok(heading, compat(line1=line1, line2=line2, line3=line3))
 
 
-def dialog_text(heading, content="", file=None):
+def dialog_text(heading: str, content: str = "", file=None):
     dialog = xbmcgui.Dialog()
     if file:
         try:
             with open(file, encoding="utf-8") as r:
-                content = r.readlines()
-                content = "".join(content)
+                content = r.read()
         except Exception as e:
             logger(f"Error reading file {file}: {e}", xbmc.LOGERROR)
             notification("Error reading file.")
             return
-    dialog.textviewer(heading, str(content), False)
+    dialog.textviewer(heading, content, False)
     return dialog
 
 
@@ -377,11 +416,7 @@ def get_current_view_id():
     return xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
 
 
-def set_view_mode(view_id):
-    xbmc.executebuiltin("Container.SetViewMode({})".format(view_id))
-
-
-def set_view(name):
+def set_view(name, default="current"):
     views_dict = {
         "list": 50,
         "poster": 51,
@@ -392,8 +427,10 @@ def set_view(name):
         "wall": 500,
         "banner": 501,
         "fanart": 502,
+        "current": get_current_view_id(),
     }
-    execute_builtin("Container.SetViewMode({})".format(views_dict[name]))
+    view_id = views_dict.get(name, views_dict.get(default))
+    execute_builtin(f"Container.SetViewMode({view_id})")
 
 
 def container_content():

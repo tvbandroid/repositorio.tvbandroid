@@ -112,12 +112,12 @@ msgid "Cache expiration hours"
 msgstr "Expiracion de Cache"
 
 msgctxt "#30106"
-msgid "Clear cache"
-msgstr "Borrar la cache"
+msgid "Clear Cache"
+msgstr "Borrar la Cache"
 
 msgctxt "#30107"
-msgid "Enable cache"
-msgstr "Habilitar cache"
+msgid "Enable Cache"
+msgstr "Habilitar Cache"
 
 msgctxt "#30140"
 msgid "AniList"
@@ -1737,3 +1737,31 @@ msgstr "Incluir fuentes desconocidas"
 msgctxt "#90109"
 msgid "Includes uncategorized or unidentified sources"
 msgstr "Incluye fuentes no categorizadas o no identificadas"
+
+msgctxt "#90110"
+msgid "Do you want to clear your watched history?."
+msgstr "¿Quieres borrar tu historial de vistos?"
+
+msgctxt "#90111"
+msgid "Do you want to clear your history?."
+msgstr "¿Quieres borrar tu historial?"
+
+msgctxt "#90112"
+msgid "Clear History"
+msgstr "Borrar Historial"
+
+msgctxt "#90113"
+msgid "Click to delete all watched history immediately."
+msgstr "Click para borrar todo tu historial inmediatamente"
+
+msgctxt "#90114"
+msgid "History cleared"
+msgstr "Historial borrado"
+
+msgctxt "#90115"
+msgid "Sources selection"
+msgstr "Seleccionar Fuentes"
+
+msgctxt "#90116"
+msgid "Open Settings"
+msgstr "Abrir Configuracion"

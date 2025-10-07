@@ -3,6 +3,7 @@ from copy import deepcopy
 import json
 from typing import Any, Dict, Tuple
 from lib.domain.torrent import TorrentStream
+from lib.utils.player.utils import resolve_playback_url
 from lib.utils.torrent.resolve_to_magnet import resolve_to_magnet
 from lib.utils.general.utils import Indexer, IndexerType
 from lib.utils.kodi.utils import ADDON, kodilog
@@ -15,9 +16,10 @@ ACTION_NAV_BACK = 92
 
 
 class BaseWindow(xbmcgui.WindowXMLDialog):
-    def __init__(self, xml_file, location, item_information=None):
+    def __init__(self, xml_file, location, item_information=None, previous_window=None):
         super().__init__(xml_file, location)
         self.item_information = {}
+        self.previous_window = previous_window
         self.CACHE_KEY = ""
         self._last_focused_control = (None, None)
         self.action_exitkeys_id = {
@@ -25,10 +27,8 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
             ACTION_PLAYER_STOP,
             ACTION_NAV_BACK,
         }
-
         if item_information is None:
             return
-
         self.add_item_information_to_window(item_information)
 
     def onInit(self):
@@ -111,9 +111,11 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
     def onAction(self, action):
         action_id = action.getId()
         if action_id in self.action_exitkeys_id:
+            if self.previous_window:
+                self.previous_window.setProperty("instant_close", "true")
+                self.previous_window.close()
             self.close()
-            return
-        if action_id != 7:  # Enter(7) also fires an onClick event
+        elif action_id != 7:
             self.handle_action(action_id, self.getFocusId())
 
     def prepare_source_data(
@@ -126,7 +128,6 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
     ) -> Dict[str, Any]:
         """Prepare the source data dictionary for resolving playback."""
         return {
-            "title": source.title,
             "type": source.type,
             "debrid_type": source.debridType,
             "indexer": source.indexer,
@@ -172,6 +173,16 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
             url = source.url
 
         return url, magnet, is_torrent
+
+    def _ensure_playback_info(self, source: TorrentStream):
+        url, magnet, is_torrent = self.get_source_details(source=source)
+        source_data = self.prepare_source_data(
+            source=source,
+            url=url,
+            magnet=magnet,
+            is_torrent=is_torrent,
+        )
+        return resolve_playback_url(source_data) or {}
 
     @abc.abstractmethod
     def handle_action(self, action_id, control_id=None):

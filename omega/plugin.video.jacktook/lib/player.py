@@ -37,7 +37,7 @@ video_fullscreen_check = "Window.IsActive(fullscreenvideo)"
 
 
 class JacktookPLayer(xbmc.Player):
-    def __init__(self):
+    def __init__(self, on_started=None, on_error=None):
         xbmc.Player.__init__(self)
         self.url = None
         self.kodi_monitor = xbmc.Monitor()
@@ -53,6 +53,8 @@ class JacktookPLayer(xbmc.Player):
         self.notification = notification
         self.lang_code = "en"
         self.subtitles_found = False
+        self.on_started = on_started
+        self.on_error = on_error
 
     def run(self, data={}):
         self.set_constants(data)
@@ -69,14 +71,17 @@ class JacktookPLayer(xbmc.Player):
                 self.build_playlist()
             self.play_video(self.list_item)
         except Exception as e:
-            kodilog(traceback.print_exc())
-            kodilog(f"Error during playback: {e}")
-            self.run_error()
+            self.run_error(e)
         finally:
             try:
                 del self.kodi_monitor
             except:
                 pass
+
+    def onPlayBackError(self):
+        notification("Playback failed")
+        if self.on_error:
+            self.on_error()
 
     def play_video(self, list_item):
         close_busy_dialog()
@@ -104,12 +109,14 @@ class JacktookPLayer(xbmc.Player):
             else:
                 if self.cancel_all_playback:
                     self.kill_dialog()
+                if self.on_error:
+                    self.on_error()
                 self.stop()
 
         except Exception as e:
             kodilog(f"Error during playback: {e}")
             kodilog(traceback.format_exc())
-            self.run_error()
+            self.run_error(e)
         finally:
             try:
                 del self.kodi_monitor
@@ -141,31 +148,43 @@ class JacktookPLayer(xbmc.Player):
         else:
             kodilog("No subtitle handling method selected, skipping subtitle loading")
 
-    def check_playback_start(self):
-        resolve_percent = 0
+    def check_playback_start(self, timeout_ms=15000, check_interval_ms=50):
+        elapsed_ms = 0
+        self.playback_successful = None
 
         while self.playback_successful is None:
+            # Abort requested
             if self.kodi_monitor.abortRequested():
                 self.cancel_all_playback = True
                 self.playback_successful = False
-            elif resolve_percent >= 100:
+                break
+
+            # Timeout reached
+            if elapsed_ms >= timeout_ms:
+                kodilog("Playback check timeout")
                 self.playback_successful = False
-            elif get_visibility("Window.IsTopMost(okdialog)"):
+                break
+
+            if get_visibility("Window.IsTopMost(okdialog)"):
                 execute_builtin("SendClick(okdialog, 11)")
                 self.playback_successful = False
-            elif self.isPlayingVideo():
+                break
+
+            # Check if video is playing and fullscreen
+            if self.isPlayingVideo():
                 try:
                     if self.getTotalTime() not in total_time_errors and get_visibility(
                         video_fullscreen_check
                     ):
                         self.playback_successful = True
-
+                        if self.on_started:
+                            self.on_started()
                         break
                 except Exception as e:
                     kodilog(f"Error in check_playback_start: {e}")
 
-            resolve_percent = round(resolve_percent + 26.0 / 100, 1)
-            sleep(50)
+            xbmc.sleep(check_interval_ms)
+            elapsed_ms += check_interval_ms
 
     def handle_subtitle_selection(self):
         """
@@ -409,8 +428,11 @@ class JacktookPLayer(xbmc.Player):
         close_all_dialog()
         setResolvedUrl(ADDON_HANDLE, False, ListItem(offscreen=True))
 
-    def run_error(self):
+    def run_error(self, e: Exception):
         self.playback_successful = False
+        kodilog(f"Playback Error: {e}")
+        if self.on_error:
+            self.on_error()
         self.clear_playback_properties()
         self.cancel_playback()
         notification("Playback Failed", time=3500)

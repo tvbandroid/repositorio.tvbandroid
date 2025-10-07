@@ -1,10 +1,11 @@
+from datetime import datetime
 import json
 import os
 
 from lib.clients.tmdb.utils.utils import tmdb_get
 from lib.db.pickle_db import PickleDatabase
 from lib.jacktook.utils import kodilog
-from lib.utils.general.utils import set_media_infoTag, set_pluging_category
+from lib.utils.general.utils import parse_time, set_media_infoTag, set_pluging_category
 from lib.utils.kodi.utils import (
     ADDON_HANDLE,
     ADDON_PATH,
@@ -40,6 +41,8 @@ def show_last_titles(params):
     start = (page - 1) * per_page
     end = start + per_page
     items = all_items[start:end]
+
+    items = sorted(items, key=parse_time, reverse=True)
 
     # Add "Clear Titles" button
     list_item = ListItem(label="Clear Titles")

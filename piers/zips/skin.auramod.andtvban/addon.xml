@@ -1,11 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<addon id="skin.auramod.andtvban" version="2.0.2" name="[COLOR azure]Auramod[/COLOR][COLOR turquoise]TVBAN[/COLOR]" provider-name="Auramod, [COLOR azure]andTVban, JoseAnd[/COLOR]">
+<addon id="skin.auramod.andtvban" version="2.0.2" name="[COLOR azure]Auramod[/COLOR][COLOR turquoise]TVBAN[/COLOR]" provider-name="[COLOR azure]JoseAnd_andTVban[/COLOR], Auramod">
     <requires>
         <import addon="xbmc.gui" version="5.17.0"/>
         <import addon="script.skin.helper.service" version="1.1.24"/>
         <import addon="script.skin.helper.widgets" version="1.0.0"/>
         <import addon="script.skinshortcuts" version="2.0.3"/>
         <import addon="script.image.resource.select" version="0.0.5"/>
+		<import addon="plugin.video.themoviedb.helper" version="4.3.7"/>
 		<import addon="service.library.data.provider" version="0.0.7"/>
         <import addon="plugin.program.autocompletion" version="1.0.1"/>
         <import addon="resource.images.studios.white" version="0.0.30"/>
@@ -17,10 +18,10 @@
         <res width="1920" height="1080" aspect="16:9" default="true" folder="1080i"/>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="es">[COLOR azure]Mod [COLOR turquoise]TVBAN[/COLOR] [COLOR azure]de auramod.andtvban para [COLOR steelblue]Kodi 21 [COLOR azure]/ [COLOR cyan]Omega [COLOR azure]Minimalista, Personalizable, Multiple Widgets.[/COLOR] </summary>
-        <description lang="es">Mod [COLOR turquoise]TVBAN[/COLOR] de AuraMod. Esta versión de Aura está basada para todos los usuarios. Editado por José Andrés</description>
+        <summary lang="es">[COLOR azure]Mod [COLOR turquoise]TVBAN [COLOR azure]de auramod.andtvban para [COLOR steelblue]Kodi 22 [COLOR azure]/ [COLOR cyan]Piers [COLOR azure]Minimalista, Personalizable, Múltiples Widgets.[/COLOR]</summary>
+        <description lang="es">[B]Mod [COLOR turquoise]TVBAN[/COLOR] de AuraMod. Esta versión de Aura está basada para Todos los usuarios. [COLOR tan]Modificado por: [COLOR azure]JoséAnd_Teba[/B]</description>
 		<news>[COLOR tan]Nuevos cambios:[/COLOR]
-		- Skin modificada por [COLOR darkviolet]JoseAnd[/COLOR] para Kodi 21 Omega andTVban.
+		- Skin modificada por [COLOR darkviolet]JoseAnd_andTVban[/COLOR] para Kodi 22 Piers.
 		</news> 
         <platform>all</platform>
         <license>Creative Commons Attribution Non-Commercial Share-Alike 4.0</license>

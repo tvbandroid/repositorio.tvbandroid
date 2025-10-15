@@ -1,0 +1,17 @@
+Version 5.1.130 (Apr 13, 2024)
+- Code Base Changes:
+    - None
+
+- Resolvers Added:
+    - bewab
+    - asumanaksoy
+
+- Resolvers Fixed/Updated:
+    - filelions
+    - videooo
+
+- Resolvers Removed
+    - None
+
+- Languages Added/Updated
+    - None

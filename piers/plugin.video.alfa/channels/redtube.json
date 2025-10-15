@@ -1,0 +1,15 @@
+{
+  "id": "redtube",
+  "name": "redtube",
+  "active": true,
+  "adult": true,
+  "language": ["*"],
+  "thumbnail": "https://i.postimg.cc/G34ttR2G/redtube-logo.png",
+  "banner": "",
+  "fanart": "",
+  "categories": [
+    "adult"
+  ],
+  "settings": [
+  ]
+}

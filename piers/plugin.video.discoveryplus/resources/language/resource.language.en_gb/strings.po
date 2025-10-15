@@ -1,0 +1,214 @@
+# discovery+ language file
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.discoveryplus\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-09-25 23:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: English\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#30000"
+msgid "General"
+msgstr ""
+
+msgctxt "#30001"
+msgid "Logout"
+msgstr ""
+
+msgctxt "#30002"
+msgid "Playable "
+msgstr ""
+
+msgctxt "#30003"
+msgid "No search query provided."
+msgstr ""
+
+#empty strings from id 30004 to 30005
+
+msgctxt "#30006"
+msgid "Error"
+msgstr ""
+
+msgctxt "#30007"
+msgid "Search"
+msgstr ""
+
+msgctxt "#30008"
+msgid "[Kids]"
+msgstr ""
+
+msgctxt "#30009"
+msgid "Add to My List (discovery+)"
+msgstr ""
+
+msgctxt "#30010"
+msgid "Delete from My List (discovery+)"
+msgstr ""
+
+msgctxt "#30011"
+msgid "Season"
+msgstr ""
+
+msgctxt "#30012"
+msgid "Wrong email or password"
+msgstr ""
+
+msgctxt "#30013"
+msgid "[Active profile]"
+msgstr ""
+
+msgctxt "#30014"
+msgid "Watch"
+msgstr ""
+
+#empty strings from id 30015 to 30016
+
+msgctxt "#30017"
+msgid "Favorites"
+msgstr ""
+
+msgctxt "#30018"
+msgid "Results per Page"
+msgstr ""
+
+msgctxt "#30019"
+msgid "Next Page"
+msgstr ""
+
+msgctxt "#30020"
+msgid "Use cookies.txt file"
+msgstr ""
+
+msgctxt "#30021"
+msgid "Cookies.txt location"
+msgstr ""
+
+msgctxt "#30022"
+msgid "It looks like you are not logged in to discovery+. Please login using Chrome and export cookies to file or set cookie in add-on settings."
+msgstr ""
+
+msgctxt "#30023"
+msgid "Integration"
+msgstr ""
+
+msgctxt "#30024"
+msgid "Install IPTV Manager add-on"
+msgstr ""
+
+msgctxt "#30025"
+msgid "Enable IPTV Manager integration"
+msgstr ""
+
+msgctxt "#30026"
+msgid "IPTV Manager settings…"
+msgstr ""
+
+msgctxt "#30027"
+msgid "Sync to Discovery+"
+msgstr ""
+
+msgctxt "#30028"
+msgid "Use InputStream Adaptive"
+msgstr ""
+
+msgctxt "#30029"
+msgid "Enable UHD (experimental) / USA only"
+msgstr ""
+
+msgctxt "#30030"
+msgid "Login"
+msgstr ""
+
+msgctxt "#30031"
+msgid "Views"
+msgstr ""
+
+msgctxt "#30032"
+msgid "Hide non season categories from seasons page"
+msgstr ""
+
+msgctxt "#30033"
+msgid "Flatten TV show seasons if only one season"
+msgstr ""
+
+msgctxt "#30034"
+msgid "[Subscription needed]"
+msgstr ""
+
+msgctxt "#30035"
+msgid "Reset settings"
+msgstr ""
+
+msgctxt "#30036"
+msgid "Profiles"
+msgstr ""
+
+msgctxt "#30037"
+msgid "[PIN-Code required]"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Enter the PIN for the profile"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Cookie"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Channels"
+msgstr ""
+
+msgctxt "#30041"
+msgid "Use DRM"
+msgstr ""
+
+msgctxt "#30042"
+msgid "Mark as unwatched (d+)"
+msgstr ""
+
+msgctxt "#30043"
+msgid "Mark as watched (d+)"
+msgstr ""
+
+msgctxt "#30044"
+msgid "Reset resume position (d+)"
+msgstr ""
+
+msgctxt "#30045"
+msgid "Show watched season markers"
+msgstr ""
+
+msgctxt "#30046"
+msgid "Go on your mobile phone, tablet or computer[CR]{linkDevice_url}[CR]When prompted, enter this 6-digit code:[CR]{linkingCode}"
+msgstr ""
+
+msgctxt "#30047"
+msgid "Warning: This will slow down loading seasons page"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Select first unwatched TV show season / episode"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Never"
+msgstr ""
+
+msgctxt "#30050"
+msgid "On first entry"
+msgstr ""
+
+msgctxt "#30051"
+msgid "Always"
+msgstr ""
+
+msgctxt "#30052"
+msgid "Automatic select for season only works when 'season markers' is on"
+msgstr ""

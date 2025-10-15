@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<addon id="skin.auramod.andtvban" version="2.0.2" name="[COLOR azure]Auramod[/COLOR][COLOR turquoise]TVBAN[/COLOR]" provider-name="Auramod, [COLOR azure]andTVban, JoseAnd[/COLOR]">
+    <requires>
+        <import addon="xbmc.gui" version="5.17.0"/>
+        <import addon="script.skin.helper.service" version="1.1.24"/>
+        <import addon="script.skin.helper.widgets" version="1.0.0"/>
+        <import addon="script.skinshortcuts" version="2.0.3"/>
+        <import addon="script.image.resource.select" version="0.0.5"/>
+		<import addon="service.library.data.provider" version="0.0.7"/>
+        <import addon="plugin.program.autocompletion" version="1.0.1"/>
+        <import addon="resource.images.studios.white" version="0.0.30"/>
+        <import addon="resource.images.studios.coloured" version="0.0.18"/>
+        <import addon="resource.images.moviegenreicons.transparent" version="0.0.6"/>
+		<import addon="script.colorbox" version="2.0.8"/>
+    </requires>
+    <extension point="xbmc.gui.skin" defaultthemename="Textures.xbt" debugging="false" effectslowdown="1">
+        <res width="1920" height="1080" aspect="16:9" default="true" folder="1080i"/>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es">[COLOR azure]Mod [COLOR turquoise]TVBAN[/COLOR] [COLOR azure]de auramod.andtvban para [COLOR steelblue]Kodi 21 [COLOR azure]/ [COLOR cyan]Omega [COLOR azure]Minimalista, Personalizable, Multiple Widgets.[/COLOR] </summary>
+        <description lang="es">Mod [COLOR turquoise]TVBAN[/COLOR] de AuraMod. Esta versión de Aura está basada para todos los usuarios. Editado por José Andrés</description>
+		<news>[COLOR tan]Nuevos cambios:[/COLOR]
+		- Skin modificada por [COLOR darkviolet]JoseAnd[/COLOR] para Kodi 21 Omega andTVban.
+		</news> 
+        <platform>all</platform>
+        <license>Creative Commons Attribution Non-Commercial Share-Alike 4.0</license>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+            <screenshot>resources/screenshot-01.jpg</screenshot>
+            <screenshot>resources/screenshot-02.jpg</screenshot>
+            <screenshot>resources/screenshot-03.jpg</screenshot>
+            <screenshot>resources/screenshot-04.jpg</screenshot>
+            <screenshot>resources/screenshot-05.jpg</screenshot>
+        </assets>
+    </extension>
+</addon>

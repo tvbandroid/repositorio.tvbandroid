@@ -2,13 +2,15 @@ from tmdbhelper.lib.api.tvdb.api import TVDb
 from tmdbhelper.lib.api.tmdb.api import TMDb
 from tmdbhelper.lib.addon.dialog import ProgressDialog
 from tmdbhelper.lib.files.futils import dumps_to_file
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
+from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 
 
 class AwardsBuilder():
     def __init__(self):
         self.tvdb_api = TVDb()
         self.tmdb_api = TMDb()
+        self.query_database = FindQueriesDatabase()
         self.listings_tvdb = {'movie': {}, 'series': {}}
         self.listings_tmdb = {'movie': {}, 'tv': {}}
         self._pd = None
@@ -67,9 +69,9 @@ class AwardsBuilder():
         def _get_tmdb_id(tvdb_id, v):
             tmdb_id = None
             if tmdb_type == 'tv':
-                tmdb_id = self.tmdb_api.get_tmdb_id(tmdb_type, tvdb_id=tvdb_id, query=v.get('name'), year=v.get('year'))
+                tmdb_id = self.query_database.get_tmdb_id(tmdb_type, tvdb_id=tvdb_id, query=v.get('name'), year=v.get('year'))
             else:
-                tmdb_id = self.tmdb_api.get_tmdb_id(tmdb_type, query=v.get('name'), year=v.get('year'))
+                tmdb_id = self.query_database.get_tmdb_id(tmdb_type, query=v.get('name'), year=v.get('year'))
             if not tmdb_id:
                 self._pd.update(f'Failed to get TMDb ID for {v.get("name")}')
                 return
@@ -83,7 +85,7 @@ class AwardsBuilder():
             tmdb_type = {'movie': 'movie', 'series': 'tv'}[i_type]
             self._pd.update('Getting TMDb IDs', total=len(self.listings_tvdb[i_type]))
             for tvdb_id, v in self.listings_tvdb[i_type].items():
-                t = Thread(target=_get_tmdb_id, args=[tvdb_id, v])
+                t = SafeThread(target=_get_tmdb_id, args=[tvdb_id, v])
                 t.start()
                 _pool.append(t)
                 if len(_pool) >= _threads:

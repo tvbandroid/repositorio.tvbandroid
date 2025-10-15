@@ -3,16 +3,15 @@ from xbmc import Monitor
 from itertools import zip_longest
 from tmdbhelper.lib.items.router import Router
 from tmdbhelper.lib.addon.dialog import BusyDialog
-from tmdbhelper.lib.addon.thread import ParallelThread
+from tmdbhelper.lib.addon.thread import ParallelThread, SafeThread
 from tmdbhelper.lib.addon.plugin import get_infolabel, executebuiltin, get_condvisibility, ADDONPATH
-from tmdbhelper.lib.api.tmdb.api import TMDb
 from jurialmunkey.window import get_property, WindowProperty, wait_until_active
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
-from threading import Thread
+from tmdbhelper.lib.query.database.database import FindQueriesDatabase
 
 
-TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', 'episode_year',)
-TMDB_AFFIX = '&fanarttv=false&cacheonly=true'
+TMDB_QUERY_PARAMS = ('imdb_id', 'tvdb_id', 'query', 'year', )
+TMDB_AFFIX = '&cacheonly=true'
 PROP_LIST_VISIBLE = 'List_{}_Visible'
 PROP_LIST_ISUPDATING = 'List_{}_IsUpdating'
 PROP_HIDEINFO = 'Recommendations.HideInfo'
@@ -24,19 +23,20 @@ PROP_ONCLOSED = 'Recommendations.OnClosed'
 
 ACTION_CONTEXT_MENU = (117,)
 ACTION_SHOW_INFO = (11,)
-ACTION_SELECT = (7, )
+ACTION_SELECT = (7, 100, )
 ACTION_CLOSEWINDOW = (9, 10, 92, 216, 247, 257, 275, 61467, 61448,)
 ID_VIDEOINFO = 12003
 
 
 """
 Runscript(plugin.video.themoviedb.helper,recommendations=)
-recommendations=list_id(int)|paramstring(str)|related(bool)|action(str) [Separate multiples with || ]
+recommendations=list_id(int)|paramstring(str)|related(bool)|action(str)|close(str) [Separate multiples with || ]
     * The lists to add. Separate additional lists with ||
     * list_id: the container that the items will be added
     * paramstring: the tmdbhelper base path such as info=cast
     * related: whether to add related query params to the paramstring
     * action: the action to perform. can be info|play|text or a Kodi builtin
+    * close: override window close and execute a Kodi builtin instead
 window_id=window_id(int)
     * The custom window that will act as the base window
 setproperty=property(str)
@@ -52,7 +52,35 @@ context=builtin(str)
 script-tmdbhelper-recommendations.xml
 <onload>SetProperty(Action_{list_id},action)</onload>
     * Set an action for an undefined list
+<onload>SetProperty(Close_{list_id},builtin)</onload>
+    * Set a builtin to execute instead of closing for an undefined list
 """
+
+
+class RecommendationsValues():
+    def __init__(self, *args):
+        self.values = args
+        self.list_id = int(self.values[0])
+        self.url = self.values[1]
+        self.related = self.get_value(2, fallback='').lower() == 'true'
+        self.action = self.get_value(3)
+        self.close = self.get_value(4)
+
+    @property
+    def output_dictionary(self):
+        return {
+            'list_id': self.list_id,
+            'url': self.url,
+            'related': self.related,
+            'action': self.action,
+            'close': self.close,
+        }
+
+    def get_value(self, x, fallback=None):
+        try:
+            return self.values[x]
+        except IndexError:
+            return fallback
 
 
 class WindowRecommendations(xbmcgui.WindowXMLDialog):
@@ -61,15 +89,14 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         self._initialised = False
         self._state = None
         self._monitor = Monitor()
-        self._tmdb_api = TMDb()
         self._tmdb_type = get_property(PROP_TMDBTYPE, kwargs['tmdb_type'])
         self._tmdb_affix = f"&nextpage=false{kwargs.get('affix') or TMDB_AFFIX}"
         self._tmdb_query = {i: kwargs[i] for i in TMDB_QUERY_PARAMS if kwargs.get(i)}
-        self._tmdb_id = kwargs.get('tmdb_id') or self._tmdb_api.get_tmdb_id(tmdb_type=self._tmdb_type, **self._tmdb_query)
-        self._recommendations = sorted(kwargs['recommendations'].split('||'))
+        self._tmdb_id = kwargs.get('tmdb_id') or FindQueriesDatabase().get_tmdb_id(tmdb_type=self._tmdb_type, **self._tmdb_query)
         self._recommendations = {
-            int(list_id): {'list_id': int(list_id), 'url': url, 'related': related.lower() == 'true', 'action': action}
-            for list_id, url, related, action in (i.split('|') for i in self._recommendations)}
+            rv.list_id: rv.output_dictionary
+            for rv in (RecommendationsValues(*i.split('|')) for i in sorted(kwargs['recommendations'].split('||')))
+        }
         self._queue = (i for i in self._recommendations)
         self._context_action = kwargs.get('context')
         self._window_id = kwargs['window_id']
@@ -99,7 +126,7 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
         _list_id = self._add_items(_next_id, _listitems)
         _list_id = self._focus_id or _list_id  # Allow skinner to override first list default focus
 
-        Thread(target=self._build_all_in_groups, args=[3, _list_id]).start()  # Don't block closing
+        SafeThread(target=self._build_all_in_groups, args=[3, _list_id]).start()  # Don't block closing
         self.setProperty(PROP_LIST_VISIBLE.format('Main'), 'True')
 
     def _build_next(self):
@@ -129,13 +156,20 @@ class WindowRecommendations(xbmcgui.WindowXMLDialog):
     def onAction(self, action):
         _action_id = action.getId()
         if _action_id in ACTION_CLOSEWINDOW:
-            return self.do_close()
+            return self.do_back()
         if _action_id in ACTION_SHOW_INFO:
             return self.do_action()
         if _action_id in ACTION_CONTEXT_MENU:
             return executebuiltin(self._context_action) if self._context_action else self.do_action()
         if _action_id in ACTION_SELECT:
             return self.do_action()
+
+    def do_back(self):
+        focus_id = self.getFocusId()
+        _action = self.getProperty(f'Close_{focus_id}') or self._recommendations.get(focus_id, {}).get('close')
+        if not _action:
+            return self.do_close()
+        return executebuiltin(_action)
 
     def do_close(self):
         self._state = 'onback'
@@ -260,7 +294,7 @@ class WindowRecommendationsManager():
     def on_info_new(self):
         _tmdb_type = self._kwargs['tmdb_type']
         _tmdb_query = {i: self._kwargs[i] for i in TMDB_QUERY_PARAMS if self._kwargs.get(i)}
-        _tmdb_id = self._kwargs.get('tmdb_id') or TMDb().get_tmdb_id(tmdb_type=_tmdb_type, **_tmdb_query)
+        _tmdb_id = self._kwargs.get('tmdb_id') or FindQueriesDatabase().get_tmdb_id(tmdb_type=_tmdb_type, **_tmdb_query)
         if not _tmdb_type or not _tmdb_id:
             return
         self.dump_kwargs(update_current_dump=True)
@@ -389,7 +423,7 @@ class WindowRecommendationsManager():
         self._current_dump = ''
         get_property(PROP_JSONDUMP, clear_property=True)
         if threaded:
-            t = Thread(target=xbmcgui.Dialog().info, args=[listitem])
+            t = SafeThread(target=xbmcgui.Dialog().info, args=[listitem])
             t.start()
             return t
         xbmcgui.Dialog().info(listitem)

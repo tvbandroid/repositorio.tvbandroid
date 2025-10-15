@@ -1,64 +1,62 @@
-from threading import Thread
+from tmdbhelper.lib.addon.thread import SafeThread
+from jurialmunkey.ftools import cached_property
 
 
 CRONJOB_POLL_TIME = 600
 
 
-class CronJobMonitor(Thread):
+class CronJobMonitor(SafeThread):
 
     _poll_time = CRONJOB_POLL_TIME
 
-    def __init__(self, update_hour=0):
-        from xbmc import Monitor
-        Thread.__init__(self)
+    def __init__(self, parent, update_hour=0):
+        SafeThread.__init__(self)
         self.exit = False
         self.update_hour = update_hour
-        self.xbmc_monitor = Monitor()
+        self.update_monitor = parent.update_monitor
 
     def _on_startup(self):
-        self._do_delete_old_databases()
         self._do_recache_kodidb()
         self._do_trakt_authorization()
 
     def _on_poll(self):
+        self._do_database_vacuum()
+        self._do_delete_old_databases()
         self._do_library_update_check()
-        self._do_trakt_lastactivities_update()
+        self._do_reset_trakt_lastactivities()
 
-    @property
+    @cached_property
     def trakt_api(self):
-        try:
-            return self._trakt_api
-        except AttributeError:
-            from tmdbhelper.lib.api.trakt.api import TraktAPI
-            self._trakt_api = TraktAPI()
-            return self._trakt_api
+        from tmdbhelper.lib.api.trakt.api import TraktAPI
+        return TraktAPI()
 
-    @staticmethod
-    def _do_delete_old_databases():
-        from tmdbhelper.lib.script.method.maintenance import clean_old_databases
-        clean_old_databases()
+    @cached_property
+    def database_maintenance(self):
+        from tmdbhelper.lib.script.method.maintenance import DatabaseMaintenance
+        return DatabaseMaintenance()
 
-    @staticmethod
-    def _do_recache_kodidb():
-        from tmdbhelper.lib.script.method.maintenance import recache_kodidb
-        recache_kodidb(notification=False)
+    def _do_database_vacuum(self):
+        self.database_maintenance.vacuum()
+
+    def _do_delete_old_databases(self):
+        self.database_maintenance.delete_legacy_folders()
+
+    def _do_recache_kodidb(self):
+        self.database_maintenance.recache_kodidb(notification=False)
 
     def _do_trakt_authorization(self):
-        from jurialmunkey.parser import boolean
         from jurialmunkey.window import get_property
-        self.trakt_api.authorize(confirmation=True)
-        self.xbmc_monitor.waitForAbort(1)
-        if not boolean(get_property('TraktIsAuth')):
+        self.trakt_api.authorize()
+        self.update_monitor.waitForAbort(1)
+        if not get_property('TraktIsAuth', is_type=float):
             return
         from tmdbhelper.lib.script.method.trakt import get_stats
         get_stats()
 
-    def _do_trakt_lastactivities_update(self):
-        from jurialmunkey.parser import boolean
+    def _do_reset_trakt_lastactivities(self):
         from jurialmunkey.window import get_property
-        if not boolean(get_property('TraktIsAuth')):
-            return
-        self.trakt_api.get_last_activity(cache_refresh=True)
+        from tmdbhelper.lib.addon.consts import LASTACTIVITIES_DATA
+        get_property(LASTACTIVITIES_DATA, clear_property=True)
 
     def _do_library_update(self):
         from tmdbhelper.lib.addon.plugin import executebuiltin
@@ -88,8 +86,6 @@ class CronJobMonitor(Thread):
     def run(self):
         self._on_startup()
 
-        while not self.xbmc_monitor.abortRequested() and not self.exit:
-            self.xbmc_monitor.waitForAbort(self._poll_time)
+        while not self.update_monitor.abortRequested() and not self.exit:
+            self.update_monitor.waitForAbort(self._poll_time)
             self._on_poll()
-
-        del self.xbmc_monitor

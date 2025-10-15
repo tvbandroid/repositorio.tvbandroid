@@ -13,7 +13,10 @@ import xbmc
 import xbmcvfs
 import xbmcgui
 import xbmcaddon
-import urllib.request, urllib.error, urllib.parse
+if sys.version_info.major == 3:
+   import urllib.request, urllib.error, urllib.parse
+else:
+   import urllib2
 from resources.lib.utils import KODI_VERSION, ADDON_ID, log_exception, kodi_json, getCondVisibility, try_decode
 from resources.lib.dialogselect import DialogSelect
 import re

@@ -9,7 +9,10 @@
 
 import os, sys
 import threading
-import _thread as thread
+if sys.version_info.major == 3:
+    import _thread as thread
+else:
+    import thread
 from resources.lib.utils import log_msg, log_exception, get_current_content_type, kodi_json, prepare_win_props, merge_dict, getCondVisibility, try_decode
 import xbmc
 from simplecache import SimpleCache
@@ -121,7 +124,7 @@ class ListItemMonitor(threading.Thread):
         self.enable_extrafanart = getCondVisibility("Skin.HasSetting(SkinHelper.EnableExtraFanart)") == 1
         self.enable_extraposter = getCondVisibility("Skin.HasSetting(SkinHelper.EnableExtraPoster)") == 1
         self.enable_pvrart = getCondVisibility(
-            "Skin.HasSetting(SkinHelper.EnablePVRThumbs) + PVR.HasTVChannels + !String.Contains(Container.FolderPath,pvr://channels/radio/)") == 1
+            "Skin.HasSetting(SkinHelper.EnablePVRThumbs) + PVR.HasTVChannels") == 1
         self.enable_forcedviews = getCondVisibility("Skin.HasSetting(SkinHelper.ForcedViews.Enabled)") == 1
         studiologos_path = xbmc.getInfoLabel("Skin.String(SkinHelper.StudioLogos.Path)")
         if studiologos_path != self.metadatautils.studiologos_path:
@@ -326,7 +329,7 @@ class ListItemMonitor(threading.Thread):
                     details = merge_dict(details,
                                          self.get_directors_writers_cast(details["director"], details["writer"], details["cast"]))
                     if self.enable_extrafanart:
-                        #log_msg("skin.helper.service: extrafanart", xbmc.LOGINFO)
+                        log_msg("skin.helper.service: extrafanart", xbmc.LOGINFO)
                         if not details["filenameandpath"]:
                             details["filenameandpath"] = details["path"]
                         if "plugin://" in details["path"]:
@@ -376,8 +379,6 @@ class ListItemMonitor(threading.Thread):
                         details = merge_dict(details, self.metadatautils.get_metacritic_info((details["title"]), content_type))
                     if content_type in ["movie", "movies", "tvshow", "tvshows"]:
                         details = merge_dict(details, self.metadatautils.get_tunes_info((details["title"]), content_type, details["year"]))
-                    if content_type in ["tvshow", "tvshows"]:
-                        details = merge_dict(details, self.metadatautils.get_tvmaze_info(details["imdbnumber"]))
                     # movies-only properties (tmdb, animated art)
                     if content_type in ["movies", "setmovies", "tvshows"]:
                         details = merge_dict(details, self.metadatautils.get_tmdb_details(details["imdbnumber"]))

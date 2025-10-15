@@ -339,11 +339,11 @@ def update_trakt(do, who):
                 tree.write(settings)
                 
                 logging.log_notify("[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, name),
-                                   '[COLOR {0}]Add-on Data: Cleared![/COLOR]'.format(CONFIG.COLOR2),
+                                   '[COLOR {0}]Addon Data: Cleared![/COLOR]'.format(CONFIG.COLOR2),
                                    2000,
                                    icon)
             except Exception as e:
-                logging.log("[Trakt Data] Unable to Clear Add-on {0} ({1})".format(who, str(e)), level=xbmc.LOGERROR)
+                logging.log("[Trakt Data] Unable to Clear Addon {0} ({1})".format(who, str(e)), level=xbmc.LOGERROR)
     xbmc.executebuiltin('Container.Refresh()')
 
 
@@ -366,10 +366,10 @@ def auto_update(who):
 
                 if dialog.yesno(CONFIG.ADDONTITLE,
                                     "Would you like to save the [COLOR {0}]Trakt Data[/COLOR] for [COLOR {1}]{2}[/COLOR]?".format(CONFIG.COLOR2, CONFIG.COLOR1, n)
-                                    +'\n'+"Add-on: [COLOR springgreen][B]{0}[/B][/COLOR]".format(u)
+                                    +'\n'+"Addon: [COLOR springgreen][B]{0}[/B][/COLOR]".format(u)
                                     +'\n'+"Saved:[/COLOR] [COLOR red][B]{0}[/B][/COLOR]".format(su) if not su == '' else 'Saved:[/COLOR] [COLOR red][B]None[/B][/COLOR]',
                                     yeslabel="[B][COLOR springgreen]Save Data[/COLOR][/B]",
-                                    nolabel="[B][COLOR red]Cancel[/COLOR][/B]"):
+                                    nolabel="[B][COLOR red]No Cancel[/COLOR][/B]"):
                     trakt_it('update', who)
             else:
                 trakt_it('update', who)

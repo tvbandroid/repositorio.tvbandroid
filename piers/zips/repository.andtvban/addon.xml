@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.andtvban" name="[B][COLOR azure]Repo [COLOR cyan]and[COLOR white]TV[COLOR deepskyblue]ban[/COLOR][/B]" version="1.6.24" provider-name="JoseaTeb_andTVban">
+<addon id="repository.andtvban" name="[B][COLOR azure]Repo [COLOR cyan]and[COLOR white]TV[COLOR deepskyblue]ban[/COLOR][/B]" version="1.3.25" provider-name="JoseaTeb_andTVban">
     <extension point="xbmc.addon.repository" name="[B][COLOR azure]Repo [COLOR cyan]and[COLOR white]tv[COLOR deepskyblue]ban[/COLOR][/B]">
         <dir minversion="20.9.9" maxversion="21.9.9"> 
             <info compressed="false">https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/master/omega/zips/addons.xml</info>
@@ -14,10 +14,10 @@
 		    </extension>
 			
     <extension point="xbmc.addon.metadata">
-        <summary>[COLOR azure]Repo [COLOR cyan]and[COLOR white]tv[COLOR deepskyblue]ban[/COLOR]</summary>
+        <summary>[COLOR azure]Repo [COLOR cyan]and[COLOR white]TV[COLOR deepskyblue]ban[/COLOR]</summary>
         <description>Repositorio de Add-ons para [COLOR azure]TVBAN [COLOR cyan]MATNEXOMPIE[/COLOR].
 [B][COLOR lime]CREDITOS: [COLOR white]JoseaTeb
-[COLOR lime]• Developers:[/B] JoseaTeb[/COLOR]</description> 		             
+[COLOR white]• [COLOR lime]Developers:[/B] JoseaTeb[/COLOR]</description> 		             
         <disclaimer>[COLOR tan]Éste repositorio sólo recoge [COLOR azure]Add-ons Externos [COLOR tan]para [COLOR steelblue]KODI[/COLOR]</disclaimer>
         <platform>all</platform>
         <assets>

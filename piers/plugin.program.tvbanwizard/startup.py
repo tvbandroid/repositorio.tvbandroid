@@ -176,7 +176,7 @@ def installed_build_check():
                                        '{0} was not installed correctly!'.format(CONFIG.BUILDNAME)
                                        +'\n'+'It looks like the skin settings was not applied to the build.'
                                        +'\n'+'Would you like to apply the GuiFix?',
-                                       nolabel='[B]Cancel[/B]', yeslabel='[B]Apply Fix[/B]')
+                                       nolabel='[B]No, Cancel[/B]', yeslabel='[B]Apply Fix[/B]')
                 if yes:
                     xbmc.executebuiltin("PlayMedia(plugin://{0}/?mode=install&name={1}&url=gui)".format(CONFIG.ADDON_ID,
                                                                                                         quote_plus(CONFIG.BUILDNAME)))

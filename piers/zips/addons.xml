@@ -3060,7 +3060,7 @@ v1.20.0
     </extension>
 </addon>
 
-	<addon id="script.skin.helper.colorpicker" name="Skin Helper Service ColorPicker" version="2.0.2" provider-name="sualfred,marcelveldt">
+	<addon id="script.skin.helper.colorpicker" name="Skin Helper Service ColorPicker" version="2.0.3" provider-name="marcelveldt,sualfred and others">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0"/>
 		<import addon="script.module.pil" version="1.1.7"/>
@@ -3284,7 +3284,7 @@ v1.1.25
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="es">[COLOR azure]Mod [COLOR turquoise]TVBAN [COLOR azure]de auramod.andtvban para [COLOR steelblue]Kodi 22 [COLOR azure]/ [COLOR cyan]Piers [COLOR azure]Minimalista, Personalizable, Múltiples Widgets.[/COLOR]</summary>
-        <description lang="es">[B]Mod [COLOR turquoise]TVBAN[/COLOR] de AuraMod. Esta versión de Aura está basada para Todos los usuarios. [COLOR tan]Modificado por: [COLOR azure]JoséAnd_Teba[/B]</description>
+        <description lang="es">[B]Mod [COLOR turquoise]TVBAN de [COLOR moccasin]AuraMod[/COLOR][COLOR azure]. Esta versión de Aura está basada para Todos los usuarios. [COLOR tan]Modificado por: [COLOR white]JoséAnd_Teba[/COLOR][/B]</description>
 		<news>[COLOR tan]Nuevos cambios:[/COLOR]
 		- Skin modificada por [COLOR darkviolet]JoseAnd_andTVban[/COLOR] para Kodi 22 Piers.
 		</news>

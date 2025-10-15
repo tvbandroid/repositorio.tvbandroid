@@ -246,7 +246,7 @@ class ColorPicker(xbmcgui.WindowXMLDialog):
             xbmc.executebuiltin("Skin.SetString(%s, %s)" % (self.skinstring, colorstring))
 
             colorbase = "ff" + colorstring[2:]
-            xbmc.executebuiltin("Skin.SetString(%s.base, %s)" % (self.skinstring), colorbase)
+            xbmc.executebuiltin("Skin.SetString(%s.base, %s)" % (self.skinstring, colorbase))
 
         elif self.win_property:
             WINDOW.setProperty(self.win_property, colorstring)
@@ -315,7 +315,7 @@ class ColorPicker(xbmcgui.WindowXMLDialog):
         color_image_file = None
         if colorstring:
             paths = []
-            paths.append(u"%s%s.png" % (COLORFILES_PATH, colorstring))
+            paths.append("%s%s.png" % (COLORFILES_PATH, colorstring))
             if xbmcvfs.exists(SKINCOLORFILE):
                 paths.append(u"%s%s.png" % (SKINCOLORFILES_PATH, colorstring))
             for color_image_file in paths:

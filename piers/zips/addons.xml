@@ -594,7 +594,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="16.1.25" provider-name="[B][COLOR azure]andTVban, JoseaAnd[/COLOR][/B]">
+<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="16.1.25" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
     <requires>
         <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" />
@@ -609,11 +609,11 @@
 
     <extension point="xbmc.addon.metadata">
         <summary lang="es">
-	[COLOR azure]TVBAN[/COLOR] [COLOR cyan]MATNEXOMPIE[/COLOR],
+	[COLOR azure]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/COLOR],
 	tu [COLOR azure]tvban[COLOR tan]Wizard[/COLOR] para [COLOR teal]KODI[/COLOR]
 	    </summary>
     	<description lang="es">
-[COLOR lime][B]CREDITOS:          [COLOR darkorange]JoseaTeb[/COLOR][/B]
+[COLOR lime][B]CREDITOS:[/COLOR][/B]
 [COLOR white][B]• Developers:[/B]      [COLOR darkorange]JoseaTeb[/COLOR]
 [COLOR white][B]• Testers:[/B]             [COLOR darkorange]JoseaTeb, [COLOR moccasin]Amillans[/COLOR]
 [COLOR white][B]• Telegram:[/B]         [COLOR dodgerblue]t.me/+andtvban[/COLOR]</description>

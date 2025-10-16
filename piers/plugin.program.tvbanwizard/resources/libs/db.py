@@ -55,21 +55,21 @@ def addon_database(addon=None, state=1, array=False):
 
     if state == 2:
         try:
-            textexe.execute("BORRAR DESDE instalado DONDE addonID = ?", (addon,))
+            textexe.execute("ELIMINAR DE instalado DONDE addonID = ?", (addon,))
             textdb.commit()
             textexe.close()
         except:
-            logging.log("Error al liminar {0} de DB".format(addon))
+            logging.log("Error al eliminar {0} de DB".format(addon))
         return True
 
     try:
         if not array:
             textexe.execute('INSERTAR o IGNORAR en los VALORES instalados (addonID, habilitado, installDate) (?,?,?)', (addon, state, installedtime,))
-            textexe.execute('ACTUALIZAR instalado SET habilitado =? DONDE addonID = ? ', (state, addon,))
+            textexe.execute('ACTUALIZAR instalado SET habilitado = ? DONDE addonID = ? ', (state, addon,))
         else:
             for item in addon:
                 textexe.execute('INSERTAR o IGNORAR en los VALORES instalados (addonID, habilitado, installDate) (?,?,?)', (item, state, installedtime,))
-                textexe.execute('ACTUALIZAR instalado SET habilitado =? DONDE addonID = ? ', (state, item,))
+                textexe.execute('ACTUALIZAR instalado SET habilitado = ? DONDE addonID = ? ', (state, item,))
         textdb.commit()
         textexe.close()
     except:
@@ -98,7 +98,7 @@ def force_check_updates(auto=False, over=False):
     
     if not over:
         logging.log_notify(CONFIG.ADDONTITLE,
-                           '[COLOR {0}][COLOR gold]Forzar la Comprobación de Actualizaciones[/COLOR]'.format(CONFIG.COLOR2))
+                           '[COLOR {0}][COLOR gold]Comprobación Forzada de Actualizaciones[/COLOR]'.format(CONFIG.COLOR2))
 
     dbfile = latest_db('Addons')
     dbfile = os.path.join(CONFIG.DATABASE, dbfile)
@@ -235,7 +235,7 @@ def kodi_17_fix():
     if len(disabledAddons) > 0:
         addon_database(disabledAddons, 1, True)
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}][COLOR gold]Habilitación de Addons Completa![/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}][COLOR gold]Habilitación de Add-ons Completa![/COLOR]".format(CONFIG.COLOR2))
     update.force_update()
     xbmc.executebuiltin("ReloadSkin()")
 
@@ -258,7 +258,7 @@ def toggle_addon(id, value, over=None):
             if len(tid) > 0:
                 addonid = tid
             if tservice == 'xbmc.service':
-                logging.log("[COLOR gold]Tenemos uno en vivo, deteniendo script:[/COLOR] {0}".format(tid))
+                logging.log("[COLOR gold]Tenemos un script en vivo, que se detiene:[/COLOR] {0}".format(tid))
                 xbmc.executebuiltin('StopScript({0})'.format(os.path.join(CONFIG.ADDONS, addonid)))
                 xbmc.executebuiltin('StopScript({0})'.format(addonid))
                 xbmc.executebuiltin('StopScript({0})'.format(os.path.join(CONFIG.ADDONS, addonid, tservice[0])))
@@ -272,10 +272,10 @@ def toggle_addon(id, value, over=None):
     if 'error' in response and over is None:
         dialog = xbmcgui.Dialog()
         
-        v = 'Enabling' if value == 'true' else 'Disabling'
+        v = 'Habilitando' if value == 'true' else 'Deshabilitando'
         dialog.ok(CONFIG.ADDONTITLE,
                       "[COLOR {0}]Error {1} [COLOR {2}]{3}[/COLOR]".format(CONFIG.COLOR2, v, CONFIG.COLOR1, id) + '\n' +
-                      "Verifique que la lista de add-ons este actualizada y vuelva a intentarlo.[/COLOR]")
+                      "Verifique que la lista de add-ons esté actualizada y vuelva a intentarlo.[/COLOR]")
 
 
 def toggle_dependency(name, dp=None):
@@ -289,7 +289,7 @@ def toggle_dependency(name, dp=None):
                 dependspath = os.path.join(CONFIG.ADDONS, depends)
                 if dp is not None:
                     dp.update("",
-                              "Comprobando la Dependencia [COLOR yellow]{0}[/COLOR] para [COLOR yellow]{1}[/COLOR]".format(depends, name),
+                              "Comprobando la Dependencia [COLOR gold]{0}[/COLOR] para [COLOR gold]{1}[/COLOR]".format(depends, name),
                               "")
                 if os.path.exists(dependspath):
                     toggle_addon(name, 'true')

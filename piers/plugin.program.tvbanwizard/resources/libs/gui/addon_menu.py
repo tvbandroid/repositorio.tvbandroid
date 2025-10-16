@@ -65,7 +65,7 @@ def install_from_kodi(plugin):
 
         # Assuming we only want to answer the one known "install" dialog
         if xbmc.getCondVisibility(visible_cond) and not clicked:
-            logging.log('Dialog to click open', level=xbmc.LOGDEBUG)
+            logging.log('Diálogo para hacer clic en abrir', level=xbmc.LOGDEBUG)
             xbmc.executebuiltin('SendClick(yesnodialog, 11)')
             clicked = True
         else:
@@ -185,7 +185,7 @@ class AddonMenu:
                         directory.add_file("Aún no se agregaron addons a este menú!", themeit=CONFIG.THEME2)
         else:
             logging.log("[Addon Menu] ERROR: La URL de la lista de Addon no funciona.")
-            directory.add_file('Url para el archivo txt no válido', themeit=CONFIG.THEME3)
+            directory.add_file('La Url para el archivo txt no válido', themeit=CONFIG.THEME3)
             directory.add_file('{0}'.format(CONFIG.ADDONFILE), themeit=CONFIG.THEME3)
 
     def install_dependency(self, plugin):
@@ -288,7 +288,7 @@ class AddonMenu:
             repo_id = urls[1]
         
             if not xbmc.getCondVisibility('System.HasAddon({0})'.format(repo_id)):
-                logging.log("Repository not installed, installing it")
+                logging.log("Repositorio no instalado, instalandolo")
 
                 from xml.etree import ElementTree
                 root = ElementTree.fromstring(repositoryxml_response.text.encode('ascii', 'backslashreplace'))
@@ -311,15 +311,15 @@ class AddonMenu:
                         return True
                 else:
                     logging.log(
-                        "[Addon Installer] Repositorio no instalado: [COLOR gold]No se puede obtener la URL![/COLOR] ({0})".format(urls[1]))
+                        "[Instalador de Addon] Repositorio no instalado: [COLOR gold]No se puede obtener la URL![/COLOR] ({0})".format(urls[1]))
             else:
-                logging.log("Repository installed, installing addon")
+                logging.log("Repositorio instalado, instalando addon")
                 install = install_from_kodi(plugin)
                 if install:
                     xbmc.executebuiltin('Container.Refresh()')
                     return True
         elif url_response:
-            logging.log("No repository, installing addon")
+            logging.log("Sin repositorio, instalando addon")
             self.install_addon_from_url(plugin, urls[0])
 
             if os.path.exists(os.path.join(CONFIG.ADDONS, plugin)):

@@ -38,7 +38,6 @@ except ImportError:  # Python 2
     from urllib import FancyURLopener
 
 
-#URL = 'https://t.me/+lC4ECITUPH43NTE0'
 URL = 'https://t.me/+andTvban'
 EXPIRATION = 2592000
 REPLACES = (('//.+?:.+?@', '//USER:PASSWORD@'), ('<user>.+?</user>', '<user>USER</user>'), ('<pass>.+?</pass>',
@@ -148,8 +147,8 @@ def upload_log():
             content = clean_log(data)
             succes, result = post_log(content, name)
             if succes:
-                msg = "Publique esta URL o escanee el código QR para su [COLOR {0}]{1}[/COLOR]," \
-                      " junto con una descripción del problema:[CR][COLOR {2}]{3}[/COLOR]".format(
+                msg = "[COLOR khaki]Publique esta URL o escanee el código QR para su[/COLOR] [COLOR {0}]{1}[/COLOR][COLOR khaki],[/COLOR]" \
+                      "\n[COLOR khaki]Junto con una descripción del problema:[/COLOR][CR][COLOR {2}]{3}[/COLOR]".format(
                     CONFIG.COLOR1, name, CONFIG.COLOR1, result)
 
                 # if len(self.email) > 5:
@@ -205,9 +204,9 @@ def get_files():
             crashlog_path = os.path.expanduser('~')
             filematch = 'kodi_crashlog'
         elif tools.platform() == 'windows':
-            log("Los registros de fallos de Windows no son compatibles, desactive esta opción en la configuración del add-on")
+            log("Los registros de fallos de Windows no son compatibles, deshabilite esta opción en los ajustes del add-on")
         elif tools.platform() == 'android':
-            log("Los registros de fallos de Android no son compatibles, desactive esta opción en la configuración del add-on")
+            log("Los registros de fallos de Android no son compatibles, desactive esta opción en los ajustes del add-on")
         if crashlog_path and os.path.isdir(crashlog_path):
             dirs, files = xbmcvfs.listdir(crashlog_path)
             for item in files:
@@ -229,10 +228,10 @@ def read_log(path):
             return True, content
         else:
             log('el archivo está vacío')
-            return False, "El Archivo está Vacío"
+            return False, "File is Empty"
     except Exception as e:
         log('imposible leer el archivo: {0}'.format(e))
-        return False, "Imposible Leer el Archivo"
+        return False, "Unable to Read File"
 
 
 def clean_log(content):
@@ -350,7 +349,7 @@ def view_log_file():
     wizlog = grab_log(file=True, wizard=True)
     
     choices = []
-    logfiles = {'mainlog': "View {0}".format(os.path.basename(mainlog)), 'oldlog': "View {0}".format(os.path.basename(oldlog)), 'wizlog': "View {0}".format(os.path.basename(wizlog))}
+    logfiles = {'mainlog': "Ver {0}".format(os.path.basename(mainlog)), 'oldlog': "Ver {0}".format(os.path.basename(oldlog)), 'wizlog': "Ver {0}".format(os.path.basename(wizlog))}
     
     which = 0
     logtype = oldlog
@@ -379,7 +378,7 @@ def view_log_file():
             logtype = wizlog
     elif len(choices) == 0:
         log_notify('[COLOR {0}]Ver Registro[/COLOR]'.format(CONFIG.COLOR1),
-                   '[COLOR {0}]No se Encontró Ningún Archivo de Registro![/COLOR]'.format(CONFIG.COLOR2))
+                   '[COLOR {0}]No se Encontró ningún Archivo de registro![/COLOR]'.format(CONFIG.COLOR2))
         return
     else:
         if mainlog:
@@ -389,7 +388,7 @@ def view_log_file():
         elif wizlog:
             logtype = wizlog
 
-    window.show_log_viewer("[B][COLOR azure]Ver Archivo de Registro[/COLOR][/B]", log_file=logtype, ext_buttons=True)
+    window.show_log_viewer("Ver Archivo de Registro", log_file=logtype, ext_buttons=True)
 
 
 def swap_debug():
@@ -398,7 +397,7 @@ def swap_debug():
     new = '"debug.showloginfo"'
     query = '{{"jsonrpc":"2.0", "method":"Settings.GetSettingValue","params":{{"setting":{0}}}, "id":1}}'.format(new)
     response = xbmc.executeJSONRPC(query)
-    log("Configuración de Obtención del Registro de Depuración: {0}".format(str(response)))
+    log("Obtener Configuración de Registro de Depuración: {0}".format(str(response)))
     if 'false' in response:
         value = 'true'
         threading.Thread(target=_dialog_watch).start()
@@ -409,7 +408,7 @@ def swap_debug():
         log_notify(CONFIG.ADDONTITLE,
                            '[COLOR {0}]Registro de Depuración:[/COLOR] [COLOR {1}]Activado[/COLOR]'.format(CONFIG.COLOR1,
                                                                                                    CONFIG.COLOR2))
-        log("Configuración del Conjunto de Registros de Depuración: {0}".format(str(response)))
+        log("Debug Logging Set Settings: {0}".format(str(response)))
     elif 'true' in response:
         value = 'false'
         threading.Thread(target=_dialog_watch).start()
@@ -420,7 +419,7 @@ def swap_debug():
         log_notify(CONFIG.ADDONTITLE,
                    '[COLOR {0}]Registro de Depuración:[/COLOR] [COLOR {1}]Desactivado[/COLOR]'.format(CONFIG.COLOR1,
                                                                                          CONFIG.COLOR2))
-        log("Configuración del Conjunto de Registros de Depuración: {0}".format(str(response)))
+        log("Configuraciones del Conjunto de Registro de Depuración: {0}".format(str(response)))
 
 
 def _dialog_watch():
@@ -487,10 +486,10 @@ def error_checking(log=None, count=None, last=None):
             for item in errors:
                 i += 1
                 string += "[B][COLOR red]ERROR NÚMERO {0}:[/B][/COLOR] [COLOR silver]{1}[/COLOR]\n".format(str(i), item.replace(CONFIG.HOME, '/').replace('                                        ', ''))
-            window.show_log_viewer("[B][COLOR azure]Visualización de Errores en el Registro[/COLOR][/B]", string)
+            window.show_log_viewer("[B][COLOR darkcyan]Visualización de Errores en el Registro[/COLOR][/B]", string)
         else:
-           string = "[B][COLOR red]Último Error en el Registro:[/B][/COLOR] [COLOR teal]{0}[/COLOR]\n".format(errors[0].replace(CONFIG.HOME, '/').replace('                                        ', ''))
-           window.show_log_viewer("[B][COLOR azure]Visualización del Último Error en el Registro[/COLOR][/B]", string)
+            string = "[B][COLOR red]Ultimo Error en el Registro:[/B][/COLOR] [COLOR teal]{0}[/COLOR]\n".format(errors[0].replace(CONFIG.HOME, '/').replace('                                        ', ''))
+            window.show_log_viewer("[B][COLOR darkcyan]Visualización del Último Error en el Registro[/COLOR][/B]", string)
 
     else:
         log_notify('[COLOR {0}]Ver Error de Registro[/COLOR]'.format(CONFIG.COLOR1),

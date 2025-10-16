@@ -91,7 +91,7 @@ class Restore:
     def _prompt_for_wipe(self):
         # Should we wipe first?
         wipe = self.dialog.yesno(CONFIG.ADDONTITLE,
-                                 "[COLOR {0}]Desea restaurar su".format(CONFIG.COLOR2) + '\n' + "configuración de Kodi a la configuración predeterminada" + '\n' + "Antes de instalar la Copia de Seguridad {0}?[/COLOR]".format('local' if not self.external else 'external'),
+                                 "[COLOR {0}]Deseas Restaurar su".format(CONFIG.COLOR2) + '\n' + "configuración de Kodi a la configuración predeterminada" + '\n' + "Antes de instalar la Copia de Seguridad {0}?[/COLOR]".format('local' if not self.external else 'external'),
                                  nolabel='[B][COLOR red]No[/COLOR][/B]',
                                  yeslabel='[B][COLOR cyan]Si[/COLOR][/B]')
 
@@ -159,7 +159,7 @@ class Restore:
         skin.look_and_feel_data('restaurar')
         external = 'External' if self.external else 'Local'
 
-        file = self.dialog.browseSingle(1, '[COLOR {0}]Seleccione el archivo de la Copia de Seguridad que desea restaurar[/COLOR]'.format(
+        file = self.dialog.browseSingle(1, '[COLOR {0}]Seleccione el archivo de la [COLOR yellowgreen]Copia de Seguridad [COLOR {0}]que deseas Restaurar[/COLOR]'.format(
             CONFIG.COLOR2), '' if self.external else 'archivos', mask='.zip', useThumbs=True,
                                         defaultt=None if self.external else CONFIG.MYBUILDS)
 

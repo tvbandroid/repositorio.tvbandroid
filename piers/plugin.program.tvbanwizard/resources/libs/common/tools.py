@@ -86,7 +86,7 @@ def write_to_file(file, content, mode='w'):
 def remove_folder(path):
     from resources.libs.common import logging
 
-    logging.log("Deleting Folder: {0}".format(path))
+    logging.log("Eliminando Carpeta: {0}".format(path))
     try:
         shutil.rmtree(path, ignore_errors=True, onerror=None)
     except:
@@ -96,7 +96,7 @@ def remove_folder(path):
 def remove_file(path):
     from resources.libs.common import logging
 
-    logging.log("Deleting File: {0}".format(path))
+    logging.log("Eliminando Archivo: {0}".format(path))
     try:
         os.remove(path)
     except:
@@ -114,7 +114,7 @@ def empty_folder(folder):
             total += 1
 
             from resources.libs.common import logging
-            logging.log("Empty Folder: {0}".format(root))
+            logging.log("Carpeta Vacia: {0}".format(root))
     return total
 
 
@@ -138,14 +138,14 @@ def clean_house(folder, ignore=False):
                     try:
                         shutil.rmtree(os.path.join(root, f))
                     except:
-                        logging.log("Error Deleting {0}".format(f), level=xbmc.LOGERROR)
+                        logging.log("Error Eliminando {0}".format(f), level=xbmc.LOGERROR)
             for d in dirs:
                 total_folds += 1
                 try:
                     shutil.rmtree(os.path.join(root, d))
                     total_folds += 1
                 except:
-                    logging.log("Error Deleting {0}".format(d), level=xbmc.LOGERROR)
+                    logging.log("Error Eliminando {0}".format(d), level=xbmc.LOGERROR)
     return total_files, total_folds
 
 
@@ -216,7 +216,7 @@ def ensure_folders(folder=None):
         dialog = xbmcgui.Dialog()
 
         dialog.ok(CONFIG.ADDONTITLE,
-                      "[COLOR {0}]Error al crear directorios Addons:[/COLOR]".format(CONFIG.COLOR2)
+                      "[COLOR {0}]Error al crear directorios de Addons:[/COLOR]".format(CONFIG.COLOR2)
                       +'\n'+"[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, name))
 
 #########################
@@ -397,12 +397,12 @@ def platform():
 
 
 def kodi_version():
-    if 19.0 <= CONFIG.KODIV <= 19.9:
-        vername = 'Matrix'
-    elif 20.0 <= CONFIG.KODIV <= 20.9:
+    if 20.0 <= CONFIG.KODIV <= 20.9:
         vername = 'Nexus'
     elif 21.0 <= CONFIG.KODIV <= 21.9:
         vername = 'Omega'
+    elif 22.0 <= CONFIG.KODIV <= 22.9:
+        vername = 'Piers'
     else:
         vername = "Unknown"
     return vername
@@ -419,12 +419,12 @@ def kill_kodi(msg=None, over=None):
         dialog = xbmcgui.Dialog()
         
         if not msg:
-            msg = '[B][COLOR {0}]Estás a punto de cerrar Kodi.[/B] Te gustaría continuar?[/COLOR]'.format(CONFIG.COLOR2)
+            msg = '[B][COLOR {0}]Estás a punto de Cerrar Kodi.[/B] Te gustaría continuar?[/COLOR]'.format(CONFIG.COLOR2)
         
-        choice = dialog.yesno('Forzar Cierre Kodi',
+        choice = dialog.yesno('[COLOR yellowgreen]Forzar el Cierre de Kodi[/COLOR]',
                                   msg,
-                                  nolabel='[B][COLOR red] No, Cancelar[/COLOR][/B]',
-                                  yeslabel='[B][COLOR cyan]Forzar Cierre Kodi[/COLOR][/B]')
+                                  nolabel='[B][COLOR cyan] No, Cancelar[/COLOR][/B]',
+                                  yeslabel='[B][COLOR red]Forzar Cierre[/COLOR][/B]')
     if choice == 1:
         from resources.libs.common import logging
         logging.log("Forzar Cierre de Kodi: Plataforma[{0}]".format(str(platform())))
@@ -473,7 +473,7 @@ def convert_special(url, over=False):
                                        "[COLOR {0}]Conversión de Ruta Cancelada[/COLOR]".format(CONFIG.COLOR2))
                     sys.exit()
     progress_dialog.close()
-    logging.log("[Convertir Rutas en Especiales Completas")
+    logging.log("[Convertir Rutas en Especiales] Completa")
     if not over:
         logging.log_notify(CONFIG.ADDONTITLE,
                            "[COLOR {0}]Convertir Rutas en Especiales:[/COLOR] [COLOR gold]Completo![/COLOR]".format(CONFIG.COLOR2))
@@ -501,8 +501,8 @@ def reload_fix(default=None):
     dialog = xbmcgui.Dialog()
     
     dialog.ok(CONFIG.ADDONTITLE,
-                  "[COLOR red]ADVERTENCIA:[/COLOR] [COLOR {0}]A veces, Recargando el Perfil hace que Kodi se bloquee. Mientras Kodi está Recargando el Perfil, Por Favor No Presione Ningún Botón![/COLOR]".format(CONFIG.COLOR2))
-                  
+                  "[COLOR red]ADVERTENCIA[COLOR white]!: [COLOR {0}]A veces, al Recargar el Perfil, Kodi se bloquea. Mientras Kodi Recarga el Perfil, Por Favor no Presione Ningún Botón[COLOR red]![/COLOR]".format(CONFIG.COLOR2))
+                
     if not os.path.exists(CONFIG.PACKAGES):
         os.makedirs(CONFIG.PACKAGES)
     if default is None:
@@ -514,7 +514,7 @@ def reload_fix(default=None):
     if CONFIG.KODIV >= 17:
         db.kodi_17_fix()
     if default is None:
-        logging.log("Switching to: {0}".format(CONFIG.get_setting('defaultskin')))
+        logging.log("Cambiando a: {0}".format(CONFIG.get_setting('defaultskin')))
         gotoskin = CONFIG.get_setting('defaultskin')
         skin.switch_to_skin(gotoskin)
         skin.look_and_feel_data('restore')
@@ -551,7 +551,7 @@ def ascii_check(use=None, over=False):
             yes = 1
         else:
             yes = dialog.yesno(CONFIG.ADDONTITLE,
-                                   '[COLOR {0}]Desea [COLOR {1}]eliminar[/COLOR] todos los nombres de archivo con carácteres especiales o prefiere simplemente [COLOR {2}]escanear y ver[/COLOR] los resultados en el Registro (log)?[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.COLOR1),
+                                   '[COLOR {0}]Desea [COLOR {1}]eliminar[/COLOR] todos los nombres de archivo con carácteres especiales o prefiere simplemente [COLOR {2}]escanear y ver[/COLOR] los resultados en el Registro log?[/COLOR]'.format(CONFIG.COLOR2, CONFIG.COLOR1, CONFIG.COLOR1),
                                    yeslabel='[B][COLOR cyan]Eliminar[/COLOR][/B]',
                                    nolabel='[B][COLOR red]Escanear[/COLOR][/B]')
     else:
@@ -581,13 +581,13 @@ def ascii_check(use=None, over=False):
         for file in files:
             prog.append(file)
             prog2 = int(len(prog) / float(items) * 100)
-            progress_dialog.update(prog2, "[COLOR {0}]Comprobación de archivos no ASCII".format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, file) + '\n' + 'Espere por Favor[/COLOR]')
+            progress_dialog.update(prog2, "[COLOR {0}]Comprobación de archivos que no sean ASCII".format(CONFIG.COLOR2) + '\n' + '[COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, file) + '\n' + 'Espere por Favor[/COLOR]')
             try:
                 file.encode('ascii')
             except UnicodeEncodeError:
-                logging.log("[ASCII Check] Carácter ilegal encontrado en archivo: {0}".format(file))
+                logging.log("[ASCII Check] Carácter ilegal encontrado en el archivo:: {0}".format(file))
             except UnicodeDecodeError:
-                logging.log("[ASCII Check] Carácter ilegal encontrado en archivo: {0}".format(file))
+                logging.log("[ASCII Check] Carácter ilegal encontrado en el archivo:: {0}".format(file))
                 badfile = os.path.join(base, file)
                 if yes:
                     try:
@@ -629,13 +629,13 @@ def ascii_check(use=None, over=False):
                 logging.log_notify(CONFIG.ADDONTITLE,
                                  "[COLOR {0}]ASCII Check: {1} Eliminado / {2} Fallido.[/COLOR]".format(CONFIG.COLOR2, f1, f2))
             else:
-                window.show_text_box("Viewing Removed ASCII Files",
+                window.show_text_box("Visualización de Archivos ASCII Eliminados",
                                   "[COLOR yellow][B]{0} Archivos Eliminados:[/B][/COLOR]\n {1}\n\n[COLOR yellow][B]{2} Archivos Fallidos:[B][/COLOR]\n {3}".format(f1, msg, f2, msg2))
         else:
-            window.show_text_box("Viewing Found ASCII Files", "[COLOR yellow][B]{0} Archivos Encontrados:[/B][/COLOR]\n {1}".format(f1, msg))
+            window.show_text_box("Visualización de Archivos ASCII Encontrados", "[COLOR yellow][B]{0} Archivos Encontrados:[/B][/COLOR]\n {1}".format(f1, msg))
     else:
         logging.log_notify(CONFIG.ADDONTITLE,
-                           "[COLOR {0}]ASCII Check:[/COLOR] [COLOR gold]Nada Encontrado.[/COLOR]".format(CONFIG.COLOR2))
+                           "[COLOR {0}]ASCII Check:[/COLOR] [COLOR gold]Ninguno Encontrado.[/COLOR]".format(CONFIG.COLOR2))
 
 
 def clean_text(text):
@@ -701,22 +701,22 @@ def _check_url(url, cred):
             response = requests.head(url, headers={'user-agent': CONFIG.USER_AGENT}, allow_redirects=True, auth=cred)
             
             if response.status_code < 300:
-                logging.log("Verificación de URL aprobada para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                logging.log("Comprobación de URL aprobada para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
                 return True
             elif response.status_code < 400:
-                logging.log("Verificación de URL redirigida de {0} a {1}: Código de estado [{2}]".format(url, response.headers['Location'], response.status_code), level=xbmc.LOGDEBUG)
+                logging.log("Comprobación de URL redirigida de {0} a {1}: Código de estado [{2}]".format(url, response.headers['Location'], response.status_code), level=xbmc.LOGDEBUG)
                 return _check_url(response.headers['Location'])
             elif response.status_code == 401:
-                logging.log("URL requiere autenticación para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                logging.log("La URL requiere autenticación para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
                 return 'auth'
             else:
-                logging.log("Error al comprobar la URL de {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
+                logging.log("Error al comprobar la URL para {0}: Código de estado [{1}]".format(url, response.status_code), level=xbmc.LOGDEBUG)
                 return False
         except Exception as e:
-            logging.log("Error de verificación de URL para {0}: [{1}]".format(url, e), level=xbmc.LOGDEBUG)
+            logging.log("Error de comprobación de URL para {0}: [{1}]".format(url, e), level=xbmc.LOGDEBUG)
             return False
     else:
-        logging.log("La URL no tiene un esquema válido: {0}".format(url), level=xbmc.LOGDEBUG)
+        logging.log("La URL no es de un esquema válido: {0}".format(url), level=xbmc.LOGDEBUG)
         return False
         
 
@@ -744,7 +744,7 @@ def open_url(url, stream=False, check=False, cred=None, count=0):
         response = requests.get(url, headers=user_agent, timeout=10.000, stream=stream, auth=cred)
 
         if response.status_code == 401:
-            retry = dialog.yesno(CONFIG.ADDONTITLE, 'El nombre de usuario o la contraseña no eran válidos. Le gustaría volver a intentarlo?', yeslabel='Intentar Otra Vez', nolabel='Cancelar')
+            retry = dialog.yesno(CONFIG.ADDONTITLE, 'El nombre de usuario o la contraseña no son válidos. Desea volver a intentarlo?', yeslabel='[COLOR cyan]Intentar Otra Vez[/COLOR]', nolabel='[COLOR red]Cancelar[/COLOR]')
             
             if retry and count < 3:
                 count += 1
@@ -752,7 +752,7 @@ def open_url(url, stream=False, check=False, cred=None, count=0):
                 
                 response = open_url(url, stream, check, cred, count)
             else:
-                dialog.ok(CONFIG.ADDONTITLE, 'Error de Autenticación.')
+                dialog.ok(CONFIG.ADDONTITLE, 'Falló la Autenticación.')
                 return False
         
         return response

@@ -56,7 +56,7 @@ def highlight_text(msg):
     for item in matches:
         string = '-->Python callback/script returned the following error<--{0}-->End of Python script error report<--'.format(item)
         msg = msg.replace(string, '[COLOR red]{0}[/COLOR]'.format(string))
-    msg = msg.replace('WARNING', '[COLOR yellow]ADVERTENCIA[/COLOR]').replace('ERROR', '[COLOR red]ERROR[/COLOR]').replace('[NL]', '\n').replace(': EXCEPCIÓN Lanzado (PythonToCppException) :', '[COLOR red]: EXCEPCIÓN Lanzado (PythonToCppException) :[/COLOR]')
+    msg = msg.replace('WARNING', '[COLOR red]ADVERTENCIA[/COLOR]').replace('ERROR', '[COLOR red]ERROR[/COLOR]').replace('[NL]', '\n').replace(': EXCEPCIÓN Lanzado (PythonToCppException) :', '[COLOR red]: EXCEPCIÓN Lanzado (PythonToCppException) :[/COLOR]')
     msg = msg.replace('\\\\', '\\').replace(CONFIG.HOME, '')
     return msg
 
@@ -396,7 +396,7 @@ def show_update_window(name='Testing Window', current='1.0', new='1.1', icon=CON
 
         def do_fresh_install(self):
             logging.log("[Revisa Actualizaciones] [[COLOR white]Versión Instalada:[/COLOR] {0}] [[COLOR white]Version Actual:[/COLOR]  {1}] [Usuario Seleccionado: Instalación de la Nueva Build]".format(CONFIG.BUILDVERSION, CONFIG.BUILDLATEST))
-            logging.log("[Revisa Actualizaciones] [Siguiente    Verificación: {0}]".format(tools.get_date(days=CONFIG.UPDATECHECK, formatted=True)))
+            logging.log("[Revisa Actualizaciones] [Siguiente Verificación: {0}]".format(tools.get_date(days=CONFIG.UPDATECHECK, formatted=True)))
             url = 'plugin://{0}/?mode=install&name={1}&action=fresh'.format(CONFIG.ADDON_ID, quote_plus(CONFIG.BUILDNAME))
             xbmc.executebuiltin('RunPlugin({0})'.format(url))
             self.close()

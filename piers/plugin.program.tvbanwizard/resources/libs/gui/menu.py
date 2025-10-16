@@ -56,7 +56,7 @@ def check_for_fm():
     
     if fm == 0 and 'com.android.documentsui' not in apps:
         dialog = xbmcgui.Dialog()
-        choose = dialog.yesno(CONFIG.ADDONTITLE, 'Parece que su dispositivo no tiene un administrador de archivos predeterminado. ¿Le gustaría establecer uno ahora?')
+        choose = dialog.yesno(CONFIG.ADDONTITLE, 'Parece que su dispositivo no tiene un Administrador de Archivos predeterminado. Le gustaría establecer uno ahora?')
         if not choose:
             dialog.ok(CONFIG.ADDONTITLE, 'Si se descarga un APK, pero no se abre para la instalación, intente cambiar su administrador de archivo\'s en {} "Configuración de instalación".'.format(CONFIG.ADDONTITLE))
         else:
@@ -71,8 +71,8 @@ def apk_menu(url=None):
     from resources.libs.common import tools
 
     if check_for_fm():
-        directory.add_dir('[B]APK\'s OFICIAL DE [COLOR teal]KODI[/COLOR][/B]', {'mode': 'kodiapk'}, icon=CONFIG.ICONAPK, themeit=CONFIG.THEME1)
-        directory.add_separator('[B]DESCARGAR APLICACIONES[/B]')
+        directory.add_dir('[B]APK\s OFICIAL DE [COLOR teal]KODI[/COLOR][/B]', {'mode': 'kodiapk'}, icon=CONFIG.ICONAPK, themeit=CONFIG.THEME1)
+        directory.add_separator('[B]DESCARGAR APLICACIONES[/B]', themeit=CONFIG.THEME7)
     response = tools.open_url(CONFIG.APKFILE)
     url_response = tools.open_url(url)
 
@@ -305,8 +305,8 @@ def system_info():
 
 
 def save_menu():
-    on = '[COLOR cyan]ON[/COLOR]'
-    off = '[COLOR red]OFF[/COLOR]'
+    on = '[COLOR forestgreen][B]ON[/B][/COLOR]'
+    off = '[COLOR red][B]OFF[/B][/COLOR]'
 
     trakt = 'true' if CONFIG.KEEPTRAKT == 'true' else 'false'
     debrid = 'true' if CONFIG.KEEPDEBRID == 'true' else 'false'
@@ -321,15 +321,15 @@ def save_menu():
     super = 'true' if CONFIG.KEEPSUPER == 'true' else 'false'
     whitelist = 'true' if CONFIG.KEEPWHITELIST == 'true' else 'false'
 
-    directory.add_dir('Manterner Datos Trakt', {'mode': 'trakt'}, icon=CONFIG.ICONTRAKT, themeit=CONFIG.THEME1)
-    directory.add_dir('Mantener Debrid', {'mode': 'realdebrid'}, icon=CONFIG.ICONDEBRID, themeit=CONFIG.THEME1)
-    directory.add_dir('Mantener Información del Login', {'mode': 'login'}, icon=CONFIG.ICONLOGIN, themeit=CONFIG.THEME1)
-    directory.add_file('Importar Datos Guardados', {'mode': 'managedata', 'name': 'import'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
-    directory.add_file('Exportar Datos Guardados', {'mode': 'managedata', 'name': 'export'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
-    directory.add_file('[B][COLOR white]-[/COLOR] Haga Clic para Cambiar la Configuración [COLOR white]-[/COLOR][/B]', themeit=CONFIG.THEME3)
-    directory.add_file('Guardar Trakt: {0}'.format(trakt.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keeptrakt'}, icon=CONFIG.ICONTRAKT, themeit=CONFIG.THEME1)
-    directory.add_file('Guardar Debrid: {0}'.format(debrid.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keepdebrid'}, icon=CONFIG.ICONDEBRID, themeit=CONFIG.THEME1)
-    directory.add_file('Guardar Información de: {0}'.format(login.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keeplogin'}, icon=CONFIG.ICONLOGIN, themeit=CONFIG.THEME1)
+    directory.add_dir('Mantener [COLOR mediumvioletred]Datos [COLOR crimson]Trakt[/COLOR]', {'mode': 'trakt'}, icon=CONFIG.ICONTRAKT, themeit=CONFIG.THEME1)
+    directory.add_dir('Mantener [COLOR lightgreen]Datos [COLOR skyblue]Debrid[/COLOR]', {'mode': 'realdebrid'}, icon=CONFIG.ICONDEBRID, themeit=CONFIG.THEME1)
+    directory.add_dir('Mantener [COLOR lightsteelblue]Informació[COLOR tan]n del Login[/COLOR]', {'mode': 'login'}, icon=CONFIG.ICONLOGIN, themeit=CONFIG.THEME1)
+    directory.add_file('[COLOR khaki]Importar [COLOR yellowgreen]Datos Guardados[/COLOR]', {'mode': 'managedata', 'name': 'import'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
+    directory.add_file('[COLOR khaki]Exportar [COLOR yellowgreen]Datos Guardados[/COLOR]', {'mode': 'managedata', 'name': 'export'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
+    directory.add_file('[B][COLOR white]••[/COLOR] HAGA [COLOR white]CLIC[/COLOR] ABAJO PARA CAMBIAR LA CONFIGURACION[COLOR white][B]:[/COLOR][/B]', themeit=CONFIG.THEME3)
+    directory.add_file('[COLOR mediumvioletred]Guardar [COLOR crimson]Trakt:[/COLOR] {0}'.format(trakt.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keeptrakt'}, icon=CONFIG.ICONTRAKT, themeit=CONFIG.THEME1)
+    directory.add_file('[COLOR lightgreen]Guardar [COLOR skyblue]Debrid:[/COLOR] {0}'.format(debrid.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keepdebrid'}, icon=CONFIG.ICONDEBRID, themeit=CONFIG.THEME1)
+    directory.add_file('[COLOR lightgreen]Guardar [COLOR lightsteelblue]Informació[COLOR tan]n del Login:[/COLOR] {0}'.format(login.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keeplogin'}, icon=CONFIG.ICONLOGIN, themeit=CONFIG.THEME1)
     directory.add_file('Mantener \'Fuentes.xml\': {0}'.format(sources.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keepsources'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
     directory.add_file('Mantener \'Perfiles.xml\': {0}'.format(profiles.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keepprofiles'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
     directory.add_file('Mantener \'playercorefactory.xml\': {0}'.format(playercore.replace('true', on).replace('false', off)), {'mode': 'togglesetting', 'name': 'keepplayercore'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
@@ -519,17 +519,17 @@ def enable_addons(all=False):
         if len(addonids) == 0:
             directory.add_file("No se encontrado Addons para habilitar o deshabilitar..", icon=CONFIG.ICONMAINT)
         else:
-            directory.add_file("[I][B][COLOR red]!! AVISO: Desactivar Algunos Addons Puede Causar Problemas !![/COLOR][/B][/I]", icon=CONFIG.ICONMAINT)
+            directory.add_file("[I][B][COLOR white]!! [COLOR red]AVISO: [COLOR white]Desactivar Algunos Addons Puede Causar Problemas [COLOR red]!![/COLOR][/B][/I]", icon=CONFIG.ICONMAINT)
             directory.add_dir('[B]Habilitar Todos los Addons[/B]', {'mode': 'enableall'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME3)
             for i in range(0, len(addonids)):
                 folder = os.path.join(CONFIG.ADDONS, addonids[i])
                 icon = os.path.join(folder, 'icon.png') if os.path.exists(os.path.join(folder, 'icon.png')) else CONFIG.ADDON_ICON
                 fanart = os.path.join(folder, 'fanart.jpg') if os.path.exists(os.path.join(folder, 'fanart.jpg')) else CONFIG.ADDON_FANART
                 if tools.get_addon_info(addonids[i], 'name'):
-                    state = "[COLOR green][Habilitado][/COLOR]"
+                    state = "[COLOR yellowgreen][Habilitado][/COLOR]"
                     goto = "false"
                 else:
-                    state = "[COLOR orange][Deshabilitado][/COLOR]"
+                    state = "[COLOR tomato][Deshabilitado][/COLOR]"
                     goto = "true"
 
                 directory.add_file("{0} {1}".format(state, addonnames[i]), {'mode': 'toggleaddon', 'name': addonids[i], 'url': goto}, icon=icon, fanart=fanart)
@@ -542,10 +542,10 @@ def enable_addons(all=False):
 
 def remove_addon_data_menu():
     if os.path.exists(CONFIG.ADDON_DATA):
-        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data', {'mode': 'removedata', 'name': 'all'}, themeit=CONFIG.THEME2)
-        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data para Addons Desinstalados', {'mode': 'removedata', 'name': 'uninstalled'}, themeit=CONFIG.THEME2)
-        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] Todas las Carpetas Vacías en Addon_Data', {'mode': 'removedata', 'name': 'empty'}, themeit=CONFIG.THEME2)
-        directory.add_file('[COLOR red][B][ELIMINAR][/B][/COLOR] {0} Addon_Data'.format(CONFIG.ADDONTITLE), {'mode': 'resetaddon'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data', {'mode': 'removedata', 'name': 'all'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] Todos los Addon_Data para Addons Desinstalados', {'mode': 'removedata', 'name': 'uninstalled'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] Todas las Carpetas Vacías en Addon_Data', {'mode': 'removedata', 'name': 'empty'}, themeit=CONFIG.THEME2)
+        directory.add_file('[COLOR tomato][B][ELIMINAR][/B][/COLOR] {0} Addon_Data'.format(CONFIG.ADDONTITLE), {'mode': 'resetaddon'}, themeit=CONFIG.THEME2)
         directory.add_separator(themeit=CONFIG.THEME3)
         fold = glob.glob(os.path.join(CONFIG.ADDON_DATA, '*/'))
         for folder in sorted(fold, key = lambda x: x):
@@ -627,6 +627,6 @@ def create_save_data_menu(add='', name=''):
     menu_items.append((CONFIG.THEME3.format('Importar {0} Datos'.format(add3)), 'RunPlugin(plugin://{0}/?mode=import{1}&name={2})'.format(CONFIG.ADDON_ID, add2, name2)))
     menu_items.append((CONFIG.THEME3.format('Eliminar Addon {0} Datos'.format(add3)), 'RunPlugin(plugin://{0}/?mode=addon{1}&name={2})'.format(CONFIG.ADDON_ID, add2, name2)))
 
-    menu_items.append((CONFIG.THEME2.format('{0} Ajustes'.format(CONFIG.ADDONTITLE)), 'RunPlugin(plugin://{0}/?mode=settings)'.format(CONFIG.ADDON_ID)))
+    menu_items.append((CONFIG.THEME2.format('{0} Ajustes1'.format(CONFIG.ADDONTITLE)), 'RunPlugin(plugin://{0}/?mode=settings)'.format(CONFIG.ADDON_ID)))
 
     return menu_items

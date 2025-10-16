@@ -42,7 +42,7 @@
                 <font>font12</font>
                 <align>left</align>
                 <aligny>top</aligny>
-                <label>[B]Primera ejecución del asistente, le gustaría habilitar alguna de las siguientes configuraciones?[/B]</label>
+                <label>[B][COLOR white]Esta es tu primera Ejecución de [B][COLOR azure]TVBAN [COLOR tan]WIZARD[/B][COLOR white]. ¡Te recomendamos continuar con las opciones predeterminadas![/COLOR][/B]</label>
             </control>
         </control>
 	    <!-- Scrollbar  -->

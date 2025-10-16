@@ -58,7 +58,7 @@ def wipe():
         CONFIG.set_setting('loginnextsave', str(tools.get_date(days=3, formatted=True)))
 
     exclude_dirs = CONFIG.EXCLUDES
-    exclude_dirs.append('mi_build')
+    exclude_dirs.append('Mis_Builds')
     
     progress_dialog = xbmcgui.DialogProgress()
     
@@ -151,7 +151,7 @@ def wipe():
     for root, dirs, files in os.walk(xbmcPath, topdown=True):
         dirs[:] = [d for d in dirs if d not in exclude_dirs]
         for name in dirs:
-            progress_dialog.update(100, '\n' + 'Limpieza de Carpetas Vacías: [COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, name))
+            progress_dialog.update(100, '\n' + 'Limpieza de Carpetas Vacias: [COLOR {0}]{1}[/COLOR]'.format(CONFIG.COLOR1, name))
             if name not in ["Database", "userdata", "temp", "addons", "addon_data"]:
                 shutil.rmtree(os.path.join(root, name), ignore_errors=True, onerror=None)
         if progress_dialog.iscanceled():
@@ -191,19 +191,19 @@ def fresh_start(install=None, over=False):
 
     elif install == 'restore':
         yes_pressed = dialog.yesno(CONFIG.ADDONTITLE,
-                                       "[COLOR {0}]¿Desea restaurar su".format(CONFIG.COLOR2)
-                                       +'\n'+"Configuración de Kodi a la configuración predeterminada"
-                                       +'\n'+"Antes de instalar la copia de seguridad local?[/COLOR]",
+                                       "[COLOR {0}]Desea [COLOR khaki]Restaurar[/COLOR] su [COLOR khaki]Configuración[/COLOR] de [COLOR teal]Kodi[/COLOR]".format(CONFIG.COLOR2)
+                                       +'\n'+"a la [COLOR yellowgreen]Configuración Predeterminada[/COLOR]"
+                                       +'\n'+"antes de instalar la [COLOR cyan]Copia de Seguridad Local[/COLOR]?[/COLOR]",
                                        nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]',
                                        yeslabel='[B][COLOR cyan]Continuar[/COLOR][/B]')
     elif install:
-        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]¿Desea restaurar su".format(CONFIG.COLOR2)
-                                       +'\n'+"Configuración de Kodi a la configuración predeterminada"
-                                       +'\n'+"Antes de instalar [COLOR {0}]{1}[/COLOR]?".format(CONFIG.COLOR1, install),
+        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]Desea [COLOR khaki]Restaurar[/COLOR] su [COLOR khaki]Configuración[/COLOR] de [COLOR teal]Kodi[/COLOR]".format(CONFIG.COLOR2)
+                                       +'\n'+"Kodi a la [COLOR yellowgreen]Configuración Predeterminada[/COLOR]"
+                                       +'\n'+"antes de Instalar [COLOR {0}]{1}[/COLOR]?".format(CONFIG.COLOR1, install),
                                        nolabel='[B][COLOR red]No, Cancelar[/COLOR][/B]',
                                        yeslabel='[B][COLOR cyan]Continuar[/COLOR][/B]')
     else:
-        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[COLOR {0}]¿Desea restaurar su".format(CONFIG.COLOR2) +' \n' + "Configuración de Kodi a la configuración predeterminada?[/COLOR]", nolabel='[B][COLOR red]No, CancelAR[/COLOR][/B]', yeslabel='[B][COLOR CYAN]ContinuAR[/COLOR][/B]')
+        yes_pressed = dialog.yesno(CONFIG.ADDONTITLE, "[B][COLOR {0}]Desea [COLOR khaki]Restaurar[/COLOR] su [COLOR khaki]Configuración[/COLOR] de [COLOR teal]Kodi[/COLOR]".format(CONFIG.COLOR2) +' \n\n' + "a la [COLOR yellowgreen]Configuración Predeterminada[/COLOR]?[/B]", nolabel='[B][COLOR red]No, CancelAR[/COLOR][/B]', yeslabel='[B][COLOR cyan]Continuar[/COLOR][/B]')
     if yes_pressed:
         wipe()
         
@@ -216,7 +216,7 @@ def fresh_start(install=None, over=False):
 
             Wizard().build('normal', install, over=True)
         else:
-            dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi, Presione [COLOR azure]OK[/COLOR] para Forzar el Cierre de Kodi[/B][/COLOR]".format(CONFIG.COLOR2))
+            dialog.ok(CONFIG.ADDONTITLE, "[B][COLOR khaki]INSTALADO CORRECTAMENTE.[/B], [COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi, Presione [COLOR azure]OK[/COLOR] para Forzar el Cierre de Kodi[/B][/COLOR]".format(CONFIG.COLOR2))
             from resources.libs import update
             update.addon_updates('reset')
             tools.kill_kodi(over=True)
@@ -274,13 +274,13 @@ def install_apk(name, url):
         redownload = True
         yes = True
         if os.path.exists(lib):
-            redownload = dialog.yesno(CONFIG.ADDONTITLE, '[COLOR {}]{}[/COLOR] ya existe. Te gustaría volver a descargarlo?'.format(CONFIG.COLOR1, apk),
+            redownload = dialog.yesno(CONFIG.ADDONTITLE, '[COLOR {}]{} [COLOR white]ya existe. \n\nTe gustaría volver a descargarlo?[/COLOR]'.format(CONFIG.COLOR1, apk),
                                yeslabel="[B][COLOR darkorange]Volver a descargar[/COLOR][/B]",
                                nolabel="[B][COLOR cyan]Instalar[/COLOR][/B]")
             yes = False
         else:
             yes = dialog.yesno(CONFIG.ADDONTITLE,
-                                   "[COLOR {0}]Le gustaría descargar e instalar: ".format(CONFIG.COLOR2)
+                                   "[COLOR {0}][COLOR white]Le gustaría descargar e instalar:[/COLOR] ".format(CONFIG.COLOR2)
                                    +'\n'+"[COLOR {0}]{1}[/COLOR]".format(CONFIG.COLOR1, name),
                                    yeslabel="[B][COLOR cyan]Descargar[/COLOR][/B]",
                                    nolabel="[B][COLOR red]Cancelar[/COLOR][/B]")
@@ -294,7 +294,7 @@ def install_apk(name, url):
             response = tools.open_url(url, check=True)
             if not response:
                 logging.log_notify(CONFIG.ADDONTITLE,
-                                   '[COLOR {0}]APK Instalador:[/COLOR] [COLOR gold]Apk Url Invalida![/COLOR]'.format(CONFIG.COLOR2))
+                                   '[COLOR {0}]Instalador APK:[/COLOR] [COLOR gold]URL de Apk no Válida![/COLOR]'.format(CONFIG.COLOR2))
                 return
                 
             progress_dialog.create(CONFIG.ADDONTITLE,
@@ -312,8 +312,8 @@ def install_apk(name, url):
                 
         dialog.ok(CONFIG.ADDONTITLE, '[COLOR {}]{}[/COLOR] descargado a [COLOR {}]{}[/COLOR]. Si la instalación no comienza por sí sola, navegue hasta esa ubicación para instalar el APK.'.format(CONFIG.COLOR1, apk, CONFIG.COLOR1, path))
         
-        logging.log('Opening {} with {}'.format(lib, use_manager), level=xbmc.LOGINFO)
+        logging.log('Abriendo {} con {}'.format(lib, use_manager), level=xbmc.LOGINFO)
         xbmc.executebuiltin('StartAndroidActivity({},,,"content://{}")'.format(use_manager, lib))
     else:
         logging.log_notify(CONFIG.ADDONTITLE,
-                           '[COLOR {0}]ERROR:[/COLOR] [COLOR gold]Ningun Dispositivo Android[/COLOR]'.format(CONFIG.COLOR2))
+                           '[COLOR {0}]ERROR:[/COLOR] [COLOR gold]Ningún Dispositivo Android[/COLOR]'.format(CONFIG.COLOR2))

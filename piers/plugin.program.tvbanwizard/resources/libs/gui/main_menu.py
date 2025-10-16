@@ -70,21 +70,21 @@ class MainMenu:
         directory.add_dir('[B][COLOR orange]BUILDS[COLOR azure] - [COLOR orange]PARCHES:[COLOR azure] TVBAN [COLOR cyan]MATNEXOM[/COLOR][/B]', {'mode': 'builds'}, icon=CONFIG.ICONBUILDS, themeit=CONFIG.THEME1)
         directory.add_dir('[B]Mantenimiento[/B]', {'mode': 'maint'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
         if (tools.platform() == 'android' or CONFIG.DEVELOPER == 'true'):
-            directory.add_dir('[B]Instalador de APK[/B]', {'mode': 'apk'}, icon=CONFIG.ICONAPK, themeit=CONFIG.THEME1)
+            directory.add_dir('[B]Instalador de [COLOR yellowgreen]APKs[/COLOR][/B]', {'mode': 'apk'}, icon=CONFIG.ICONAPK, themeit=CONFIG.THEME1)
         if tools.open_url(CONFIG.ADDONFILE, check=True) or os.path.exists(os.path.join(CONFIG.ADDON_PATH, 'resources', 'text', 'addons.json')):
             directory.add_dir('[B]Instalador de Addon[/B]', {'mode': 'addons'}, icon=CONFIG.ICONADDONS, themeit=CONFIG.THEME1)
         if tools.open_url(CONFIG.YOUTUBEFILE, check=True) and not CONFIG.YOUTUBETITLE == '':
             directory.add_dir(CONFIG.YOUTUBETITLE, {'mode': 'youtube'}, icon=CONFIG.ICONYOUTUBE, themeit=CONFIG.THEME1)
         directory.add_dir('[B]Guardar Datos[/B]', {'mode': 'savedata'}, icon=CONFIG.ICONSAVE, themeit=CONFIG.THEME1)
         if CONFIG.HIDECONTACT == 'No':
-            directory.add_file('[B]Contacto[/B]', {'mode': 'contact'}, icon=CONFIG.ICONCONTACT, themeit=CONFIG.THEME1)
+            directory.add_file('[B][COLOR dodgerblue]Contacto[/COLOR][/B]', {'mode': 'contact'}, icon=CONFIG.ICONCONTACT, themeit=CONFIG.THEME1)
         directory.add_separator()
         directory.add_file('[B]Cargar Archivo de Registro[/B]', {'mode': 'uploadlog'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
-        directory.add_file('[B]Ver Errores en el Registro:[/B] [COLOR teal]{0}[/COLOR]'.format(errorsfound), {'mode': 'viewerrorlog'}, icon=CONFIG.ICONMAINT,
-                           themeit=CONFIG.THEME1)
+        directory.add_file('[B]Ver Errores en el Registro:[/B] [COLOR khaki]{0}[/COLOR]'.format(errorsfound), {'mode': 'viewerrorlog'}, icon=CONFIG.ICONMAINT,
+                           themeit=CONFIG.THEME3)
         if errors > 0:
-            directory.add_file('[B]Ver el Ultimo Error en el Registro[/B]', {'mode': 'viewerrorlast'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME1)
-        directory.add_separator()
-        directory.add_file('[B]Ajustes[/B]', {'mode': 'settings', 'name': CONFIG.ADDON_ID}, icon=CONFIG.ICONSETTINGS, themeit=CONFIG.THEME1)
+            directory.add_file('[B]Ver el Ultimo Error en el Registro[/B]', {'mode': 'viewerrorlast'}, icon=CONFIG.ICONMAINT, themeit=CONFIG.THEME6)
+        directory.add_separator('[B]AJUSTES TVBAN WIZARD[/B]', themeit=CONFIG.THEME2)
+        directory.add_file('[B]AJUSTES[/B]', {'mode': 'settings', 'name': CONFIG.ADDON_ID}, icon=CONFIG.ICONSETTINGS, themeit=CONFIG.THEME1)		
         if CONFIG.DEVELOPER == 'true':
             directory.add_dir('[B]Menú de Desarrollador[/B]', {'mode': 'developer'}, icon=CONFIG.ADDON_ICON, themeit=CONFIG.THEME1)

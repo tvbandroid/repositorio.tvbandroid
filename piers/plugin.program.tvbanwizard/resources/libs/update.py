@@ -120,5 +120,5 @@ def toggle_addon_updates():
     
     selected = dialog.select(CONFIG.ADDONTITLE, options)
             
-    logging.log_notify(CONFIG.ADDONTITLE, 'Las actualizaciones cambiaron a "{0}"'.format(options[selected]))
+    logging.log_notify(CONFIG.ADDONTITLE, '[COLOR azure]Las actualizaciones cambiaron a "[COLOR yellowgreen]{0}[/COLOR]"'.format(options[selected]))
     xbmc.executeJSONRPC(set_query.format(selected))

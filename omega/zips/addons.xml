@@ -1079,6 +1079,34 @@
 </extension>
 </addon>
 
+<addon id="plugin.video.dlv2" name="DaddyLive V2" version="0.2.6" provider-name="X">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.requests" />
+    <import addon="script.module.beautifulsoup4" />
+    <import addon="inputstream.ffmpegdirect" />
+    <import addon="script.module.pytz" />
+    <import addon="script.module.tzlocal" />
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.jpg</fanart>
+      <screenshot>screen1.jpg</screenshot>
+      <screenshot>screen2.jpg</screenshot>
+      <screenshot>screen3.jpg</screenshot>
+    </assets>
+    <summary lang="en_GB">The X</summary>
+	<description lang="en_GB">0.2.6 - Resolver fix. 0.2.5 - Added extra error handling. Force http to hopefully prevent ssl error. Some code cleanup.  v0.2.4 - Resolver fix. v0.2.3 - Updated to use new api. v0.2.2 - Changed favourites file path to prevent favourites deleting when addon updates. Added autoplay option in settings.  Added new api for channels from Daddylive which includes more channels! v0.2.1 - Fix some resolvers. Added extra players. v0.2.0 - Added favourite channels. Add/remove a channel via context menu. Added toggle timeshift on/off in settings. Timeshift enables pause and rewind but requires available storage. New code framework.</description>
+    <platform>all</platform>
+    <language>en</language>
+    <license>GPL-2.0-or-later</license>
+  </extension>
+</addon>
+
 <addon id="plugin.video.doqmental"
 	name="DOQMENTAL"
 	version="1.1"
@@ -1125,6 +1153,28 @@
         <news>- Añadida opción de reproducción externa de playlists[CR]- Correcciones menores
         </news>
     </extension>
+</addon>
+
+<addon id="plugin.video.eagle.ace" name="[COLORskyblue]Eagle [COLORbrown]Ace[/COLOR]" version="1.5" provider-name="[COLOR orange]@by_black_eagle[/COLOR]">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" /> <!-- Kodi en Python 3 -->
+    <import addon="script.module.requests" version="2.22.0" /> <!-- Compatible con Python 3 -->
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+<summary>Canais de Televisão, desportos e mais...</summary>
+		<description lang="en">[COLOR red]Eagle Acel[/COLOR] [COLORorange][/COLOR] [COLORorange]é um addon da familia Arrow Negra.TODOS OS LINKS ESTÃO DISPONIVEIS NA INTERNET![/COLOR]</description>
+		<platform>all</platform>
+		<assets>
+       <icon>icon.png</icon>
+       <fanart>fanart.jpg</fanart>
+       <screenshot>resources/screenshots/1.jpg</screenshot>
+       <screenshot>resources/screenshots/2.jpg</screenshot>
+       <screenshot>resources/screenshots/3.jpg</screenshot>
+    </assets>
+</extension>
 </addon>
 
 <addon id="plugin.video.elementum" name="Elementum" version="0.1.110" provider-name="elgatito">

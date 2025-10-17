@@ -181,79 +181,6 @@
   </extension>
 </addon>
 
-<addon
-  id="inputstream.adaptive"
-  version="22.3.0"
-  name="InputStream Adaptive"
-  provider-name="peak3d, Team Kodi">
-  <requires>
-<import addon="kodi.binary.global.main" minversion="2.0.0" version="2.0.2"/>
-<import addon="kodi.binary.global.general" minversion="1.0.4" version="1.0.5"/>
-<import addon="kodi.binary.global.gui" minversion="5.15.0" version="5.15.0"/>
-<import addon="kodi.binary.global.filesystem" minversion="1.1.7" version="1.1.8"/>
-<import addon="kodi.binary.global.tools" minversion="1.0.0" version="1.0.4"/>
-<import addon="kodi.binary.instance.inputstream" minversion="3.3.0" version="3.3.0"/>
-<import addon="kodi.binary.instance.videocodec" minversion="2.1.0" version="2.1.0"/></requires>
-  <extension
-    point="kodi.inputstream"
-    name="adaptive"
-    extension=""
-    tags="true"
-    listitemprops="drm_legacy|license_type|license_key|license_url|license_url_append|license_data|license_flags|manifest_type|server_certificate|manifest_update_parameter|manifest_upd_params|manifest_params|manifest_headers|stream_params|stream_headers|original_audio_language|play_timeshift_buffer|pre_init_data|stream_selection_type|chooser_bandwidth_max|chooser_resolution_max|chooser_resolution_secure_max|live_delay|internal_cookies|config|manifest_config"
-    library_windows="inputstream.adaptive.dll"/>
-  <extension point="xbmc.addon.metadata">
-    <platform>windows-x86_64</platform>
-	<license>GPL-2.0-or-later</license>
-	<source>https://github.com/xbmc/inputstream.adaptive</source>
-	<assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>
-    </assets>
-    <summary lang="ca_ES">Client InputStream per a transmissions adaptatives</summary>
-    <summary lang="cs_CZ">Klient adaptivních toků protokolu InputStream</summary>
-    <summary lang="da_DK">InputStream-klient til adaptive streams</summary>
-    <summary lang="de_DE">InputStream-Client für adaptive Streams</summary>
-    <summary lang="en_GB">InputStream client for adaptive streams</summary>
-    <summary lang="es_ES">Cliente InputStream para transmisiones adaptativas</summary>
-    <summary lang="es_MX">Cliente InputStream para transmisiones adaptativas</summary>
-    <summary lang="et_EE">InputStream klient kohanduvate voogude jaoks</summary>
-    <summary lang="fi_FI">InputStream-asiakas mukautuville mediavirroille</summary>
-    <summary lang="fr_FR">Client InputStream pour les flux adaptatifs</summary>
-    <summary lang="he_IL">לקוח InputStream לתזרימים מסתגלים</summary>
-    <summary lang="hr_HR">InputStream klijent za prilagodljiva strujanja</summary>
-    <summary lang="hu_HU">InputStream kliens az adaptív streamekhez</summary>
-    <summary lang="is_IS">InputStream-biðlari fyrir aðlaganleg streymi</summary>
-    <summary lang="it_IT">Client InputStream per flussi adattivi</summary>
-    <summary lang="ko_KR">적응형 스트림을 위한 InputStream 클라이언트</summary>
-    <summary lang="lv_LV">InputStream klients adaptīvām straumēm</summary>
-    <summary lang="nl_NL">InputStream client voor adaptive streams</summary>
-    <summary lang="pl_PL">Klient InputStream dla strumieni adaptacyjnych</summary>
-    <summary lang="pt_BR">Cliente InputStream para transmissões adaptáveis</summary>
-    <summary lang="ru_RU">Клиент InputStream для адаптивных потоков</summary>
-    <summary lang="zh_CN">用于自适应流的 InputStream 客户端</summary>
-    <description lang="ca_ES">Client InputStream per a transmissions adaptatives</description>
-    <description lang="cs_CZ">Klient adaptivních toků protokolu InputStream</description>
-    <description lang="da_DK">InputStream-klient til adaptive streams</description>
-    <description lang="de_DE">InputStream-Client für adaptive Streams. Unterstützt werden Streamingprotokolle wie MPEG-DASH, HLS und Microsoft Smooth Streaming.[CR][CR] Das Addon unterstützt ebenfalls DRM-geschützte Streams, wie Google Widevine, Microsoft Playready und andere.[CR][CR]Für Dokumentation https://github.com/xbmc/inputstream.adaptive besuchen</description>
-    <description lang="en_GB">InputStream client for adaptive streams. Common streaming protocols such as MPEG-DASH, HLS and Microsoft Smooth Streaming are supported.[CR][CR]The add-on also has support for DRM protected streams, such as Google Widevine, Microsoft PlayReady and others.[CR][CR]For documentation visit: https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="es_ES">Cliente InputStream para transmisiones de datos adaptativos. Se admiten protocolos de transmisión comunes como MPEG-DASH, HLS y Microsoft Smooth Streaming.[CR][CR]El complemento también es compatible con transmisiones protegidas por DRM, como Google Widevine, Microsoft PlayReady y otros.[CR][CR]Para consultar la documentación, visite: https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="es_MX">Cliente InputStream para transmisiones adaptativas</description>
-    <description lang="et_EE">InputStream klient adaptiivsete voogude jaoks. Toetatakse levinud voogedastusprotokolle, nagu MPEG-DASH, HLS ja Microsoft Smooth Streaming.[CR][CR]Lisamoodul toetab ka DRM-iga kaitstud vooge, nagu Google Widevine, Microsoft PlayReady ja teised.[CR][CR][CR] ]Dokumentatsiooni saamiseks külasta aadressi https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="fi_FI">InputStream-asiakas mukautuville mediavirroille, joka tukee yleisiä suoratoistoprotokollia, kuten MPEG-DASH, HLS ja Microsoft Smooth Streaming.[CR][CR]Tukee myös mm. Google Widevine ja Microsoft PlayReady -tekniikoilla DRM-suojattua suoratoistoa.[CR][CR]Ohjeita löydät osoitteesta https://github.com/xbmc/inputstream.adaptive.</description>
-    <description lang="fr_FR">Client InputStream pour les flux adaptatifs. Les protocoles de streaming courants tels que MPEG-DASH, HLS et Microsoft Smooth Streaming sont pris en charge.[CR][CR]Le module complémentaire prend également en charge les flux protégés par DRM, tels que Google Widevine, Microsoft PlayReady et autres.[CR][CR] Pour la documentation, visitez : https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="he_IL">לקוח InputStream לתזרימים מסתגלים</description>
-    <description lang="hr_HR">InputStream klijent za prilagodljiva strujanja</description>
-    <description lang="hu_HU">InputStream kliens az adaptív streamekhez</description>
-    <description lang="it_IT">Client InputStream per flussi adattivi. Sono supportati protocolli di streaming comuni come MPEG-DASH, HLS e Microsoft Smooth Streaming.[CR][CR]L&apos;add-on supporta anche flussi protetti da DRM, come Google Widevine, Microsoft PlayReady e altri.[CR][CR] ]Per la documentazione visita: https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="ko_KR">적응형 스트림을 위한 InputStream 클라이언트입니다. MPEG-DASH, HLS 및 Microsoft Smooth Streaming과 같은 일반적인 스트리밍 프로토콜이 지원됩니다.[CR][CR]추가 기능은 Google Widevine, Microsoft PlayReady 등과 같은 DRM 보호 스트림도 지원합니다.[CR][CR ]문서를 보려면 https://github.com/xbmc/inputstream.adaptive를 방문하세요</description>
-    <description lang="lv_LV">InputStream klients adaptīvām straumēm</description>
-    <description lang="pl_PL">Klient InputStream dla strumieni adaptacyjnych. Obsługiwane są popularne protokoły przesyłania strumieniowego, takie jak MPEG-DASH, HLS i Microsoft Smooth Streaming.[CR][CR]Dodatek obsługuje również strumienie chronione DRM, takie jak Google Widevine, Microsoft PlayReady i inne.[CR][CR] ]Dokumentacja znajduje się na stronie: https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="pt_BR">Cliente InputStream para transmissões adaptáveis. Há suporte para protocolos de streaming comuns, como MPEG-DASH, HLS e Microsoft Smooth Streaming.[CR][CR]O addon também oferece suporte a transmissões protegidas por DRM, como Google Widevine, Microsoft PlayReady e outros.[CR][CR]Para obter a documentação, visite: https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="ru_RU">Клиент InputStream для адаптивных потоков. Поддерживаются такие распространенные потоковые протоколы, как MPEG-DASH, HLS и Microsoft Smooth Streaming.[CR][CR]Дополнение также поддерживает потоки, защищенные DRM, такие как Google Widevine, Microsoft PlayReady и другие.[CR][CR]Для получения документации посетите: https://github.com/xbmc/inputstream.adaptive</description>
-    <description lang="zh_CN">用于自适应流的 InputStream 客户端</description>
-  </extension>
-</addon>
-
 <addon id="plugin.audio.mp3streams" name="MP3 Streams" version="2023.2.31" provider-name="Jon Bovi, Slamious, Diggz">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
@@ -1119,6 +1046,34 @@
 </extension>
 </addon>
 
+<addon id="plugin.video.dlv2" name="DaddyLive V2" version="0.2.6" provider-name="X">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.requests" />
+    <import addon="script.module.beautifulsoup4" />
+    <import addon="inputstream.ffmpegdirect" />
+    <import addon="script.module.pytz" />
+    <import addon="script.module.tzlocal" />
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.jpg</fanart>
+      <screenshot>screen1.jpg</screenshot>
+      <screenshot>screen2.jpg</screenshot>
+      <screenshot>screen3.jpg</screenshot>
+    </assets>
+    <summary lang="en_GB">The X</summary>
+	<description lang="en_GB">0.2.6 - Resolver fix. 0.2.5 - Added extra error handling. Force http to hopefully prevent ssl error. Some code cleanup.  v0.2.4 - Resolver fix. v0.2.3 - Updated to use new api. v0.2.2 - Changed favourites file path to prevent favourites deleting when addon updates. Added autoplay option in settings.  Added new api for channels from Daddylive which includes more channels! v0.2.1 - Fix some resolvers. Added extra players. v0.2.0 - Added favourite channels. Add/remove a channel via context menu. Added toggle timeshift on/off in settings. Timeshift enables pause and rewind but requires available storage. New code framework.</description>
+    <platform>all</platform>
+    <language>en</language>
+    <license>GPL-2.0-or-later</license>
+  </extension>
+</addon>
+
 <addon id="plugin.video.doqmental"
 	name="DOQMENTAL"
 	version="1.1"
@@ -1167,6 +1122,28 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.eagle.ace" name="[COLORskyblue]Eagle [COLORbrown]Ace[/COLOR]" version="1.5" provider-name="[COLOR orange]@by_black_eagle[/COLOR]">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" /> <!-- Kodi en Python 3 -->
+    <import addon="script.module.requests" version="2.22.0" /> <!-- Compatible con Python 3 -->
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="addon.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+<summary>Canais de Televisão, desportos e mais...</summary>
+		<description lang="en">[COLOR red]Eagle Acel[/COLOR] [COLORorange][/COLOR] [COLORorange]é um addon da familia Arrow Negra.TODOS OS LINKS ESTÃO DISPONIVEIS NA INTERNET![/COLOR]</description>
+		<platform>all</platform>
+		<assets>
+       <icon>icon.png</icon>
+       <fanart>fanart.jpg</fanart>
+       <screenshot>resources/screenshots/1.jpg</screenshot>
+       <screenshot>resources/screenshots/2.jpg</screenshot>
+       <screenshot>resources/screenshots/3.jpg</screenshot>
+    </assets>
+</extension>
+</addon>
+
 <addon id="plugin.video.f4mTester" version="4.2.3" name="f4mTester" provider-name="Joel">
     <requires>
         <import addon="script.module.simplejson" />
@@ -1187,32 +1164,6 @@
 			<icon>icon.png</icon>
 		</assets>
     </extension>
-</addon>
-
-<addon id="plugin.video.fenix-mac" name="[COLORcyan]fenix[COLORgrey]Mac[/COLOR]" version="1.8.2" provider-name="[COLORchocolate]@by_black[COLORgold]_eagle[/COLOR]">
-<requires>
-    	<import addon="script.module.resolveurl"/>
-	    <import addon="script.module.requests"/>
-		<import addon="script.module.six"/>
-		<import addon="script.module.kodi-six" />
-		<import addon="script.module.web-pdb" />
-  </requires>
-	<extension point="xbmc.python.pluginsource" library="default.py">
-		<provides>video</provides>
-	</extension>
-<extension point="xbmc.addon.metadata">
-		<summary>Canais de Televisão, desportos e mais...</summary>
-		<description lang="en">[COLOR red]fenix[/COLOR] [COLORorange]mac[/COLOR] [COLORorange]é um addon da familia blackeagle team.TODOS OS LINKS ESTÃO DISPONIVEIS NA INTERNET![/COLOR]</description>
-		<platform>all</platform>
-		<assets>
-       <icon>icon.png</icon>
-       <fanart>fanart.jpg</fanart>
-       <screenshot>resources/screenshots/1.jpg</screenshot>
-       <screenshot>resources/screenshots/2.jpg</screenshot>
-       <screenshot>resources/screenshots/3.jpg</screenshot>
-    </assets>
-		<language>pt</language>
-	</extension>
 </addon>
 
 <addon id="plugin.video.jacktook" name="Jacktook" version="0.4.10" provider-name="Sam-Max">
@@ -1358,37 +1309,6 @@ No se acepta ninguna responsabilidad por el uso de este addon.
     <news>1.0.1 Se añade la pagina tucanaldeportivo.com</news>
     <news>1.0.0 Desplegada la version incial</news>
   </extension>
-</addon>
-
-<addon id="plugin.video.Magellan_Matrix" name="[COLOR lime]Magellan[/COLOR]" version="3.0.0" provider-name="[COLOR lime][B]Magellan[/B][/COLOR]">
-	<requires>
-		<import addon="script.module.six" />
-		<import addon="script.module.kodi-six" />
-		<import addon="script.module.requests" optional="true"/>
-		<import addon="script.module.websocket" version="0.50.0"  optional="true"/>
-		<import addon="script.module.youtube.dl" optional="true"/>
-		<import addon="plugin.video.youtube" optional="true" />
-		<import addon="script.module.dateutil" optional="true" />
-		<import addon="script.module.resolveurl" optional="true"/>
-		<import addon="script.module.urlresolver" optional="true"/>
-		<import addon="script.module.cloudscraper" optional="true"/>
-		<import addon="script.module.inputstreamhelper" optional="true"/>
-		<import addon="script.module.slproxy" optional="true"/>
-	</requires>
-	<extension point="xbmc.python.pluginsource" library="default.py">
-		<provides>video</provides>
-	</extension>
-
-	<extension point="xbmc.addon.metadata">
-		<summary>Magellan Tv e Filmes</summary>
-		<description>Magellan_Matrix é um plugin de vídeo gratuito para o KODI que agrega links de reprodução de vídeos de vários tipos,encontrados
-		livremente na internet,levando o lazer e o prazer a todos vocês, para assistirem e curtirem cada momento, com a família e amigos.</description>
-		<platform>all</platform>
-		<assets>
-			<icon>icon.png</icon>
-			<fanart>fanart.jpg</fanart>
-		</assets>
-	</extension>
 </addon>
 
 <addon
@@ -1727,50 +1647,6 @@ No se acepta ninguna responsabilidad por el uso de este addon.
 			- Añadidas librerías de soporte.
 		</news>
 	</extension>
-</addon>
-
-<addon id="plugin.video.themoviedb.helper"
-version="6.10.5"
-name="TMDb Helper"
-provider-name="jurialmunkey">
-<requires>
-  <import addon="xbmc.python" version="3.0.1"/>
-  <import addon="script.module.requests" version="2.9.1"/>
-  <import addon="script.module.pil" version="1.1.7"/>
-  <import addon="script.module.addon.signals" version="0.0.6" />
-  <import addon="script.module.jurialmunkey" version="0.2.29" />
-  <import addon="script.module.infotagger" version="0.0.5" />
-  <import addon="script.module.qrcode" version="6.1.0" />
-</requires>
-<extension point="xbmc.python.pluginsource" library="resources/plugin.py">
-  <provides>video</provides>
-</extension>
-<extension point="xbmc.python.script" library="resources/script.py" />
-<extension point="xbmc.service" library="resources/service.py" />
-<extension point="xbmc.python.module" library="resources/modules"/>
-<extension point="xbmc.addon.metadata">
-  <reuselanguageinvoker>false</reuselanguageinvoker>
-  <summary lang="de_DE">TMDb Helfer</summary>
-  <summary lang="en_GB">TMDb Helper</summary>
-  <summary lang="zh_CN">TMDb 助手</summary>
-  <description lang="de_DE">TMDb Helper liefert Details über Filme, Fernsehsendungen und Schauspieler aus TMDb. Benutzer können auf eine Vielzahl von Listen aus TMDb TVDb MDbList und Trakt zugreifen.</description>
-  <description lang="en_GB">TMDb Helper provides details about movies, tvshows and actors from TMDb. Users can access a variety of lists from TMDb TVDb MDbList and Trakt.</description>
-  <description lang="sv_SE">TMDb Helper tillhandahåller information om filmer, tv-serier och skådespelare från TMDb. Användare kan få tillgång till en mängd olika listor från TMDb, TVDb, MDbList och Trakt.</description>
-  <description lang="zh_CN">TMDb 助手从 TMDb（影视数据库） 获取电影、电视剧及演员的详细信息。用户可访问来自 TMDb、TVDb、MDbList 和 Trakt 的各类影视列表。</description>
-  <disclaimer lang="de_DE">Daten bereitgestellt von TMDb TVDb MDbList OMDb FanartTV und Trakt. Einige der Informationen werden von TheTVDB.com bereitgestellt. Bitte erwäge sie zu unterstützen. https://thetvdb.com/subscribe</disclaimer>
-  <disclaimer lang="en_GB">Data provided by TMDb TVDb MDbList OMDb FanartTV and Trakt. Some of the information is provided by TheTVDB.com. Please consider supporting them. https://thetvdb.com/subscribe</disclaimer>
-  <disclaimer lang="sv_SE">Data tillhandahållen av TMDb TVDb MDbList OMDb FanartTV och Trakt. En del av informationen tillhandahålls av TheTVDB.com. Stöd dem gärna. https://thetvdb.com/subscribe</disclaimer>
-  <disclaimer lang="zh_CN">数据由 TMDb、TVDb、MDbList、OMDb、FanartTV 和 Trakt 提供。部分信息由 TheTVDB.com 提供，建议您支持他们。订阅链接：https://thetvdb.com/subscribe</disclaimer>
-  <license>GPL-3.0-or-later</license>
-  <website>https://github.com/jurialmunkey/plugin.video.themoviedb.helper</website>
-  <forum>https://forum.kodi.tv/showthread.php?tid=345847</forum>
-  <assets>
-    <icon>icon.png</icon>
-    <fanart>fanart.jpg</fanart>
-    <screenshot>resources/screenshot-01.jpg</screenshot>
-    <screenshot>resources/screenshot-02.jpg</screenshot>
-  </assets>
-</extension>
 </addon>
 
 <addon

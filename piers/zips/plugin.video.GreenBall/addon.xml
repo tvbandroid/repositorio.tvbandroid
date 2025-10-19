@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.GreenBall" version="1.0.7" name="Green Ball" provider-name="">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.beautifulsoup4" version="4.9.3+matrix.1"/>
+        <import addon="script.module.requests" version="2.25.1+matrix.1"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es">--</summary>
+        <description lang="es">--</description>
+        <platform>all</platform>
+        <version>1.0.0</version>
+        <provider-name></provider-name>
+        <assets>
+            <icon>gballN.gif</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>

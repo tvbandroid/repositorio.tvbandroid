@@ -204,6 +204,105 @@
     </extension>
 </addon>
 
+<addon id="plugin.audio.shoutcast" name="SHOUTcast" provider-name="Tristan Fischer (sphere@dersphere.de), enen92" version="2.5.2+matrix.1">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0" />
+        <import addon="script.module.xbmcswift2" version="19.0.0" />
+        <import addon="script.module.xmltodict" version="0.12.0" />
+    </requires>
+    <extension library="addon.py" point="xbmc.python.pluginsource">
+        <provides>audio</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <website>https://www.shoutcast.com/</website>
+        <source>https://github.com/XBMC-Addons/plugin.audio.shoutcast</source>
+        <forum>https://forum.kodi.tv/showthread.php?tid=143678</forum>
+        <license>GPL-2.0-only</license>
+        <summary lang="ar_SA">وجود اكثر من 50.000 محطة اذاعية مجانية على الانترنت </summary>
+        <summary lang="be_BY">more than 50.000 free internet radio stations</summary>
+        <summary lang="bg_BG">повече от 50 000 безплатни интернет радиостанции</summary>
+        <summary lang="ca_ES">Més de 50.000 estacions de ràdio per Internet gratuïtes</summary>
+        <summary lang="da_DK">mere end 50.000 gratis netradiostationer</summary>
+        <summary lang="de_DE">mehr als 50.000 kostenlose Internet Radio Sender</summary>
+        <summary lang="el_GR">Πάνω από 50.000 δωρεάν διαδικτυακοί ραδιοφωνικοί σταθμοί</summary>
+        <summary lang="en_GB">more than 50.000 free internet radio stations</summary>
+        <summary lang="en_NZ">more than 50.000 free internet radio stations</summary>
+        <summary lang="en_US">more than 50.000 free internet radio stations</summary>
+        <summary lang="es_ES">Más de 50.000 emisoras de radio por Internet gratuitas</summary>
+        <summary lang="es_MX">mas de 50.000 estaciones de radio gratuitas</summary>
+        <summary lang="fr_FR">plus de 50.000 radios internet gratuites</summary>
+        <summary lang="fr_CA">plus de 50 000 stations de radio Internet gratuites</summary>
+        <summary lang="gl_ES">máis de 50.000 emisoras de radio por internet de balde</summary>
+        <summary lang="he_IL">יותר מ־50.000 תחנות רדיו אינטרנטיות חינמיות</summary>
+        <summary lang="hr_HR">više od 50.000 besplatnih Internet radio stanica</summary>
+        <summary lang="hu_HU">Több mint 50.000 ingyenes internet rádió</summary>
+        <summary lang="id_ID">lebih dari 50.000 stasiun radio internet gratisan</summary>
+        <summary lang="it_IT">più di 50.000 stazioni radio libere su internet</summary>
+        <summary lang="ko_KR">50,000개 이상의 무료 인터넷 라디오 방송 청취</summary>
+        <summary lang="lt_LT">daugiau kaip 50,000 nemokamų internetinių radijo stočių</summary>
+        <summary lang="nl_NL">Meer dan 50.000 vrije internet radio stations</summary>
+        <summary lang="nb_NO">mer enn 50.000 gratis radiokanaler fra internett</summary>
+        <summary lang="pl_PL">Ponad 50.000 darmowych internetowych stacji radiowych</summary>
+        <summary lang="pt_PT">mais de 50.000 estações de rádio da net grátis</summary>
+        <summary lang="pt_BR">mais de 50.000 estações de rádio gratuitas on-line</summary>
+        <summary lang="ru_RU">более 50 000 свободных интернет радиостанций</summary>
+        <summary lang="sk_SK">Viac než 50.000 voľných internetových rádio staníc</summary>
+        <summary lang="sl_SI">več kot 50000 brezplačnih internetnih radijskih postaj</summary>
+        <summary lang="sv_SE">mer än 50.000 fria internetradiostationer</summary>
+        <summary lang="ta_IN">50.000 மேற்பட்ட இலவச இணைய வானொலி நிலையங்கள்</summary>
+        <summary lang="tr_TR">50.000 den Fazla Ücretsiz Internet Radyo Istasyonu</summary>
+        <summary lang="zh_CN">超过50.000免费网络电台</summary>
+        <description lang="be_BY">With this Add-on you can browse more than 50.000 free internet radio stations. Current Features:[CR]- Top 500 Stations[CR]- Browse by genre (and subgenre if enabled in settings)[CR]- Search Station by name[CR]- Search Stations by current playing track[CR]- You can manage a "My Stations"-list[CR]- bitrate and amount of listeners visible and sortable[CR]- 500 Stations on each Page (can be changed in the settings)[CR]- uses cache (24h genre, 1h station listings)</description>
+        <description lang="bg_BG">С това допълнение, можете да слушате над 50.000 достъпни и свободни радиостанции. В момента плъгина позволява:[CR] - Преглед на Топ 500 станции[CR] - Търсене по жанр (и поджанрове, ако е определено в настройките)[CR] - Търсене на станции по име[CR] - Търсене на подобни станции по текущо възпроизвежданата музика[CR] - Управление на списъка "Моите станции"[CR] - Преглеждане, сортиране по битрейт и количество слушатели[CR] - 500 станции на всяка страница (може да се промени в настройките)[CR] - Ползване на кеширане (стилове на 24 часа, списъци на станции на 1 час)</description>
+        <description lang="ca_ES">Amb aquest Add-on poden escoltar més de 50.000 emissores de ràdio per Internet gratuïtes. Característiques: [CR]- Les 500 millors emissores. [CR]- Cerca per gènere (i per subgèneres si s'habilita en la configuració). [CR]- Cerca d'emissores per nom. [CR]- Recerca d'emissores que reprodueixen una cançó. [CR]- Possibilitat d'administrar un directori amb "Els meus emissores". [CR]- Directoris ordenats que mostren bitrate i quantitat d'oients. [CR]- 500 emissores a cada pàgina (la quantitat pot canviar en la configuració). [CR]- Ús de memòria cau (24h gènere, 1h directori d'emissores).</description>
+        <description lang="da_DK">Med denne addon kan du udforske mere end 50.000 gratis internetradiostationer. Nuværende funktioner:[CR]- Top 500 Stationer[CR]- Gennemse efter genre (og undergenre hvis det er aktiveret i indstillinger)[CR]- Søg efter navn på Station[CR]- Søg efter Station ud fra nummeret der spiller[CR]- Du kan administrere en "My Stations"-liste[CR]- bitrate og antal lyttere vises og kan sorteres[CR]- 500 Stationer på hver side (kan ændres i indstillinger)[CR]- bruger cache (24 timer for genre, 1 time for lister)</description>
+        <description lang="de_DE">Dieses Add-on ermöglicht dir Zugriff auf über 50.000 kostenlose Internet Radio Sender.[CR]Aktuelle Features:[CR]- Top 500 Sender[CR]- Nach Genre browsen[CR]- Sender nach Name suchen[CR]- Sender nach aktuellem Track suchen[CR]- Sender per Kontext Menu in die "Meine Sender"-Liste kopieren[CR]- Anzeige der Bitrate und Anzahl Höhrer[CR]- 500 Sender pro Seite[CR]- Schnell durch lokalen Cache</description>
+        <description lang="el_GR">Με αυτό το Πρόσθετο μπορείτε να περιηγηθείτε ανάμεσα σε περισσότερους από 50.000 δωρεάν διαδικτυακούς ραδιοφωνικούς σταθμούς. Τρέχουσες λειτουργίες:[CR]- Κορυφαίοι 500 Σταθμοί[CR]- Περιήγηση ανά είδος (και υπο-είδος αν είναι ενεργό στις ρυθμίσεις)[CR]- Αναζήτηση Σταθμού με βάση το όνομα[CR]- Αναζήτηση Σταθμών με βάση το τρέχον τραγούδι[CR]- Μπορείτε να διαχειριστείτε μία λίστα "Σταθμών μου"[CR]- Το bitrate και το πλήθος των ακροατών είναι ορατά και η ταξινόμηση μπορεί να γίνει σύμφωνα με αυτά[CR]- 500 Σταθμοί σε κάθε Σελίδα (μπορεί να αλλάξει στις ρυθμίσεις)[CR]- Χρήση λανθάνουσας μνήμης (είδος 24 ωρών, καταχωρίσεις σταθμών 1 ώρας)</description>
+        <description lang="en_GB">With this Add-on you can browse more than 50.000 free internet radio stations. Current Features:[CR]- Top 500 Stations[CR]- Browse by genre (and subgenre if enabled in settings)[CR]- Search Station by name[CR]- Search Stations by current playing track[CR]- You can manage a "My Stations"-list[CR]- bitrate and amount of listeners visible and sortable[CR]- 500 Stations on each Page (can be changed in the settings)[CR]- uses cache (24h genre, 1h station listings)</description>
+        <description lang="en_NZ">With this Add-on you can browse more than 50.000 free internet radio stations. Current Features:[CR]- Top 500 Stations[CR]- Browse by genre (and subgenre if enabled in settings)[CR]- Search Station by name[CR]- Search Stations by current playing track[CR]- You can manage a "My Stations"-list[CR]- bitrate and amount of listeners visible and sortable[CR]- 500 Stations on each Page (can be changed in the settings)[CR]- uses cache (24h genre, 1h station listings)</description>
+        <description lang="en_US">With this Add-on you can browse more than 50.000 free internet radio stations. Current Features:[CR]- Top 500 Stations[CR]- Browse by genre (and subgenre if enabled in settings)[CR]- Search Station by name[CR]- Search Stations by current playing track[CR]- You can manage a "My Stations"-list[CR]- bitrate and amount of listeners visible and sortable[CR]- 500 Stations on each Page (can be changed in the settings)[CR]- uses cache (24h genre, 1h station listings)</description>
+        <description lang="es_ES">Con este Add-on pueden escucharse más de 50.000 emisoras de radio por Internet gratuitas. Características:[CR]- Las 500 mejores emisoras.[CR]- Búsqueda por género (y por subgéneros si se habilita en la configuración).[CR]- Búsqueda de emisoras por nombre.[CR]- Búsqueda de emisoras que reproducen una canción.[CR]- Posibilidad de administrar un directorio con "Mis emisoras".[CR]- Directorios ordenados que muestran bitrate y cantidad de oyentes.[CR]- 500 emisoras en cada página (la cantidad puede cambiarse en la configuración).[CR]- Uso de caché (24h género, 1h directorio de emisoras).</description>
+        <description lang="es_MX">Con este complemento usted puede navegar por mas de 50.000 estaciones de redio de internet gratuitas. Caracteristicas Actuales:[CR]- Mejores 500 Estaciones[CR]- Navegar por genero (y subgenero si lo habilita en los ajustes)[CR]- Busqueda de Estacion por nombre[CR]- Busqueda de Estaciones por la pista actual en reproduccion[CR]- Usted puede administrar una lista"Mis Estaciones"[CR]- tasa de bits y cantidad de oyentes visibles y ordenable[CR]- 500 Estaciones en cada Pagina (puede ser cambiado en los ajustes)[CR]- utiliza cache (24h genero, 1h lista de estaciones)</description>
+        <description lang="fr_FR">Avec cette extension vous pouvez accéder à plus de 50.000 station radio internet gratuite. Possibilités actuelles :[CR]- Top 500 stations[CR]- Naviguer par genre (et sous-genre si le réglage est activé)[CR]- Rechercher une station par nom[CR]- Rechercher une station jouant la piste en cours[CR]- Création d'une liste de stations favorites[CR]- Bitrate et nombre d'auditeurs visibles et triables[CR]- 500 stations par page (modifiable dans les réglages)[CR]- Utilisation d'un cache (24h par genre, 1h par station)</description>
+        <description lang="fr_CA">Avec cet addiciel vous pouvez parcourir plus de 50 000 stations de radio Internet gratuites. Caractéristiques actuelles :[CR] - Les 500 1res stations[CR] - Parcourir par genre (et sous-genre si activé dans les paramètres)[CR] - Rechercher les stations par nom[CR] - Rechercher les stations par piste en cours de lecture[CR] - Vous pouvez gérer une liste « Mes stations »[CR] - Débit binaire et nombre d'auditeurs visible et triable[CR] - 500 stations par page (peut être modifié dans les paramètres)[CR] - Utilise un cache (24 h pour les genres, 1h pour les listes de stations).</description>
+        <description lang="gl_ES">Grazas a este complemento pode buscar máis de 50.000 emisoras de radio por internet de balde. Características:[CR]- Mellores 500 Emisoras[CR]- Buscar por xénero (e subxénero se esta habilitado na configuración)[CR]- Buscar Emisoras por nome[CR]- Buscar Emisoras pola pista en reprodución actual[CR]- Pode xestionar a listaxe "As miñas Emisoras"[CR]- taxa de bits e número de ointes visíbeis e ordenábel[CR]- 500 Emisoras en cada páxina (pódese trocar na configuración)[CR]- usar a caché (24h para xénero, 1h para listaxe de emisoras)</description>
+        <description lang="he_IL">בעזרת הרחבה זו ניתן לעיין ביותר מ-50.000 תחנות רדיו אינטרנטיות חינמיות. כולל:[CR]- 500 התחנות הגדולות ביותר[CR]- עיון לפי סגנון (ותת סגנון אם מאופשר בהגדרות)[CR]- חיפוש תחנה לפי שם[CR]- חיפוש תחנות לפי רצועה המנוגנת כעת[CR]- ניתן לנהל רשימת "התחנות שלי"[CR]- מוצג קצב נתונים וכמות מאזינים וניתן למיין לפיהם[CR]- 500 תחנות בכל עמוד (ניתן לשינוי בהגדרות)[CR]- נעשה שימוש בזיכרון מטמון (24 שע' לסגנונות,1 שע' לרשימת התחנות)</description>
+        <description lang="hr_HR">Sa ovim dodatkom možete pregledati više od 50.000 besplatnih Internet radio stanica. Trenutne značajke:[CR]- Top 500 stanica[CR]- Pregledajte prema žanru (i podžanru ako je omogućeno u postavkama)[CR]- Pretraživajte stanice prema nazivu[CR]- Pretraživajte stanice prema trenutnoj reprodukciji pjesme[CR]- Možete upravljati "Moje stanice"-list[CR]- brzina prijenosa i broj slušatelja je vidljiv i prilagodljiv[CR]- 500 stanica na svakoj stranici (mogu se promijeniti u postavkama)[CR]- koristi se predmemorija (24 sata za žanr, 1 sat slušanje stanice)</description>
+        <description lang="hu_HU">Ezzel a kiegészítővel választhatsz több mint 50.000 ingyenes rádió adó közül. Jelenlegi szolgáltatások:[CR]- Top 500 állomás[CR]-Műfajonkénti (és alműfajonkénti) keresés[CR]- Név szerinti állomáskeresés[CR]- Állomáskeresés az éppen játszott szám alapján[CR]- Az "én állomásaim" lista kezelése[CR]- Minőség és hallgatottság szerinti rendezés[CR]- 500 adó minden oldalon (a szám beállítható)[CR]- Gyorsítótár használata (24óra a műfajokra, 1óra az állomásokra)</description>
+        <description lang="id_ID">Dengan addon ini Anda dapat menjelajahi lebih dari 50.000 stasiun radio gratisan. Fitur saat ini:[CR]- 500 Stasiun Teratas[CR]- Jelajahi berdasarkan tema (dan subtema jika diaktifkan di pengaturan)[CR]- Cari Stasiun berdasarkan nama[CR]- Cari Stasiun berdasarkan trek yang diputar[CR]- Anda dapat mengelola daftar "Stasiun Saya"[CR]- bitrate dan jumlah pendengar terlihat dan dapat diurutkan[CR]- 500 Stasiun setiap halaman (dapat diubah di pengaturan)[CR]- menggunakan cache (24 jam tema, 1 jam daftar stasiun)</description>
+        <description lang="it_IT">Con questo Add-on puoi sfogliare più di 50.000 stazioni radio libere su internet. Caratteristiche attuali:[CR]- Migliori 500 stazioni[CR]- Sfoglia per genere (e sottogenere se abilitato nelle impostazioni)[CR]- Cerca le stazioni per nome[CR]- Cerca le stazioni per traccia in esecuzione[CR]- Puoi gestire un lista "Mie Stazioni"[CR]- bitrate e quantità di ascoltatori visibile e riordinabile[CR]- 500 Stazioni in ogni pagina (può essere modificato nelle impostazioni)[CR]- cache utilizzata (24h genere, 1h ascolto)</description>
+        <description lang="ko_KR">이 애드온으로 50,000개 이상의 무료 인터넷 라디오 방송을 탐색할 수 있습니다. 현재 기능:[CR]- Top 500 방송국[CR]- 장르(설정에서 활성화하면 하위 장르)로 탐색[CR]- 방송국명으로 검색[CR]- 현재 트랙을 방송중인 방송국 검색[CR]- "내 방송국" 목록 관리[CR]- 비트레이트와 청취자수 표시와 정렬[CR]- 페이지당 500 방송국 표시 (설정에서 변경 가능)[CR]- 캐시 사용 (장르 24시간, 방송국 리스트 1시간)</description>
+        <description lang="lt_LT">Su šiuo priedu galite naršyti daugiau kaip 50,000 nemokamų internetinių radijo stočių. Dabartinės funkcijos:[CR]- 500 geriausių stočių[CR]- Naršyti pagal žanrą (ir porūšį, jei įjungta nustatymuose)[CR]- Ieškoti stoties pagal pavadinimą[CR]- Ieškoti stočių pagal dabartinį atkuriamą takelį[CR]- Jūs galite valdyti "Mano radijo stotys" sąrašą[CR]- galima matyti pralaidumą ir klausytojų skaičių bei pagal juos rūšiuoti[CR]- 500 stočių kiekviename puslapyje (galima pakeisti nustatymuose)[CR]- Naudoja talpyklą (24h žanro, 1h stoties sąrašai)</description>
+        <description lang="nl_NL">Met deze Add-on die kunt u door meer dan 50.000 vrije internet radiostations bladeren. Huidige functies: [CR]- Top 500 Stations [CR]- bladeren door genre (en subgenre indien ingeschakeld in instellingen) [CR] - Zoek Station op naam [CR] - Zoek Stations door huidig afspelende track [CR]- u kunt een "Mijn Stations" lijst beheren[CR]- bitrate en hoeveelheid luisteraars zichtbaar en sorteerbaar [CR]- 500 Stations op elke pagina (kan gewijzigd worden in de instellingen) [CR]-gebruikte cache (24u genre, 1 uur station luisteren)</description>
+        <description lang="nb_NO">Med denne utvidelsen kan du finne mer enn 50.000 radiokanaler helt gratis fra internett. Nåværende funksjoner:[CR]- Topp 500 stasjoner[CR]- Bla gjennom etter sjanger (og undersjangre om aktivert i innstillinger)[CR]- Søk etter stasjon med navn[CR]- Søk etter stasjoner etter hva som spilles nå[CR]- Du kan lage din egen "Mine stasjoner" -liste[CR]- Kvalitet og antall lyttere vises og kan filtreres[CR]- 500 stasjoner på hver side (kan endres i innstillinger)[CR]- Bruker mellomlagring (24 timer for sjanger, 1 time for stasjonslister)</description>
+        <description lang="pl_PL">Dzięki tej wtyczce możesz przeglądać w ponad 50.000 darmowych stacjach radiowych. Aktualne funkcje:[CR]- Top 500 stacji[CR]- przeglądaj według gatunków (oraz subgatunków jeżeli włączone)[CR]- szukaj stacji po nazwie[CR]- szukaj stacji po granym utworze[CR]- zarządzaj listą Moje stacje[CR]- sortowanie oraz widoczność liczby słuchaczy i bitrate[CR]- 500 stacji na stronie (możliwa edycja)[CR]- pamięć podręczna (24h gatunki, 1h lista stacji)</description>
+        <description lang="pt_PT">Com este add-on, pode escolher entre mais de 50.000 estações de rádio da net grátis. Funcionalidades:[CR]- Top 500 Rádios[CR]- Procure por Género (e sub-género, se activo nas preferências)[CR]- Procurar Rádio por nome[CR]- Procurar Rádios por faixa em reprodução[CR]- Pode gerir uma lista de "Minhas Rádios"[CR]- bitrate e quantidade de ouvintes visíveis e ordenáveis[CR]- 500 Rádios em cada Página (pode ser alterado nas preferências)[CR]- usar cache (24h para género, 1h para lista das rádios)</description>
+        <description lang="pt_BR">Com este Add-on, você pode navegar em mais de 50.000 estações de rádio on-line grátis. Características atuais:[CR]- As 500 Melhores Estações[CR]- Procurar por gênero (e subgênero se habilitado nas configurações)[CR]- Pesquisar estações por nome[CR]- Pesquisar estações pela faixa atual[CR]- Você pode gerenciar uma lista de "Minhas Estações"[CR]- bitrate e quantidade de ouvintes visíveis e ordenáveis[CR]- 500 estações por página (pode ser alterado nas configurações)[CR]- usa cache (24h para gêneros, 1h para listagem de estações)</description>
+        <description lang="ru_RU">С этим дополнением Вы сможете слушать более 50 тысяч доступных свободных радиостанций. На данный момент плагин позволяет:[CR]- Просматривать Top 500 станций[CR]- Искать по стилю (и подстилю, если задано в настройках)[CR]- Искать станции по имени[CR]- Искать похожие станции по текущей воспроизводимой музыке[CR]- Управление списком "Мои станции"[CR]- Просматривать, сортировать по битрейту и количеству слушателей[CR]- 500 станций на каждой странице (может быть изменено в настройках)[CR]- Использование кеширования (стили на 24 часа, списки станций на 1 час) </description>
+        <description lang="sk_SK">S týmto doplnok môžete prehliadať vyše 50.000 voľných internetových rádio staníc. Momentálne podporuje:
+- Top 500 staníc
+- Prehliadanie podľa žánru (a pod-žánru, ak povolené v nastaveniach)
+- hľadanie stanice podľa mena
+- hľadanie stanice podľa práve hranej skladby
+- Môžete spravovať zoznam "Moje stanice"
+- zobrazenie a zoradenie podľa dátového toku a počtu poslucháčov
+- 500 staníc na každej strane (môže byť zmenené v nastaveniach)
+- používa medzi-pamäť (24h pre žánre, 1h pre zoznam staníc)</description>
+        <description lang="sv_SE">Med detta tillägg kan du bläddra bland mer än 50.000 fria internetradiostationer. Nuvarande funktioner:[CR]- Topp 500 stationer[CR]- Bläddra efter genre (och undergenre, om det är påslaget i inställningar)[CR]- Sök station efter namn[CR]- Sök stationer som spelar låt[CR]- Du kan hantera "Mina stationer"-lista[CR]- bitrate och antal lyssnare är synligt och sorterbart[CR]- 500 stationer på varje sida (kan ändras i inställningar)[CR]- använder buffert (24 genre, 1 timmes stationlista)</description>
+        <description lang="ta_IN">இந்த துணை பயன் மூலம் நீங்கள் 50.000 மேற்பட்ட இலவச இணைய வானொலி நிலையங்களை உலாவ முடியும். தற்போதய சிறப்பியல்:[CR]- உச்சி 500 நிலையங்கள்[CR]- வகைபடி உலாவு (துணை வகைப்படி சேர்க்கவும் - அமைப்புகளில் தேர்வு செய்யவும்)[CR]- பெயர்படி நிலையத்தனி தேடுக[CR]- பெயர்படி நிலையத்தனி தேடுக[CR]- "என்னுடைய நிலையங்கள்" பட்டியலை நீங்கள் நிர்வகிக்க முடியும்[CR]- பிட்வீதம் மற்றும் கேட்போர் அளவுகளை பார்க்கவும் மற்றும் வரிசைபடுத்தவும்[CR]- ஒரு பக்கத்தில் 500 நிலையங்கள் (அமைப்புகளில் மாற்ற இயலும்)[CR]- தேக்கத்தை பயன்படுத்தவும் (24 மணிநேர வகை, 1 மணிநேர நிலைய பட்டியல்)</description>
+        <description lang="zh_CN">你可以使用本插件浏览超过50.000免费网络电台。当前功能：[CR]- 500强电台[CR]- 按类别浏览（可设置子类）[CR]- 按名字搜索电台[CR]- 按当前播放曲目搜索电台[CR]- 管理“我的电台”-列表[CR]- 按比特率和收听人数排序[CR]- 每页500个电台（可设置）[CR]- 使用缓存（24小时类别，1小时站点列表）</description>
+        <news>
+            2.5.2+matrix.1 (07/05/2021)
+            - Updated translations from Weblate
+        </news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.audio.tuneinradio" name="[COLOR aqua]TuneIn Radio K19[/COLOR]" version="4.0.3" provider-name="joaconigro">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0"/>
@@ -1692,6 +1791,34 @@ v3.0.0
       <fanart>fanart.jpg</fanart>
     </assets>
   </extension>
+</addon>
+
+<addon id="plugin.video.rtve" name="RTVE" version="1.0.0" provider-name="mcr222">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.future" version="1.0.0"/>
+        <import addon="script.module.inputstreamhelper" version="0.4.2"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <platform>all</platform>
+        <summary lang="en_GB">Entertainment, news, documentaries, etc from spanish television https://www.rtve.es/play/</summary>
+        <description lang="en_GB">Entertainment, news, documentaries, etc from spanish television https://www.rtve.es/play/. </description>
+        <summary lang="ca_ES">Tots els programes de RTVE.</summary>
+        <description lang="ca_ES">Tota la programació de RTVE.</description>
+        <summary lang="es_ES">Toda la programación de RTVE</summary>
+        <description lang="es_ES">Toda la programación de RTVE</description>
+        <language>ca</language>
+        <license>GPL-2.0-or-later</license>
+        <source>https://github.com/mcr222/plugin.video.rtve</source>
+        <website>https://www.rtve.es/play/</website>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
+    </extension>
 </addon>
 
 <addon id="plugin.video.sporthdme" name="SportHD" version="0.1.56" provider-name="Bugatsinho">
@@ -3413,400 +3540,6 @@ v1.1.25
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
         </assets>
-    </extension>
-</addon>
-
-<addon id="skin.auramod" version="2.0.4" name="Aura[COLOR cyan]MOD[/COLOR]" provider-name="skyfsza,inb4after,SerpentDrago">
-    <requires>
-        <import addon="xbmc.gui" version="5.17.0"/>
-        <import addon="script.skin.helper.service" version="1.1.24"/>
-        <import addon="script.skin.helper.widgets" version="1.0.0"/>
-        <import addon="script.skinshortcuts" version="1.0.20"/>
-        <import addon="script.image.resource.select" version="0.0.5"/>
-        <import addon="plugin.video.themoviedb.helper" version="4.3.7"/>
-        <import addon="plugin.program.autocompletion" version="1.0.1"/>
-        <import addon="resource.images.studios.white" version="0.0.10"/>
-        <import addon="resource.images.studios.coloured" version="0.0.18"/>
-        <import addon="resource.images.moviegenreicons.transparent" version="0.0.6"/>
-        <import addon="script.colorbox" version="2.0.8"/>
-    </requires>
-    <extension point="xbmc.gui.skin" defaultthemename="Textures.xbt" debugging="false" effectslowdown="1">
-        <res width="1920" height="1080" aspect="16:9" default="true" folder="1080i"/>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="en">Matrix / Kodi 19 Version of Auramod </summary>
-        <description lang="en">AuraMod is a Heavily Modified version of Aura by jurialmunkey. Combining parts and code of Aura,AZ2,Titan bingie, and many other skins  Credit to all those Devs for without them this would not be possible [COLOR cyan]Mods to Aura by skyfsza,inb4after,SerpentDrago[/COLOR]</description>
-        <platform>all</platform>
-        <license>Creative Commons Attribution Non-Commercial Share-Alike 4.0</license>
-        <source>https://github.com/SerpentDrago/skin.auramod</source>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-            <screenshot>resources/screenshot-01.jpg</screenshot>
-            <screenshot>resources/screenshot-02.jpg</screenshot>
-            <screenshot>resources/screenshot-03.jpg</screenshot>
-            <screenshot>resources/screenshot-04.jpg</screenshot>
-            <screenshot>resources/screenshot-05.jpg</screenshot>
-        </assets>
-        <news>
-            v2.0.4
-            -Remove More... widget item for Netflix Info "Cast and More" lists
-            -Remove deprecated See More... widget item
-            -Remove deprecated Favourites dialog
-            v2.0.3
-            -Increase xbmc.gui version for Omega
-            v2.0.2
-            -Fix missing Timers.xml log warning
-            -Fix deprecated Player.DisplayAfterSeek
-            -Add MyFavourites browser
-            -Fix Video calibration screen
-            -Fix Addon Info topbar focus
-            v2.0.1
-            -Increase xbmc.gui version for Nexus
-            v2.0.0
-            -Fix widgetPath is not defined for disabled widgets
-            -Fix Netflix Info "Cast and More" clearlogo image fallbacks
-            -Fix Aura Home TMDBHelper widget label
-            -Improve Aura Home LandscapeWide widget
-            --Remove widget item title label
-            -Improve Aura Home LandscapeDetails widget
-            --Adjust landscape artwork size
-            --Adjust clearlogo position
-            --Adjust progress bar width
-            --Adjust details position
-            -Improve Aura Home PosterDetails widget
-            --Add separate Poster Details layout
-            --Improve poster artwork position
-            --Improve plot label
-            --Adjust poster artwork position
-            -Improve Aura Home landscape widgets
-            --Add progress bar
-            --Adjust clearlogo position
-            --Add season and episode label
-            --Add separate Landscape layout
-            --Add separate Landscape Wide Poster layout
-            --Add separate Landscape Netflix layout
-            --Add separate Landscape Panel layout
-            --Add separate Landscape Details layout
-            -Fix infoline duration visibility
-            -Improve library landscape views
-            --Add progress bar
-            --Adjust clearlogo position
-            --Add season and episode label
-            --Fix clearlogo visibility
-            -Improve Netflix Home landscape widgets
-            --Remove old episode progress bar
-            --Add separate Landscape Panel layout
-            --Fix separate Landscape Wide Poster layout
-            -Improve Netflix Home Landscape and LandscapeWide widgets
-            --Add progress bar
-            --Adjust clearlogo position
-            --Improve season and episode label
-            --Fix season and episode label visibility
-            -Fix MyLists hub widget visibility
-            -Fix conditional expression formatting
-            -Fix MyLists search label
-            -Fix MyLists widget visibility
-            -Fix clearlogo visibility when landscape artwork not available
-            -Fix addon landscape artwork unnecessary clearlogo duplication
-            -Fix Liked % disappearing when modal dialog opened
-            -Fix icon image scaling when landscape artwork not available
-            -Fix poster image fallbacks
-            -Fix Netflix Home Spotlight Fanart "jumping" when navigating between items
-            -Add "Reset to defaults" skin setting for Background settings tab
-            -Add Extra fanart skin setting
-            -Fix Netflix Info "Cast and More" Seasons watched label visibility
-            -Fix library infoline disappearing when topbar focused
-            -Fix library landscape artwork unnecessary clearlogo duplication
-            -Fix fanart image fallbacks
-            --Fix poster fanart scaling when landscape artwork not available
-            --Fix TMDBHelper next page icon scaling
-            --Add container cycling fanart
-            -Rework Aura Home layout
-            --Fix focus skipping first widget when scrolling down from spotlights to widgets
-            --Fix widgets being cut-off
-            --Remove Aura Home widget gap skin setting
-            --Remove gap for landscape widget style when spotlight is enabled
-            --Fix small category widget label
-            --Add conditional category widget gap
-            --Consolidate conditional spacers
-            --Consolidate spotlight animations
-            --Fix spotlight animations affecting widgets
-            --Fix spotlight animations triggering when scrolling down last widget
-            --Add widget animations
-            --Reposition spotlight using animations only
-            --Reposition widgets using animations only
-            --Fix Aura Home horizontal menu topbar shadow
-            -Fix Netflix Season List view
-            --Remove overlay image on landscape artwork
-            --Fix watched overlay conditions
-            -Improve Netflix Season List view
-            --Add clearlogo
-            --Adjust progress bar position and size
-            --Round corners for progress bar
-            --Adjust season and episode label position
-            --Add infoline flag skin setting for seasons and episodes
-            --Fix infoline flag visibility
-            --Fix unnecessary plot duplication
-            --Fix clearlogo disappearing when modal dialog opened
-            -Add notification addon icon skin setting
-            -Fix Netflix Info button list moving when scrolling between buttons
-            -Remove Netflix Info arrow indicator
-            -Fix Netflix Info "Cast and More" Seasons plot width
-            -Fix Netflix Info "Cast and More" Seasons watched label
-            -Fix TV show watched overlay conditions
-            -Fix Liked % variables
-            -Improve Netflix Side List hub views
-            --Fix landscape artwork visibility when fanart not available
-            -Fix skin settings unfocused text color
-            -Fix settings highlight when modal dialog opened
-            -Fix PVR settings overlap
-            -Add dynamic global background
-            -Fix parent folder icon visibility
-            -Fix global background artwork changing when modal dialog opened
-            -Improve Netflix Landscape Showcase view
-            -Improve Netflix Poster Showcase view
-            -Add disable library time header skin setting
-            -Improve Netflix Simple Home item title and plot labels
-            -Fix autoscroll bug
-            -Improve Netflix Home/Info item title and plot labels
-            -Improve cast list label separator
-            -Fix Netflix Home tagline label changing when modal dialog opened
-            -Fix parent folder label visibility
-            -Fix parent folder icon
-            -Fix Netflix Info "Cast and More" artwork changing when modal dialog opened
-            -Fix Netflix Home artwork disappearing when modal dialog opened
-            -Add notification shadow skin setting
-            -Fix settings page widget position
-            -Add new localization for list pagination and its skin setting
-            -Fix settings page positioning
-            -Fix studio logo visibility for widget spotlight
-            --Fix container ratings visibility when widget spotlight not visible
-            --Fix container ratings visibility when widget spotlight not focused
-            -Fix Aura Home horizontal menu layout
-            --Add hidden list to force submenu widget gap when category widget is enabled but list is empty
-            -Fix Netflix Home horizontal menu layout
-            --Add separate topbar includes for Netflix Home and Aura Home layouts
-            --Remove topbar shadow on Netflix Home
-            --Fix widget navigation up when spotlight is disabled
-            -Fix disable settings background
-            -Fix virtual search keyboard
-            -Fix Netflix Info "Cast and More" empty variables when modal dialog opened
-            -Fix Netflix Info "Cast and More" list pagination
-            v1.1.9
-            -Fix Aura Home horizontal menu layout
-            -Fix conditional spacers when horizontal menu enabled
-            -Add conditional spacer when category widget disabled
-            v1.1.8
-            -Fix weather widget visibility
-            -Fix skin settings labels
-            -Fix skin settings comment blocks
-            v1.1.7
-            -Fix empty enabled widgets visibility
-            -Fix default widget paths
-            v1.1.6
-            -Fix Aura Home autoscroll to hub
-            v1.1.5
-            -Fix Aura Home category widget spacing
-            -Remove widget gap when category widget is disabled
-            -Fix spotlight navigation down when category widget is disabled
-            -Remove invisible category widget for workaround of grouplist usecontrolcoords
-            v1.1.4
-            -Fix studio logo visibility while trailer is playing
-            v1.1.3
-            -Fix episode thumbnail spoilers
-            -Fix Kaito search path
-            v1.1.2
-            -Fix Aura Home spacing when weather header is enabled
-            v1.1.1
-            -Fix Aura Home horizontal menu layout
-            -Fix spotlight info and normal widget positions
-            -Fix Settings and Weather widget positions
-            -Fix home widget navigation with spotlights enabled
-            -Add conditional spacers for small category widget size
-            -Fix fullscreen spotlight widget positions
-            -Fix fullscreen spotlight button positions
-            -Add conditional spacers for fullscreen spotlight
-            -Add conditional spacers for widget spotlight
-            -Add conditional spacers for multi-widget spotlight
-            -Add conditional spacers for category widget size
-            v1.1.0
-            -Rework Aura Home layout
-            -Remove widget gap when category widget is disabled
-            -Fix focus skipping first widget when scrolling right from main menu to widgets
-            -Fix focus skipping first widget when scrolling down from multi-widget spotlight to widgets
-            -Improve spotlight current item indicators
-            -Fix first widget being cut-off
-            -Add conditional spacers
-            -Reposition multi-widget spotlight
-            -Reposition widget spotlight
-            -Fix disable aura home widget gap for new design
-            -Fix fullscreen spotlight button visibility when on first widget
-            -Fix fullscreen spotlight buttons inconsistencies
-            -Add invisible category widget to workaround grouplist usecontrolcoords
-            -Fix spotlight content being affected by normal widget focus
-            -Fix spotlight ratings being affected by normal widget focus
-            -Add hidden lists for spotlight content details
-            -Add gap for landscape widget style if spotlight is enabled
-            -Add autoscroll for widget spotlight plot
-            -Add autoscroll for multi-widget spotlight plot
-            -Fix autoscroll for multi-widget spotlight items
-            -Increase autoscroll timing for multi-widget spotlight items
-            -Increase multi-widget spotlight title width
-            -Fix multi-widget spotlight content being affected by normal widget focus
-            -Fix movies fullscreen spotlight disappearing on normal widget focus
-            -Add autoscroll for fullscreen spotlight plot
-            -Increase autoscroll timing for fullscreen spotlight items
-            -Fix Netflix Home widgets sliding down on fullscreen spotlight focus with category widget disabled
-            v1.0.36
-            -Localization rework
-            -Add localization for many skin labels
-            -Add new localized labels to all languages
-            -Add en_gb, nl_nl, pt_br strings.po
-            -Fix localization issues in all strings.po
-            -Fix TV show status being cut-off
-            -Fix LoveFilm view ratings being cut-off
-            -Fix episode airdate being cut-off
-            -Fix script.skinshortcuts header label being cut-off
-            -Fix RT critics consensus visibility
-            -Fix double end tag
-            -Fix colorbox advanced blur settings textbox position
-            v1.0.35
-            -Fix Netflix Home Info "jumping" when clearlogo missing for adjacent item
-            v1.0.34
-            -Add Netflix Info "More Episodes" button for TMDBHelper episodes
-            v1.0.33
-            -Fix script.artistslideshow update notice for MusicVisualisation.xml
-            v1.0.32
-            -Fix Netflix Info "Cast and More" clearlogo fallback text inconsistency
-            -Fix Netflix Info "Cast and More" clearlogo fallback text ghosting
-            -Fix Netflix Info "Cast and More" clearlogo inconsistency
-            v1.0.31
-            -Fix cast list "Staring" spelling mistake
-            v1.0.30
-            -Improve Skin Helper Service Widgets similar title
-            -Match font with widget label
-            -Remove prefix "to"
-            -Fix positioning
-            v1.0.29
-            -Improve LandscapePanel widget position
-            v1.0.28
-            -Improve Netflix Info "Cast and More" Seasons/Episodes/Next Up List views
-            -Add clearlogo
-            -Adjust progress bar position and size
-            -Round corners for progress bar
-            -Adjust season and episode label position
-            v1.0.27
-            -Fix Netflix Info "Cast and More" clearlogo fallback text inconsistency
-            v1.0.26
-            -Fix Netflix Info "Cast and More" clearlogo fallback text for episode info
-            v1.0.25
-            -Fix Netflix Info "Cast and More" clearlogo visibility on focus cast
-            -Fix Netflix Info "Cast and More" clearlogo texture inconsistencies
-            v1.0.24
-            -Add Netflix Info "Cast and More" dynamic container clearlogo
-            v1.0.23
-            -Re-add Netflix Info "Cast and More" Ratings
-            -Add separate Ratings include for container lookups
-            -Force widget container for dynamic container Widget_ID in DialogVideoInfo.xml
-            -Force home window properties to only be used if widget is focused: avoids performance issues and quickly hitting OMDb rate limits
-            -Save initial widget container onload/onunload of DialogVideoInfo.xml
-            -More Info widget made visible only for movies
-            -More Info fallback label added if no RT information found
-            v1.0.22
-            -Remove Netflix Info "Cast and More" Ratings
-            -Revert: Fix Netflix Info "Cast and More" Ratings
-            -Re-commit: Adjust Widget_TMDB position
-            v1.0.21
-            -Fix Netflix Info "Cast and More" Ratings
-            -Add separate Ratings include for container lookups
-            -Force widget container for dynamic container Widget_ID in DialogVideoInfo.xml
-            -Adjust Widget_TMDB position
-            v1.0.20
-            -Fix small category widget position for Aura Home
-            v1.0.19
-            -Fix widget positioning being off-set after upwards scrolling
-            v1.0.18
-            -Repo release
-            v1.0.17
-            -Fix multi-widget spotlight studio logo visibility on widget spotlights
-            -Add "Kod" an Italian addon for movies and tv series to default search items
-            v1.0.16
-            -Fix studio logos for Widget Spotlights
-            v1.0.15
-            -Improve Netflix Episode List view
-            -Add clearlogo
-            -Adjust progress bar position and size
-            -Round corners for progress bar
-            -Adjust season and episode label position
-            v1.0.14
-            -Fix actor thumbnails on multi-widget spotlights
-            -Fix studio logos for multi-widget spotlights
-            v1.0.13
-            -Fix studio logos for Aura Home
-            v1.0.12
-            -Fix studio logo duplicate ID
-            v1.0.11
-            -Repo Release
-            -Reworked addon.xml
-            v1.0.10
-            -Fix star rating visibility on "See More" widget items
-            -addon.xml overhaul
-            v1.0.9
-            -Fix "small category widget" focus highlight for netflix home
-            v1.0.8
-            -Fix Studio logos for aura home
-            V1.0.7
-            -Massive Studio Logo and ratings overhall
-            -Add more default/built in search lists (Kato,Venom,Fen)
-            -updated instructions in readme
-            -added script.colorbox to imports
-            -added TMDBHelper 4.3.7 to imports
-            -Fix Skinshortcuts widgets with color code in label
-            -Fix RT usermeter visibility condition for Liked %
-            -changed Liked % to use RT usermeter rating
-            -Add Monochrome RT certified icon
-            -Add DialogVideoInfo.xml monochrome studio logo support
-            -Fix star ratings for seasons in library views
-            -Fix episode duration visibility
-            v1.0.6
-            -Fix RT icons in "More Info" section of "Cast and More"
-            -Improve custom Actor Window handling
-            -Fix missing ) in next aired and imdb_rating
-            -Fix "Cast and More" navigation initial info entry point
-            -Fix "Cast and More" actor navigation in MyVideoNav.xml
-            v1.0.5
-            -Massive overhal to use TMDBHelper for ratings and artwork instead of SkinHelper
-            -Massive overhal to navigation in Netflix info "cast and more"
-            -Massive overhal to Netflix info (fixed play , episodes , and other buttons)
-            v1.0.4
-            -Fix startup video hang bug
-            -Lots of fixs to various library views and the images used
-            -Fix Dependency Hang on startup
-            -Removed old XBMC. references throughout skin
-            -Fix tmdbhelper widget netflix info "Episodes" button
-            -Fix hang on opening addon dependencies
-            -Fix Widget Aspect for skin shortcuts
-            -Fix addon versions menu
-            -removed unload conditions that are no longer needed for matrix
-            -Fixed unmatched ()
-            -Tweaked display of notification/busy dialog
-            -Fixed shade on volume controls
-            -Temp fix error with "multi widget spotlight" style Removed actors for now
-            v1.0.3.1
-            -Status bar OSD now follows main skin Highlight color
-            -OSD time Elapsed Separators now match skin highlight color 2
-            -Removed disable mouse/touch on startup
-            -Added Partial Spanish Translation
-            V1.0.2
-            -replaced old xbmc. commands with modern equivalents in power menus
-            -readme update
-            v1.0.1
-            -Fix addon info buttons not showing
-            -readme update
-            V1.0 Matrix Release
-            -Various changes so skin would install on Matrix
-        </news>
     </extension>
 </addon>
 

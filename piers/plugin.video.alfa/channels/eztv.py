@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -28,7 +28,7 @@ canonical = {
              'host_black_list': ["https://eztv.li/", "https://eztv.re/"], 
              'pattern': '<div\s*id="header_logo">\s*<a\s*href="([^"]+)"', 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False
             }
 host = canonical['host'] or canonical['host_alt'][0]
 host_torrent = 'https://zoink.ch/'
@@ -60,7 +60,7 @@ finds = {'find': {'find_all': [{'tag': ['tr'], 'name': ['hover'], '@LIM': 500}]}
          'season_episode': {}, 
          'seasons': dict([('find', [{'tag': ['table'], 'class': ['show_info_description']}]), 
                           ('find_all', [{'tag': ['h3'], 'string': re.compile('(?i)season')}])]), 
-         'season_num': {'get_text': [{'tag': '', '@STRIP': True, '@TEXT': '(?i)season\s+(\d{1,2})\s+'}]}, 
+         'season_num': {'get_text': [{'tag': '', '@STRIP': True, '@TEXT': '(?i)season\s+(?:\d{2})?(\d{1,2})\s+'}]}, 
          'seasons_search_num_rgx': [], 
          'seasons_search_qty_rgx': [], 
          'episode_url': '', 
@@ -72,7 +72,7 @@ finds = {'find': {'find_all': [{'tag': ['tr'], 'name': ['hover'], '@LIM': 500}]}
          'findvideos': {'find_all': [{'tag': ['tr'], 'name': ['hover']}]}, 
          'find_torrents': dict([('find', [{'tag': ['td'], 'class': ['section_post_header'], 'string': re.compile('(?i)download\s*links')}]), 
                                 ('find_next', [{'tag': ['tr']}]), 
-                                ('find_all', [{'tag': ['a'], 'title': re.compile('(?i)download\s*torrent')}])]), 
+                                ('find_all', [{'tag': ['a'], 'title': re.compile('(?i)magnet\s*link')}])]), 
          'title_clean': [['(?i)TV|Online|(4k-hdr)|(fullbluray)|4k| - 4k|(3d)|miniserie|\s*imax|documental|completo|\s*torrent', ''],
                          ['[\(|\[]\s+[\)|\]]', '']],
          'quality_clean': [['(?i)proper\s*|unrated\s*|directors\s*|cut\s*|german\s*|repack\s*|internal\s*|real\s*|korean\s*', ''],
@@ -82,7 +82,7 @@ finds = {'find': {'find_all': [{'tag': ['tr'], 'name': ['hover'], '@LIM': 500}]}
          'controls': {'min_temp': min_temp, 'url_base64': True, 'add_video_to_videolibrary': True, 'cnt_tot': 20,
                       'get_lang': False, 'reverse': False, 'videolab_status': True, 'tmdb_extended_info': True, 'seasons_search': False, 
                       'host_torrent': host_torrent, 'btdigg': False, 'duplicates': [], 'dup_list': 'title', 'dup_movies': True, 
-                      'join_dup_episodes': False, 'manage_torrents': True, 'sort_findvideos': True},
+                      'join_dup_episodes': False, 'manage_torrents': True, 'sort_findvideos': True, 'season_TMDB_limit': False},
          'timeout': timeout}
 AlfaChannel = DictionaryAllChannel(host, movie_path=movie_path, tv_path=tv_path, canonical=canonical, finds=finds, 
                                    idiomas=IDIOMAS, language=language, list_language=list_language, list_servers=list_servers, 
@@ -117,6 +117,8 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
     
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
+
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
     
     autoplay.show_option(item.channel, itemlist)

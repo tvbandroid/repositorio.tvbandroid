@@ -3,25 +3,17 @@
 # Conector vidguard By Alfa development Group
 # --------------------------------------------------------
 
-
-import sys
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
-
-if PY3:
-    import urllib.parse as urlparse                             # Es muy lento en PY2.  En PY3 es nativo
-else:
-    import urlparse                                             # Usamos el nativo de PY2 que es más rápido
-
 import re
+
+from core import urlparse
 from core import httptools
-from core import scrapertools
 from platformcode import logger
 from lib import aadecode
 import base64
 import binascii
 from core import jsontools
 
+# https://vembed.net/e/MAlwEMZea4OJ39X  #360 720 1080
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
@@ -30,14 +22,10 @@ def test_video_exists(page_url):
         return False, "[4tube] El fichero no existe o ha sido borrado"
     return True, ""
 
-# https://vembed.net/e/MAlwEMZea4OJ39X  #360 720 1080
-
 
 def get_video_url(page_url, video_password):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
-    if "/d/" in page_url or  "/v/" in page_url:
-        page_url = page_url.replace("/d/", "/e/").replace("/v/", "/e/")
     data = httptools.downloadpage(page_url).data
     r = re.search(r'eval\("window\.ADBLOCKER\s*=\s*false;\\n(.+?);"\);</script', data)
     if r:
@@ -76,6 +64,6 @@ def sig_decode(url):
         t[i + 1], t[i] = t[i], t[i + 1]
     s=""
     for v in t:
-        s += chr(v)
+        s += chr(v) if isinstance(v, int) else v
     url = url.replace(sig, s[:-5])
     return url

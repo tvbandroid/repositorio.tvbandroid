@@ -6,15 +6,21 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
 if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+
     import urllib.parse as urllib
 else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
     import urllib
 
 
-import xbmc, time
+import os, xbmc, time
 
-from core import httptools, scrapertools
 from platformcode import config, logger, platformtools
+from core import filetools, httptools, scrapertools
 
 
 espera = config.get_setting('servers_waiting', default=6)
@@ -25,8 +31,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -64,24 +69,29 @@ def get_video_url(page_url, url_referer=''):
         return 'Archivo inexistente ó eliminado'
 
     url = ''
+
     post = ''
 
     block = scrapertools.find_single_match(data, '(?i)<Form method="POST"(.*?)</Form>')
+
     matches = scrapertools.find_multiple_matches(block, 'input.*?name="([^"]+)".*?value="([^"]*)"')
 
     for name, value in matches:
-        post += name + '=' + value + '&'
+        if name == 'referer':
+            if not value: value = page_url
+
+        post += name + '=' + value.replace('download1', 'download2') + '&'
 
     if post:
-        post = post.replace("download1", "download2")
-
         headers = {'Referer': page_url}
 
         data = httptools.downloadpage(page_url, post=post, headers=headers).data
 
         url = scrapertools.find_single_match(data, "window.open\('([^']+)")
 
-    if url:
+    if not url:
+        return 'CloudFlare Human Verify'
+    else:
         url_strip = urllib.quote(url.rsplit('/', 1)[1])
         media_url = url.rsplit('/', 1)[0] + "/" + url_strip
 
@@ -90,6 +100,12 @@ def get_video_url(page_url, url_referer=''):
         return video_urls
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+        path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'clicknupload.py'))
+
+        existe = filetools.exists(path)
+        if not existe:
+            return 'El Plugin No existe en Resolveurl'
+
         if config.get_setting('servers_time', default=True):
             platformtools.dialog_notification('Cargando [COLOR cyan][B]Clicknupload[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
             time.sleep(int(espera))
@@ -122,16 +138,22 @@ def get_video_url(page_url, url_referer=''):
                 trace = traceback.format_exc()
                 if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                     return 'Archivo inexistente ó eliminado'
+
                 elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                     return 'Fichero sin link al vídeo ó restringido'
 
             elif ' Bad Request' in traceback.format_exc():
-               if '/recaptcha/' in traceback.format_exc():
-                   return 'Fichero de Vídeo con CaptCha'
+               if '/recaptcha/' in traceback.format_exc(): return 'Fichero de Vídeo con CaptCha'
+
+            elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                return 'Archivo inexistente'
 
             elif '<urlopen error' in traceback.format_exc():
                 return 'No se puede establecer la conexión'
 
             return 'Sin Respuesta ResolveUrl'
+
+    else:
+        return 'Falta ResolveUrl'
 
     return video_urls

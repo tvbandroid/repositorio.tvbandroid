@@ -43,6 +43,9 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'movie' ))
 
     return itemlist
 
@@ -62,8 +65,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Live action', action ='list_all', url = host + 'category/liveaction/', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action='alfabetico', search_type = 'tvshow' ))
 
     return itemlist
@@ -94,13 +97,18 @@ def anios(item):
     logger.info()
     itemlist = []
 
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    current_year = current_year - 10
+    current_year = current_year = 2015
 
     for x in range(current_year, 1954, -1):
-        itemlist.append(item.clone( title = str(x), url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x), action = 'list_all', text_color = 'hotpink' ))
+        url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x)
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -109,12 +117,16 @@ def alfabetico(item):
     logger.info()
     itemlist = []
 
-    for letra in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ':
-        letras = letra.lower()
+    if item.search_type == 'movie': text_color = 'deepskyblue'
+    else: text_color = 'hotpink'
+
+    for letra in '#ABCDEFGHIJKLMNOPQRSTUVWXYZ':
+        if letra == '#': letras = '0-9'
+        else: letras = letra.lower()
 
         url = host + 'letter/' + letras + '/'
 
-        itemlist.append(item.clone( action = 'list_alfa', title = letra, url = url, text_color = 'hotpink' ))
+        itemlist.append(item.clone( action = 'list_alfa', title = letra, url = url, text_color = text_color ))
 
     return itemlist
 
@@ -139,7 +151,9 @@ def list_all(item):
         year = scrapertools.find_single_match(match, '<span class="Year">(.*?)</span>')
         if not year: year = '-'
 
-        name = title.replace('&#038;', '&')
+        title = title.replace('&#038;', '&')
+
+        name = title
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -194,7 +208,24 @@ def list_alfa(item):
         year = scrapertools.find_single_match(match, '<strong>.*?</td><td>Serie</td><td>(\d{4})</span>')
         if not year: year = '-'
 
-        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, contentType = 'tvshow', contentSerieName = title, infoLabels = {'year': year} ))
+        title = title.replace('&#038;', '&')
+
+        name = title
+
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if item.search_type == 'tvshow': continue
+
+            itemlist.append(item.clone( action='findvideos', url=url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+
+        if tipo == 'tvshow':
+            if item.search_type == 'movie': continue
+
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, fmt_sufijo=sufijo,
+                                        contentType = 'tvshow', contentSerieName = name, infoLabels = {'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -388,9 +419,9 @@ def findvideos(item):
         srv = servertools.corregir_servidor(srv)
 
         if srv == 'various':
-           link_other = servertools.corregir_other(_srv)
+            link_other = servertools.corregir_other(_srv)
 
-        url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)"')
+        url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)".*?</div>')
 
         if url.endswith('.png'): url = ''
 
@@ -419,6 +450,10 @@ def findvideos(item):
         elif srv == 'blenditall':
             link_other = srv
             servidor = 'directo'
+
+        elif srv == 'vkvideo':
+            link_other = srv
+            servidor = 'vk'
 
         lang = lang_qlty
 
@@ -513,7 +548,7 @@ def play(item):
 
     if url:
         if '/ouo.' in url:
-            return 'CloudFlare [COLOR red]ReCaptcha[/COLOR]'
+            return 'Servidor con [COLOR red]CloudFlare ReCaptcha[/COLOR]'
 
         if url.startswith('//') == True: url = 'https:' + url
 
@@ -522,11 +557,12 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
-        if servidor != 'directo':
-            url = servertools.normalize_url(servidor, url)
-            itemlist.append(item.clone(url = url, server = servidor))
+        url = servertools.normalize_url(servidor, url)
+        itemlist.append(item.clone(url = url, server = servidor))
 
     return itemlist
 

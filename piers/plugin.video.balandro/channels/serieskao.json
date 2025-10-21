@@ -9,9 +9,9 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
-  "language": ["lat", "cast", "vose"],
+  "language": ["cast", "lat", "vose"],
 
-  "clusters": ["current", "years", "kids", "docs", "vos", "anime", "dorama"],
+  "clusters": ["clons", "crypto", "current", "years", "kids", "docs", "vos", "anime", "dorama"],
 
   "notes": "Películas por géneros, año. Series por Géneros."
 }

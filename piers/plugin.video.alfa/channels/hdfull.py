@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 import ast
 from platformcode.platformtools import dialog_notification, dialog_ok, itemlist_refresh, itemlist_update, show_channel_settings
@@ -33,23 +33,27 @@ debug = config.get_setting('debug_report', default=False)
 canonical = {
              'channel': 'hdfull', 
              'host': config.get_setting("current_host", 'hdfull', default=''), 
-             "host_alt": ["https://hdfull.today/", "https://hd-full.sbs/", "https://hdfull.monster/", "https://hd-full.vip/"], 
-             "host_alt_main": 2, 
-             'host_verification': '%slogin', 
-             "host_black_list": ["https://hd-full.biz/", "https://hd-full.me/", "https://hd-full.fit/", 
-                                 "https://hd-full.info/", "https://hdfull.blog/", "https://hd-full.life/", 
+             "host_alt": ["https://hdfull.today/", "https://www2.hdfull.one/", 
+                          "https://hd-full.biz/", "https://hdfull.cfd/", "https://hdfull.org/", "https://hdfull.sbs/"], 
+             "host_alt_main": 1, 
+             "host_verification": '%slogin', 
+             "host_black_list": ["https://hdfull.help/", "https://hdfull.one/", "https://hdfull.blog/", 
 
-                                 "https://hdfull.one/", "https://hdfull.buzz/", "https://hdfull.tel/", 
-                                 "https://hdfull.cfd/", "https://hdfull.sbs/", 
+                                 "https://hd-full.me/", 
+                                 "https://hd-full.fit/", "https://hd-full.info/", "https://hd-full.life/", 
+
+                                 "https://hdfull.cv/", "https://hdfull.monster/", "https://hdfull.buzz/", 
+                                 "https://hdfull.tel/", "https://hd-full.sbs/", "https://hdfull.love/", 
 
                                  "https://hd-full.lol/", "https://hd-full.co/", "https://hdfull.quest/", 
                                  "https://hd-full.in/", "https://hd-full.im/", "https://hd-full.one/", 
-                                 "https://hdfull.icu/", "https://hdfull.org/", 
+                                 "https://hdfull.icu/", "https://hd-full.vip/", 
                                  "https://hdfull.life/", "https://hdfull.digital/", "https://hdfull.work/", 
                                  "https://hdfull.video/", "https://hdfull.cloud/", "https://hdfull.wtf/", 
                                  "https://hdfull.fun/", "https://hdfull.lol/", "https://hdfull.store/", 
                                  "https://new.hdfull.one/", "https://hdfull.top/", "https://hdfull.bz/"],
              'pattern': r'<meta\s*property="og:url"\s*content="([^"]+)"', 
+             "canonical_no_check_list": [],
              'set_tls': True, 'set_tls_min': False, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': cf_assistant, 
              'cf_assistant_ua': True, 'cf_assistant_get_source': True if cf_assistant == 'force' else False, 
              'cf_no_blacklist': True, 'cf_removeAllCookies': False if cf_assistant == 'force' else True,
@@ -57,14 +61,16 @@ canonical = {
              'cf_cookie': '$HOST|cf_clearance' if cf_assistant is True else None, 'cf_jscode': None, 
              'cf_cookies_names': {'cf_clearance': False if cf_assistant is True else True},
              'CF_if_assistant': True if cf_assistant is True else False, 'retries_cloudflare': -1, 
-             'CF_stat': True if cf_assistant is True else False, 'session_verify': True if cf_assistant is True else False, 
-             'CF': False, 'CF_test': True, 'alfa_s': True
+             'CF_stat': True if cf_assistant is True else False, 
+             'CF': False, 'CF_test': True, 'alfa_s': True, 'renumbertools': False,
+             'data_js': ''
             }
 host = canonical['host'] or canonical['host_alt'][0]
 host_main = canonical['host_alt'][canonical.get('host_alt_main', 0)]
 host_save = host
 host_thumb = 'https://hdfullcdn.cc/'
 _silence = config.get_setting('silence_mode', channel=canonical['channel'])
+if host in canonical['canonical_no_check_list']: canonical['canonical_check'] = False
 
 timeout = (5, 20)
 kwargs = {}
@@ -249,6 +255,8 @@ def mainlist(item):
         itemlist.append(Item(channel=item.channel, action="logout", url="", folder=False, refresh=True, 
                              title="[COLOR steelblue][B]Desloguearse[/B][/COLOR]",
                              plot="Para cambiar de usuario", thumbnail=get_thumb("back.png")))
+
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
@@ -666,7 +674,8 @@ def list_all_matches(item, matches_int, **AHkwargs):
             if str_:
                 elem_json['plot_extend'] += str_.replace('[COLOR blue](Visto)[/COLOR]', '')
                 elem_json['playcount'] = 1 if 'Visto' in str_ else 0
-            if item.extra not in ['listas_res', 'estreno', 'actualizadas']: elem_json = add_context(elem_json, str_)
+            if item.extra not in ['listas_res', 'estreno', 'actualizadas']:
+                elem_json = add_context(elem_json, str_)
 
         except Exception:
             logger.error(elem)
@@ -913,7 +922,7 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
     except Exception:
         pass
 
-    provs = alfaresolver.jhexdecode(data_js)
+    provs = jsontools.load(base64.b64decode(canonical.get('data_js', '')).decode('utf-8') or {}) or alfaresolver.jhexdecode(data_js)
     matches_int = jsontools.load(alfaresolver.obfs(AlfaChannel.response.data, js_data))
 
     ## Carga estados: items usuario en titulo (visto, pendiente, etc).  Reset si viene de Videoteca
@@ -1318,7 +1327,7 @@ def verify_domain_alt(url, post=None, headers={}, soup=False, json=False, alfa_s
     if window and not window.getProperty("AH_hdfull_domain"):
         url_rest = url.replace(host_alt, '')
         canonical_alt = canonical.copy()
-    
+
         for host_alt in canonical['host_alt']:
             canonical_alt['host'] = host_alt
             canonical_alt['host_alt'] = [host_alt]

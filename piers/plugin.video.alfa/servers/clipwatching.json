@@ -6,6 +6,10 @@
       {
         "pattern": "(?:clipwatching|highstream).\\w{2,4}/(?:embed-|)([A-z0-9_]+)",
         "url": "https://highstream.tv/embed-\\1.html"
+      },
+      {
+        "pattern": "(?:lamovie).\\w{2,4}/(?:embed-|)([A-z0-9_]+)",
+        "url": "https://lamovie.link/embed-\\1.html"
       }
     ]
   },
@@ -38,5 +42,6 @@
       "visible": false
     }
   ],
-  "thumbnail": "https://i.postimg.cc/L6t6gMWr/clipwatching.png"
+  "thumbnail": "https://i.postimg.cc/L6t6gMWr/clipwatching.png",
+  "force_inputstream": "adaptive"
 }

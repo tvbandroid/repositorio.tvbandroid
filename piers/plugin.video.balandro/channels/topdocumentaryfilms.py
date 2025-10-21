@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -48,7 +48,7 @@ def list_all(item):
     matches = scrapertools.find_multiple_matches(data, '<article(.*?)</article>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+        url = scrapertools.find_single_match(match, '<a class="watch-now".*?href="(.*?)"')
         title = scrapertools.find_single_match(match, 'title="(.*?)"')
 
         if not url or not title: continue
@@ -57,15 +57,15 @@ def list_all(item):
 
         plot = scrapertools.find_single_match(match, '<p>(.*?)</p>')
 
-        title = title.replace('&#8217;', "'").replace('&#039;s', "'s")
+        title = title.replace('&#8217;', "'").replace('&#039;s', "'s").replace('&#039;', "'")
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, plot = plot,
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
                                     contentType='movie', infoLabels={"year": '-', "plot": plot}, contentTitle=title, contentExtra='documentary' ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<div class="pagination module">.*?<span class="current">.*?<a href="(.*?)"')
+        next_page = scrapertools.find_single_match(data, '<nav class="navigation pagination".*?class="page-numbers current">.*?href="(.*?)"')
 
         if next_page:
             if '/page/' in next_page:
@@ -80,14 +80,23 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
+    i = 0
+
     url = scrapertools.find_single_match(data, '<meta itemprop="embedUrl" content="(.*?)"')
     if not url: url = scrapertools.find_single_match(data, "<meta itemprop='embedUrl' content='(.*?)'")
 
     if url:
+        i += 1
+
         servidor = servertools.get_server_from_url(url)
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vo' ))
+
+    if not itemlist:
+        if not i == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

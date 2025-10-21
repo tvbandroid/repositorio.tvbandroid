@@ -42,26 +42,38 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'scenes/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'xxxscenes/' ))
 
     itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'category/featured/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Parodias', action = 'list_all', url = host + 'category/parodies/', text_color = 'pink' ))
 
-    itemlist.append(item.clone( title = 'Películas', action = 'list_all', url = host, text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Películas', action = 'pelis', text_color = 'deepskyblue' ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'categorias', url = host, group = 'estudios' ))
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host, group = 'categorias'))
 
     itemlist.append(item.clone( title = 'Por año', action = 'anios', url = host))
+
+    return itemlist
+
+
+def pelis(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Películas catálogo', action = 'list_all', url = host ))
+    itemlist.append(item.clone( title = 'Películas más vistas', action = 'list_all', url = host + '?v_sortby=views' ))
+    itemlist.append(item.clone( title = 'Películas más valoradas', action = 'list_all', url = host + '?r_sortby=highest_rated' ))
 
     return itemlist
 
@@ -116,13 +128,15 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron = '<article class="TPost B">.*?<a href="(.*?)">.*?data-lazy-src="(.*?)".*?<div class="Title">(.*?)</div>'
+    patron = '<article.*?<a href="(.*?)".*?src="(.*?)".*?<div class="Title">(.*?)</div>.*?</article>'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
 
     num_matches = len(matches)
 
     for url, thumb, title in matches[item.page * perpage:]:
+        title = title.replace('&amp;', '').strip()
+
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
         if len(itemlist) >= perpage: break
@@ -149,6 +163,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
 
@@ -169,8 +190,10 @@ def findvideos(item):
         other = ''
 
         if servidor == 'various': other = servertools.corregir_other(url)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                              language = 'Vo', other = other ))
 
     # ~  Download
     if '>Download<' in data:
@@ -206,8 +229,10 @@ def findvideos(item):
                 other = 'D'
 
                 if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                      language = 'Vo', other = other ))
 
     if not itemlist:
         if not ses == 0:

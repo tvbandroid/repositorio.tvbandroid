@@ -91,7 +91,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_mundodonghua', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('zonaleros') ))
+    itemlist.append(Item( channel='helper', action='show_help_mundodonghua', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('mundodonghua') ))
+
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('mundodonghua'), text_color='turquoise' ))
 
     platformtools.itemlist_refresh()
 
@@ -107,6 +109,14 @@ def mainlist_animes(item):
     itemlist = []
 
     if config.get_setting('descartar_anime', default=False): return
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -228,9 +238,11 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    bloque = scrapertools.find_single_match(data, '> Lista de Episodios<(.*?)</div></div>')
+    bloque = scrapertools.find_single_match(data, 'Lista de Episodios<(.*?)</ul></div></div>')
+    if not bloque: bloque = scrapertools.find_single_match(data, 'Listade Episodios<(.*?)</ul></div></div>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?<img src="(.*?)".*?<blockquote class="message sf fc-dark f-bold fs-16">(.*?)</blockquote>')
+    if not matches: matches = scrapertools.find_multiple_matches(bloque, '<ahref="(.*?)".*?<img src="(.*?)".*?<blockquote class="message sf fc-dark f-bold fs-16">(.*?)</blockquote>')
 
     if not matches:
         url = scrapertools.find_single_match(bloque, '<a href="(.*?)"')
@@ -314,6 +326,14 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
 
@@ -444,9 +464,8 @@ def play(item):
         if item.ref: data = do_downloadpage(url, headers={'Referer': item.ref})
         else: data = do_downloadpage(url)
 
-        if not data: return itemlist
-
-        if '404 Not Found' in data: return itemlist
+        if not data or '404 Not Found' in data:
+            return 'Archivo [COLOR red]Inaccesible[/COLOR]'
 
         vid = scrapertools.find_single_match(data, '"url":"(.*?)"')
 
@@ -464,11 +483,11 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
- 
             if new_server.startswith("http"):
-                servidor = new_server
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
-                if '/nemonicplayer/' in url: servidor = 'directo'
+        if '/nemonicplayer/' in url: servidor = 'directo'
 
         if servidor == 'zplayer': url = url + '|' + host
 

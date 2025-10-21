@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww5.pelisplushd.lat/'
+host = 'https://www.pelisplushd.ms/'
 
 
 # ~ por si viene de enlaces guardados
@@ -19,7 +19,9 @@ ant_hosts = ['https://pelisplushd.net/', 'https://pelisplushd.to/', 'https://www
              'https://www14.pelisplushd.lat/', 'https://www15.pelisplushd.lat/', 'https://www16.pelisplushd.lat/',
              'https://www17.pelisplushd.lat/', 'https://www18.pelisplushd.lat/', 'https://www19.pelisplushd.lat/',
              'https://www20.pelisplushd.lat/', 'https://www21.pelisplushd.lat/', 'https://ww1.pelisplushd.lat/',
-             'https://ww2.pelisplushd.lat/', 'https://ww3.pelisplushd.lat/', 'https://ww4.pelisplushd.lat/']
+             'https://ww2.pelisplushd.lat/', 'https://ww3.pelisplushd.lat/', 'https://ww4.pelisplushd.lat/',
+             'https://ww5.pelisplushd.lat/', 'https://ww6.pelisplushd.lat/', 'https://ww7.pelisplushd.lat/',
+             'https://ww8.pelisplushd.lat/']
 
 
 domain = config.get_setting('dominio', 'pelisplushd', default='')
@@ -127,11 +129,11 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    if not config.get_setting('descartar_anime', default=False):
-        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
-
     if config.get_setting('mnu_doramas', default=False):
         itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
     return itemlist
 
@@ -170,11 +172,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'series/populares?page=1', search_type = 'tvshow' ))
 
-    if not config.get_setting('descartar_anime', default=False):
-        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
-
     if config.get_setting('mnu_doramas', default=False):
         itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'generos/dorama/series?page=1', search_type = 'tvshow', text_color = 'firebrick' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -501,7 +503,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    lang = 'Lat'
+    IDIOMAS = {'ESPAÑOL': 'Esp', 'Español': 'Esp', 'espanola': 'Esp', 'LATINO': 'Lat', 'latino': 'Lat', 'Español Latino': 'Lat', 'SUBTITULADO': 'Vose', 'Subtitulado': 'Vose', 'SUB': 'Vose', 'subtitle': 'Vose'}
 
     data = do_downloadpage(item.url)
 
@@ -535,11 +537,11 @@ def findvideos(item):
 
         if servidor == 'various': link_other = servertools.corregir_other(url)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Lat', other = link_other ))
 
-    matches = scrapertools.find_multiple_matches(data, 'data-url="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'data-url="(.*?)".*?data-name="(.*?)"')
 
-    for url in matches:
+    for url, lng in matches:
         if not url: continue
 
         ses += 1
@@ -555,6 +557,11 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         link_other = ''
+
+        lang = 'Lat'
+
+        if lng == 'Español': lang = 'Esp'
+        elif lng == 'Subtitulado': lang = 'Vose'
 
         if servidor == 'directo':
             link_other = normalize_other(url)
@@ -575,7 +582,7 @@ def findvideos(item):
 
         link_other = srv
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = link_other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'Lat', other = link_other ))
 
     # ~ downloads
     matches = scrapertools.find_multiple_matches(data, '<span class="Num".*? <!-- -->(.*?)</td>.*?href="(.*?)"')
@@ -591,7 +598,36 @@ def findvideos(item):
 
         link_other = srv
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = lang, other = link_other + ' D' ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'Lat', other = link_other + ' D' ))
+
+    # ~ links
+    bloque = scrapertools.find_single_match(data, '"links"(.*?)},')
+
+    options = scrapertools.find_multiple_matches(str(bloque), '"(.*?)":"(.*?)"')
+
+    if not options:
+        options = scrapertools.find_multiple_matches(data, '<button class="bstd Button">.*?<span>(.*?)<span>.*?data-url="(.*?)"')
+
+    for lang, embed in options:
+        ses += 1
+
+        if not embed: continue
+
+        if '/goodstream.' in embed:
+            if not 'http' in embed: embed = 'https:' + embed
+            url = embed
+        else:
+            url = 'https://goodstream.one/video/embed/' + embed
+
+        servidor = servertools.get_server_from_url(url)
+        servidor = servertools.corregir_servidor(servidor)
+
+        url = servertools.normalize_url(servidor, url)
+
+        other = ''
+        if servidor == 'various': other = servertools.corregir_other(url)
+
+        itemlist.append(Item(channel = item.channel, action = 'play', server=servidor, title = '', url=url, language=IDIOMAS.get(lang,lang), other=other ))
 
     if not itemlist:
         if not ses == 0:
@@ -605,6 +641,8 @@ def normalize_other(url):
     if 'pelisplus' in url: link_other = 'plus'
     elif 'damedamehoy' in url: link_other = 'dame'
     elif 'tomatomatela' in url: link_other = 'dame'
+
+    elif 'player.' in url: link_other = 'Player'
 
     elif 'plustream' in url: link_other = ''
 
@@ -664,9 +702,9 @@ def play(item):
 
                 if servidor == 'directo':
                     new_server = servertools.corregir_other(url).lower()
-                    if not new_server.startswith("http"): servidor = new_server
-
-                if servidor == 'directo': continue
+                    if new_server.startswith("http"):
+                        if not config.get_setting('developer_mode', default=False): continue
+                    servidor = new_server 
 
                 itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -678,11 +716,13 @@ def play(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
-
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

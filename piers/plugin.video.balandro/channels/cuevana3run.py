@@ -136,10 +136,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias/?get=movies', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
-
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Lista general', action = 'listado', url = host + 'catalogo-peliculas/', search_type = 'movie', text_color='moccasin' ))
 
@@ -258,12 +258,16 @@ def listado(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '&').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         c_year = scrapertools.find_single_match(title, '(\d{4})')
-        if c_year: title = title.replace('(' + c_year + ')', '').strip()
+        if not c_year: c_year = scrapertools.find_single_match(title, '(d{4})')
+
+        if c_year:
+            title = title.replace('(' + c_year + ')', '').strip()
+            title = title.replace(' ' + c_year + ' ', '').strip()
 
         PeliName = title
 
@@ -312,7 +316,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '&').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(article, '<img src="(.*?)"')
 
@@ -325,15 +329,13 @@ def list_all(item):
         tipo = 'tvshow' if '/series/' in url else 'movie'
 
         if tipo == 'movie':
-            if not item.search_type == "all":
-                if item.search_type == "tvshow": continue
+            if item.search_type == "tvshow": continue
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
-            if not item.search_type == "all":
-                if item.search_type == "movie": continue
+            if item.search_type == "movie": continue
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                         contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
@@ -378,7 +380,7 @@ def last_epis(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '').replace('&#215;', 'x').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&#215;', 'x').replace('&amp;', '').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
@@ -387,6 +389,8 @@ def last_epis(item):
         contentSerieName = scrapertools.find_single_match(title, '(.*?) \d')
 
         titulo = str(season) + 'x' + str(episode) + ' ' + title.replace(str(season) + 'x' + str(episode), '')
+
+        titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
                                     contentType = 'episode', contentSerieName=contentSerieName, contentSeason = season, contentEpisodeNumber = episode,
@@ -499,6 +503,12 @@ def episodios(item):
 
         titulo = str(season) + 'x' + str(epis) + ' ' + title.strip()
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
@@ -543,7 +553,7 @@ def findvideos(item):
 
         embed = scrapertools.find_single_match(data1, '"embed_url":"(.*?)"')
 
-        if not embed: return itemlist
+        if not embed: continue
 
         embed = embed.replace('\\/', '/')
 
@@ -630,7 +640,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 
@@ -654,7 +666,7 @@ def list_search(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&amp;', '&').strip()
+        title = title.replace('&#039;s', "'s").replace('&#038;', '').replace('&#8211;', '').replace('&amp;', '&').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 

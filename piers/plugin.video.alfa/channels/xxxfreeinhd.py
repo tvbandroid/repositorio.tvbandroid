@@ -26,8 +26,6 @@ canonical = {
             }
 host = canonical['host'] or canonical['host_alt'][0]
 
-# netu
-
 
 def mainlist(item):
     logger.info()
@@ -67,7 +65,10 @@ def categorias(item):
     for elem in matches:
         url = elem.a['href']
         title = elem.a['title']
-        thumbnail = elem.img['src']
+        if elem.img.get('src', ''):
+            thumbnail = elem.img['src']
+        else:
+            thumbnail = elem.img['data-src']
         plot = ""
         itemlist.append(Item(channel=item.channel, action="lista", title=title, url=url,
                              fanart=thumbnail, thumbnail=thumbnail , plot=plot) )
@@ -98,7 +99,10 @@ def lista(item):
     for elem in matches:
         url = elem.a['href']
         title = elem.a['title']
-        thumbnail = elem.img['data-src']
+        if elem.img.get('src', ''):
+            thumbnail = elem.img['src']
+        else:
+            thumbnail = elem.img['data-src']
         plot = ""
         itemlist.append(Item(channel=item.channel, action="findvideos", title=title, contentTitle=title, url=url,
                              fanart=thumbnail, thumbnail=thumbnail , plot=plot) )
@@ -113,11 +117,16 @@ def lista(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+    frames = []
     soup = create_soup(item.url).find('div', class_='responsive-player')
     matches = soup.find_all('iframe')
     for elem in matches:
         url = elem['src']
-        itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
+        if "about:" in url:
+            url =  elem['data-lazy-src']
+        if not url in frames:
+            frames.append(url)
+            itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     autoplay.start(itemlist, item)
     return itemlist

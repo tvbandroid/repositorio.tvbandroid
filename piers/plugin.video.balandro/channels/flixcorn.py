@@ -401,6 +401,12 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         url = host + url
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
@@ -448,6 +454,7 @@ def findvideos(item):
         elif 'fikper' in match.lower(): continue
         elif 'rapidcloud' in match.lower(): continue
         elif 'buzzheavier' in match.lower(): continue
+        elif 'vikingfile' in match.lower(): continue
 
         srv = scrapertools.find_single_match(match, "<img src='.*?/>(.*?)</div>").lower().strip()
 
@@ -488,9 +495,14 @@ def play(item):
 
         url = servertools.normalize_url(servidor, url)
 
+        if '/bigwarp.' in url or '/bgwp.' in url:
+            servidor = 'zures'
+
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

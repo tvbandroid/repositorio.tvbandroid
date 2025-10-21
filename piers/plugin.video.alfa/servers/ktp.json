@@ -16,7 +16,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:ballzdeep|pornxpert|hoes|bigtitslust|mondetube|watchporn|faapy|pornvase|sortporn|4wank|porncaper|camstreams|celebsroulette|pornve|xhand|baddies247|baddiesonly).(?:com|xxx|tube|to|tv)/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:ballzdeep|pornxpert|hoes|bigtitslust|mondetube|watchporn|faapy|pornvase|sortporn|4wank|porncaper|camstreams|celebsroulette|pornve|xhand|baddies247|baddiesonly|vidzx).(?:com|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -36,11 +36,19 @@
         "url": "\\1"
       },
       {
+        "pattern": "https://(?:www.|)pornkut.com/(?:videos|embed)/([0-9]+)",
+        "url": "https://www.pornkut.com/videos/\\1/a"
+      },
+      {
+        "pattern": "https://(?:www.|)heroero.com/embed/([0-9]+)",
+        "url": "https://heroero.com/videos/\\1/a/"
+      },
+      {
         "pattern": "(https://\\w{2,4}.huyamba.\\w{2,4}/video/[0-9]+(?:/|))",
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:mix.|\\w{2,4}.|)(?:onlinetube|pornoreka).(?:tv|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:mix.|x.|\\w{2,4}.|)(?:onlinetube|pornoreka).(?:tv|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -49,6 +57,10 @@
       },
       {
         "pattern": "(https://www.inxxx.com/v/[A-z0-9-.]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://watcherotic.com/(?:embed|video)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -76,7 +88,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(http(?:s|)://www.(?:camwhores|camwhoreshd|camvideos|cwtvembeds|lesbianbliss).(?:tv|com|org)/embed/[A-z0-9-]+(?:/|))",
+        "pattern": "(http(?:s|)://(?:www.|)(?:camwhores|camwhoreshd|camvideos|cwtvembeds|lesbianbliss|shareanynudes).(?:tv|com|org)/(?:embed|video)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -84,7 +96,11 @@
         "url": "\\1"
       },
       {
-        "pattern": "(http(?:s|)://(?:www.|)(?:sloppyfans|nudes7|hornyfap|mypornhere|asianviralhub|viralpornhub|amateurest|in35|thothub|thothd).(?:tv|com|org|to|lol|xxx)/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(http(?:s|)://(?:www.|)(?:sloppyfans|nudes7|hornyfap|asianviralhub|viralpornhub|amateurest|in35|thothub).(?:tv|com|org|to|lol|xxx)/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(http(?:s|)://(?:www.|)(?:thothd).(?:tv|com|org|to|lol|xxx)/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -108,7 +124,11 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://pornox.hu/(?:porno|video)/[0-9]+/[A-z0-9-.]+(?:/|))",
+        "pattern": "justporn.com/(?:embed|video)/([0-9]+)",
+        "url": "https://www.justporn.com/video/\\1/a"
+      },
+      {
+        "pattern": "(https://pornox.hu(?:/\\w{2}|)/(?:porno|video)/[0-9]+/[A-z0-9-.]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -144,11 +164,7 @@
         "url": "https://www.perfectgirls.xxx/embed/\\1"
       },
       {
-        "pattern": "(https://(?:www.|)pornstars.(?:xxx|tube)/video(?:s|)/[0-9]+(?:/|))",
-        "url": "\\1"
-      },
-      {
-        "pattern": "(http(?:s|)://(?:www.|)(?:cambro|camvideos|alotporn).(?:tv|com)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(http(?:s|)://(?:www.|)(?:cambro|camvideos).(?:tv|com)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -157,10 +173,6 @@
       },
       {
         "pattern": "(https://www.(?:tabooporn|teenpornvideo).(?:tv|sex)/videos/[0-9]+/[A-z0-9-]+(?:/|))",
-        "url": "\\1"
-      },
-      {
-        "pattern": "(https://max.porn/videos/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -188,6 +200,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://(?:www.|)uppornx.com/(?:video|videos)/[0-9]+/[A-z0-9-]+/)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://pornwild.to(?:/es|)/embed/\\w+(?:/|))",
         "url": "\\1"
       },
@@ -212,7 +228,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://www.(?:tabootube|nubilefilm).xxx/[A-z0-9-]+)(?:/|)",
+        "pattern": "(https://www.(?:tabootube|nubilefilm).xxx/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -240,7 +256,7 @@
         "url": "\\1/a/"
       },
       {
-        "pattern": "(https://(?:www.|\\w{2,4}.|)sslkn.(?:com|\\w{2,4})/(?:video|videos|embed)/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|\\w{2,4}.|)(?:sslkn|sosalkino).(?:com|\\w{2,4})/(?:video|videos|embed)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -278,5 +294,6 @@
       "visible": false
     }
   ],
-  "thumbnail": ""
+  "thumbnail": "",
+  "force_inputstream": "adaptive"
 }

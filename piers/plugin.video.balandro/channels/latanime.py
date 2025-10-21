@@ -103,9 +103,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -301,12 +305,25 @@ def list_all(item):
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
 
-            title = title.replace(' S1 ', '[COLOR tan] S1 [/COLOR]').replace(' S2 ', '[COLOR tan] S2 [/COLOR]').replace(' S3 ', '[COLOR tan] S3 [/COLOR]').replace(' S4 ', '[COLOR tan] S4 [/COLOR]')
-            title = title.replace(' S5 ', '[COLOR tan] S5 [/COLOR]').replace(' S6 ', '[COLOR tan] S6 [/COLOR]').replace(' S7 ', '[COLOR tan] S7 [/COLOR]').replace(' S8 ', '[COLOR tan] S8 [/COLOR]')
-            title = title.replace(' S9 ', '[COLOR tan] S9 [/COLOR]')
+            title = title.replace(' S1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' S2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' S3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' S4 ', '[COLOR tan] Temp. 4 [/COLOR]')
+
+            title = title.replace(' S5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' S6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' S7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' S8 ', '[COLOR tan] Temp. 8 [/COLOR]')
+
+            title = title.replace(' S9 ', '[COLOR tan] Temp. 9 [/COLOR]')
+
+            season = 1
+
+            if ' S2 ' in title: season = 2
+            elif ' S3 ' in title: season = 3
+            elif ' S4 ' in title: season = 4
+            elif ' S5 ' in title: season = 5
+            elif ' S6 ' in title: season = 6
+            elif ' S7 ' in title: season = 7
+            elif ' S8 ' in title: season = 8
+            elif ' S9 ' in title: season = 9
 
             itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
-                                        contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
+                                        contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -345,13 +362,26 @@ def last_epis(item):
 
         titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epis) + ' ' + title.replace('capitulo '+ str(epis), '').strip()
 
-        titlulo = titulo.replace(' S1 ', '[COLOR tan] S1 [/COLOR]').replace(' S2 ', '[COLOR tan] S2 [/COLOR]').replace(' S3 ', '[COLOR tan] S3 [/COLOR]').replace(' S4 ', '[COLOR tan] S4 [/COLOR]')
-        titlulo = titulo.replace(' S5 ', '[COLOR tan] S5 [/COLOR]').replace(' S6 ', '[COLOR tan] S6 [/COLOR]').replace(' S7 ', '[COLOR tan] S7 [/COLOR]').replace(' S8 ', '[COLOR tan] S8 [/COLOR]')
-        titlulo = titulo.replace(' S9 ', '[COLOR tan] S9 [/COLOR]')
+        titulo = titulo.replace(' S1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' S2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' S3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' S4 ', '[COLOR tan] Temp. 4 [/COLOR]')
+
+        titulo = titulo.replace(' S5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' S6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' S7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' S8 ', '[COLOR tan] Temp. 8 [/COLOR]')
+
+        titulo = titulo.replace(' S9 ', '[COLOR tan] Temp. 9 [/COLOR]')
+
+        season = 1
+
+        if ' S2 ' in title: season = 2
+        elif ' S3 ' in title: season = 3
+        elif ' S4 ' in title: season = 4
+        elif ' S5 ' in title: season = 5
+        elif ' S6 ' in title: season = 6
+        elif ' S7 ' in title: season = 7
+        elif ' S8 ' in title: season = 8
+        elif ' S9 ' in title: season = 9
 
         itemlist.append(item.clone( action='findvideos', url=url, title=titulo, thumbnail=thumb,
                                     contentSerieName=SerieName, contentType='episode',
-                                    contentSeason=1, contentEpisodeNumber=epis, infoLabels={'year': '-'} ))
+                                    contentSeason=season, contentEpisodeNumber=epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -428,9 +458,16 @@ def episodios(item):
 
         if not epis: epis = 1
 
-        titulo = '1x' + str(epis) + ' ' + title.replace('Capitulo ' + str(epis), '').replace('capitulo ' + str(epis), '' ).strip()
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace('Capitulo ' + str(epis), '').replace('capitulo ' + str(epis), '' ).strip()
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=titulo, contentType = 'episode', contentSeason = 1, contentEpisodeNumber=epis ))
+        titulo = titulo.replace(' S1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' S2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' S3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' S4 ', '[COLOR tan] Temp. 4 [/COLOR]')
+
+        titulo = titulo.replace(' S5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' S6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' S7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' S8 ', '[COLOR tan] Temp. 8 [/COLOR]')
+
+        titulo = titulo.replace(' S9 ', '[COLOR tan] Temp. 9 [/COLOR]')
+
+        itemlist.append(item.clone( action='findvideos', url=url, title=titulo,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -447,6 +484,14 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     if not item.search_type == 'tvshow':
         if not '-episodio-' in item.url: item.url = item.url.replace('/anime/', '/ver/') + '-episodio-1'

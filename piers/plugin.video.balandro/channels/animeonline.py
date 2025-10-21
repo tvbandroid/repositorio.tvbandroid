@@ -193,9 +193,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -406,10 +410,57 @@ def list_all(item):
 
                 SerieName = corregir_SerieName(title)
 
+                season = 1
+
+                if 'Season' in title:
+                    if '2nd' in title: season = 2
+                    elif '3rd' in title: season = 3
+                    elif '4th' in title: season = 4
+                    elif '5th' in title: season = 5
+                    elif '6th' in title: season = 6
+                    elif '7th' in title: season = 7
+                    elif '8th' in title: season = 8
+                    elif '9th' in title: season = 9
+                    else:
+                        season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+                        if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+                        if not season: season = 1
+                else:
+                    if ' S2 ' in title: season = 2
+                    elif ' S3 ' in title: season = 3
+                    elif ' S4 ' in title: season = 4
+                    elif ' S5 ' in title: season = 5
+                    elif ' S6 ' in title: season = 6
+                    elif ' S7 ' in title: season = 7
+                    elif ' S8 ' in title: season = 8
+                    elif ' S9 ' in title: season = 9
+
+                    elif ' T2 ' in title: season = 2
+                    elif ' T3 ' in title: season = 3
+                    elif ' T4 ' in title: season = 4
+                    elif ' T5 ' in title: season = 5
+                    elif ' T6 ' in title: season = 6
+                    elif ' T7 ' in title: season = 7
+                    elif ' T8 ' in title: season = 8
+                    elif ' T9 ' in title: season = 9
+
                 epis = scrapertools.find_single_match(title, 'Cap(.*?)$').strip()
                 if not epis: epis = 1
 
                 title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
+
+                title = title.replace(' S1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' S2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' S3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' S4 ', '[COLOR tan] Temp. 4 [/COLOR]')
+
+                title = title.replace(' S5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' S6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' S7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' S8 ', '[COLOR tan] Temp. 8 [/COLOR]')
+
+                title = title.replace(' S9 ', '[COLOR tan] Temp. 9 [/COLOR]')
+
+                title = title.replace(' T1 ', '[COLOR tan] Temp. 1 [/COLOR]').replace(' T2 ', '[COLOR tan] Temp. 2 [/COLOR]').replace(' T3 ', '[COLOR tan] Temp. 3 [/COLOR]').replace(' T4 ', '[COLOR tan] Temp. 4 [/COLOR]')
+
+                title = title.replace(' T5 ', '[COLOR tan] Temp. 5 [/COLOR]').replace(' T6 ', '[COLOR tan] Temp. 6 [/COLOR]').replace(' T7 ', '[COLOR tan] Temp. 7 [/COLOR]').replace(' T8 ', '[COLOR tan] Temp. 8 [/COLOR]')
+
+                title = title.replace(' T9 ', '[COLOR tan] Temp. 9 [/COLOR]')
 
                 title = title.replace('Cap ', '[COLOR goldenrod]Epis. [/COLOR]').replace('Episode ', '[COLOR goldenrod]Epis. [/COLOR]')
 
@@ -418,7 +469,7 @@ def list_all(item):
                 itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                             qualities=qlty, languages=lang, fmt_sufijo=sufijo,
                                             contentType = 'episode', contentSerieName = SerieName,
-                                            contentSeason = 1, contentEpisodeNumber=epis, infoLabels={'year': year} ))
+                                            contentSeason = season, contentEpisodeNumber=epis, infoLabels={'year': year} ))
 
                 continue
 
@@ -428,7 +479,8 @@ def list_all(item):
 
             SerieName = corregir_SerieName(title)
 
-            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb, qualities=qlty, languages=lang, fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                        qualities=qlty, languages=lang, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
@@ -536,10 +588,15 @@ def episodios(item):
                 else: item.perpage = 50
 
     for epi in episodes[item.page * item.perpage:]:
-        epis = scrapertools.find_single_match(epi, "(.*?)'>")
-        if not epis: epis = scrapertools.find_single_match(epi, '(.*?)">')
+        if '>Episodio' in epi:
+            epis = scrapertools.find_single_match(epi, ">Episodio(.*?)</a>").strip()
 
-        if not epis: epis = 1
+            if not epis: epis = 1
+        else:
+            epis = scrapertools.find_single_match(epi, "(.*?)'>")
+            if not epis: epis = scrapertools.find_single_match(epi, '(.*?)">')
+
+            if not epis: epis = 1
 
         thumb = scrapertools.find_single_match(epi, "data-src='(.*?)'")
         if not thumb: thumb = scrapertools.find_single_match(epi, 'data-src="(.*?)"')
@@ -551,11 +608,13 @@ def episodios(item):
         if not title: title = scrapertools.find_single_match(epi, '<div class="episodiotitle">.*?">(.*?)</a>')
 
         if item.contentSerieName: 
-            titulo = '%sx%s - %s' % (str(item.contentSeason), str(epis), title)
+            titulo = '%sx%s %s' % (str(item.contentSeason), str(epis), title)
 
             titulo = titulo + ' ' + item.contentSerieName
 
         else: titulo = item.title
+
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         if '.' in epis: epis = epis.split(".")[0]
 
@@ -578,6 +637,14 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
 
@@ -625,6 +692,7 @@ def findvideos(item):
             url = scrapertools.find_single_match(dat_server, "to_player.*?'(.*?)'")
 
             if '/saikoudane.' in url: continue
+            elif '/saidochesto.' in url: continue
 
             if url:
                 if url == 'undefined': continue
@@ -669,7 +737,8 @@ def findvideos(item):
                     if link_other == servidor: link_other = ''
                     else: link_other = link_other
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = link_other.capitalize() ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                                      language = lang, other = link_other.capitalize() ))
 
     if not itemlist:
         if not ses == 0:

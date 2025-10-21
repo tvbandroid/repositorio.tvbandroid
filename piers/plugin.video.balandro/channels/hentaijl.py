@@ -18,11 +18,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color='orange' ))
 
@@ -156,6 +157,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = httptools.downloadpage(item.url).data
     data = re.sub(r'\n|\r|\t|\s{2}', "", data)
 
@@ -169,16 +177,26 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
+        if '/powvideo.' in url: continue
+        elif '/streamplay.' in url or '/stre4mplay.' in url: continue
+
+        elif '/anime.' in url: continue
+
+        url = url.replace('/Smoothpre.', '/smoothpre.')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         other = ''
+
         if servidor == 'various': other = servertools.corregir_other(url)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
         if url:
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = lang, other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url,
+                                  language = lang, other = other.capitalize() ))
 
     # ~ descargas  ReCaptcha
 

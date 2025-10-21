@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import re
+
 from core import httptools
 from core import scrapertools
 from core import urlparse
@@ -7,8 +8,8 @@ from platformcode import logger
 from bs4 import BeautifulSoup
 
 kwargs = {
-    "set_tls": True,
-    "set_tls_min": True,
+    "set_tls": None,
+    "set_tls_min": False,
     "retries_cloudflare": 1,
     "ignore_response_code": True,
     "cf_assistant": False,
@@ -17,9 +18,13 @@ kwargs = {
 
 def test_video_exists(page_url):
     logger.info("(page_url='%s')" % page_url)
-    global data, server
+    
+    global data, host, server
     data = httptools.downloadpage(page_url, **kwargs).data
-    server = scrapertools.get_domain_from_url(page_url).split(".")[-2]
+    domain = scrapertools.get_domain_from_url(page_url)
+    host = "https://%s" % domain
+    server = domain.split(".")[-2]
+    # server = scrapertools.get_domain_from_url(page_url).split(".")[-2]
     # server = scrapertools.find_single_match(page_url, '//(?:www.|es.|)([A-z0-9-]+).(?:com|net|nl|xxx|cz)')
     if "<h2>WE ARE SORRY</h2>" in data or "<title>404 Not Found</title>" in data:
         return False, "[%s] El fichero no existe o ha sido borrado" % server
@@ -29,18 +34,19 @@ def test_video_exists(page_url):
 def get_video_url(page_url, video_password):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
-    data = httptools.downloadpage(page_url, **kwargs).data
+    
+    global data, host, server
+    
     soup = BeautifulSoup(data, "html5lib", from_encoding="utf-8")
     if soup.find("div", id="player-wrap"):  ####  anyporn
         data = soup.find("div", class_="player-wrap")
         data = str(data)
         patron = "([0-9]+)\s*:\s*'([^']+)'"
         matches = re.compile(patron, re.DOTALL).findall(data)
-        logger.debug(matches)
         for quality, url in matches:
             video_urls.append(["[%s] %s" % (server, quality), url])
     else:
-        if soup.video.find("source"):
+        if soup.find("video"):
             matches = soup.video.find_all("source")
         if soup.find("dl8-video"):
             matches = soup.find("dl8-video").find_all("source")  ####  sexVR
@@ -73,7 +79,11 @@ def get_video_url(page_url, video_password):
                 url = urlparse.urljoin(page_url, url)  # pornobande
             if not url.startswith("http"):
                 url = "http:%s" % url
-            url += "|Referer=%s" % page_url
+            
+            # url += "|Referer=%s/" % host
+            headers = httptools.default_headers.copy() 
+            url += "|%s&Referer=%s/&Origin=%s" % (urlparse.urlencode(headers), host,host)
             video_urls.append(["[%s] %s" % (server, quality), url])
+    
     video_urls.sort(key=lambda item: int(re.sub("\D", "", item[0])))
     return video_urls

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import os, xbmc, time
 
-from core import httptools, scrapertools
+from core import httptools, scrapertools, filetools, jsontools
 from platformcode import config, logger, platformtools
 
 from lib import jsunpack
@@ -89,6 +89,17 @@ def get_video_url(page_url, url_referer=''):
 
     page_url = normalizar_url(page_url)
 
+    path_server = os.path.join(config.get_runtime_path(), 'servers', 'gamovideo.json')
+    data = filetools.read(path_server)
+    dict_server = jsontools.load(data)
+
+    try:
+       notes = dict_server['notes']
+    except: 
+       notes = ''
+
+    if "out of service" in notes.lower(): return 'Fuera de Servicio'
+
     CUSTOM_HEADERS = get_headers(url_referer)
 
     data = httptools.downloadpage(page_url, headers=CUSTOM_HEADERS).data
@@ -147,7 +158,7 @@ def get_video_url(page_url, url_referer=''):
 
                 page_url = ini_page_url
 
-                return 'No se pudo Reproducir el Vídeo con ResolveUrl'
+                return 'ResolveUrl No se pudo Reproducir el Vídeo'
 
             except:
                 import traceback
@@ -157,8 +168,12 @@ def get_video_url(page_url, url_referer=''):
                     trace = traceback.format_exc()
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
+
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                    return 'Archivo inexistente'
 
                 elif '<urlopen error' in traceback.format_exc():
                     return 'No se puede establecer la conexión'

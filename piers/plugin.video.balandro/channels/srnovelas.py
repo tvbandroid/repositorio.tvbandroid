@@ -45,11 +45,11 @@ except:
    except: pass
 
 
-host = 'https://srnovelas.org/'
+host = 'https://srnovelas.com/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.srnovelas.cc/', 'https://srnovelas.com/', 'https://meganovelas.online/']
+ant_hosts = ['https://www.srnovelas.cc/', 'https://meganovelas.online/', 'https://srnovelas.org/']
 
 domain = config.get_setting('dominio', 'srnovelas', default='')
 
@@ -239,6 +239,10 @@ def last_epis(item):
             SerieName = scrapertools.find_single_match(match, '<h2>(.*?)Capitulo')
             SerieName = SerieName.replace('Final', '').strip()
 
+        SerieName = SerieName.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        SerieName = SerieName.capitalize()
+
         season = 1
 
         epis = scrapertools.find_single_match(match, '<h2>.*?Capitulo(.*?)</h2>')
@@ -286,7 +290,9 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "").strip()
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
         title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
         title = title.replace('&amp;', '&')
 
@@ -319,6 +325,8 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         title = title.capitalize()
+
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
                                     contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': year} ))
@@ -356,9 +364,11 @@ def temporadas(item):
         return itemlist
 
     for title in seasons:
-        tempo = title.strip()
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
 
-        title = 'Temporada ' + title.strip()
+        tempo = title
+
+        title = 'Temporada ' + title
 
         if len(seasons) == 1:
             if config.get_setting('channels_seasons', default=True):
@@ -501,6 +511,7 @@ def findvideos(item):
         elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
 
         elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://sr.ennovelas.watch/'): url = url.replace('/sr.ennovelas.watch/', '/waaw.to/')
         elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
         elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
         elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
@@ -547,7 +558,7 @@ def findvideos(item):
 
             if url.startswith('//'): url = 'https:' + url
 
-            elif 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
+            if 'api.mycdn.moe/uqlink.php?id=' in url: url = url.replace('api.mycdn.moe/uqlink.php?id=', 'uqload.com/embed-')
 
             elif 'api.mycdn.moe/dourl.php?id=' in url: url = url.replace('api.mycdn.moe/dourl.php?id=', 'dood.to/e/')
 
@@ -556,6 +567,7 @@ def findvideos(item):
             elif url.startswith('http://vidmoly/'): url = url.replace('http://vidmoly/w/', 'https://vidmoly/embed-').replace('http://vidmoly/', 'https://vidmoly/')
 
             elif url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+            elif url.startswith('https://sr.ennovelas.watch/'): url = url.replace('/sr.ennovelas.watch/', '/waaw.to/')
             elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
             elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
             elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
@@ -601,6 +613,7 @@ def findvideos(item):
 
            if u_link:
                if u_link.startswith('https://sr.ennovelas.net/'): u_link = u_link.replace('/sr.ennovelas.net/', '/waaw.to/')
+               elif u_link.startswith('https://sr.ennovelas.watch/'): u_link = u_link.replace('/sr.ennovelas.watch/', '/waaw.to/')
                elif u_link.startswith('https://video.ennovelas.net/'): u_link = u_link.replace('/video.ennovelas.net/', '/waaw.to/')
                elif u_link.startswith('https://reproductor.telenovelas-turcas.com.es/'): u_link = u_link.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
                elif u_link.startswith('https://novelas360.cyou/player/'): u_link = u_link.replace('/novelas360.cyou/player/', '/waaw.to/')
@@ -635,6 +648,7 @@ def findvideos(item):
         if url.startswith('//'): url = 'https:' + url
 
         if url.startswith('https://sr.ennovelas.net/'): url = url.replace('/sr.ennovelas.net/', '/waaw.to/')
+        elif url.startswith('https://sr.ennovelas.watch/'): url = url.replace('/sr.ennovelas.watch/', '/waaw.to/')
         elif url.startswith('https://video.ennovelas.net/'): url = url.replace('/video.ennovelas.net/', '/waaw.to/')
         elif url.startswith('https://reproductor.telenovelas-turcas.com.es/'): url = url.replace('/reproductor.telenovelas-turcas.com.es/', '/waaw.to/')
         elif url.startswith('https://novelas360.cyou/player/'): url = url.replace('/novelas360.cyou/player/', '/waaw.to/')
@@ -671,14 +685,24 @@ def play(item):
     url = item.url
 
     if url:
+        url = url.replace('/Smoothpre.', '/smoothpre.')
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
+
+        if 'filelions' in url or 'azipcdn' in url or 'alions' in url or 'dlions' in url or 'mlions' in url or 'fviplions' in url or 'javlion' in url or 'fdewsdc' in url or 'peytonepre' in url or 'ryderjet' in url:
+            url += "|Referer=" + host
+
+        elif 'vidhide' in url or 'stblion' in url or 'dhtpre' in url or 'dramacool' in url:
+            url += "|Referer=" + host
 
         itemlist.append(item.clone( url=url, server=servidor ))
 
@@ -701,9 +725,21 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
+        title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
+        title = title.replace('&amp;', '&')
+
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 
         name = scrapertools.find_single_match(article, ' alt="(.*?)"')
+
+        name = name.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        name = name.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
+        name = name.replace('&#8216;', "").replace('&#8217;', "").strip()
+        name = name.replace('&amp;', '&')
 
         SerieName = name
 

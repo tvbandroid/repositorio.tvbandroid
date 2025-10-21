@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -24,14 +24,15 @@ forced_proxy_opt = 'ProxySSL'
 canonical = {
              'channel': 'grantorrent', 
              'host': config.get_setting("current_host", 'grantorrent', default=''), 
-             'host_alt': ["https://grantorrent.mov/"], 
-             'host_black_list': ["https://www4.grantorrent.wf/", "https://www3.grantorrent.wf/"
+             'host_alt': ["https://www2.grantorrent.lol/"], 
+             'host_black_list': ["https://www1.grantorrent.lol/", 
+                                 "https://grantorrent.mov/", "https://www4.grantorrent.wf/", "https://www3.grantorrent.wf/"
                                  "https://www1.grantorrent.wf/", "https://www1.grantorrent.pm/", "https://grantorrent.zip/", 
                                  'https://grantorrent.bz/', 'https://grantorrent.fi/', 'https://grantorrent.si/', 
                                  'https://grantorrent.re/', 'https://grantorrent.ac/', 'https://grantorrent.ch/'], 
              'pattern': '<div\s*class="flex[^>]*>\s*<a\s*href="([^"]+)"[^>]*>\s*.nicio\s*<', 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False
             }
 host = canonical['host'] or canonical['host_alt'][0]
 host_torrent = host.replace('https://', 'https://files.')
@@ -135,6 +136,8 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
     
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
+
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
     
     autoplay.show_option(item.channel, itemlist)

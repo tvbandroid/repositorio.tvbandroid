@@ -8,12 +8,11 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; _dict = dict
 
 from lib import AlfaChannelHelper
-if not PY3: _dict = dict; from AlfaChannelHelper import dict
-from AlfaChannelHelper import DictionaryAllChannel
-from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
-
-from modules import renumbertools
+if not PY3: _dict = dict; from lib.AlfaChannelHelper import dict
+from lib.AlfaChannelHelper import DictionaryAllChannel
+from lib.AlfaChannelHelper import re, traceback
+from lib.AlfaChannelHelper import Item, servertools, scrapertools, get_thumb, config, logger, filtertools, autoplay, renumbertools
+from lib.alfa_assistant import is_alfa_installed
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_ANIME
 list_language = list(set(IDIOMAS.values()))
@@ -21,17 +20,26 @@ list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES
 list_quality_tvshow = AlfaChannelHelper.LIST_QUALITY_TVSHOW
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS
-forced_proxy_opt = 'ProxyCF'
+
+cf_assistant = "force" if is_alfa_installed() else False
+forced_proxy_opt = None if cf_assistant else 'ProxyCF'
+debug = config.get_setting('debug_report', default=False)
 
 canonical = {
              'channel': 'veranime', 
              'host': config.get_setting("current_host", 'veranime', default=''), 
              'host_alt': ["https://ww3.animeonline.ninja/"], 
              'host_black_list': ["https://ww2.animeonline.ninja/", "https://www1.animeonline.ninja/"], 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'cf_assistant_if_proxy': True, 'cf_assistant_get_source': False, 'CF_stat': True, 'session_verify': False, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': True, 'set_tls_min': True, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': cf_assistant, 
+             'cf_assistant_ua': True, 'cf_assistant_get_source': True if cf_assistant == 'force' else False, 
+             'cf_no_blacklist': True, 'cf_removeAllCookies': False if cf_assistant == 'force' else True,
+             'cf_challenge': True, 'cf_returnkey': 'url', 'cf_partial': True, 'cf_debug': debug, 
+             'cf_cookies_names': {'cf_clearance': False},
+             'CF_if_assistant': True if cf_assistant is True else False, 'retries_cloudflare': -1, 
+             'CF_stat': True if cf_assistant is True else False, 'session_verify': True, 
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': True
             }
+
 host = canonical['host'] or canonical['host_alt'][0]
 
 timeout = 15
@@ -111,7 +119,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Buscar...", action="search", url=host,
                          thumbnail=get_thumb("search", auto=True)))
 
-    itemlist = renumbertools.show_option(item.channel, itemlist)
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
@@ -214,8 +222,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
             if elem.find("div", class_=["texto", "contenido"]): 
                 elem_json['plot'] = elem.find("div", class_=["texto", "contenido"]).get_text(strip=True)
 
-            elem_json['context'] = renumbertools.context(item)
-            elem_json['context'].extend(autoplay.context)
+            elem_json['context'] = autoplay.context
 
         except Exception:
             logger.error(elem)
@@ -282,8 +289,6 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
                 elem_json['title'] = info.a.get_text(strip=True)
                 elem_json['season'] = item.contentSeason
                 elem_json['thumbnail'] = elem.img.get('data-src', '') or elem.img.get('src', '')
-                elem_json['season'], elem_json['episode'] = renumbertools.numbered_for_trakt(item.channel, 
-                                                            item.contentSerieName, elem_json['season'], elem_json['episode'])
 
             except Exception:
                 logger.error(elem)

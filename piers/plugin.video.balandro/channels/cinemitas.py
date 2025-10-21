@@ -10,6 +10,38 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://cinemitas.org/'
 
 
+def item_configurar_proxies(item):
+    color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+
+    color_avis = config.get_setting('notification_avis_color', default='yellow')
+    color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+    context = []
+
+    tit = '[COLOR %s]Información proxies[/COLOR]' % color_avis
+    context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
+
+    if config.get_setting('channel_cinemitas_proxies', default=''):
+        tit = '[COLOR %s][B]Quitar los proxies del canal[/B][/COLOR]' % color_list_proxies
+        context.append({'title': tit, 'channel': item.channel, 'action': 'quitar_proxies'})
+
+    tit = '[COLOR %s]Ajustes categoría proxies[/COLOR]' % color_exec
+    context.append({'title': tit, 'channel': 'actions', 'action': 'open_settings'})
+
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = '[B]Configurar proxies a usar ...[/B]', action = 'configurar_proxies', folder=False, context=context, plot=plot, text_color='red' )
+
+def quitar_proxies(item):
+    from modules import submnuctext
+    submnuctext._quitar_proxies(item)
+    return True
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
+
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~ por si viene de enlaces guardados
     ant_hosts = ['https://www3.pelisplus.uno/']
@@ -19,19 +51,61 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
     if '/release/' in url: raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    hay_proxies = False
+    if config.get_setting('channel_cinemitas_proxies', default=''): hay_proxies = True
 
-    if '<title>Bot Verification</title>' in data:
-        if not '?s=' in url:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] reCAPTCHA[/B][/COLOR]')
+    timeout = None
+    if host in url:
+        if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
+
+    if not url.startswith(host):
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+    else:
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('cinemitas', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+        if not data:
+            if not '/?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CineMitas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('cinemitas', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
         return ''
 
     return data
 
 
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( channel='submnuctext', action='_test_webs', title='Test Web del canal [COLOR yellow][B] ' + host + '[/B][/COLOR]',
+                                from_channel='cinemitas', folder=False, text_color='chartreuse' ))
+
+    itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_cinemitas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('cinemitas') ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
+
+
 def mainlist(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
@@ -44,6 +118,8 @@ def mainlist(item):
 def mainlist_pelis(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
@@ -62,6 +138,8 @@ def mainlist_pelis(item):
 def mainlist_series(item):
     logger.info()
     itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -349,6 +427,10 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
@@ -425,7 +507,11 @@ def findvideos(item):
                 elif '/viewsb.' in url: continue
                 elif '/www.fembed.' in url: continue
 
+                url = url.replace('E', 'e').replace('F', 'f').replace('D', 'd')
+
                 url = url.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
+
+                if url.startswith('https://cvid.lat/'): url = url.replace('/cvid.lat/', '/waaw.to/')
 
                 servidor = servertools.get_server_from_url(url)
                 servidor = servertools.corregir_servidor(servidor)
@@ -443,7 +529,11 @@ def findvideos(item):
 
         if not embed: continue
 
+        embed = embed.replace('E', 'e').replace('F', 'f').replace('D', 'd')
+
         embed = embed.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
+
+        if embed.startswith('https://cvid.lat/'): embed = embed.replace('/cvid.lat/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(embed)
         servidor = servertools.corregir_servidor(servidor)
@@ -479,7 +569,9 @@ def play(item):
 
     if servidor == 'directo':
         new_server = servertools.corregir_other(url).lower()
-        if new_server.startswith("http"): servidor = new_server
+        if new_server.startswith("http"):
+            if not config.get_setting('developer_mode', default=False): return itemlist
+        servidor = new_server
 
     itemlist.append(item.clone( url=url, server=servidor))
 

@@ -20,8 +20,12 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:porngo|porncake|pornpapa|xxxfiles|fapguru|veryfreeporn|porntry|titshub|bigwank|mylust).(?:com|tv)/videos/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:porngo|porncake|pornpapa|xxxfiles|fapguru|veryfreeporn|porntry|titshub|bigwank|mylust|mypornhere).(?:com|tv)/videos/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1/"
+      },
+      {
+        "pattern": "(https://(?:www.|)pornstars.(?:xxx|tube)/video(?:s|)/[0-9]+(?:/|))",
+        "url": "\\1"
       },
       {
         "pattern": "(http(?:s|)://(?:www.|)(?:fuckamouth|hd-porn|freehdporn|thehdporn).(?:com|co|xyz|ru)/hdporn/[0-9]+/[A-z0-9-]+(?:/|))",
@@ -96,11 +100,11 @@
         "url": "https://celebsnudeworld.com/embed/\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:anysex|fapality).com/[0-9]+/)",
+        "pattern": "(https://(?:www.|)fapality.com/[0-9]+/)",
         "url": "\\1"
       },
       {
-        "pattern": "https://(?:www.|)((?:12milf|allnporn|hitprn)).com/([A-z0-9-]+/)",
+        "pattern": "https://(?:www.|)((?:12milf|allnporn|hitprn|hitrpn)).com/([A-z0-9-]+/)",
         "url": "https://www.\\1.com/\\2"
       },
       {
@@ -116,7 +120,15 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://(?:www.|ru.|de.|es.|)anysex.com/video/[0-9]+/[A-z0-9-]+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://(?:www.|)hellporno.com/(?:videos|embed)/[A-z0-9-]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)longvideos.xxx(?:/\\w{2}|)/(?:videos|video|embed)/[A-z0-9-]+/)",
         "url": "\\1"
       },
       {
@@ -140,15 +152,11 @@
         "url": "https://\\1"
       },
       {
-        "pattern": "(https://(?:www.|)jizzberry.com/(?:vids|video|videos)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:jizzberry|alotporn).com/(?:vids|video|videos)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
         "pattern": "(https:/(?:www.|)/playenix.com/(?:embed|watch)/[A-z0-9-_]+(?:.html|))",
-        "url": "\\1"
-      },
-      {
-        "pattern": "(https://(?:www.|)uppornx.com/(?:video|videos)/[0-9]+/[A-z0-9-]+/)",
         "url": "\\1"
       },
       {
@@ -173,6 +181,10 @@
       },
       {
         "pattern": "(https://(?:www.|)(?:pornojenny|pornohammer|sexente|pornovideos-hd|pornoschlange|beeg-pornos|herzporno|einfachtitten|nursexfilme|milffabrik|pornohans).(?:com|\\w{2,4})/(?:video|videos|pornvideo|porno|film|filme)/[A-z0-9-]+/)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://max.porn/videos/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {

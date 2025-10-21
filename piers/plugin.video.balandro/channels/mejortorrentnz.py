@@ -350,7 +350,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
 
     _rel = scrapertools.find_single_match(data, '<link rel="canonical" href="(.*?)"')
-    
+
     i = 0
 
     if item.search_type == 'documentary':
@@ -434,7 +434,7 @@ def episodios(item):
         if not season: season = 1
 
         epi = scrapertools.find_single_match(title, 'Temporada.*?x(.*?)$').strip()
-        if not epi: epi = 1
+        if not epi: epi = i
 
         url = scrapertools.find_single_match(match, " href='(.*?)'")
 
@@ -610,7 +610,7 @@ def list_search(item):
     matches = scrapertools.find_multiple_matches(bloque, "<a href='(.*?)'.*?" + 'class="text-decoration-none">(.*?)</a>.*?<span class="badge badge-primary float-right">(.*?)</span>')
 
     for url, title, type in matches:
-        if not url: continue
+        if not url or not title: continue
 
         if type == 'Peliculas': pass 
         elif type == 'Series': pass

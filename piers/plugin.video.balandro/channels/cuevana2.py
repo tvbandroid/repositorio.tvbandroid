@@ -155,9 +155,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_cuevana2', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='cuevana2', folder=False, text_color='chartreuse' ))
@@ -169,7 +169,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'cuevana2', thumbnail=config.get_thumb('cuevana2') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'cuevana2' ))
 
     platformtools.itemlist_refresh()
 
@@ -282,6 +284,7 @@ def list_all(item):
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
+
         title = scrapertools.find_single_match(article, ' alt="(.*?)"').strip()
 
         if not url or not title: continue
@@ -294,7 +297,7 @@ def list_all(item):
         year = scrapertools.find_single_match(article, '<span>(\d{4})</span>')
         if not year: year = '-'
 
-        title = title.replace('&#x27;', "'")
+        title = title.replace('&#x27;', "'").replace('&amp;', '&')
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -354,7 +357,7 @@ def last_epis(item):
         season = scrapertools.find_single_match(temp_epis, '(.*?)x')
         episode = scrapertools.find_single_match(temp_epis, '.*?x(.*?)$')
 
-        title = title.replace('&#x27;', "'")
+        title = title.replace('&#x27;', "'").replace('&amp;', '&')
 
         name = title.replace(temp_epis, '').strip() 
 
@@ -478,7 +481,12 @@ def episodios(item):
 
         titulo = season + 'x' + epis + ' ' + item.contentSerieName
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb, contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -645,7 +653,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         if servidor == 'zplayer': url = url + '|' + host
 

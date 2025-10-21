@@ -3,7 +3,7 @@
   "name": "YaskeOrg",
   "thumbnail": "yaskeorg.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["movie"],
@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["lat"],
 
-  "clusters": ["suggested", "kids"],
+  "clusters": ["notice", "kids"],
 
-  "notes": "Películas por géneros."
+  "notes": "Web CERRADA. Películas por géneros."
 }

@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 import datetime
 
@@ -31,7 +31,7 @@ canonical = {
                                  "https://pelitorrent.com/", "https://pelitorrent.xyz/", "https://www.pelitorrent.com/"], 
              'pattern': "<link\s*rel='stylesheet'\s*id='wp-block-library-css'\s*href='([^']+)'", 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False
             }
 host = canonical['host'] or canonical['host_alt'][0]
 host_torrent = host
@@ -64,8 +64,8 @@ finds = {'find': dict([('find', [{'tag': ['div'], 'id': ['archive-content']}]),
          'next_page': {}, 
          'next_page_rgx': [['\/page\/\d+', '/page/%s/']],  
          'last_page': dict([('find', [{'tag': ['div'], 'class': ['pagination']}]), 
-                            ('find_all', [{'tag': ['a'], '@POS': [-1]}]), 
-                            ('get_text', [{'tag': '', '@STRIP': True, '@TEXT': '(\d+)'}])]), 
+                            ('find_all', [{'tag': ['span'], '@POS': [0]}]), 
+                            ('get_text', [{'tag': '', '@STRIP': True, '@TEXT': '(?i)(?:\d+\s*de\s*)?(\d+)'}])]), 
          'year': {}, 
          'season_episode': {}, 
          'seasons': dict([('find', [{'tag': ['div'], 'id': ['seasons']}]), 
@@ -95,7 +95,7 @@ finds = {'find': dict([('find', [{'tag': ['div'], 'id': ['archive-content']}]),
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'language_clean': [], 
          'url_replace': [], 
-         'controls': {'min_temp': min_temp, 'url_base64': True, 'add_video_to_videolibrary': True, 'cnt_tot': 24, 
+         'controls': {'min_temp': min_temp, 'url_base64': True, 'add_video_to_videolibrary': True, 'cnt_tot': 15, 
                       'get_lang': False, 'reverse': False, 'videolab_status': True, 'tmdb_extended_info': True, 'seasons_search': False, 
                       'host_torrent': host_torrent, 'duplicates': [], 'join_dup_episodes': False, 'torrent_kwargs': {'follow_redirects': False},
                       'torrent_url_replace': [[r'\/s\/', '/index.php/s/'], [r'([^^]+/index.php/s/[^$]+$)', r'\1/download']]},
@@ -129,6 +129,8 @@ def mainlist(item):
                          folder=False, thumbnail=get_thumb("next.png")))
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
+
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 

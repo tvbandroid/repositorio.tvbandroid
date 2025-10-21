@@ -23,6 +23,9 @@ from core.item import Item
 from modules import filters
 
 
+ant_repos = ['4.0.0', '3.0.0', '2.0.0', '1.0.5', '1.0.3'] 
+
+
 color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
 color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
 color_list_inactive = config.get_setting('channels_list_inactive_color', default='gray')
@@ -34,8 +37,10 @@ color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 
 
+search_no_accesibles = config.get_setting('search_no_accesibles', default=False)
+
+
 _foro = "[COLOR plum][B][I] www.mimediacenter.info/foro/ [/I][/B][/COLOR]"
-_source = "[COLOR coral][B][I] https://repobal.github.io/base/ [/I][/B][/COLOR]"
 _telegram = "[COLOR lightblue][B][I] t.me/balandro_asesor [/I][/B][/COLOR]"
 
 _team = "[COLOR hotpink][B][I] t.me/balandro_team [/I][/B][/COLOR]"
@@ -46,6 +51,7 @@ tests_all_srvs = []
 srv_pending = ''
 con_incidencias = ''
 no_accesibles = ''
+con_problemas = ''
 
 try:
     with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
@@ -54,6 +60,7 @@ except:
     except: txt_status = ''
 
 if txt_status:
+    # ~ Pending
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION SERVIDORES(.*?)SITUACION CANALES')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -63,6 +70,7 @@ if txt_status:
 
         if '[COLOR orchid]' in match: srv_pending += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ Incidencias
     bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -72,6 +80,7 @@ if txt_status:
 
         if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
 
+    # ~ No Accesibles
     bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
 
     matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
@@ -80,6 +89,21 @@ if txt_status:
         match = match.strip()
 
         if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    if con_problemas:
+        hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+        channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
 
 context_desarrollo = []
 
@@ -207,6 +231,9 @@ if 'fix' in last_fix:
     tit = '[COLOR %s]Información Fix[/COLOR]' % color_infor
     context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'show_last_fix'})
 
+    tit = '[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]'
+    context_ayuda.append({'title': tit, 'channel': 'helper', 'action': 'resumen_fix'})
+
 tit = '[COLOR %s]Comprobar Actualizaciones Fix[/COLOR]' % color_avis
 context_ayuda.append({'title': tit, 'channel': 'actions', 'action': 'check_addon_updates'})
 
@@ -245,14 +272,27 @@ def submnu_team(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( action='', title='[B]DESARROLLO:[/B]', thumbnail=config.get_thumb('team'), text_color='darkorange' ))
+    avisar = False
+
+    if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): avisar = True
+
+    if not avisar:
+        titulo = '[B]DESARROLLO:[/B]'
+    else:
+        titulo = '[B]FALSO DESARROLLO:[/B]'
+
+    itemlist.append(item.clone( action='', title=titulo, thumbnail=config.get_thumb('team'), text_color='darkorange' ))
 
     itemlist.append(item.clone( action='submnu_team_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     if not config.get_setting('mnu_simple', default=False): tit_mnu = '[B][I]Menú Desarrollo:[/I][/B]'
     else: tit_mnu = '[B][I]Menú Desarrollo Simplificado:[/I][/B]'
 
-    itemlist.append(item.clone( action='', title=tit_mnu, context=context_desarrollo, text_color='tan' ))
+    itemlist.append(item.clone( action='', title=tit_mnu, context=context_desarrollo, text_color='darkorange' ))
+
+    itemlist.append(item.clone( channel='helper', action='submnu_clean', title= ' - [B]Limpiezas[/B]', text_color='olive', thumbnail=config.get_thumb('quote') ))
 
     itemlist.append(item.clone( action='submnu_center', title=' - [B]Media Center[/B]', context=context_config, thumbnail=config.get_thumb('mediacenter'), text_color='pink' ))
 
@@ -323,29 +363,42 @@ def submnu_team_info(item):
 
     itemlist.append(item.clone( action='', title='[COLOR green][B]INFORMACIÓN[/COLOR] [COLOR darkorange]DESARROLLO:[/COLOR][/B]' ))
 
-    if txt_status:
-        itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR aqua][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='helper', action='show_msgfixed', title= '[COLOR chartreuse][B]Mensajes Fijados[/B][/COLOR] Telegram Balandro Asesor', thumbnail=config.get_thumb('telegram') ))
 
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR aqua][B]Últimos Cambios Dominios[/B][/COLOR]' ))
+
+    itemlist.append(item.clone( action='', title='[COLOR gold][I][B]CANALES:[/B][/I][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    if txt_status:
         if con_incidencias:
-            itemlist.append(item.clone( action='resumen_incidencias', title='[COLOR gold][B]Canales[/COLOR][COLOR tan] Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+            itemlist.append(item.clone( action='resumen_incidencias', title=' - [COLOR tan][B] Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
         if no_accesibles:
-            itemlist.append(item.clone( action='resumen_no_accesibles', title='[COLOR gold][B]Canales[/COLOR][COLOR indianred] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+            itemlist.append(item.clone( action='resumen_no_accesibles', title=' - [COLOR indianred][B] No Accesibles[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+        if con_problemas:
+            itemlist.append(item.clone( action='resumen_con_problemas', title=' - [COLOR tomato][B] Con Problemas[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( channel='helper', action='channels_with_crypto', title= ' - [COLOR darksalmon][B] Descifrar Enlaces[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
 
     if config.get_setting('memorize_channels_proxies', default=True):
-        itemlist.append(item.clone( channel='helper',  action='channels_with_proxies_memorized', title= '[COLOR gold][B]Canales[/COLOR][COLOR red][B] Con Proxies[/B][/COLOR]', new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
+        itemlist.append(item.clone( channel='helper',  action='channels_with_proxies_memorized', title= ' - [COLOR red][B] Con Proxies[/B][/COLOR]', new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='resumen_canales', title='[COLOR gold][B]Canales[/B][/COLOR] Resúmenes y Distribución', thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='test_one_channel', title= ' - [COLOR springgreen][B] Temporalmente Inactivos[/B][/COLOR]', temp_no_active = True, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( action='resumen_servidores', title='[COLOR fuchsia][B]Servidores[/B][/COLOR] Resúmenes y Distribución', thumbnail=config.get_thumb('bolt') ))
+    itemlist.append(item.clone( action='resumen_canales', title=' - [COLOR gold][B] Resúmenes y Distribución[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( action='', title='[COLOR fuchsia][I][B]SERVIDORES:[/B][/I][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+
+    itemlist.append(item.clone( action='resumen_servidores', title=' - [COLOR fuchsia][B]Resúmenes y Distribución[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if txt_status:
         if srv_pending:
-            itemlist.append(item.clone( action='resumen_pending', title='[COLOR fuchsia][B]Servidores[/COLOR][COLOR tan] Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+            itemlist.append(item.clone( action='resumen_pending', title='[COLOR tan][B] - Con Incidencias[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        itemlist.append(item.clone( action='show_help_alternativas', title='Qué servidores tienen [COLOR yellow][B]Vías Alternativas[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
-        itemlist.append(item.clone( action='show_help_adicionales', title='Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
+        itemlist.append(item.clone( action='show_help_alternativas', title=' - Qué servidores tienen [COLOR yellow][B]Vías Alternativas[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+        itemlist.append(item.clone( action='show_help_adicionales', title=' - Servidores [COLOR goldenrod][B]Vías Adicionales[/B][/COLOR] a través de [COLOR yellowgreen][B]ResolveUrl[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
 
     return itemlist
 
@@ -359,6 +412,12 @@ def submnu_center(item):
     if not item.helper:
         itemlist.append(item.clone( action='submnu_center_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='pink' ))
+
+    itemlist.append(item.clone( channel='helper', action='show_plataforma', title=' - [COLOR gold][B]Plataforma[/B][/COLOR]', thumbnail=config.get_thumb('mediacenter') ))
+
+    itemlist.append(item.clone( channel='actions', action = 'test_internet', title= '- Comprobar [COLOR goldenrod][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
+
     path = translatePath(os.path.join('special://home/userdata', ''))
 
     file_advs = 'advancedsettings.xml'
@@ -366,10 +425,11 @@ def submnu_center(item):
     existe = filetools.exists(file)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO ADVANCED SETTINGS:[/I]', text_color='pink' ))
+        itemlist.append(item.clone( action='', title='[B][I]ADVANCED SETTINGS:[/I][/B]', text_color='pink' ))
 
-        itemlist.append(item.clone( channel='helper', action='show_advs', title=' - Ver', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
-        itemlist.append(item.clone( channel='actions', action='manto_advs', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('quote'), text_color='red' ))
+        itemlist.append(item.clone( channel='helper', action='show_advs', title=' - Ver', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_advs', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     file_favs = 'favourites.xml'
     file = path + file_favs
@@ -391,20 +451,21 @@ def submnu_center(item):
         if matches == 0: existe = False
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO FAVOURITES SETTINGS:[/I]', text_color='pink' ))
+        itemlist.append(item.clone( action='', title='[B][I]FAVOURITES SETTINGS:[/I][/B]', text_color='pink' ))
 
-        itemlist.append(item.clone( channel='helper', action='show_favs', title=' - Ver', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
-        itemlist.append(item.clone( channel='actions', action='manto_favs', title=' - Eliminar', thumbnail=config.get_thumb('quote'), text_color='red' ))
+        itemlist.append(item.clone( channel='helper', action='show_favs', title=' - Ver', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+        itemlist.append(item.clone( channel='actions', action='manto_favs', title=' - Eliminar', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     file_pcfs = 'playercorefactory.xml'
     file = path + file_pcfs
     existe = filetools.exists(file)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO PLAYERCOREFACTORY SETTINGS:[/I]', text_color='pink' ))
+        itemlist.append(item.clone( action='', title='[B][I]PLAYERCOREFACTORY SETTINGS:[/I][/B]', text_color='pink' ))
 
-        itemlist.append(item.clone( channel='helper', action='show_pcfs', title=' - Ver', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
-        itemlist.append(item.clone( channel='actions', action='manto_pcfs', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('quote'), text_color='red' ))
+        itemlist.append(item.clone( channel='helper', action='show_pcfs', title=' - Ver', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_pcfs', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     presentar = False
 
@@ -417,9 +478,9 @@ def submnu_center(item):
     if caches: presentar = True
 
     if presentar:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVOS EN LA CACHÉ:[/I]', text_color='pink' ))
+        itemlist.append(item.clone( action='', title='[B][I]ARCHIVOS CACHÉ:[/I][/B]', text_color='pink' ))
 
-        itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = caches, tipo = 'Caché', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+        itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = caches, tipo = 'Caché', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
         itemlist.append(item.clone( channel='actions', action='manto_caches', title=' - Eliminar [B][COLOR cyan](Si ejecuta es Obligatorio Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
@@ -427,7 +488,7 @@ def submnu_center(item):
     existe_thumbs = filetools.exists(path_thumbs)
 
     if existe_thumbs:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVOS EN THUMBNAILS:[/I]', text_color='pink' ))
+        itemlist.append(item.clone( action='', title='[B][I]ARCHIVOS THUMBNAILS:[/I][/B]', text_color='pink' ))
 
         itemlist.append(item.clone( channel='actions', action='manto_thumbs', title=' - Eliminar [B][COLOR cyan](Si ejecuta es Obligatorio Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
@@ -447,15 +508,11 @@ def submnu_center_info(item):
 
     itemlist.append(item.clone( action='', title='[COLOR green][B]INFORMACIÓN[/COLOR] [COLOR pink]MEDIA CENTER:[/COLOR][/B]' ))
 
-    itemlist.append(item.clone( channel='helper', action='show_plataforma', title='[COLOR gold][B]Plataforma[/B][/COLOR]', thumbnail=config.get_thumb('mediacenter') ))
+    itemlist.append(item.clone( action='', title='[B][I]LOG BALANDRO:[/I][/B]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
 
-    itemlist.append(item.clone( channel='actions', action = 'test_internet', title= 'Comprobar [COLOR goldenrod][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
+    itemlist.append(item.clone( action='balandro_log', title=' - Ver Log ejecución Balandro', thumbnail=config.get_thumb('computer'), text_color='coral' ))
 
-    itemlist.append(item.clone( action='', title='[I]ARCHIVO LOG BALANDRO:[/I]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
-
-    itemlist.append(item.clone( action='balandro_log', title=' -  Ver Log ejecución Balandro', thumbnail=config.get_thumb('search'), text_color='coral' ))
-
-    itemlist.append(item.clone( action='', title='[I]ARCHIVO LOG GENERAL:[/I]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
+    itemlist.append(item.clone( action='', title='[B][I]LOG GENERAL:[/I][/B]', thumbnail=config.get_thumb('computer'), text_color='pink' ))
 
     itemlist.append(item.clone( channel='helper', action='show_log', title=' - Ver Log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
     itemlist.append(item.clone( channel='helper', action='copy_log', title=' - Obtener una Copia', thumbnail=config.get_thumb('folder'), text_color='yellowgreen' ))
@@ -491,16 +548,16 @@ def submnu_addons(item):
 
     if presentar:
         if packages:
-            itemlist.append(item.clone( action='', title='[I]ARCHIVOS EN PACKAGES:[/I]', thumbnail=config.get_thumb('kodiaddons'), text_color='yellowgreen' ))
+            itemlist.append(item.clone( action='', title='[B][I]ARCHIVOS PACKAGES:[/I][/B]', thumbnail=config.get_thumb('kodiaddons'), text_color='yellowgreen' ))
 
-            itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = packages, tipo = 'Packages', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+            itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = packages, tipo = 'Packages', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
             itemlist.append(item.clone( channel='actions', action='manto_addons_packages', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
         if temps:
-            itemlist.append(item.clone( action='', title='[I]ARCHIVOS EN TEMP:[/I]', thumbnail=config.get_thumb('kodiaddons'), text_color='yellowgreen' ))
+            itemlist.append(item.clone( action='', title='[B][I]ARCHIVOS TEMP:[/I][/B]', thumbnail=config.get_thumb('kodiaddons'), text_color='yellowgreen' ))
 
-            itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = temps, tipo = 'Temp', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+            itemlist.append(item.clone( action='show_addons', title=' - Ver', addons = temps, tipo = 'Temp', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
             itemlist.append(item.clone( channel='actions', action='manto_addons_temp', title=' - Eliminar [B][COLOR violet](Si ejecuta es Recomendable Re-iniciar Media Center)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
@@ -527,6 +584,7 @@ def submnu_addons_info(item):
     itemlist.append(item.clone( channel='helper', action='show_help_vias', title= 'Vía alternativa [COLOR goldenrod][B]Youtube[/B][/COLOR]', only_youtube=True, thumbnail=config.get_thumb('youtube') ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_torrents', title= '¿ Dónde obtener los Add-Ons para [COLOR gold][B]Clientes/Motores[/B][/COLOR] torrents ?', thumbnail=config.get_thumb('tools') ))
+
     itemlist.append(item.clone( channel='helper', action='show_clients_torrent', title= 'Clientes/Motores externos torrent [COLOR gold][B]Soportados[/B][/COLOR]', thumbnail=config.get_thumb('cloud') ))
 
     itemlist.append(item.clone( action='', title='[COLOR yellowgreen][B][I]ADD-ONS y VIAS ALTERNATIVAS:[/B][/I][/COLOR] (Gestión desde Balandro)', thumbnail=config.get_thumb('kodiaddons') ))
@@ -574,12 +632,25 @@ def submnu_addons_info(item):
 
     itemlist.append(item.clone( action='', title='[COLOR yellowgreen][B][I]REPOSITORIOS:[/B][/I][/COLOR] (Gestión desde Balandro)', thumbnail=config.get_thumb('kodiaddons') ))
 
+    hay_repo = False
+    if xbmc.getCondVisibility('System.HasAddon("%s")' % 'repository.balandro'): hay_repo = True
+
+    if hay_repo:
+        repo_version = xbmcaddon.Addon('repository.balandro').getAddonInfo("version").strip()
+
+        tex_repo = 'Repositorio Balandro ' + repo_version
+        if repo_version in ant_repos: tex_repo = '[COLOR red]Desfasado ' + repo_version + '[/COLOR]'
+    else:
+        tex_repo = 'Repositorio Balandro [COLOR red]No Instalado[/COLOR]'
+
+    itemlist.append(item.clone( action='', title=' - [COLOR cyan][B]' + tex_repo + '[/B][/COLOR]', thumbnail=config.get_thumb('repo') ))
+
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
         cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
         tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-    itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurl') ))
+    itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('resolveurlrepo') ))
 
     if config.get_setting('mnu_torrents', default=True):
         if not PY3:
@@ -588,14 +659,14 @@ def submnu_addons_info(item):
                 tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
             else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-            itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '  (hasta K18.x)[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
+            itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '  (hasta K18.x)[/B][/COLOR]', thumbnail=config.get_thumb('elementumrepo') ))
 
         if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
             cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
             tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
         else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-        itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('elementum') ))
+        itemlist.append(item.clone( action = '', title= ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR]', thumbnail=config.get_thumb('elementumrepo') ))
 
     if not item._help:
         itemlist.append(item.clone( action='submnu_all_addons', title='[COLOR limegreen][B][I]ADD-ONS INSTALADOS[/I][/B][/COLOR]', thumbnail=config.get_thumb('kodiaddons') ))
@@ -632,6 +703,12 @@ def submnu_resto_addons(item):
            if addon == 'packages': continue
            elif addon == 'temp': continue
 
+        cod_version = ''
+        if xbmc.getCondVisibility('System.HasAddon("%s")' % addon):
+            cod_version = xbmcaddon.Addon("%s" % addon).getAddonInfo("version")
+
+            cod_version = cod_version.strip()
+
         addon = addon.replace('plugin', '[COLOR yellow]plugin[/COLOR]')
         addon = addon.replace('repository', '[COLOR cyan]repository[/COLOR]')
         addon = addon.replace('script', '[COLOR orange]script[/COLOR]')
@@ -639,7 +716,15 @@ def submnu_resto_addons(item):
         addon = addon.replace('service', '[COLOR violet]service[/COLOR]')
         addon = addon.replace('resource', '[COLOR magenta]resource[/COLOR]')
 
-        addon = addon.replace('inputstream', '[COLOR coral]inputstream[/COLOR]')
+        addon = addon.replace('inputstream', '[COLOR fuchsia]inputstream[/COLOR]')
+
+        addon = addon.replace('resolveurl', '[COLOR fuchsia]resolveurl[/COLOR]')
+        addon = addon.replace('elementum', '[COLOR fuchsia]elementum[/COLOR]')
+        addon = addon.replace('youtube', '[COLOR fuchsia]youtube[/COLOR]')
+
+        addon = addon.replace('balandro', '[COLOR yellow]balandro[/COLOR]')
+
+        addon = addon + '  [COLOR gold][B]' + cod_version + '[/B][/COLOR]'
 
         if item.all_addons: txt += '  ' + str(addon) + '[CR]'
         else: txt += '  ' + str(addon) + '[CR][CR]'
@@ -659,23 +744,31 @@ def submnu_sistema(item):
     if not item.helper:
         itemlist.append(item.clone( action='submnu_sistema_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='violet' ))
+
+    itemlist.append(item.clone( channel='helper', action = 'show_plataforma', title=' - [COLOR gold][B]Plataforma[/B][/COLOR]', thumbnail=config.get_thumb('mediacenter') ))
+
+    itemlist.append(item.clone( channel='actions', action = 'test_internet', title= '- Comprobar [COLOR goldenrod][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
+
+    itemlist.append(item.clone( channel='helper', action = 'show_test', title= ' - Test [COLOR yellow][B]Status[/B][/COLOR] del sistema', thumbnail=config.get_thumb('addon') ))
+
     path = os.path.join(config.get_data_path(), 'Lista-proxies.txt')
 
     existe = filetools.exists(path)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO LISTA-PROXIES.TXT:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+        itemlist.append(item.clone( action='', title='[B][I]LISTA-PROXIES.TXT:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-        itemlist.append(item.clone( channel='helper', action='show_yourlist', title=' - Ver', thumbnail=config.get_thumb('keyboard'), text_color='yellow' ))
+        itemlist.append(item.clone( channel='helper', action='show_yourlist', title=' - Ver', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_yourlist', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_yourlist', title= " - Eliminar", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     path = os.path.join(config.get_data_path(), 'cookies.dat')
 
     existe = filetools.exists(path)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO COOKIES:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+        itemlist.append(item.clone( action='', title='[B][I]COOKIES:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
         itemlist.append(item.clone( channel='actions', action='manto_cookies', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
 
@@ -684,9 +777,9 @@ def submnu_sistema(item):
     existe = filetools.exists(path)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]CARPETA CACHÉ:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+        itemlist.append(item.clone( action='', title='[B][I]CARPETA CACHÉ:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_folder_cache', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_folder_cache', title= " - Eliminar", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     if not item.helper:
         path = filetools.join(config.get_data_path(), 'tracking_dbs')
@@ -694,9 +787,9 @@ def submnu_sistema(item):
         existe = filetools.exists(path)
 
         if existe:
-            itemlist.append(item.clone( action='', title='[I]CONTENIDO PREFERIDOS:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+            itemlist.append(item.clone( action='', title='[B][I]CONTENIDO PREFERIDOS:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-            itemlist.append(item.clone( channel='actions', action='manto_tracking_dbs', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+            itemlist.append(item.clone( channel='actions', action='manto_tracking_dbs', title= " - Eliminar", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
         downloadpath = config.get_setting('downloadpath', default='')
 
@@ -706,27 +799,27 @@ def submnu_sistema(item):
         existe = filetools.exists(path)
 
         if existe:
-            itemlist.append(item.clone( action='', title='[I]CONTENIDO DESCARGAS:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+            itemlist.append(item.clone( action='', title='[B][I]CONTENIDO DESCARGAS:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-            itemlist.append(item.clone( channel='actions', action='manto_folder_downloads', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+            itemlist.append(item.clone( channel='actions', action='manto_folder_downloads', title= " - Eliminar", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     path = filetools.join(config.get_data_path(), 'tmdb.sqlite-journal')
 
     existe = filetools.exists(path)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO TMDB SQLITE JOURNAL:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+        itemlist.append(item.clone( action='', title='[B][I]TMDB SQLITE JOURNAL:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_tmdb_sqlite', title= " - Eliminar", journal = 'journal', thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_tmdb_sqlite', title= " - Eliminar", journal = 'journal', thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     path = filetools.join(config.get_data_path(), 'tmdb.sqlite')
 
     existe = filetools.exists(path)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO TMDB SQLITE:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+        itemlist.append(item.clone( action='', title='[B][I]TMDB SQLITE:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_tmdb_sqlite', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+        itemlist.append(item.clone( channel='actions', action='manto_tmdb_sqlite', title= " - Eliminar", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     if not item.helper:
         path = config.get_data_path()
@@ -734,9 +827,9 @@ def submnu_sistema(item):
         existe = filetools.exists(path)
 
         if existe:
-            itemlist.append(item.clone( action='', title='[I]AJUSTES PREFERENCIAS:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+            itemlist.append(item.clone( action='', title='[B][I]AJUSTES PREFERENCIAS:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
-            itemlist.append(item.clone( channel='actions', action='manto_folder_addon', title= " - Eliminar", thumbnail=config.get_thumb('computer'), text_color='red' ))
+            itemlist.append(item.clone( channel='actions', action='manto_folder_addon', title= " - Eliminar", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     if item.helper: platformtools.itemlist_refresh()
 
@@ -757,9 +850,8 @@ def submnu_sistema_info(item):
     itemlist.append(item.clone( action='show_sistema', title= 'Información [COLOR teal][B]Ajustes del Sistema[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR aqua][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('stack') ))
+
     itemlist.append(item.clone( channel='helper', action='show_version', title= '[COLOR lime][B]Versión[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
-    itemlist.append(item.clone( channel='actions', action = 'test_internet', title= 'Comprobar [COLOR goldenrod][B]Internet[/B][/COLOR]', thumbnail=config.get_thumb('crossroads') ))
-    itemlist.append(item.clone( channel='helper', action='show_test', title= 'Test [COLOR gold][B]Status[/B][/COLOR] del sistema', thumbnail=config.get_thumb('addon') ))
 
     txt_python = '  %s.%s.%s[CR][CR]' % (str(sys.version_info[0]), str(sys.version_info[1]), str(sys.version_info[2]))
     itemlist.append(item.clone( action='', title='[COLOR green][B]Versión Python[/COLOR][COLOR violet]' + txt_python + '[/COLOR][/B]', thumbnail=config.get_thumb('python') ))
@@ -769,15 +861,19 @@ def submnu_sistema_info(item):
     existe = filetools.exists(path)
 
     if existe:
-        itemlist.append(item.clone( action='', title='[I]ARCHIVO FIX:[/I]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
+        itemlist.append(item.clone( action='', title='[B][I]FIXES:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='violet' ))
 
         if config.get_setting('addon_update_atstart', default=True):
             itemlist.append(item.clone( action='', title= ' - Comprobar Fixes al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center [COLOR yellow][B]Activado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
         else:
             itemlist.append(item.clone( action='', title= ' - Comprobar Fixes al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center [COLOR red][B]Des-Activado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
+
         itemlist.append(item.clone( channel='helper', action='show_last_fix', title= ' - [COLOR green][B]Información[/B][/COLOR] Fix instalado', thumbnail=config.get_thumb('news') ))
-        itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar fichero control 'Fix'", thumbnail=config.get_thumb('news'), text_color='red' ))
+
+        itemlist.append(item.clone( channel='helper',  action='resumen_fix', title= ' - [COLOR darkcyan][B]Resumen[/B][/COLOR] Fix Instalado', thumbnail=config.get_thumb('news') ))
+
+        itemlist.append(item.clone( channel='actions', action='manto_last_fix', title= " - Eliminar fichero control 'Fix'", thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
     itemlist.append(item.clone( channel='helper',  action='show_sets', title= 'Visualizar sus [COLOR chocolate][B]Ajustes[/B][/COLOR] Personalizados', thumbnail=config.get_thumb('folder') ))
 
@@ -798,19 +894,19 @@ def submnu_logs(item):
         itemlist.append(item.clone( action='', title='[B]LOGS:[/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'servers_todo.log')):
-            itemlist.append(item.clone( action='', title='[I]LOG SERVIDORES:[/I]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
+            itemlist.append(item.clone( action='', title='[B][I]SERVIDORES:[/I][/B]', thumbnail=config.get_thumb('bolt'), text_color='limegreen' ))
 
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'servers_todo.log', thumbnail=config.get_thumb('crossroads'), text_color='yellow' ))
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'servers_todo.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'qualities_todo.log')):
-            itemlist.append(item.clone( action='', title='[I]LOG CALIDADES:[/I]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
+            itemlist.append(item.clone( action='', title='[B][I]CALIDADES:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
 
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'qualities_todo.log', thumbnail=config.get_thumb('quote'), text_color='yellow' ))
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'qualities_todo.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'proxies.log')):
-            itemlist.append(item.clone( action='', title='[I]LOG PROXIES:[/I]', thumbnail=config.get_thumb('tools'), text_color='limegreen' ))
+            itemlist.append(item.clone( action='', title='[B][I]PROXIES:[/I][/B]', thumbnail=config.get_thumb('flame'), text_color='limegreen' ))
 
-            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'proxies.log', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
+            itemlist.append(item.clone( channel='helper', action='show_todo_log', title=' - Ver', todo = 'proxies.log', thumbnail=config.get_thumb('computer'), text_color='yellow' ))
 
         itemlist.append(item.clone( channel='actions', action='manto_temporales', title='Eliminar Todos los LOGS', _logs = True, thumbnail=config.get_thumb('keyboard'), text_color='red' ))
 
@@ -842,37 +938,37 @@ def submnu_temporales(item):
         itemlist.append(item.clone( action='', title='[B]TEMPORALES:[/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'info_channels.csv')):
-            itemlist.append(item.clone( action='', title='[I]FICHEROS INFO CHANNELS:[/I]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+            itemlist.append(item.clone( action='', title='[B][I]INFO CHANNELS:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
             itemlist.append(item.clone( action='', title=' - Hay Info channels', thumbnail=config.get_thumb('dev'), text_color='goldenrod' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'temp.torrent')):
-            itemlist.append(item.clone( action='', title='[I]FICHERO TORRENT:[/I]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+            itemlist.append(item.clone( action='', title='[B][I]TORRENT:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
             itemlist.append(item.clone( action='', title=' - Hay Torrent', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'm3u8hls.m3u8')):
-            itemlist.append(item.clone( action='', title='[I]FICHERO M3U8HLS:[/I]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+            itemlist.append(item.clone( action='', title='[B][I]M3U8HLS:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
             itemlist.append(item.clone( action='', title=' - Hay M3u8hls', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'blenditall.m3u8')):
-            itemlist.append(item.clone( action='', title='[I]FICHERO BLENDITALL:[/I]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+            itemlist.append(item.clone( action='', title='[B][I]BLENDITALL:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
             itemlist.append(item.clone( action='', title=' - Hay M3u8', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'test_logs')):
-            itemlist.append(item.clone( action='', title='[I]FICHEROS TEST LOGS:[/I]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+            itemlist.append(item.clone( action='', title='[B][I]TEST LOGS:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
             itemlist.append(item.clone( action='', title=' - Hay Test logs', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'temp_updates.zip')):
-            itemlist.append(item.clone( action='', title='[I]FICHERO UPDATES:[/I]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+            itemlist.append(item.clone( action='', title='[B][I]UPDATES:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
             itemlist.append(item.clone( action='', title=' - Hay Updates', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
         if os.path.exists(os.path.join(config.get_data_path(), 'tempfile_mkdtemp')):
-            itemlist.append(item.clone( action='', title='[I]FICHEROS MKDTEMP:[/I]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
+            itemlist.append(item.clone( action='', title='[B][I]MKDTEMP:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='cyan' ))
 
             itemlist.append(item.clone( action='', title=' - Hay Mkdtemp', thumbnail=config.get_thumb('dev'), text_color='yellow' ))
 
@@ -920,20 +1016,22 @@ def submnu_proxies(item):
 
     itemlist.append(item.clone( action='', title='[B]TESTS PROXIES:[/B]', text_color='red' ))
 
-    itemlist.append(item.clone( action='submnu_proxies_info', title=' - [COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='submnu_proxies_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='red' ))
 
     itemlist.append(item.clone( action='test_providers', title= ' - [COLOR yellowgreen][B]Tests[/B][/COLOR] Proveedores', thumbnail=config.get_thumb('flame') ))
 
     itemlist.append(item.clone( action='test_tplus', title= ' - Asignar proveedor [COLOR goldenrod][B]TPlus[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
-    itemlist.append(item.clone( action='', title='[I]OPCIONES PROXIES:[/I]', thumbnail=config.get_thumb('tools'), text_color='red' ))
+    itemlist.append(item.clone( action='', title='[B][I]OPCIONES:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='red' ))
 
     itemlist.append(item.clone( channel='helper', action='channels_with_proxies', title= ' - Qué canales pueden usar Proxies', new_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
 
     if config.get_setting('memorize_channels_proxies', default=True):
         itemlist.append(item.clone( channel='helper', action='channels_with_proxies_memorized', title= ' - Qué [COLOR red]canales[/COLOR] tiene con proxies [COLOR red][B]Memorizados[/B][/COLOR]', new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( channel='actions', action = 'manto_proxies', title= ' - Quitar los proxies en los canales [COLOR red][B](que los tengan Memorizados)[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
+    itemlist.append(item.clone( channel='actions', action = 'manto_proxies', title= ' - Quitar los proxies en los canales [COLOR red][B](que los tengan Memorizados)[/B][/COLOR]', thumbnail=config.get_thumb('keyboard') ))
 
     itemlist.append(item.clone( channel='actions', action = 'global_proxies', title = ' - Configurar proxies a usar [COLOR plum][B](en los canales que los necesiten)[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
 
@@ -946,13 +1044,13 @@ def submnu_proxies(item):
     if existe: presentar = True
 
     if presentar:
-        itemlist.append(item.clone( action='', title='[I]FICHERO LISTA-PROXIES.TXT:[/I]', thumbnail=config.get_thumb('tools'), text_color='red' ))
+        itemlist.append(item.clone( action='', title='[B][I]LISTA-PROXIES.TXT:[/I][/B]', thumbnail=config.get_thumb('tools'), text_color='red' ))
 
         itemlist.append(item.clone( channel='helper', action='show_help_yourlist', title= ' - [COLOR goldenrod][B]Gestión[/B][/COLOR] Fichero Personalizado', thumbnail=config.get_thumb('pencil') ))
 
         itemlist.append(item.clone( channel='helper', action='show_yourlist', title= ' - [COLOR green][B]Contenido[/B][/COLOR] de su Fichero [COLOR gold][B]Personalizado[/B][/COLOR] de proxies', thumbnail=config.get_thumb('news') ))
 
-        itemlist.append(item.clone( channel='actions', action='manto_yourlist', title= ' - [COLOR red][B]Eliminar[/B][/COLOR] su Fichero [COLOR yellow][B]Personalizado[/B][/COLOR]', thumbnail=config.get_thumb('settings') ))
+        itemlist.append(item.clone( channel='actions', action='manto_yourlist', title= ' - [COLOR red][B]Eliminar[/B][/COLOR] su Fichero [COLOR yellow][B]Personalizado[/B][/COLOR]', thumbnail=config.get_thumb('keyboard') ))
 
     return itemlist
 
@@ -963,14 +1061,14 @@ def submnu_proxies_info(item):
 
     itemlist.append(item.clone( action='', title='[COLOR green][B]INFORMACIÓN[/COLOR] [COLOR red]TEST PROXIES:[/COLOR][/B]' ))
 
-    itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= 'Uso de proxies' ))
-    itemlist.append(item.clone( channel='helper', action='show_help_providers', title= 'Proveedores de proxies' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_proxies', title= 'Uso de [COLOR red]Proxies[/COLOR]' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_providers', title= '[COLOR magenta]Proveedores[/COLOR] de proxies' ))
 
     if config.get_setting('proxies_extended', default=False):
         itemlist.append(item.clone( channel='helper', action='show_help_providers2', title= 'Lista [COLOR aqua][B]Ampliada[/B][/COLOR] de Proveedores de proxies' ))
 
     if config.get_setting('proxies_vias', default=False): 
-        itemlist.append(item.clone( channel='helper', action='proxies_show_vias', title= 'Lista [COLOR aqua][B]Vías Alternativas[/B][/COLOR] de Proveedores de proxies' ))
+        itemlist.append(item.clone( channel='helper', action='proxies_show_vias', title= 'Lista [COLOR aquamarine][B]Vías Alternativas[/B][/COLOR] de Proveedores de proxies' ))
 
     return itemlist
 
@@ -981,7 +1079,23 @@ def submnu_canales(item):
 
     itemlist.append(item.clone( action='', title='[B]TESTS CANALES:[/B]', text_color='gold' ))
 
-    itemlist.append(item.clone( action='submnu_canales_info', title=' - [COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='submnu_canales_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title= '[COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( action='resumen_canales', title='[COLOR gold]Resúmenes y Distribución[/COLOR]' ))
+
+    if txt_status:
+        if con_incidencias:
+            itemlist.append(item.clone( action='resumen_incidencias', title= 'Canales[COLOR tan][B] Con Incidencias[/B][/COLOR]' ))
+
+        if no_accesibles:
+            itemlist.append(item.clone( action='resumen_no_accesibles', title= 'Canales[COLOR indianred][B] No Accesibles[/B][/COLOR]' ))
+
+        if con_problemas:
+            itemlist.append(item.clone( action='resumen_con_problemas', title='Canales [COLOR tomato][B]Con Problemas[/B][/COLOR]' ))
+
+    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='gold' ))
 
     itemlist.append(item.clone( action='test_all_webs', title=' - Posibles [B][COLOR gold]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
 
@@ -993,7 +1107,7 @@ def submnu_canales(item):
 
     itemlist.append(item.clone( action='test_alfabetico', title=' - Posibles [COLOR gold]Insatisfactorios[/COLOR] desde un Canal [B][COLOR powderblue]Letra inicial[/B][/COLOR]', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_webs', title=' - Todos los canales' ))
+    itemlist.append(item.clone( action='test_all_webs', title=' - Todos los Canales [COLOR darkcyan][B]Activos[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='test_one_channel', title=' - Un canal Concreto' ))
 
@@ -1019,12 +1133,17 @@ def submnu_canales_info(item):
     itemlist.append(item.clone( channel='helper', action='channels_with_notice', title= ' - Qué canales tienen [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]' ))
 
     itemlist.append(item.clone( channel='helper', action='channels_with_proxies', title= '    - Qué canales pueden necesitar [COLOR red][B]Proxies[/B][/COLOR]', new_proxies=True ))
+
     if config.get_setting('memorize_channels_proxies', default=True):
         itemlist.append(item.clone( channel='helper', action='channels_with_proxies_memorized', title= ' - Qué [COLOR red]canales[/COLOR] tiene con proxies [COLOR red][B]Memorizados[/B][/COLOR]', new_proxies=True, memo_proxies=True, test_proxies=True, thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué canales están [COLOR plum][B]Inestables[/B][/COLOR]', no_stable = True ))
     itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué canales son [COLOR darkgoldenrod][B]Problemátios[/B][/COLOR] (Predominan Sin enlaces Disponibles/Válidos/Soportados)', problematics = True ))
+
+    itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué canales son [COLOR aquamarine][B]Principales[/COLOR] con [COLOR turquoise]Clones[/B][/COLOR] Asociados', clons = True ))
+
     itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué canales son [COLOR turquoise][B]Clones[/B][/COLOR] (Clon del Canal Principal)', clones = True ))
+
     itemlist.append(item.clone( channel='helper', action='show_channels_list_temporaries', title= '    - Qué canales están [COLOR cyan][B]Temporalmente[/B][/COLOR] inactivos' ))
     itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué canales son [COLOR grey][B]Privados[/B][/COLOR]', tipo = 'all', privates = True ))
 
@@ -1032,6 +1151,9 @@ def submnu_canales_info(item):
         itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué canales son [COLOR violet][B]Incompatibiles[/B][/COLOR] con su Media Center', mismatched = True ))
 
     itemlist.append(item.clone( channel='helper', action='show_channels_list_inactives', title= '    - Qué canales están [COLOR coral][B]Inactivos[/B][/COLOR]' ))
+
+    itemlist.append(item.clone( channel='helper', action='show_channels_list_closed', title= '    - Qué canales están [COLOR darkgoldenrod][B]Cerrados[/B][/COLOR]' ))
+    itemlist.append(item.clone( channel='helper', action='show_channels_list_voided', title= '    - Qué canales están [COLOR darkgoldenrod][B]Anulados[/B][/COLOR]' ))
 
     return itemlist
 
@@ -1042,13 +1164,23 @@ def submnu_servidores(item):
 
     itemlist.append(item.clone( action='', title='[B]TESTS SERVIDORES:[/B]', text_color='fuchsia' ))
 
-    itemlist.append(item.clone( action='submnu_servidores_info', title=' - [COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( action='submnu_servidores_info', title='[COLOR green][B]Información[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title= '[COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
+
+    itemlist.append(item.clone( action='resumen_servidores', title='[COLOR fuchsia]Resúmenes y Distribución[/COLOR]' ))
+
+    itemlist.append(item.clone( action='', title='[B][I]TESTS:[/I][/B]', text_color='fuchsia' ))
+
+    if txt_status:
+        if srv_pending:
+            itemlist.append(item.clone( action='resumen_pending', title=' - [COLOR tan][B]Con Incidencias[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='test_all_srvs', title=' - Posibles [B][COLOR fuchsia]Insatisfactorios[/B][/COLOR]', unsatisfactory = True ))
 
     itemlist.append(item.clone( action='test_alfabetico', title=' - Posibles [COLOR fuchsia]Insatisfactorios[/COLOR] desde un Servidor [B][COLOR powderblue]Letra inicial[/B][/COLOR]', unsatisfactory = True ))
 
-    itemlist.append(item.clone( action='test_all_srvs', title=' - Todos los servidores' ))
+    itemlist.append(item.clone( action='test_all_srvs', title=' - Todos los Servidores [COLOR darkcyan][B]Activos[/B][/COLOR]' ))
 
     itemlist.append(item.clone( action='test_one_server', title=' - Un servidor Concreto' ))
 
@@ -1066,9 +1198,10 @@ def submnu_servidores_info(item):
     itemlist.append(item.clone( channel='helper', action='show_servers_list', title= ' - Qué servidores están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)', tipo = 'activos', thumbnail=config.get_thumb('bolt') ))
 
     itemlist.append(item.clone( channel='helper', action='show_servers_list_out_service', title= '    - Qué servidores están [COLOR goldenrod][B]Sin Servicio[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
+
     itemlist.append(item.clone( channel='helper', action='show_servers_list_inactives', title= '    - Qué servidores están [COLOR coral][B]Inactivos[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 
-    itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué canales tienen [COLOR orchid][B]Solo un servidor[/B][/COLOR]', onlyone = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='helper', action='show_channels_list', title= '    - Qué [COLOR gold][B]Canales[/COLOR] tienen [COLOR orchid][B]Solo un servidor[/B][/COLOR]', onlyone = True, thumbnail=config.get_thumb('stack') ))
 
     return itemlist
 
@@ -1081,19 +1214,19 @@ def submnu_developers(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_notice', title= '[COLOR aqua][B]Comunicado[/B][/COLOR] Oficial de Balandro', thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( channel='helper', action='show_dev_notes', title= 'Notas para Developers (desarrolladores)', thumbnail=config.get_thumb('news') ))
+    itemlist.append(item.clone( channel='helper', action='show_dev_notes', title= '[COLOR gold][B]Notas[/B][/COLOR] para Developers (desarrolladores)', thumbnail=config.get_thumb('news') ))
 
     itemlist.append(item.clone( action='copy_dev', title= 'Obtener una Copia del fichero dev-notes.txt', thumbnail=config.get_thumb('folder'), text_color='yellowgreen' ))
 
-    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]DEVELOPERS FUENTES:[/I][/B][/COLOR]', folder=False ))
+    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]FUENTES:[/I][/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]https://github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
+    itemlist.append(item.clone( action='', title= ' - Fuentes [COLOR darkorange][B]github.com/repobal[/B][/COLOR]', thumbnail=config.get_thumb('addon'), folder=False ))
 
     itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]Developers Telegram:[/I][/B][/COLOR]', folder=False ))
 
     itemlist.append(item.clone( action='', title= ' - Team ' + _team + ' Equipo de Desarrollo', folder=False, thumbnail=config.get_thumb('telegram') ))
 
-    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]DEVELOPERS INCORPORACIONES:[/B][/I][/COLOR]', folder=False ))
+    itemlist.append(item.clone( action='', title= '[COLOR firebrick][B][I]INCORPORACIONES:[/B][/I][/COLOR]', folder=False ))
 
     itemlist.append(item.clone( action='', title='[COLOR yellow][B][I]  Solicitudes solo con Enlace de Invitación[/I][/B][/COLOR]', folder=False, thumbnail=config.get_thumb('pencil') ))
 
@@ -1248,32 +1381,33 @@ def test_tplus(item):
     if config.get_setting('proxies_tplus_proces'): tplus_actual = config.get_setting('proxies_tplus_proces', default='32')
 
     opciones_tplus = [
-            'Openproxy.space http',
-            'Openproxy.space socks4',
-            'Openproxy.space socks5',
-            'Vpnoverview.com',
-            'Proxydb.net http',
-            'Proxydb.net https',
-            'Proxydb.net socks4',
-            'Proxydb.net socks5',
-            'Netzwelt.de',
+            'Openproxy http',
+            'Openproxy socks4',
+            'Openproxy socks5',
+            'Vpnoverview',
+            'Fyvri all',
+            'Fyvri http',
+            'Fyvri https',
+            'Fyvri socks4',
+            'Fyvri socks5',
+            'Netzwelt',
             'Proxy-list.download http',
             'Proxy-list.download https',
             'Proxy-list.download socks4',
             'Proxy-list.download socks5',
-            'Freeproxy.world',
-            'Freeproxy.world anonymity',
-            'Hidemyna.me.en',
-            'List.proxylistplus.com',
-            'Proxyservers.pro',
+            'Freeproxy',
+            'Freeproxy anonymity',
+            'Hidemyna',
+            'Proxylistplus',
+            'Niek',
             'TheSpeedX',
-            'Proxyscan.io http',
-            'Proxyscan.io all',
-            'Proxyscan.io socks4',
-            'Proxyscan.io socks5',
-            'Openproxylist.xyz http',
-            'Openproxylist.xyz socks4',
-            'Openproxylist.xyz socks5',
+            'Proxyscan http',
+            'Proxyscan all',
+            'Proxyscan socks4',
+            'Proxyscan socks5',
+            'Openproxylist http',
+            'Openproxylist socks4',
+            'Openproxylist socks5',
             'Proxy-list.download v1 socks4',
             'Proxy-list.download v1 socks5',
             'Monosans',
@@ -1303,7 +1437,12 @@ def test_tplus(item):
             'Proxyscrape elite',
             'Proxyscrape transparent',
             'Proxyscrape https',
-            'Markavale'
+            'Markavale',
+            'MuRongPIG',
+            'Vakhov http',
+            'Vakhov https',
+            'Vakhov socks4',
+            'Vakhov socks5'
             ]
 
     preselect = tplus_actual
@@ -1313,30 +1452,31 @@ def test_tplus(item):
     ret = platformtools.dialog_select('[COLOR cyan][B]Proveedores Proxies Tplus[/B][/COLOR]', opciones_tplus, preselect=preselect)
     if ret == -1: return -1
 
-    if opciones_tplus[ret] == 'Openproxy.space http': proxies_tplus = '0'
-    elif opciones_tplus[ret] == 'Openproxy.space socks4': proxies_tplus = '1'
-    elif opciones_tplus[ret] == 'Openproxy.space socks5': proxies_tplus = '2'
-    elif opciones_tplus[ret] == 'Vpnoverview.com': proxies_tplus = '3'
-    elif opciones_tplus[ret] == 'Proxydb.net http': proxies_tplus = '4'
-    elif opciones_tplus[ret] == 'Proxydb.net https': proxies_tplus = '5'
-    elif opciones_tplus[ret] == 'Proxydb.net socks4': proxies_tplus = '6'
-    elif opciones_tplus[ret] == 'Proxydb.net socks5': proxies_tplus = '7'
-    elif opciones_tplus[ret] == 'Netzwelt.de': proxies_tplus = '8'
+    if opciones_tplus[ret] == 'Openproxy http': proxies_tplus = '0'
+    elif opciones_tplus[ret] == 'Openproxy socks4': proxies_tplus = '1'
+    elif opciones_tplus[ret] == 'Openproxy socks5': proxies_tplus = '2'
+    elif opciones_tplus[ret] == 'Vpnoverview': proxies_tplus = '3'
+    elif opciones_tplus[ret] == 'Fyvri all': proxies_tplus = '4'
+    elif opciones_tplus[ret] == 'Fyvri http': proxies_tplus = '5'
+    elif opciones_tplus[ret] == 'Fyvri https': proxies_tplus = '6'
+    elif opciones_tplus[ret] == 'Fyvri socks4': proxies_tplus = '7'
+    elif opciones_tplus[ret] == 'Fyvri socks5': proxies_tplus = '56'
+    elif opciones_tplus[ret] == 'Netzwelt': proxies_tplus = '8'
     elif opciones_tplus[ret] == 'Proxy-list.download http': proxies_tplus = '9'
     elif opciones_tplus[ret] == 'Proxy-list.download https': proxies_tplus = '10'
     elif opciones_tplus[ret] == 'Proxy-list.download socks4': proxies_tplus = '11'
     elif opciones_tplus[ret] == 'Proxy-list.download socks5': proxies_tplus = '12'
-    elif opciones_tplus[ret] == 'Freeproxy.world': proxies_tplus = '13'
-    elif opciones_tplus[ret] == 'Freeproxy.world anonymity': proxies_tplus = '14'
-    elif opciones_tplus[ret] == 'Hidemyna.me.en': proxies_tplus = '15'
-    elif opciones_tplus[ret] == 'List.proxylistplus.com': proxies_tplus = '16'
-    elif opciones_tplus[ret] == 'Proxyservers.pro': proxies_tplus = '17'
+    elif opciones_tplus[ret] == 'Freeproxy': proxies_tplus = '13'
+    elif opciones_tplus[ret] == 'Freeproxy anonymity': proxies_tplus = '14'
+    elif opciones_tplus[ret] == 'Hidemyna': proxies_tplus = '15'
+    elif opciones_tplus[ret] == 'Proxylistplus': proxies_tplus = '16'
+    elif opciones_tplus[ret] == 'Niek': proxies_tplus = '17'
     elif opciones_tplus[ret] == 'TheSpeedX': proxies_tplus = '18'
-    elif opciones_tplus[ret] == 'Proxyscan.io http': proxies_tplus = '19'
-    elif opciones_tplus[ret] == 'Proxyscan.io all': proxies_tplus = '20'
-    elif opciones_tplus[ret] == 'Openproxylist.xyz http': proxies_tplus = '21'
-    elif opciones_tplus[ret] == 'Openproxylist.xyz socks4': proxies_tplus = '22'
-    elif opciones_tplus[ret] == 'Openproxylist.xyz socks5': proxies_tplus = '23'
+    elif opciones_tplus[ret] == 'Proxyscan http': proxies_tplus = '19'
+    elif opciones_tplus[ret] == 'Proxyscan all': proxies_tplus = '20'
+    elif opciones_tplus[ret] == 'Openproxylist http': proxies_tplus = '21'
+    elif opciones_tplus[ret] == 'Openproxylist socks4': proxies_tplus = '22'
+    elif opciones_tplus[ret] == 'Openproxylist socks5': proxies_tplus = '23'
     elif opciones_tplus[ret] == 'Proxy-list.download v1 socks4': proxies_tplus = '24'
     elif opciones_tplus[ret] == 'Proxy-list.download v1 socks5': proxies_tplus = '25'
     elif opciones_tplus[ret] == 'Monosans': proxies_tplus = '26'
@@ -1367,8 +1507,13 @@ def test_tplus(item):
     elif opciones_tplus[ret] == 'Proxyscrape transparent': proxies_tplus = '51'
     elif opciones_tplus[ret] == 'Proxyscrape https': proxies_tplus = '52'
     elif opciones_tplus[ret] == 'Markavale': proxies_tplus = '53'
-    elif opciones_tplus[ret] == 'Proxyscan.io socks4': proxies_tplus = '54'
-    elif opciones_tplus[ret] == 'Proxyscan.io socks5': proxies_tplus = '55'
+    elif opciones_tplus[ret] == 'Proxyscan socks4': proxies_tplus = '54'
+    elif opciones_tplus[ret] == 'Proxyscan socks5': proxies_tplus = '55'
+    elif opciones_tplus[ret] == 'MuRongPIG': proxies_tplus = '57'
+    elif opciones_tplus[ret] == 'Vakhov http': proxies_tplus = '58'
+    elif opciones_tplus[ret] == 'Vakhov https': proxies_tplus = '59'
+    elif opciones_tplus[ret] == 'Vakhov socks4': proxies_tplus = '60'
+    elif opciones_tplus[ret] == 'Vakhov socks': proxies_tplus = '61'
 
     else: proxies_tplus = '32'
 
@@ -1382,7 +1527,7 @@ def test_alfabetico(item):
     logger.info()
     itemlist = []
 
-    if 'canal' in item.title:
+    if 'Canal' in item.title:
         text_color = 'gold'
         accion = 'test_all_webs'
     else:
@@ -1436,19 +1581,19 @@ def test_all_webs(item):
             if 'clone' in ch['clusters']: continue
 
         if config.get_setting('mnu_simple', default=False):
-            if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
-            elif 'exclusivamente al dorama' in ch['notes'].lower(): continue
-            elif 'exclusivamente al anime' in ch['notes'].lower(): continue
+            if 'enlaces torrent exclusivamente' in ch['notes']: continue
+            elif 'exclusivamente al dorama' in ch['notes']: continue
+            elif 'exclusivamente al anime' in ch['notes']: continue
             elif '+18' in ch['notes']: continue
         else:
             if not config.get_setting('mnu_torrents', default=False) or config.get_setting('search_no_exclusively_torrents', default=False):
-                if 'enlaces torrent exclusivamente' in ch['notes'].lower(): continue
+                if 'enlaces torrent exclusivamente' in ch['notes']: continue
 
             if not config.get_setting('mnu_doramas', default=True):
-                if 'exclusivamente al dorama' in ch['notes'].lower(): continue
+                if 'exclusivamente al dorama' in ch['notes']: continue
 
             if not config.get_setting('mnu_animes', default=True):
-                if 'exclusivamente al anime' in ch['notes'].lower(): continue
+                if 'exclusivamente al anime' in ch['notes']: continue
 
             if not config.get_setting('mnu_adultos', default=True):
                 if '+18' in ch['notes']: continue
@@ -1460,7 +1605,7 @@ def test_all_webs(item):
                 el_canal = ch['id']
 
                 if el_canal[0] < item.letra:
-                    i = i - 1
+                    i -= 1
                     continue
 
             txt = tester.test_channel(ch['name'])
@@ -1690,6 +1835,24 @@ def test_all_webs(item):
                            tests_all_webs.append(ch['name'])
                            continue
 
+               if con_problemas:
+                   host_incid = ch['name']
+
+                   if host_incid in str(con_problemas):
+                       incidencia = ''
+
+                       incids = scrapertools.find_multiple_matches(str(con_problemas), '[COLOR moccasin](.*?)[/B][/COLOR]')
+
+                       for incid in incids:
+                            if not ' ' + host_incid + ' ' in str(incid): continue
+
+                            incidencia = incid
+                            break
+
+                       if incidencia:
+                           tests_all_webs.append(ch['name'])
+                           continue
+
            if not 'nuevo:' in txt:
                if ' con proxies ' in str(txt):
                    if platformtools.dialog_yesno(config.__addon_name + ' [COLOR yellow][B]' + ch['name'] + '[/B][/COLOR]', '[COLOR red][B]¿ Desea Iniciar una nueva Búsqueda de Proxies en el Canal ?[/B][/COLOR]'):
@@ -1741,7 +1904,9 @@ def test_all_webs(item):
                         channels_proxies_memorized = channels_proxies_memorized + ', ' + el_memorizado
                         config.set_setting('channels_proxies_memorized', channels_proxies_memorized)
 
-    if i > 0:
+    if i == 0:
+        platformtools.dialog_ok(config.__addon_name, 'Sin Canales Testeados')
+    else:
         if not tests_all_webs:
             platformtools.dialog_ok(config.__addon_name, 'Canales Testeados ' + str(i))
         else:
@@ -1801,8 +1966,8 @@ def test_all_srvs(item):
 
     if item.unsatisfactory: config.set_setting('developer_test_servers', 'unsatisfactory')
 
-    from core import jsontools
 
+    from core import jsontools
     from modules import tester
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -1848,7 +2013,7 @@ def test_all_srvs(item):
                 el_servidor = el_servidor.lower()
 
                 if el_servidor[0] < item.letra:
-                    i = i - 1
+                    i -= 1
                     continue
 
             txt = tester.test_server(dict_server['name'])
@@ -1931,7 +2096,12 @@ def show_addons(item):
         addons = addons.replace('service', '[COLOR violet]service[/COLOR]')
         addons = addons.replace('resource', '[COLOR magenta]resource[/COLOR]')
 
-        addons = addons.replace('inputstream', '[COLOR coral]inputstream[/COLOR]')
+        addons = addons.replace('inputstream', '[COLOR fuchsia]inputstream[/COLOR]')
+        addons = addons.replace('resolveurl', '[COLOR fuchsia]resolveurl[/COLOR]')
+        addons = addons.replace('elementum', '[COLOR fuchsia]elementum[/COLOR]')
+        addons = addons.replace('youtube', '[COLOR fuchsia]youtube[/COLOR]')
+
+        addons = addons.replace('balandro', '[COLOR yellow]balandro[/COLOR]')
 
         txt += '  ' + str(addons) + '[CR][CR]'
 
@@ -1984,14 +2154,14 @@ def show_help_addons(item):
         tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
     else: tex_mr = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR][CR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
         cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
         tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR gold][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR cyan][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
 
     if not PY3:
         if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
@@ -1999,16 +2169,16 @@ def show_help_addons(item):
             tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
         else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-        txt += ' - [COLOR gold][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + ' (hasta K18.x)[/B][/COLOR][CR]'
+        txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + ' (hasta K18.x)[/B][/COLOR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
         cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
         tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR gold][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR cyan][B]Repository ElementumOrg[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
 
-    platformtools.dialog_textviewer('Información Add-Ons Extternos', txt)
+    platformtools.dialog_textviewer('Información Add-Ons Externos', txt)
 
 
 def show_help_torrents(item):
@@ -2058,6 +2228,19 @@ def show_help_players(item):
 
     txt = ''
 
+    if config.get_setting('mnu_torrents', default=True):
+        cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
+
+        if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+        else:
+           tex_tor = cliente_torrent
+           cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+           if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+        txt += ' - Cliente/Motor Torrent asignado ' + '[COLOR fuchsia][B] ' + tex_tor + '[/B][/COLOR][CR]'
+
     if xbmc.getCondVisibility('System.HasAddon("inputstream.adaptive")'):
         cod_version = xbmcaddon.Addon("inputstream.adaptive").getAddonInfo("version").strip()
         tex_ia = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
@@ -2077,14 +2260,31 @@ def show_help_players(item):
         tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
     else: tex_mr = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR fuchsia][B]ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_mr + '[/B][/COLOR][CR][CR]'
 
     if xbmc.getCondVisibility('System.HasAddon("repository.resolveurl")'):
         cod_version = xbmcaddon.Addon("repository.resolveurl").getAddonInfo("version").strip()
         tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
     else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
 
-    txt += ' - [COLOR gold][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+    txt += ' - [COLOR cyan][B]Repository ResolveUrl[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+
+    if config.get_setting('mnu_torrents', default=True):
+        if not PY3:
+            if xbmc.getCondVisibility('System.HasAddon("repository.elementum")'):
+                cod_version = xbmcaddon.Addon("repository.elementum").getAddonInfo("version").strip()
+                tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+            else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
+
+            txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+
+        if xbmc.getCondVisibility('System.HasAddon("repository.elementumorg")'):
+            cod_version = xbmcaddon.Addon("repository.elementumorg").getAddonInfo("version").strip()
+            tex_rp = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+        else: tex_rp = '  [COLOR red]No instalado[/COLOR]'
+
+        txt += ' - [COLOR cyan][B]Repository Elementum[/B][/COLOR]' + '[COLOR yellowgreen][B] ' + tex_rp + '[/B][/COLOR][CR]'
+
 
     platformtools.dialog_textviewer('Información Add-Ons y Repositorios Players', txt)
 
@@ -2116,8 +2316,6 @@ def show_sistema(item):
 
     if config.get_setting('chrome_last_version', default=''): txt += '[CR][COLOR yellow][B] - Versión Chrome/Chromium: [/COLOR][COLOR cyan]' + config.get_setting('chrome_last_version') + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Timeout [/B](tiempo máximo de espera en los Accesos, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
-
     txt += '[CR] - Confirmar con el Botón pulsar [OK] en ciertas Notificaciones: '
 
     if config.get_setting('notification_d_ok', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
@@ -2128,9 +2326,13 @@ def show_sistema(item):
     if config.get_setting('notification_beep', default=False): txt += '[COLOR yellow][B] Activado[/B][/COLOR][CR]'
     else: txt += '[COLOR yellowgreen][B] Des-Activado[/B][/COLOR][CR]'
 
-    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Tiempo de espera en los Reintentos [/B](en el acceso a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('httptools_timeout', default='15'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos a CANALES, por defecto 15)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('httptools_timeout')) + ' [/B][/COLOR][CR]'
 
-    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Tiempo de espera [/B](en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
+    if config.get_setting('search_timeout', default='3'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera Accesos BUSCAR, por defecto 5)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('search_timeout')) + ' [/B][/COLOR][CR]'
+
+    if config.get_setting('channels_repeat', default='30'): txt += '[CR][COLOR yellow][B] - Time Out [/B](tiempo máximo de espera al Reintentar acceder a ciertos Canales, por defecto 30)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('channels_repeat')) + ' [/B][/COLOR][CR]'
+
+    if config.get_setting('servers_waiting', default='6'): txt += '[CR][COLOR yellow][B] - Time[/B] Tiempo de espera (en el acceso a ciertos Servidores, por defecto 6)[B]: [/COLOR][COLOR cyan]' + str(config.get_setting('servers_waiting')) + ' [/B][/COLOR][CR]'
 
     txt += '[CR][COLOR goldenrod][B]PREFERENCIAS NOTIFICACIONES CANALES:[/B][/COLOR][CR]'
 
@@ -2162,6 +2364,20 @@ def show_sistema(item):
     else: tex_niv = 'Máxima Información'
 
     txt += '[COLOR yellow][B] - Nivel de información del fichero [COLOR aqua][B]LOG[/B][/COLOR] (por defecto Error): [COLOR cyan][B]' + tex_niv + ' [/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR goldenrod][B]DESARROLLO:[/B][/COLOR][CR]'
+
+    avisar = False
+
+    if not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developergenres.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertest.py')): avisar = True
+    elif not os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developertools.py')): avisar = True
+
+    if config.get_setting('developer_mode', default=False):
+        if not avisar:
+            txt += '- [COLOR crimson][B]Opción Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Activada[/B][/COLOR]'
+        else:
+            txt += '- [COLOR crimson][B]Falso Desarrollo:[/B][/COLOR]  [COLOR yellow][B]Activada[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información Ajustes del Sistema', txt)
 
@@ -2256,18 +2472,22 @@ def resumen_canales(item):
     mismatcheds = 0
     inestables = 0
     problematics = 0
+    clons = 0
     clones = 0
     notices = 0
+    cryptos = 0
     proxies = 0
     registers = 0
     dominios = 0
     currents = 0
+    streaminytorrent = 0
     onlyones = 0
-    searchables = 0
+    nosearchables = 0
     status_access = 0
+    status_problems = 0
     con_proxies = 0
 
-    bus_pelisyseries = 0
+    bus_pelisyoseries = 0
     bus_pelis = 0
     bus_series = 0
     bus_documentaryes = 0
@@ -2277,6 +2497,7 @@ def resumen_canales(item):
     bus_torrents = 0
     bus_doramas = 0
     bus_animes = 0
+    bus_trailers = 0
 
     disponibles = 0
     suggesteds = 0
@@ -2292,9 +2513,12 @@ def resumen_canales(item):
     doramas = 0
     animes = 0
     adults = 0
+    trailers = 0
     privates = 0
     others = 0
     no_actives = 0
+
+    temas_adults = 0
 
     filtros = {'active': False}
     ch_list = channeltools.get_channels_list(filtros=filtros)
@@ -2308,14 +2532,18 @@ def resumen_canales(item):
 
                 if 'Web CERRADA' in ch['notes']: cerrados += 1
                 elif 'Web ANULADA' in ch['notes']: anulados += 1
+                elif 'Canal Privado' in ch['notes']: privates += 1
+
                 else: others += 1
 
-        else:
-            if 'temporary' in ch['clusters']: temporarys += 1
+            else:
+                inactives += 1
 
-            if 'privates' in ch['clusters']:
-                el_canal = ch['id']
-                if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal + '.py')): privates += 1
+                temporarys += 1
+
+                if 'privates' in ch['clusters']:
+                    el_canal = ch['id']
+                    if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal + '.py')): privates += 1
 
     filtros = {}
     ch_list = channeltools.get_channels_list(filtros=filtros)
@@ -2337,98 +2565,235 @@ def resumen_canales(item):
         if 'mismatched' in ch['clusters']: mismatcheds += 1
         if 'inestable' in ch['clusters']: inestables += 1
         if 'problematic' in ch['clusters']: problematics += 1
+        if 'clons' in ch['clusters']: clons += 1
         if 'clone' in ch['clusters']: clones += 1
         if 'notice' in ch['clusters']: notices += 1
+        if 'crypto' in ch['clusters']: cryptos += 1
         if 'proxies' in ch['notes'].lower(): proxies += 1
         if 'register' in ch['clusters']: registers += 1
         if 'dominios' in ch['notes'].lower(): dominios += 1
         if 'current' in ch['clusters']: currents += 1
+        if 'Canal con enlaces Streaming y Torrent.' in ch['notes']: streaminytorrent +=1
         if 'onlyone' in ch['clusters']: onlyones += 1
         if 'suggested' in ch['clusters']: suggesteds += 1
 
-        if ch['searchable'] == False: searchables += 1
+        if ch['searchable'] == False: nosearchables += 1
 
-        tipos = ch['categories']
+        tipos = ch['search_types']
 
-        if not 'tráilers' in ch['notes'].lower():
-            if not '+18' in ch['notes']:
+        tipos_torrent = ch['categories']
 
-                if not 'exclusivamente al dorama' in ch['notes'].lower():
-                    if not 'exclusivamente al anime' in ch['notes'].lower():
-                        if 'movie' in tipos:
-                            peliculas += 1
-                            if ch['searchable']: bus_pelis += 1
+        if 'exclusivamente a los tráilers' in ch['notes']:
+            trailers += 1
+            bus_trailers += 1
+        else:
+            if '+18' in ch['notes']: pass
+            elif 'exclusivamente al dorama' in ch['notes']: pass
+            elif 'exclusivamente al anime' in ch['notes']: pass
+            else:
+                if 'movie' in tipos:
+                    peliculas += 1
 
-                        if 'tvshow' in tipos:
-                            if not 'animes, ovas, doramas y mangas' in ch['notes'].lower():
-                               series += 1
-                               if ch['searchable']: bus_series += 1
+                    if ch['searchable']:
+                        bus_pelis += 1
+
+                        if not search_no_accesibles:
+                            if no_accesibles:
+                                if ch['name'] in str(no_accesibles): bus_pelis -= 1
+                            if con_problemas:
+                                if ch['name'] in str(con_problemas): bus_pelis -= 1
+
+                if 'tvshow' in tipos:
+                    if not 'mangas' in ch['notes'].lower():
+                        series += 1
+
+                        if ch['searchable']:
+                            bus_series += 1
+
+                            if not search_no_accesibles:
+                                if no_accesibles:
+                                    if ch['name'] in str(no_accesibles): bus_series -= 1
+                                if con_problemas:
+                                    if ch['name'] in str(con_problemas): bus_series -= 1
 
             if 'movie' in tipos:
                 if 'tvshow' in tipos:
-                    pelisyseries += 1
-                    if ch['searchable']: bus_pelisyseries += 1
+                    if not 'documentary' in tipos:
+                        pelisyseries += 1
+
+            if 'movie' in tipos:
+                if ch['searchable']:
+                    bus_pelisyoseries += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_pelisyoseries -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_pelisyoseries -= 1
+
+            elif 'tvshow' in tipos:
+                if ch['searchable']:
+                    bus_pelisyoseries += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_pelisyoseries -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_pelisyoseries -= 1
 
         if 'documentary' in tipos:
             documentarys += 1
-            bus_documentaryes += 1
+
+            if ch['searchable']:
+                bus_documentaryes += 1
+
+                if not search_no_accesibles:
+                    if no_accesibles:
+                        if ch['name'] in str(no_accesibles): bus_documentaryes -= 1
+                    if con_problemas:
+                        if ch['name'] in str(con_problemas): bus_documentaryes -= 1
+
         else:
            if 'docs' in ch['clusters']:
-               if ch['searchable']: bus_documentales += 1
+               if ch['searchable']:
+                   bus_documentales += 1 
 
-        if 'infantil' in ch['clusters']: infantiles += 1
+                   if not search_no_accesibles:
+                       if no_accesibles:
+                           if ch['name'] in str(no_accesibles): bus_documentales -= 1
+                       if con_problemas:
+                           if ch['name'] in str(con_problemas): bus_documentales -= 1
+
+        if 'infantil' in ch['clusters']:
+             infantiles += 1
+
+             if ch['searchable']:
+                 bus_infantiles += 1
+
+                 if not search_no_accesibles:
+                     if no_accesibles:
+                         if ch['name'] in str(no_accesibles): bus_infantiles -= 1
+                     if con_problemas:
+                         if ch['name'] in str(con_problemas): bus_infantiles -= 1
+
         else:
             if 'kids' in ch['clusters']:
-               if ch['searchable']: bus_kids += 1
+                if ch['searchable']:
+                    bus_kids += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_kids -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_kids -= 1
 
         if 'tales' in ch['clusters']: tales += 1
 
         if 'bibles' in ch['clusters']: bibles += 1
 
-        if 'torrent' in tipos:
-            torrents += 1
-            bus_torrents += 1
+        if 'torrent' in tipos_torrent:
+            if not 'Streaming y Torrent' in ch['notes']: torrents += 1
+
+            if ch['searchable']: 
+                bus_torrents += 1
+
+                if not search_no_accesibles:
+                    if no_accesibles:
+                        if ch['name'] in str(no_accesibles): bus_torrents -= 1
+                    if con_problemas:
+                        if ch['name'] in str(con_problemas): bus_torrents -= 1
+
         else:
            if 'torrents' in ch['clusters']:
-               if ch['searchable']: bus_torrents += 1
+               if ch['searchable']:
+                   bus_torrents += 1
 
-        if 'exclusivamente al dorama' in ch['notes'].lower():
+                   if not search_no_accesibles:
+                       if no_accesibles:
+                           if ch['name'] in str(no_accesibles): bus_torrents -= 1
+                       if con_problemas:
+                           if ch['name'] in str(con_problemas): bus_torrents -= 1
+
+        if 'exclusivamente al dorama' in ch['notes']:
             doramas += 1
+
             bus_doramas += 1
-        elif 'exclusivamente' in ch['notes'].lower():
-            if 'doramas' in ch['notes'].lower():
-                doramas += 1
-                bus_doramas += 1
-        else:
-           if 'dorama' in ch['clusters']: bus_doramas += 1
 
-        if 'exclusivamente al anime' in ch['notes'].lower():
+            if not search_no_accesibles:
+                if no_accesibles:
+                    if ch['name'] in str(no_accesibles): bus_doramas -= 1
+                if con_problemas:
+                    if ch['name'] in str(con_problemas): bus_doramas -= 1
+
+        else:
+            if 'dorama' in ch['clusters']:
+                if 'Animes, Ovas, Doramas y Mangas' in ch['notes']: doramas += 1
+
+                if ch['searchable']:
+                    bus_doramas += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_doramas -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_doramas -= 1
+
+        if 'exclusivamente al anime' in ch['notes']:
             animes += 1
-            bus_animes += 1
-        elif 'exclusivamente' in ch['notes'].lower():
-            if 'animes' in ch['notes'].lower():
-                animes += 1
-                bus_animes += 1
-        else:
-           if 'anime' in ch['clusters']: bus_animes += 1
 
-        if '+18' in ch['notes']: adults += 1
+            bus_animes += 1
+
+            if not search_no_accesibles:
+                if no_accesibles:
+                    if ch['name'] in str(no_accesibles): bus_animes -= 1
+                if con_problemas:
+                    if ch['name'] in str(con_problemas): bus_animes -= 1
+
+        else:
+            if 'anime' in ch['clusters']:
+                if 'Animes, Ovas, Doramas y Mangas' in ch['notes']: animes += 1
+
+                if ch['searchable']:
+                    bus_animes += 1
+
+                    if not search_no_accesibles:
+                        if no_accesibles:
+                            if ch['name'] in str(no_accesibles): bus_animes -= 1
+                        if con_problemas:
+                            if ch['name'] in str(con_problemas): bus_animes -= 1
+
+        if config.get_setting('mnu_adultos', default=True):
+            if '+18' in ch['notes']: adults += 1
+
+        if 'adults' in ch['clusters']:
+            if not config.get_setting('descartar_xxx', default=False): temas_adults += 1
 
         if 'privates' in ch['clusters']:
             el_canal = ch['id']
             if os.path.exists(os.path.join(config.get_runtime_path(), 'channels', el_canal + '.py')): privates += 1
 
-    txt = '[COLOR yellow][B]RESÚMENES CANALES:[/B][/COLOR][CR]'
+    txt = '[COLOR yellow][B]RESUMEN SITUACIÓN CANALES:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(total) + ' [COLOR darkorange][B]Canales[/B][/COLOR][CR][CR]'
+    txt += '  ' + str(total) + ' [COLOR darkorange][B]Canales[/B][/COLOR][CR]'
 
-    txt += '     ' + str(inactives) + ' [COLOR coral]Inactivos[/COLOR][CR]'
-    txt += '           ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
-    txt += '           ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
+    if not inactives == 0:
+        txt += '          ' + str(inactives) + ' [COLOR coral][B]Inactivos[/B][/COLOR][CR]'
 
-    if not others == 0: txt += '             ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
+    if not cerrados == 0:
+        txt += '                  ' + str(cerrados) + ' [COLOR coral]Cerrados[/COLOR][CR]'
 
-    if not temporarys == 0: txt += '       ' + str(temporarys) + ' [COLOR cyan]Temporalmente Inactivos[/COLOR][CR]'
+    if not anulados == 0:
+        txt += '                  ' + str(anulados) + ' [COLOR coral]Anulados[/COLOR][CR]'
+
+    if not privates == 0: txt += '                    ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
+
+    if not others == 0: txt += '                    ' + str(others) + ' [COLOR coral]Otros[/COLOR][CR]'
+
+    if not temporarys == 0: txt += '                    ' + str(temporarys) + ' [COLOR mediumaquamarine]Temporalmente[/COLOR][CR]'
+
+    activos = (total - inactives)
+
+    txt += '[CR]  ' + str(activos) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR][CR]'
 
     if not PY3:
         if not mismatcheds == 0: txt += '       ' + str(mismatcheds) + ' [COLOR violet]Posible Incompatibilidad[/COLOR][CR]'
@@ -2437,19 +2802,33 @@ def resumen_canales(item):
 
     if not problematics == 0: txt += '       ' + str(problematics) + ' [COLOR darkgoldenrod]Problemáticos[/COLOR][CR]'
 
-    txt += '     ' + str(clones) + ' [COLOR turquoise]Clones[/COLOR][CR]'
-    txt += '     ' + str(notices) + ' [COLOR olivedrab]Con Probable CloudFlare Protection[/COLOR][CR]'
-    txt += '     ' + str(proxies) + ' [COLOR red]Pueden Usar Proxies[/COLOR][CR]'
+    if not clons == 0:
+        txt += '     ' + str(clons) + ' [COLOR aquamarine]Principal con clones[/COLOR][CR]'
+
+    if not clones == 0:
+        txt += '     ' + str(clones) + ' [COLOR turquoise]Clones[/COLOR][CR]'
+
+    if not notices == 0:
+        txt += '     ' + str(notices) + ' [COLOR olivedrab]Control CloudFlare Protection[/COLOR][CR]'
+
+    if not cryptos == 0:
+        txt += '       ' + str(cryptos) + ' [COLOR darksalmon]Descifrar Enlaces[/COLOR][CR]'
+
+    if not proxies == 0:
+        txt += '     ' + str(proxies) + ' [COLOR red]Pueden Usar Proxies[/COLOR][CR]'
 
     if not registers == 0: txt += '       ' + str(registers) + ' [COLOR teal]Requieren Cuenta[/COLOR][CR]'
 
     if not dominios == 0: txt += '       ' + str(dominios) + ' [COLOR green]Varios Dominios[/COLOR][CR]'
 
-    txt += '     ' + str(currents) + ' [COLOR goldenrod]Gestión Dominio Vigente[/COLOR][CR]'
+    if not currents == 0:
+        txt += '     ' + str(currents) + ' [COLOR goldenrod]Gestión Dominio Vigente[/COLOR][CR]'
+
+    if not streaminytorrent == 0: txt += '     ' + str(streaminytorrent) + ' [COLOR magenta]Con enlaces Streamin y Torrent[/COLOR][CR]'
 
     if not onlyones == 0: txt += '     ' + str(onlyones) + ' [COLOR fuchsia]Con un Único Servidor[/COLOR][CR]'
 
-    if not searchables == 0: txt += '     ' + str(searchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
+    if not nosearchables == 0: txt += '     ' + str(nosearchables) + ' [COLOR aquamarine]No Actuan en Búsquedas[/COLOR][CR]'
 
     if txt_status:
         if no_accesibles:
@@ -2458,12 +2837,21 @@ def resumen_canales(item):
             if matches:
                 status_access = matches
 
+        if con_problemas:
+            matches = con_problemas.count('[COLOR lime]')
+
+            if matches:
+                status_problems = matches
+
     txt += '[CR]  ' + str(disponibles) + ' [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
 
-    if not status_access == 0: txt += '          [COLOR indianred]No Accesibles[/COLOR][B] '  + str(status_access) + '[/B][CR]'
+    if not status_access == 0: txt += '          [COLOR indianred][B]No Accesibles[/COLOR] '  + str(status_access) + '[/B][CR]'
+    if not status_problems == 0: txt += '          [COLOR tomato][B]Con Problemas[/COLOR] '  + str(status_problems) + '[/B][CR]'
 
-    accesibles = (disponibles - status_access)
-    txt += '  ' + str(accesibles) + ' [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
+    if not (status_access + status_problems) == 0:
+        accesibles = (disponibles - status_access - status_problems)
+
+        txt += '[CR]         ' + ' [COLOR powderblue][B]Accesibles[/COLOR] ' + str(accesibles) + '[/B][CR]'
 
     if txt_status:
         if con_incidencias:
@@ -2472,9 +2860,9 @@ def resumen_canales(item):
             if matches:
                 status_incid = matches
 
-                txt += '          [COLOR tan]Con Incidencias[/COLOR][B] ' + str(status_incid) + '[/B][CR]'
+                txt += '          [COLOR tan][B]Con Incidencias[/COLOR] ' + str(status_incid) + '[/B][CR]'
 
-    if not no_actives == 0: txt += '          [COLOR gray][B]Desactivados[/B][/COLOR][B] ' + str(no_actives) + '[/B][CR]'
+    if not no_actives == 0: txt += '          [COLOR gray][B]Desactivados[/COLOR] ' + str(no_actives) + '[/B][CR]'
 
     filtros = {}
 
@@ -2488,58 +2876,101 @@ def resumen_canales(item):
 
             con_proxies += 1
 
-        if con_proxies > 0: txt += '          [COLOR red]Con Proxies Informados[/COLOR][B] ' +  str(con_proxies) + '[/B][CR]'
+        if con_proxies > 0: txt += '          [COLOR red][B]Con Proxies Informados[/COLOR] ' +  str(con_proxies) + '[/B][CR]'
 
-    txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN CANALES DISPONIBLES:[/B][/COLOR][CR]'
+    txt += '[CR][COLOR dodgerblue][B]CANALES DISPONIBLES:[/B][/COLOR]'
 
-    txt += '    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
+    if config.get_setting('mnu_sugeridos', default=True):
+        txt += '[CR]    ' + str(suggesteds) + ' [COLOR moccasin]Sugeridos[/COLOR][CR]'
 
-    txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+    if config.get_setting('mnu_simple', default=False):
+        canales = (disponibles - no_actives)
+        txt += '[CR]  ' + str(canales) + ' [COLOR aqua][B]Canales[/B][/COLOR][CR]'
+    else:
+        if config.get_setting('mnu_pelis', default=True):
+            txt += '[CR]  ' + str(peliculas) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
 
-    txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+        if config.get_setting('mnu_series', default=True):
+            txt += '  ' + str(series) + ' [COLOR hotpink]Series[/COLOR][CR]'
 
-    txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+        if config.get_setting('channels_link_pyse', default=False):
+            txt += '    ' + str(pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
 
-    txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
-    txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
+        if config.get_setting('mnu_generos', default=True):
+            txt += '[CR]    ' + str(generos) + '  [COLOR thistle]Géneros[/COLOR][CR]'
 
-    if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
+        if config.get_setting('mnu_documentales', default=True):
+            txt += '    ' + str(documentarys) + '  [COLOR cyan]Documentales[/COLOR][CR]'
 
-    txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
+        if config.get_setting('mnu_infantiles', default=True):
+            if not infantiles == 0: txt += '      ' + str(infantiles) + '  [COLOR lightyellow]Infantiles[/COLOR][CR]'
 
-    if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
+        if config.get_setting('mnu_novelas', default=True):
+            txt += '    ' + str(tales) + '  [COLOR limegreen]Novelas[/COLOR][CR]'
 
-    txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '    ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
-    txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
-    txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+        if not bibles == 0: txt += '      ' + str(bibles) + '  [COLOR tan]Bíblicos[/COLOR][CR]'
 
-    if not privates == 0: txt += '      ' + str(privates) + '  [COLOR grey]Privados[/COLOR][CR]'
+        if config.get_setting('mnu_torrents', default=True):
+            txt += '    ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
 
-    txt += '[CR][COLOR powderblue][B]DISTRIBUCIÓN CANALES DISPONIBLES PARA BÚSQUEDAS:[/B][/COLOR][CR]'
+        if config.get_setting('mnu_doramas', default=True):
+            txt += '    ' + str(doramas) + '  [COLOR firebrick]Doramas[/COLOR][CR]'
 
-    txt += '   ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
-    txt += '   ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
-    txt += '     ' + str(bus_pelisyseries) + ' [COLOR teal]Películas y Series[/COLOR][CR]'
+        if config.get_setting('mnu_animes', default=True):
+            if not config.get_setting('descartar_anime', default=False):
+                txt += '    ' + str(animes) + '  [COLOR springgreen]Animes[/COLOR][CR]'
 
-    txt += '[CR]'
-    txt += '     ' + str(bus_documentaryes) + ' [COLOR cyan]Documentales[/COLOR][CR]'
+        if not trailers == 0: txt += '       ' + str(trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR][CR]'
+
+        if config.get_setting('mnu_adultos', default=True):
+            if not adults == 0: txt += '    ' + str(adults) + '  [COLOR orange]Adultos[/COLOR][CR]'
+
+    txt += '[CR][COLOR powderblue][B]BÚSQUEDAS POR TÍTULO EN CANALES DISPONIBLES:[/B][/COLOR][CR]'
+
+    txt += '   ' + str(bus_pelisyoseries) + ' [COLOR yellow]Películas y/ó Series[/COLOR][CR]'
 
     bus_tematica_documentales = bus_documentales + bus_documentaryes
-    txt += '   ' + str(bus_tematica_documentales) + ' [COLOR darkcyan]Temática Documental[/COLOR][CR]'
+    txt += '           ' + str(bus_tematica_documentales) + ' [COLOR darkcyan]Temática Documental[/COLOR][CR]'
 
-    txt += '[CR]'
     bus_tematica_infantil = bus_kids + bus_infantiles
-    txt += '     ' + str(bus_tematica_infantil) + ' [COLOR lightyellow]Temática Infantil[/COLOR][CR]'
+    txt += '           ' + str(bus_tematica_infantil) + ' [COLOR lightyellow]Temática Infantil[/COLOR][CR]'
 
-    txt += '[CR]'
-    txt += '     ' + str(bus_torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
-    txt += '[CR]'
+    if not bus_torrents == 0: txt += '           ' + str(bus_torrents) + ' [COLOR blue]Contenido Torrent[/COLOR][CR]'
 
-    txt += '     ' + str(bus_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
-    txt += '     ' + str(bus_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+    bus_tematica_doramas = bus_doramas + doramas
+    if not bus_tematica_doramas == 0: txt += '           ' + str(bus_tematica_doramas) + ' [COLOR firebrick]Temática Dorama[/COLOR][CR]'
 
-    platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución', txt)
+    bus_tematica_animes = bus_animes + animes
+    if not bus_tematica_animes == 0:
+        if not config.get_setting('descartar_anime', default=True):
+            txt += '           ' + str(bus_tematica_animes) + ' [COLOR springgreen]Temática Anime[/COLOR][CR]'
+
+    if not temas_adults == 0: txt += '           ' + str(temas_adults) + ' [COLOR orange]Temática Adultos[/COLOR][CR]'
+
+    if config.get_setting('mnu_pelis', default=True):
+        txt += '[CR]      ' + str(bus_pelis) + ' [COLOR deepskyblue]Películas[/COLOR][CR]'
+
+    if config.get_setting('mnu_series', default=True):
+        txt += '      ' + str(bus_series) + ' [COLOR hotpink]Series[/COLOR][CR]'
+
+    if config.get_setting('mnu_documentales', default=True):
+        txt += '[CR]      ' + str(bus_tematica_documentales) + ' [COLOR cyan]Documentales[/COLOR][CR]'
+
+    if config.get_setting('mnu_torrents', default=True):
+        txt += '      ' + str(torrents) + ' [COLOR blue]Torrents[/COLOR][CR]'
+
+    if config.get_setting('mnu_doramas', default=True):
+        if not bus_tematica_doramas == 0: txt += '      ' + str(bus_tematica_doramas) + ' [COLOR firebrick]Doramas[/COLOR][CR]'
+
+    if config.get_setting('mnu_animes', default=True):
+        if not config.get_setting('descartar_anime', default=True):
+            if not bus_tematica_animes == 0: txt += '      ' + str(bus_tematica_animes) + ' [COLOR springgreen]Animes[/COLOR][CR]'
+
+    if not bus_trailers == 0:
+        if config.get_setting('search_extra_trailers', default=False):
+           txt += '      ' + str(bus_trailers) + ' [COLOR darkgoldenrod]Traílers[/COLOR]'
+
+    platformtools.dialog_textviewer('Resúmenes de Canales y su Distribución (según sus Ajustes)', txt)
 
 
 def resumen_incidencias(item):
@@ -2584,6 +3015,27 @@ def resumen_no_accesibles(item):
     platformtools.dialog_textviewer('Canales No Accesibles', txt)
 
 
+def resumen_con_problemas(item):
+    logger.info()
+
+    txt = ''
+
+    if txt_status:
+        if con_problemas:
+            matches = scrapertools.find_multiple_matches(con_problemas, "[B](.*?)[/B]")
+
+            for match in matches:
+                match = match.strip()
+
+                if '[COLOR moccasin]' in match: txt += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    if not txt:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay No Accesibles[/COLOR][/B]' % color_exec)
+        return
+
+    platformtools.dialog_textviewer('Canales Con Problemas', txt)
+
+
 def resumen_servidores(item):
     logger.info()
 
@@ -2597,9 +3049,8 @@ def resumen_servidores(item):
 
     aditionals = 0
     if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-         aditionals = 95  # ~ 44 Various  y  51  Zures
+         aditionals = 100  # ~ 44 Various  y  56 Zures
 
-    disponibles = 0
     pending = 0
 
     path = os.path.join(config.get_runtime_path(), 'servers')
@@ -2619,7 +3070,6 @@ def resumen_servidores(item):
         total += 1
 
         if dict_server['active'] == False: inactives += 1
-        else: disponibles += 1
 
         try:
            notes = dict_server['notes']
@@ -2629,60 +3079,87 @@ def resumen_servidores(item):
         if "requiere" in notes.lower(): notsuported += 1
         elif "out of service" in notes.lower(): outservice += 1
 
-        if not dict_server['name'] == 'Youtube':
+        if not dict_server['name'] in ['Various', 'Youtube', 'Zures']:
             if "alternative" in notes.lower(): alternatives += 1
 
-    txt = '[COLOR yellow][B]RESÚMENES SERVIDORES:[/B][/COLOR][CR]'
+    txt = '[COLOR yellow][B]RESUMEN SITUACIÓN SERVIDORES:[/B][/COLOR][CR]'
 
-    txt += '  ' + str(total) + ' [COLOR darkorange][B]Servidores[/B][/COLOR][CR][CR]'
+    txt += '  ' + str(total) + ' [COLOR darkorange][B]Servidores[/B][/COLOR][CR]'
 
-    txt += '    ' + str(inactives) + '  [COLOR coral]Inactivos[/COLOR][CR]'
-    txt += '    ' + str(notsuported) + '  [COLOR fuchsia]Sin Soporte[/COLOR][CR]'
+    inactivos = (inactives + notsuported + outservice)
 
-    if outservice > 0: txt += '    ' + str(outservice) + '  [COLOR red]Sin Servicio[/COLOR][CR]'
+    if not inactivos == 0:
+        txt += '          ' + str(inactivos) + ' [COLOR coral][B]Inactivos[/B][/COLOR][CR]'
 
-    txt += '[CR]  ' + str(disponibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+        txt += '               ' + str(inactives) + ' [COLOR coral]Desactivados[/COLOR][CR]'
+        txt += '               ' + str(notsuported) + ' [COLOR fuchsia]Sin Soporte[/COLOR][CR]'
 
-    operativos = disponibles
+        if outservice > 0: txt += '               ' + str(outservice) + ' [COLOR red]Sin Servicio[/COLOR][CR]'
 
-    if outservice > 0:
-        operativos = disponibles - outservice
-        txt += '    ' + str(operativos) + '  [COLOR goldenrod][B]Operativos[/B][/COLOR][CR]'
+    disponibles = (total - inactivos)
 
-    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-        txt += '[CR][COLOR goldenrod][B]RESOLVEURL:[/B][/COLOR][CR]'
+    txt += '[CR]     ' + str(disponibles) + ' [COLOR cyan][B]Activos[/B][/COLOR][CR]'
 
-        txt += '    ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
-        txt += '    ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
+    presentar = False
 
-    cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
-
-    if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+    if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): presentar = True
+    elif xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): presentar = True
     else:
-       tex_tor = cliente_torrent
-       cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
-       if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
-           cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
-           tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+       cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
-    if not cliente_torrent == 'Ninguno':
-        txt += '[CR][COLOR goldenrod][B]TORRENTS:[/B][/COLOR][CR]'
+       if not cliente_torrent == 'Ninguno':  presentar = True
 
-        txt += '      1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
+    if presentar:
+        txt += '[COLOR yellow][B][CR]SERVIDORES VÍAS ALTERNATIVAS, ADICIONALES, TORRENTS, YOUTUBE:[/B][/COLOR]'
 
-        aditionals += 1
+        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+            tex_mr = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
 
-    if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
-        txt += '[CR][COLOR goldenrod][B]YOUTUBE:[/B][/COLOR][CR]'
+            txt += '[CR]  [COLOR goldenrod][B]Resolveurl:[/B][/COLOR][CR]'
 
-        txt += '      1' + '   [COLOR green]Vía alternativa[/COLOR][CR]'
+            txt += '      Versión' + tex_mr + '[CR]'
 
-        aditionals += 1
+            txt += '          ' + str(alternatives) + '  [COLOR green]Vías alternativas[/COLOR][CR]'
+            txt += '        ' + str(aditionals) + '  [COLOR powderblue]Vías Adicionales[/COLOR][CR]'
 
-    txt += '[CR][COLOR dodgerblue][B]DISTRIBUCIÓN SERVIDORES DISPONIBLES:[/B][/COLOR]'
+        cliente_torrent = config.get_setting('cliente_torrent', default='Seleccionar')
 
-    accesibles = (operativos + aditionals)
-    txt += '[CR]  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
+        if cliente_torrent == 'Seleccionar' or cliente_torrent == 'Ninguno': tex_tor = cliente_torrent
+        else:
+           tex_tor = cliente_torrent
+           cliente_torrent = 'plugin.video.' + cliente_torrent.lower()
+
+           if xbmc.getCondVisibility('System.HasAddon("%s")' % cliente_torrent):
+               cod_version = xbmcaddon.Addon(cliente_torrent).getAddonInfo("version").strip()
+               tex_tor += '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+        if not cliente_torrent == 'Ninguno':
+            txt += '[CR]  [COLOR goldenrod][B]Torrents:[/B][/COLOR][CR]'
+
+            txt += '       1' + '   [COLOR fuchsia]' + tex_tor + '[/COLOR][CR]'
+
+            aditionals += 1
+
+        if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
+            cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
+            tex_yt = '  [COLOR goldenrod]' + cod_version + '[/COLOR]'
+
+            txt += '[CR]  [COLOR goldenrod][B]Youtube:[/B][/COLOR][CR]'
+
+            txt += '       1' + '   [COLOR green]Vía alternativa[/COLOR]' + tex_yt + '[CR]'
+
+            aditionals += 1
+
+    accesibles = (disponibles + aditionals + alternatives)
+
+    txt += '[CR][COLOR cyan][B]SERVIDORES DISPONIBLES[/B][/COLOR][CR]'
+
+    txt += '  ' + str(accesibles) + '  [COLOR gold][B]Disponibles[/B][/COLOR][CR]'
+
+    txt += '[CR][COLOR dodgerblue][B]SERVIDORES ACCESIBLES:[/B][/COLOR][CR]'
+
+    txt += '  ' + str(accesibles) + '  [COLOR powderblue][B]Accesibles[/B][/COLOR][CR]'
 
     if txt_status:
         if srv_pending:
@@ -2691,9 +3168,15 @@ def resumen_servidores(item):
             if matches:
                 status = matches
 
-                txt += '           [COLOR tan]Con Incidencias[/COLOR][B] ' + str(status) + '[/B][CR]'
+                txt += '           [COLOR tan][B]Con Incidencias[/COLOR] ' + str(status) + '[/B][CR]'
 
-    platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución', txt)
+    servers_discarded = config.get_setting('servers_discarded', default='')
+
+    if servers_discarded:
+        txt += '[CR][COLOR cyan][B]Descartados:[/B][/COLOR][CR]'
+        txt += '   ' + str(servers_discarded)
+
+    platformtools.dialog_textviewer('Resúmenes Servidores y su Distribución  (según sus Ajustes)', txt)
 
 
 def resumen_pending(item):
@@ -2711,7 +3194,7 @@ def resumen_pending(item):
                 if '[COLOR orchid]' in match: txt += '[B' + match + '/I][/B][/COLOR][CR]'
 
     if not txt:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay con Incidencias[/COLOR][/B]' % color_exec)
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No Hay Incidencias[/COLOR][/B]' % color_exec)
         return
 
     platformtools.dialog_textviewer('Servidores con Incidencias', txt)
@@ -2738,6 +3221,7 @@ def show_help_alternativas(item):
         txt += '   [COLOR yellow]Doodstream[/COLOR][CR]'
         txt += '   [COLOR yellow]Flashx[/COLOR][CR]'
         txt += '   [COLOR yellow]Gamovideo[/COLOR][CR]'
+        txt += '   [COLOR yellow]Fastplay[/COLOR][CR]'
         txt += '   [COLOR yellow]Gofile[/COLOR][CR]'
         txt += '   [COLOR yellow]MegaUp[/COLOR][CR]'
         txt += '   [COLOR yellow]Mixdrop[/COLOR][CR]'
@@ -2835,7 +3319,8 @@ def show_help_adicionales(item):
 
         txt += '   [COLOR yellow]Allviid[/COLOR][CR]'
         txt += '   [COLOR yellow]Amdahost[/COLOR][CR]'
-        txt += '   [COLOR yellow]Asian[/COLOR][CR]'
+        txt += '   [COLOR yellow]Asianload[/COLOR][CR]'
+        txt += '   [COLOR yellow]Asianplay[/COLOR][CR]'
         txt += '   [COLOR yellow]Bigwarp[/COLOR][CR]'
         txt += '   [COLOR yellow]Cloudfile[/COLOR][CR]'
         txt += '   [COLOR yellow]Cloudmail[/COLOR][CR]'
@@ -2844,7 +3329,6 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Dembed[/COLOR][CR]'
         txt += '   [COLOR yellow]Downace[/COLOR][CR]'
         txt += '   [COLOR yellow]Fastdrive[/COLOR][CR]'
-        txt += '   [COLOR yellow]Fastplay[/COLOR][CR]'
         txt += '   [COLOR yellow]Filegram[/COLOR][CR]'
         txt += '   [COLOR yellow]Gostream[/COLOR][CR]'
         txt += '   [COLOR yellow]Letsupload[/COLOR][CR]'
@@ -2854,12 +3338,14 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Oneupload[/COLOR][CR]'
         txt += '   [COLOR yellow]Pandafiles[/COLOR][CR]'
         txt += '   [COLOR yellow]Rovideo[/COLOR][CR]'
+        txt += '   [COLOR yellow]Savefiles[/COLOR][CR]'
         txt += '   [COLOR yellow]Send[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamable[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamdav[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamcool[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamgzzz[/COLOR][CR]'
         txt += '   [COLOR yellow]Streamoupload[/COLOR][CR]'
+        txt += '   [COLOR yellow]Streamup[/COLOR][CR]'
         txt += '   [COLOR yellow]SwiftLoad[/COLOR][CR]'
         txt += '   [COLOR yellow]Turbovid[/COLOR][CR]'
         txt += '   [COLOR yellow]Tusfiles[/COLOR][CR]'
@@ -2872,16 +3358,19 @@ def show_help_adicionales(item):
         txt += '   [COLOR yellow]Upvid[/COLOR][CR]'
         txt += '   [COLOR yellow]Veev[/COLOR][CR]'
         txt += '   [COLOR yellow]Veoh[/COLOR][CR]'
-        txt += '   [COLOR yellow]Videa[/COLOR][CR]'
+        txt += '   [COLOR yellow]Vidbasic[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidbob[/COLOR][CR]'
+        txt += '   [COLOR yellow]Videa[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidlook[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidmx[/COLOR][CR]'
         txt += '   [COLOR yellow]Vido[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidpro[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidstore[/COLOR][CR]'
         txt += '   [COLOR yellow]Vidtube[/COLOR][CR]'
+        txt += '   [COLOR yellow]Vimeos[/COLOR][CR]'
         txt += '   [COLOR yellow]Vipss[/COLOR][CR]'
         txt += '   [COLOR yellow]Vkprime[/COLOR][CR]'
+        txt += '   [COLOR yellow]Wecima[/COLOR][CR]'
         txt += '   [COLOR yellow]Worlduploads[/COLOR][CR]'
         txt += '   [COLOR yellow]Ztreamhub[/COLOR]'
 

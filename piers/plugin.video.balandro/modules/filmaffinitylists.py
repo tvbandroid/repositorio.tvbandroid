@@ -15,7 +15,8 @@ from modules import search
 host = 'https://www.filmaffinity.com/es/'
 
 
-ruta_sel = 'topgen.php?country=%s&genre=%s&fromyear=%s&toyear=%s'
+ruta_sel = 'topgen.php?country=%s&genre%s5s&fromyear=%s&toyear=%s'
+
 
 current_year = int(datetime.today().year)
 
@@ -28,19 +29,30 @@ def mainlist(item):
 
     itemlist.append(item.clone( action='show_help', title='[COLOR green][B]Información [COLOR violet]Filmaffinity[/B][/COLOR]', folder=False, thumbnail=config.get_thumb('news') ))
 
-    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen', plot = '' ))
+    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Personas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
     itemlist.append(item.clone( action='listas', search_type='person', stype='cast', title=' - Buscar [COLOR aquamarine]intérprete[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de un actor o una actriz para listar todas las películas y series en las que ha intervenido.' ))
 
     itemlist.append(item.clone( action='listas', search_type='person', stype='name', title=' - Buscar [COLOR springgreen]dirección[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el nombre de una persona para listar todas las películas y series que ha dirigido.' ))
 
-    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen', plot = '' ))
+    itemlist.append(item.clone( action='', title= '[B]Búsquedas a través de [COLOR pink]Listas[/COLOR]:[/B]', text_color='yellowgreen' ))
 
     itemlist.append(item.clone( action='listas', search_type='all', stype='title', title=' - Buscar [COLOR yellow]película y/ó serie[/COLOR] ...', thumbnail=config.get_thumb('search'), plot = 'Indicar el título para Buscarlo indistintamente en películas y/ó series' ))
 
     if not config.get_setting('mnu_simple', default=False):
         if config.get_setting('mnu_documentales', default=True):
             itemlist.append(item.clone( action='listas', search_type='documentary', stype='documentary', title=' - Buscar [COLOR cyan]documental[/COLOR] ...', thumbnail=config.get_thumb('documentary'), plot = 'Indicar el título de un documental' ))
+
+    if not config.get_setting('mnu_simple', default=False):
+        itemlist.append(item.clone( action='', title= '[B]Premios y Festivales:[/B]', folder=False, text_color='darkgoldenrod' ))
+
+        itemlist.append(item.clone( action='emmy_ediciones', title=' - Premios Emmy', url = host + 'award_data.php?award_id=emmy&year=', thumbnail = config.get_thumb('emmys'), search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = ' - Festivales', action = 'festivales', url = host + 'all_awards.php', search_type = 'movie' ))
+
+        itemlist.append(item.clone( title = ' - Otros Premios', action = 'festivales', url = host + 'all_awards.php', group = 'awards', search_type = 'movie' ))
 
     por_plataforma = False
     por_tema = False
@@ -55,7 +67,7 @@ def mainlist(item):
         por_plataforma = True
         por_tema = True
 
-        itemlist.append(item.clone( title = '[B]Películas:[/B]', action = '', text_color='deepskyblue', plot = '' ))
+        itemlist.append(item.clone( title = '[B]Películas:[/B]', action = '', text_color='deepskyblue' ))
 
         if config.get_setting('search_extra_trailers', default=False):
             itemlist.append(item.clone( channel='trailers', action='search', title=' - Buscar en [COLOR darkgoldenrod]Tráilers[/COLOR] ...', thumbnail=config.get_thumb('trailers'), plot = 'Indicar el título de una película para buscar su tráiler' ))
@@ -67,12 +79,6 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Por género', action = 'generos', thumbnail=config.get_thumb('listgenres'), search_type = 'movie' ))
         itemlist.append(item.clone( title = ' - Por país', action = 'paises', thumbnail=config.get_thumb('idiomas'), search_type = 'movie' ))
         itemlist.append(item.clone( title = ' - Por año', action = 'anios', thumbnail=config.get_thumb('listyears'), search_type = 'movie' ))
-
-        itemlist.append(item.clone( title = ' - Premios Oscar', action = 'oscars', url = host + 'oscar_data.php', thumbnail=config.get_thumb('oscars'), search_type = 'movie' ))
-
-        itemlist.append(item.clone( title = ' - Festivales', action = 'festivales', url = host + 'all_awards.php', search_type = 'movie' ))
-
-        itemlist.append(item.clone( title = ' - Otros Premios', action = 'festivales', url = host + 'all_awards.php', group = 'awards', search_type = 'movie' ))
 
         itemlist.append(item.clone( title = ' - Sagas y colecciones', action = 'sagas', url = host + 'movie-groups-all.php', page = 1, thumbnail=config.get_thumb('bestsagas'), search_type = 'movie' ))
 
@@ -91,11 +97,9 @@ def mainlist(item):
         if not por_tema:
             itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'movie' ))
 
-        itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink', plot = '' ))
+        itemlist.append(item.clone( title = '[B]Series:[/B]', action = '', text_color='hotpink' ))
 
         itemlist.append(item.clone( title = ' - Las mejores', action = 'list_sel', url = host + ruta_sel + '&nodoc=1', cod_genre = 'TV_SE', thumbnail=config.get_thumb('besttvshows'), search_type = 'tvshow' ))
-
-        itemlist.append(item.clone( title = ' - Premios Emmy', action = 'emmy_ediciones', url = host + 'award_data.php?award_id=emmy&year=', thumbnail=config.get_thumb('emmys'), search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - Por plataforma', action = 'plataformas', thumbnail=config.get_thumb('booklet'), search_type = 'tvshow' ))
         itemlist.append(item.clone( title = ' - Por tema', action = 'temas', url = host + 'topics.php', thumbnail=config.get_thumb('listthemes'), search_type = 'tvshow' ))
@@ -114,13 +118,13 @@ def mainlist(item):
 
         if not config.get_setting('mnu_simple', default=False):
             if config.get_setting('mnu_documentales', default=True):
-                itemlist.append(item.clone( title = '[B]Documentales:[/B]', action = '', text_color='cyan', plot = '' ))
+                itemlist.append(item.clone( title = '[B]Documentales:[/B]', action = '', text_color='cyan' ))
 
                 itemlist.append(item.clone( title = ' - Los mejores', action = 'list_sel', url = host + ruta_sel + '&notvse=1', cod_genre = 'DO', thumbnail=config.get_thumb('bestdocumentaries'), search_type = 'all' ))
 
     if not item.search_type:
         if config.get_setting('channels_link_main', default=True):
-            itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', action = '', text_color='teal', plot = '' ))
+            itemlist.append(item.clone( title = '[B]Películas y Series:[/B]', action = '', text_color='teal' ))
 
             itemlist.append(item.clone( title = ' - Novedades a la venta', action = 'list_all', url = host + 'cat_new_sa_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
             itemlist.append(item.clone( title = ' - Novedades en alquiler', action = 'list_all', url = host + 'cat_new_re_es.html', thumbnail=config.get_thumb('novedades'), search_type = 'all' ))
@@ -129,17 +133,21 @@ def mainlist(item):
  
 
 def show_help(item):
-    txt = 'En este apartado se pueden hacer consultas a la web [COLOR gold][B]Filmaffinity[/B][/COLOR], que ofrece información de películas, series y personas.'
+    txt = '[COLOR goldenrod][B]INFORMACIÓN FILMAFFINITY:[/B][/COLOR][CR]'
 
-    txt += '[CR]'
-    txt += '[CR]Se puede buscar la [COLOR moccasin][B]Filmografía[/B][/COLOR] de una persona y ver las películas/series dónde ha participado.'
+    txt += 'Se pueden hacer consultas a la web [COLOR gold][B]Filmaffinity[/B][/COLOR], que ofrece información de [COLOR lightyellow][B]Películas, Series y Personas[/B][/COLOR].'
 
-    txt += '[CR]'
-    txt += '[CR]También se pueden ver distintas [COLOR yellow][B]Listas[/B][/COLOR] de películas y/ó series según varios conceptos (más populares, más valoradas, por géneros, etc.)'
+    txt += '[CR][CR]Se puede buscar la [COLOR moccasin][B]Filmografía[/B][/COLOR] de una persona y ver las [COLOR lightyellow][B]Películas/Series[/B][/COLOR] dónde ha participado.'
 
-    txt += '[CR]'
-    txt += '[CR]Al seleccionar una película/serie [COLOR chartreuse][B]se iniciará su búsqueda en los canales[/B][/COLOR] y se mostrarán los resultados encontrados.'
-    txt += ' Hay que tener en cuenta que habrá películas/series que no tendrán enlaces en ninguno de los canales.'
+    txt += '[CR][CR]También se pueden ver distintas [COLOR yellow][B]Listas[/B][/COLOR] de [COLOR lightyellow][B]Películas y/ó Series[/B][/COLOR] según varios conceptos (más populares, más valoradas, por géneros, etc.)'
+
+    txt += '[CR][CR][COLOR goldenrod][B]RESULTADOS:[/B][/COLOR][CR]'
+
+    txt += 'Al seleccionar una [COLOR lightyellow][B]Película/Serie[/COLOR] [COLOR chartreuse]se Iniciará su Búsqueda en los Canales[/B][/COLOR]'
+
+    txt += '[CR]y se mostrarán los resultados encontrados.'
+
+    txt += '[CR][CR][COLOR fuchsia][B]Hay que tener en cuenta que habrá [COLOR lightyellow]Películas/Series[COLOR fuchsia] que no tendrán enlaces en ninguno de los canales.[/B][/COLOR]'
 
     platformtools.dialog_textviewer('Información búsquedas y listas en Filmaffinity', txt)
     return True
@@ -207,7 +215,10 @@ def festivales(item):
 
         title = title.replace('(datos prox.)', '').strip()
 
-        itemlist.append(item.clone( action = 'festivales_ediciones', title = title, url = festival ))
+        if item.group == 'awards':
+            title = title.replace(' del', '').strip()
+
+        itemlist.append(item.clone( action = 'festivales_ediciones', title = title, url = festival, text_color = 'moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
 
@@ -215,8 +226,6 @@ def festivales(item):
 def festivales_ediciones(item):
     logger.info()
     itemlist = []
-
-    text_color = 'moccasin'
 
     if item.search_type == 'movie': text_color = 'deepskyblue'
     elif item.search_type == 'tvshow': text_color = 'hotpink'
@@ -242,6 +251,7 @@ def festivales_ediciones(item):
 def listas(item):
     logger.info()
     itemlist = []
+    matches = []
 
     if not item.page: item.page = 0
 
@@ -278,8 +288,11 @@ def listas(item):
 
     if item.stype == 'name':
         matches = scrapertools.find_multiple_matches(data, '<li class="name-row px-0">(.*?)</li>')
+        if not matches: matches = scrapertools.find_multiple_matches(data, '<li class="name-row">(.*?)</li>')  
+
     elif item.stype == 'cast':
         matches = scrapertools.find_multiple_matches(data, '<div class="row movie-card movie-card-1"(.*?)<div class="item-search">')
+
     else:
         matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="item-search">')
 
@@ -292,11 +305,16 @@ def listas(item):
         if title == 'No image': title = scrapertools.find_single_match(match, 'title="(.*?)"').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        thumb = thumb.strip()
+
         if '/images/empty.gif' in thumb:
             thumb = scrapertools.find_single_match(match, 'srcset="(.*?).jpg')
             if thumb: thumb = thumb + '.jpg'
 
         thumb = thumb.replace('-mtiny', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -313,12 +331,12 @@ def listas(item):
                 title = title.replace('(TV)', '[COLOR hotpink](TV)[/COLOR]')
 
             if item.stype == 'cast':
-                title =  scrapertools.find_single_match(match, '<div class="credits">.*?title="(.*?)"')
+                title =  scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
 
-                url = scrapertools.find_single_match(match, '<div class="credits">.*?href="(.*?)"')
+                url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
                 if url:
-                    itemlist.append(item.clone( action = 'list_lst', title=title, url=url, thumbnail=thumb, stype=item.stype, search_type=_search_type ))
+                    itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels = {'year': '-'} ))
 
             elif item.stype == 'name':
                 url = scrapertools.find_single_match(match, 'href="(.*?)"')
@@ -341,15 +359,17 @@ def listas(item):
             if item.search_type == 'documentary': _search_type = 'all'
 
             if item.stype == 'cast':
-                title =  scrapertools.find_single_match(match, '<div class="credits">.*?title="(.*?)"')
+                title =  scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
 
-                url = scrapertools.find_single_match(match, '<div class="credits">.*?href="(.*?)"')
+                url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
                 if url:
-                    itemlist.append(item.clone( action = 'list_lst', title=title, url=url, thumbnail=thumb, stype=item.stype, search_type=_search_type ))
+                    itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = title, contentTitle = title, infoLabels = {'year': '-'} ))
 
             elif item.stype == 'name':
-                url = scrapertools.find_single_match(match, 'href="(.*?)"')
+                title =  scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
+
+                url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
                 if url:
                     itemlist.append(item.clone( action = 'list_lst', title=title, url=url, thumbnail=thumb, stype=item.stype, search_type=_search_type ))
@@ -379,6 +399,7 @@ def listas(item):
 def list_lst(item):
     logger.info()
     itemlist = []
+    matches = []
 
     if not item.page: item.page = 0
 
@@ -386,15 +407,7 @@ def list_lst(item):
 
     data = httptools.downloadpage(url).data
 
-    if item.stype == 'cast':
-        url = scrapertools.find_single_match(data, '<ul class="main-role">.*?<a href="(.*?)"')
-
-        if url:
-            data = httptools.downloadpage(url).data
-
-            matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
-
-    elif item.stype == 'name':
+    if item.stype == 'name':
         url = scrapertools.find_single_match(data, '<ul class="main-role">.*?<a href="(.*?)"')
 
         if url:
@@ -402,7 +415,7 @@ def list_lst(item):
 
             data = httptools.downloadpage(url).data
 
-            matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="lists-box">')
+            matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="ms-1 mc-action">')
 
     else:
         matches = scrapertools.find_multiple_matches(data, 'data-movie-id="(.*?)<div class="item-search">')
@@ -415,7 +428,12 @@ def list_lst(item):
         title = scrapertools.find_single_match(match, 'alt="(.*?)"').strip()
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        thumb = thumb.strip()
+
         thumb = thumb.replace('-mtiny', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -475,16 +493,18 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="movie-poster" data-movie-id=.*?src="(.*?)".*?title="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, '<div class="col" data-movie-id=.*?src="(.*?)".*?alt="(.*?)"')
 
     num_matches = len(matches)
     desde = item.page * perpage
     hasta = desde + perpage
 
     for thumb, title in matches[desde:hasta]:
-        title = title.strip()
+        thumb = thumb.strip()
 
         thumb = thumb.replace('-mtiny', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -724,9 +744,13 @@ def list_temas(item):
             if year > str(current_year): action = ''
         else: year = '-'
 
+        thumb = thumb.strip()
+
         if thumb.startswith('/imgs/') == True: thumb = 'https://www.filmaffinity.com' + thumb
 
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -880,17 +904,19 @@ def list_premios_anyo(item):
         matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?title="(.*?)".*?src="(.*?)"')
 
     for url, title, thumb in matches:
-        title = title.strip()
-
         if 'Edición de los Oscar' in title: continue
 
         if item.edition == 'any_oscars' or item.edition == 'any_emmys' or item.edition == 'any_fests':
             if 'Todas las nominaciones' in title: continue	
 
         if thumb:
+            thumb = thumb.strip()
+
             if not '.jpg' in thumb: thumb = thumb + '.jpg'
 
             thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -935,20 +961,27 @@ def list_premios_anyo(item):
                         elif item.edition == 'any_emmys': _search_type = 'tvshow'
                         elif item.edition == 'any_festss': _search_type = 'movie'
 
-                        thumb = scrapertools.find_single_match(bloque, 'title="' + title + '".*?data-srcset="(.*?).jpg')
+                        if 'data-srcset="' in bloque:
+                            thumb = scrapertools.find_single_match(bloque, 'title="' + title + '".*?data-srcset="(.*?).jpg')
+                        else: thumb = ''
 
                         if item.edition == 'any_fests':
                             if not item.group == 'awards':
-                                thumb = scrapertools.find_single_match(bloque, '<a class="fa-name-image position-relative type-pers".*?' + '".*?title="' + title + '".*?data-srcset="(.*?).jpg')
+                                if 'data-srcset="' in bloque:
+                                    thumb = scrapertools.find_single_match(bloque, '<a class="fa-name-image position-relative type-pers".*?' + '".*?title="' + title + '".*?data-srcset="(.*?).jpg')
+                                else: thumb = ''
 
                         if thumb:
+                            thumb = thumb.strip()
+
                             thumb = thumb.replace('-msmall', '-large') + '.jpg' + '|User-Agent=Mozilla/5.0'
 
                         title = '[COLOR goldenrod][B]' + title + '[/B][/COLOR]'
                         itemlist.append(item.clone( action = 'list_names_anyo', title = title, url = url, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name ))
 
                     else:
-                        itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
+                        if not first_person:
+                            itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = _search_type, name = name, contentTitle = name, infoLabels = {'year': item.anyo} ))
                 else:
                     itemlist.append(item.clone( action = 'find_search', title = title, thumbnail = thumb, search_type = 'tvshow', name = name, contentSerieName = name, infoLabels={'year': item.anyo} ))
 
@@ -982,9 +1015,11 @@ def list_names_anyo(item):
 
         elif '(C)' in title: title = title.replace('(C)', '[COLOR moccasin](C)[/COLOR]')
 
-        title = title.replace('&amp;', '&').strip()
+        thumb = thumb.strip()
 
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '&').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(TV)', '').replace('(C)', '')
 
@@ -1010,7 +1045,10 @@ def emmy_ediciones(item):
 
     for url, title, anyo in matches:
         title = title.strip()
+
         if not title: title = 'Premios Emmy ' + anyo
+
+        title = title.replace('Temporada', 'Temp.')
 
         itemlist.append(item.clone( action = 'list_premios_anyo', title = title, url = url, anyo = anyo, edition = 'any_emmys', text_color = text_color ))
 
@@ -1083,11 +1121,11 @@ def list_sagas(item):
             if year > str(current_year): action = ''
         else: year = '-'
 
-        title = title.strip()
-
         thumb = thumb.strip()
 
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -1180,7 +1218,12 @@ def list_sel(item):
             else: year = '-'
 
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
+
+        thumb = thumb.strip()
+
         thumb = thumb.replace('-msmall', '-large') + '|User-Agent=Mozilla/5.0'
+
+        title = title.replace('&amp;', '').strip()
 
         name = title.replace('(Serie de TV)', '').replace('(Miniserie de TV)', '').replace('(C)', '')
 
@@ -1241,6 +1284,18 @@ def _oscars(item):
     data = httptools.downloadpage(url).data
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
+    if 'was not found on this server' in data:
+         item.url = host + 'oscar_data.php'
+
+         return oscars(item)
+
+    elif 'Todos los ganadores y nominados de Premios Oscars' in data:
+         item.url = host + 'award-edition.php?edition-id=academy_awards_' + str(current_year)
+         item.anyo = str(current_year)
+         item.edition = 'any_oscars'
+
+         return list_premios_anyo(item)
+
     matches = re.compile('<div class="full-content"><div class="header" id="([^"]+)">([^<]+)').findall(data)
 
     for oscars_id, title in matches:
@@ -1289,25 +1344,14 @@ def _oscars_categories(item):
 def _emmys(item):
     logger.info()
 
-    item.url = host + 'award_data.php?award_id=emmy&year='
-
-    if item.origen == 'mnu_esp':
-        return emmy_ediciones(item)
-
     item.url = host + 'award-edition.php?edition-id=emmy_'
 
     item.url = item.url + str(current_year)
 
+    item.edition = 'any_emmys'
+
     return list_premios_anyo(item)
 
-
-def _oscars(item):
-    logger.info()
-
-    item.url = host + 'oscar_data.php'
-    item.page = 1
-
-    return oscars(item)
 
 def _sagas(item):
     logger.info()

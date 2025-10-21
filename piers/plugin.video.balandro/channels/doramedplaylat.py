@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://doramedplay.com/'
+host = 'https://doramed.tv/'
 
 
 sub_host = 'https://doramedplay.net/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://doramedplay.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
@@ -57,12 +63,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'tvshows/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Subtituladas', action = 'list_all', url = sub_host + 'tvshows/', sub_host = True, search_type = 'tvshow', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'Subtitulados', action = 'list_all', url = sub_host + 'tvshows/', sub_host = True, search_type = 'tvshow', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Destacadas', action = 'list_all', url = sub_host + 'ratings/', sub_host = True, search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Más vistas', action = 'list_all', url = host + 'tendencias-2/?get=tv', search_type = 'tvshow' ))
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'ratings-2/?get=tv', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'tendencias-2/?get=tv', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'ratings-2/?get=tv', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
 
@@ -320,13 +324,37 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile("<iframe.*?src='(.*?)'", re.DOTALL).findall(data)
-    if not matches: matches = re.compile('<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+    matches1 = re.compile("id='source-player-.*?<iframe.*?src='(.*?)'", re.DOTALL).findall(data)
+    matches2 = re.compile("id='source-player-.*?" + '<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+
+    matches3 = re.compile("id='source-player-.*?" + '<iframe.*?src="(.*?)"', re.DOTALL).findall(data)
+    matches4 = re.compile("id='source-player-.*?<iframe.*?src='(.*?)'", re.DOTALL).findall(data)
+
+    matches = matches1 + matches2 + matches3 + matches4
 
     ses = 0
 
     for url in matches:
+        if '.youtube.' in url: continue
+
         ses += 1
+
+        if 'peertubeLink' in url:
+            url = url.replace('&amp;', '&')
+
+            data1 = do_downloadpage(url)
+
+            data1 = data1.replace('\\/', '/')
+            data1 = data1.replace('\\"', '"')
+
+            data1 = data1.replace('=\\', '=').replace('\\"', '/"')
+
+            blk1 = scrapertools.find_single_match(str(data1), '"scheme":"peertube"(.*?)"player"')
+
+            new_url = scrapertools.find_single_match(str(blk1), '/peertube/(.*?)"')
+
+            if new_url:
+                url = 'https;//peertube.uno/videos/embed/' + new_url
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -334,9 +362,9 @@ def findvideos(item):
         url = servertools.normalize_url(servidor, url)
 
         if url.startswith('https://player.doramed.top/'):
-            data1 = do_downloadpage(url)
+            data2 = do_downloadpage(url)
 
-            url = scrapertools.find_single_match(str(data1), "'file':'(.*?)'")
+            url = scrapertools.find_single_match(str(data2), "'file':'(.*?)'")
 
             if url:
                 url = 'https://player.doramed.top/' + url

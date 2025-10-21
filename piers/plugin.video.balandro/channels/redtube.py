@@ -23,11 +23,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -137,15 +138,15 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    data = scrapertools.find_single_match(data,'<em class="premium_tab_icon rt_icon rt_Menu_Star">(.*?)<div class="footer">')
-    data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
+    bloque = scrapertools.find_single_match(data,'<em class="premium_tab_icon rt_icon rt_Menu_Star">(.*?)<div class="footer">')
+    bloque = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', bloque)
 
     patron = '<div class="video_block_wrapper js_mediaBookBounds ">.*?'
-    patron += 'data-o_thumb="([^"]+)".*?'
-    patron += '<span class="duration">(.*?)</a>.*?'
-    patron += '<a title="([^"]+)".*?href="(/\d+)"'
+    patron += 'data-o_thumb="(.*?)".*?'
+    patron += '<div class="duration">(.*?)</a>.*?'
+    patron += '<a title="(.*?)".*?href="(.*?)"'
 
-    matches = re.compile(patron,re.DOTALL).findall(data)
+    matches = re.compile(patron,re.DOTALL).findall(bloque)
 
     for thumb, duration, title, url in matches:
         url = host[:-1] + url
@@ -174,7 +175,12 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    url = item.url
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     videos = get_video_url(item.url)
 

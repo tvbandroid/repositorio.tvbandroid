@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -24,8 +24,8 @@ forced_proxy_opt = 'ProxySSL'
 canonical = {
              'channel': 'divxtotal', 
              'host': config.get_setting("current_host", 'divxtotal', default=''), 
-             'host_alt': ["https://divxtotal.io/"], 
-             'host_black_list': ["https://www5.divxtotal.mov/",
+             'host_alt': ["https://www2.divxtotal.lol/"], 
+             'host_black_list': ["https://www1.divxtotal.lol/", "https://divxtotal.io/", "https://www5.divxtotal.mov/",
                                  "https://www4.divxtotal.mov/", "https://www3.divxtotal.mov/", "https://www2.divxtotal.mov/", 
                                  "https://www2.divxtotal.zip/", "https://www1.divxtotal.zip/", "https://www.divxtotal.win/", 
                                  "https://www.divxtotal.wf/", "https://www.divxtotal.pl/", "https://www.divxtotal.cat/", 
@@ -33,7 +33,7 @@ canonical = {
                                  "https://www.divxtotal.re/", "https://www.divxtotal.pm/", "https://www.divxtotal.nl/"], 
              'pattern': r'<li>\s*<a\s*href="([^"]+)"\s*>\S*\/a><\/li>', 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False
             }
 host = canonical['host'] or canonical['host_alt'][0]
 channel = canonical['channel']
@@ -130,6 +130,8 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
     
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
+
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
     
     autoplay.show_option(item.channel, itemlist)
@@ -163,6 +165,8 @@ def submenu(item):
         itemlist.append(Item(channel=item.channel, title='Buscar...', action="search", 
                              url=host, thumbnail=get_thumb("search.png"), 
                              c_type="search", category=categoria))
+
+        itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
         itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
@@ -223,7 +227,8 @@ def list_all(item):
         findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['col-lg-8 title']}]}
     
     elif item.c_type == "series":
-        findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['col-lg-3 col-md-3 col-md-4 col-xs-6']}]}
+        findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['col-lg-3 col-md-3 col-md-4 col-xs-6',
+                                                                 'col-lg-3 col-md-3 col-sm-4 col-xs-6 serie-card']}]}
                        
     return AlfaChannel.list_all(item, matches_post=list_all_matches, generictools=True, finds=findS, **kwargs)
 

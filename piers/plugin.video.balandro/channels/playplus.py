@@ -43,6 +43,13 @@ def mainlist(item):
     if not config.get_setting('descartar_anime', default=False):
         itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
+
+    itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', search_type = 'person',
+                                plot = 'Indicar el nombre y/ó apellido/s del intérprete.'))
+    itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', search_type = 'person',
+                                plot = 'Indicars el nombre y/ó apellido/s del director.'))
+
     return itemlist
 
 
@@ -64,10 +71,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas/?tipo=rate', search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'peliculas', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'peliculas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'peliculas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'peliculas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por país', action = 'paises', slug = 'peliculas', search_type = 'movie' ))
 
     return itemlist
@@ -96,11 +104,10 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'seriesa/?tipo=rate', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'series', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', slug = 'series', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', slug = 'series', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', slug = 'series', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -121,10 +128,10 @@ def mainlist_animes(item):
 
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'animacion/?tipo=rate', search_type = 'tvshow' ))
 
+    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'anime', slug = 'animes', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', group = 'anime', slug = 'animes', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', group = 'anime', slug = 'animes', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', group = 'anime', slug = 'animes', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -360,6 +367,7 @@ def list_last(item):
         year = scrapertools.find_single_match(match, '<p>(.*?)</p>')
         if year:
             if ',' in year: year = scrapertools.find_single_match(year, ',(.*?)$').strip()
+            elif '.' in year: year = scrapertools.find_single_match(year, '.(.*?)$').strip()
         else: year = '-'
 
         if '/movie/' in url:
@@ -620,9 +628,16 @@ def episodios(item):
         season = int(s_e.split("x")[0])
         episode = s_e.split("x")[1]
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         title = str(season) + 'x' + str(episode) + ' ' + titulo
 
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -705,7 +720,12 @@ def findvideos(item):
                 elif '/streamplay' in link: continue
 
                 elif '/viewsb.' in link: continue
+
                 elif '/formatearwindows.' in link: continue
+
+                elif '/multiup.' in link: continue
+                elif '/filemirage.' in link: continue
+                elif '/filepv.' in link: continue
 
                 link = link.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 
@@ -799,7 +819,12 @@ def findvideos(item):
                 elif '/streamplay' in link: continue
 
                 elif '/viewsb.' in link: continue
+
                 elif '/formatearwindows.' in link: continue
+
+                elif '/multiup.' in link: continue
+                elif '/filemirage.' in link: continue
+                elif '/filepv.' in link: continue
 
                 link = link.replace('/player.cuevana.ac/f/', '/waaw.to/watch_video.php?v=').replace('/player.cuevana3.one/f/', '/waaw.to/watch_video.php?v=')
 
@@ -863,6 +888,10 @@ def findvideos(item):
 
         elif '/formatearwindows.' in url: continue
 
+        elif '/multiup.' in url: continue
+        elif '/filemirage.' in url: continue
+        elif '/filepv.' in url: continue
+
         if 'https://netload.cc/st?' in url:
              url = scrapertools.find_single_match(url, '&url=(.*?)$')
              if not url: continue
@@ -878,7 +907,8 @@ def findvideos(item):
         if not server == 'directo':
             if server == 'various': other = servertools.corregir_other(server)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url, language = lang, quality = qlty, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', server = server, title = '', url = url,
+                              language = lang, quality = qlty, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -899,14 +929,16 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         elif '/ouo.' in url:
-            return 'CloudFlare [COLOR red]ReCaptcha[/COLOR]'
+            return 'Servidor con [COLOR red]CloudFlare ReCaptcha[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

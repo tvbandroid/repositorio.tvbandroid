@@ -7,14 +7,58 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.1ennovelas.top/'
+host = 'https://wc5v.gnula.onl/'
+
+
+# ~ por si viene de enlaces guardados
+ant_hosts = ['https://www.1ennovelas.top/', 'https://www.gnula.onl/', 'https://wv5n.gnula.onl/']
+
+
+domain = config.get_setting('dominio', 'vernovelas', default='')
+
+if domain:
+    if domain == host: config.set_setting('dominio', 'vernovelas', '')
+    elif domain in str(ant_hosts): config.set_setting('dominio', '', 'vernovelas')
+    else: host = domain
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/release/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
     return data
+
+
+def acciones(item):
+    logger.info()
+    itemlist = []
+
+    domain_memo = config.get_setting('dominio', 'vernovelas', default='')
+
+    if domain_memo: url = domain_memo
+    else: url = host
+
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+    itemlist.append(item.clone( channel='domains', action='test_domain_vernovelas', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
+                                from_channel='vernovelas', folder=False, text_color='chartreuse' ))
+
+    if domain_memo: title = '[B]Modificar/Eliminar el dominio memorizado[/B]'
+    else: title = '[B]Informar Nuevo Dominio manualmente[/B]'
+
+    itemlist.append(item.clone( channel='domains', action='manto_domain_vernovelas', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'vernovelas' ))
+
+    platformtools.itemlist_refresh()
+
+    return itemlist
 
 
 def mainlist(item):
@@ -25,9 +69,11 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novela/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novelas/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host + 'ver-novela/', search_type = 'tvshow', text_color = 'cyan' ))
 
@@ -399,6 +445,13 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo:
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
@@ -421,7 +474,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    postid = scrapertools.find_single_match(str(data), 'postid-(.*?)"').strip()
+    postid = scrapertools.find_single_match(str(data), "data-id='(.*?)'")
 
     if not postid: return itemlist
 
@@ -443,7 +496,7 @@ def findvideos(item):
         data1 = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
 
         url = scrapertools.find_single_match(data1, "<iframe.*?src='(.*?)'")
-        if not url: url = scrapertools.find_single_match(datal, '<IFRAME.*?SRC="(.*?)"')
+        if not url: url = scrapertools.find_single_match(data1, '<IFRAME.*?SRC="(.*?)"')
 
         if url:
             if url.startswith('//'): url = 'https:' + url

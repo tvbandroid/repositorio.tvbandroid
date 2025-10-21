@@ -3,7 +3,7 @@
   "name": "MonosChinos",
   "thumbnail": "monoschinos.jpg",
 
-  "active": false,
+  "active": true,
 
   "searchable": false,
   "search_types": ["tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["tvshow"],
   "language": ["vose", "vo"],
 
-  "clusters": ["notice", "anime"],
+  "clusters": ["anime"],
 
-  "notes": "Web CERRADA. Web dedicada exclusivamente al anime. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web dedicada exclusivamente al anime."
 }

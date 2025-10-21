@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import re, base64, time
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -42,30 +42,30 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 
-def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+def do_downloadpage(url, post=None, headers=None, raise_weberror=True, timeout=None):
     hay_proxies = False
     if config.get_setting('channel_plushd_proxies', default=''): hay_proxies = True
 
     if '/year/' in url: raise_weberror = False
 
     if not url.startswith(host):
-        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
         if hay_proxies:
-            data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
         else:
-            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
-        if not data:
-            if not 'search?buscar=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+    if not data:
+        if not 'search?buscar=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
 
-                timeout = config.get_setting('channels_repeat', default=30)
+            timeout = config.get_setting('channels_repeat', default=30)
 
-                if hay_proxies:
-                    data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                else:
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('plushd', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -95,11 +95,11 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
-    if not config.get_setting('descartar_anime', default=False):
-        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
-
     if config.get_setting('mnu_doramas', default=False):
         itemlist.append(item.clone( title = 'Doramas', action = 'mainlist_series', text_color = 'firebrick' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', text_color = 'springgreen' ))
 
     return itemlist
 
@@ -130,11 +130,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series?page=', search_type = 'tvshow' ))
 
-    if not config.get_setting('descartar_anime', default=False):
-        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
-
     if config.get_setting('mnu_doramas', default=False):
         itemlist.append(item.clone( title = 'Doramas', action = 'list_all', url = host + 'doramas?page=', search_type = 'tvshow', text_color = 'firebrick' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'mainlist_animes', search_type = 'tvshow', text_color = 'springgreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -282,6 +282,8 @@ def list_all(item):
         if not title: title = scrapertools.find_single_match(match, "<img alt='(.*?)'")
 
         if not url or not title: continue
+
+        if 'PREMIUM' in title: continue
 
         thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
 
@@ -438,6 +440,12 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
@@ -478,11 +486,29 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
 
-        if not url: continue
+        if not url:
+             if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
+                 espera = 5
 
-        if 'Estas saturando la red se te dará un bloqueo temporal' in str(data) or '&quot;' in str(url):
-            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd Saturado', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-            data = do_downloadpage(link)
+                 timeout = config.get_setting('channels_repeat', default=30)
+
+                 if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PlusHd [COLOR yellow][B]Saturado[/B][/COLOR]', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                 time.sleep(espera)
+
+                 data = do_downloadpage(link, timeout=timeout)
+
+                 url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
+
+                 if not url:
+                     if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
+                         time.sleep(espera)
+
+                         data = do_downloadpage(link, timeout=timeout)
+
+        url = scrapertools.find_single_match(data, "(?i)Location.href = '([^']+)'")
+
+        if not url: continue
 
         if 'up.asdasd' in url:
             url = scrapertools.find_single_match(url, '.site(.*?)$')
@@ -494,7 +520,7 @@ def findvideos(item):
 
         if not 'http' in url: continue
 
-        if '/pelisplus.upns.pro' in url: continue
+        if '/pelisplus.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
@@ -511,10 +537,10 @@ def findvideos(item):
     if not itemlist:
         if not ses == 0:
             if ses == len(matches):
-                platformtools.dialog_notification(config.__addon_name, '[COLOR cyan][B] Sin Localizados [COLOR yellow]Re-Intentelo[/B][/COLOR]')
+                platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]Re-Intentelo[/B] de nuevo[/COLOR]', '[COLOR cyan][B]Sin Localizar Enlaces[/B][/COLOR]')
             else:
                 if 'Estas saturando la red se te dará un bloqueo temporal' in str(data):
-                    platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen][B]Red Saturada [COLOR yellow]Re-Intentelo[/B][/COLOR]')
+                    platformtools.dialog_notification(config.__addon_name + ' [COLOR yellow][B]Re-Intentelo[/B] de nuevo[/COLOR]', '[COLOR yellowgreen][B]Red Satura[/B][/COLOR]')
                 else:
                     platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return

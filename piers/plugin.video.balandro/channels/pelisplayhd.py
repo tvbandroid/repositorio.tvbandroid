@@ -7,10 +7,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.peliplayhd.org/'
+host = 'https://peliplayhd.org/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.peliplayhd.org/', 'https://www3.peliplayhd.org/', 'https://www1.peliplayhd.org/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': url}
 
     raise_weberror = True
@@ -29,6 +35,13 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+
+    itemlist.append(item.clone( title = 'Búsqueda de personas:', action = '', folder=False, text_color='tan' ))
+
+    itemlist.append(item.clone( title = ' - Buscar intérprete ...', action = 'search', search_type = 'person',
+                                plot = 'Indicar el nombre y/ó apellido/s del intérprete.'))
+    itemlist.append(item.clone( title = ' - Buscar dirección ...', action = 'search', search_type = 'person',
+                                plot = 'Indicars el nombre y/ó apellido/s del director.'))
 
     return itemlist
 
@@ -425,7 +438,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 

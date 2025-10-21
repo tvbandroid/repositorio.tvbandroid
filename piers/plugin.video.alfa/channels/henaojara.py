@@ -10,10 +10,8 @@ if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int
 from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
-from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
-
-from modules import renumbertools
+from AlfaChannelHelper import re, traceback, base64
+from AlfaChannelHelper import Item, scrapertools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_ANIME
 list_language = list(set(IDIOMAS.values()))
@@ -29,7 +27,7 @@ canonical = {
              'host_alt': ['https://www.henaojara.com/'], 
              'host_black_list': [], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': True
              }
 host = canonical['host'] or canonical['host_alt'][0]
 
@@ -99,10 +97,10 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title='Últimos Animes', url=host, action='list_all',
                          thumbnail=get_thumb('newest', auto=True), c_type='series'))
 
-    itemlist.append(Item(channel=item.channel, title='Series', url=host + 'veronline/category/categorias/', action='list_all',
+    itemlist.append(Item(channel=item.channel, title='Series', url=host + 'animeonline/category/categorias/', action='list_all',
                          thumbnail=get_thumb('anime', auto=True), c_type='series'))
 
-    itemlist.append(Item(channel=item.channel, title='Películas', url=host + 'veronline/category/pelicula/', action='list_all',
+    itemlist.append(Item(channel=item.channel, title='Películas', url=host + 'animeonline/category/pelicula/', action='list_all',
                          thumbnail=get_thumb('movies', auto=True), c_type='peliculas'))
 
     itemlist.append(Item(channel=item.channel, title='Categorías',  action='section', url=host, 
@@ -111,7 +109,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Buscar...", action="search", url=host,
                          thumbnail=get_thumb("search", auto=True)))
 
-    itemlist = renumbertools.show_option(item.channel, itemlist)
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
@@ -217,8 +215,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
             if elem.find("div", class_=["Description"]): 
                 elem_json['plot'] = elem.find("div", class_=["Description"]).p.get_text(strip=True)
 
-            elem_json['context'] = renumbertools.context(item)
-            elem_json['context'].extend(autoplay.context)
+            elem_json['context'] = autoplay.context
 
         except Exception:
             logger.error(elem)
@@ -272,6 +269,9 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
     titleSeason = item.contentSeason
     if matches_int and titleSeason == 1:
         titleSeason = get_title_season(item.url, soup)
+    
+    nextChapterDateRegex = r'(?i)\s*-\s*Proximo\s*Capitulo\:?\s*(\d+-[A-Za-z]+-\d+)'
+    nextChapterDate = ''
 
     for elem in matches_int:
         elem_json = {}
@@ -283,13 +283,11 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
             elem_json['title'] = info.a.get_text(strip=True)
             episode = int(elem.find("span", class_="Num").get_text(strip=True) or 1)
 
-            elem_json['season'], elem_json['episode'] = renumbertools.numbered_for_trakt(item.channel, 
-                                                        item.contentSerieName, titleSeason, episode)
+            elem_json['season'] = titleSeason
+            elem_json['episode'] = episode
 
-            nextChapterDateRegex = r'(?i)\s*-\s*Proximo\s*Capitulo\:?\s*(\d+-[A-Za-z]+-\d+)'
             if re.search(nextChapterDateRegex, elem_json['title']):
                 nextChapterDate = scrapertools.find_single_match(elem_json['title'], nextChapterDateRegex)
-                elem_json['next_episode_air_date'] = nextChapterDate
 
             try:
                 elem_json['thumbnail'] = elem.find(["noscript", "span"]).find("img").get("src", "")
@@ -305,6 +303,10 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
             continue
 
         matches.append(elem_json.copy())
+        
+    if nextChapterDate:
+        for item in matches:
+            item['next_episode_air_date'] = nextChapterDate
 
     return matches
 
@@ -493,6 +495,30 @@ def get_title_season(url, soup):
     return season
 
 def multiplayer_findvideos(url):
+    kwargs["canonical"] = {}
+    kwargs["headers"] = {}
     kwargs["soup"] = False
-    data = AlfaChannel.create_soup(url, hide_infobox=True, **kwargs)
-    return scrapertools.find_multiple_matches(data.data, r'loadVideo\(\'(.*?)\'\)')
+    kwargs["canonical"]["proxy"] = False
+    kwargs["canonical"]["proxy_web"] = False
+    kwargs["headers"]["Referer"] = host
+
+    # url = url.replace('embed.php', 'player.php')
+
+    # if '?' in url:
+        # path, queryString = url.split('?', 1)
+        # if '&' in queryString:
+            # queries_in = queryString.split('&')
+            # queries_out = []
+            # for query in queries_in:
+                # if '=' in query:
+                    # key, val = query.split('=')
+                    # val = val+'ionA#as9ng849fg'
+                    # val = base64.b64encode(val.encode("utf-8")).decode('utf8')
+                    # queries_out.append('{}={}'.format(key, val))
+            # queryString = '&'.join(queries_out)
+        # url = '{}?{}'.format(path, queryString)
+        # logger.error(url)
+
+    data = AlfaChannel.create_soup(url, **kwargs)
+    # logger.error(data.data)
+    return scrapertools.find_multiple_matches(data.data, r'loadVideo\(\'\s*([^\']+)\'\)')

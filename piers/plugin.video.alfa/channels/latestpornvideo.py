@@ -21,6 +21,7 @@ list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_A
 forced_proxy_opt = 'ProxySSL'
 
+
 # https://latestpornvideo.com/   https://hdporn92.com/   https://familyroleplayporn.com/
 # https://mynewpornvideo.com/   https://newpornvideo.xyz/
 # https://trashxxx.com/     https://whereismyporn.com/
@@ -58,7 +59,7 @@ finds = {'find': {'find_all': [{'tag': ['article'], 'class': re.compile(r"^post-
          'plot': {}, 
          'findvideos': dict([('find', [{'tag': ['article'], 'class': re.compile(r"^post-\d+")}]), 
                              ('find_all', [{'tagOR': ['a'], 'href': True, 'target': 'blank'},
-                                           {'tag': ['iframe'], 'src': True}])]),
+                                           {'tag': ['iframe'], 'src': True, 'allowfullscreen':'true'}])]),
          'title_clean': [['[\(|\[]\s*[\)|\]]', ''],['(?i)\s*videos*\s*', '']],
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
@@ -83,7 +84,7 @@ def mainlist(item):
     itemlist = []
     autoplay.init(item.channel, list_servers, list_quality)
     
-    itemlist.append(Item(channel=item.channel, title="Peliculas" , action="list_all", url=host + "archives/category/porn-movie"))
+    itemlist.append(Item(channel=item.channel, title="Peliculas" , action="list_all", url=host + "category/porn-movie"))
     itemlist.append(Item(channel=item.channel, title="Nuevos" , action="list_all", url=host + "page/1/?filter=latest"))
     itemlist.append(Item(channel=item.channel, title="Mas vistos" , action="list_all", url=host + "page/1/?filter=most-viewed"))
     itemlist.append(Item(channel=item.channel, title="Mejor valorado" , action="list_all", url=host + "page/1/?filter=popular"))

@@ -349,9 +349,15 @@ def episodios(item):
                 else: item.perpage = 50
 
     for epis, url, thumb, title in episodes[item.page * item.perpage:]:
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
         titulo = str(item.contentSeason) + 'x' + epis + ' ' + title
 
-        if thumb.startswith('//'): thumb = 'https:' + thumb
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
@@ -437,12 +443,16 @@ def play(item):
     if not new_url: new_url = scrapertools.find_single_match(data, ' SRC="(.*?)"')
 
     if new_url:
+        if new_url.startswith('https://player.megaxserie.me/'): new_url = new_url.replace('/player.megaxserie.me/', '/waaw.to/')
+
         servidor = servertools.get_server_from_url(new_url)
         servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
-            new_server = servertools.corregir_other(new_url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = new_url, server = servidor))
 

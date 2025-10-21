@@ -73,9 +73,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
@@ -222,6 +226,23 @@ def last_epis(item):
     for url, thumb, episode, title in matches:
         if not url or not title: continue
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'season(.*?)$').strip()
+
+               if not season: season = 1
+
         SerieName = corregir_SerieName(title)
 
         epis = episode.replace('Episodio', '').strip()
@@ -236,7 +257,7 @@ def last_epis(item):
 
         itemlist.append(item.clone( action='findvideos', url = url if url.startswith('http') else host[:-1] + url, title = title, thumbnail=thumb,
                                     contentSerieName = SerieName, contentType = 'episode',
-                                    contentSeason = 1, contentEpisodeNumber=epis, infoLabels={'year': '-'} ))
+                                    contentSeason = season, contentEpisodeNumber=epis, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -267,6 +288,11 @@ def episodios(item):
     if not bloque: return itemlist
 
     matches = eval(scrapertools.find_single_match(data, "var episodes = (.*?);"))
+
+    if not matches:
+        if 'Proximamente<' in data:
+             platformtools.dialog_notification('AmimeFlv', '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+             return
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -316,11 +342,35 @@ def episodios(item):
     for episode in matches:
         season = 1
 
+        if 'season' in info[2]:
+            if '2nd' in info[2]: season = 2
+            elif '3rd' in info[2]: season = 3
+            elif '4th' in info[2]: season = 4
+            elif '5th' in info[2]: season = 5
+            elif '6th' in info[2]: season = 6
+            elif '7th' in info[2]: season = 7
+            elif '8th' in info[2]: season = 8
+            elif '9th' in info[2]: season = 9
+            else:
+               season = scrapertools.find_single_match(info[2], 'season-(.*?)-Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(info[2], 'season-(.*?)$').strip()
+
+               try:
+                   num_season = int(season)
+               except:
+                   season = ''
+
+               if not season: season = 1
+
         url = '{}ver/{}-{}'.format(host, info[2], episode[0])
 
         epis = episode[0]
         
         titulo = '{}x{} Episodio {}'.format(season, str(epis), str(epis))
+
+        titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -340,6 +390,14 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     if not item.search_type == 'tvshow':
         if not '-1' in item.url: item.url = item.url.replace('/anime/', '/ver/') + '-1'

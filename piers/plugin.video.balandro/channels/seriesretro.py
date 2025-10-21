@@ -295,7 +295,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#038;', '&').replace('&#8217;s', "'s").replace('&#8211;', '').strip()
+        title = title.replace('&#038;', '&').replace('&#8217;s', "'s").replace('&#8211;', '').replace('&#8216;', "'").strip()
 
         tipo = 'movie' if '/movie/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -520,6 +520,13 @@ def episodios(item):
 
         titulo = '%sx%s %s' % (season, episode, title)
 
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
 
         if len(itemlist) >= item.perpage:
@@ -540,11 +547,11 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    matches = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span>')
+    matches = scrapertools.find_multiple_matches(data, 'data-tplayernv="Opt(.*?)"><span>(.*?)</span>.*?<span>(.*?)</span>')
 
     ses = 0
 
-    for opt, servidor in matches:
+    for opt, servidor, idio_qlty in matches:
         ses += 1
 
         servidor = servidor.replace('<strong>', '').replace('</strong>', '')
@@ -562,27 +569,53 @@ def findvideos(item):
 
         if not servidor or not url: continue
 
-        if 'opción' in servidor:
-            link_other = servidor
+        other = ''
+
+        if servidor == 'lamovie': servidor = 'clipwatching'
+
+        elif 'opción' in servidor:
+            other = servidor
             servidor = 'directo'
         elif servidor == 'anavids':
-            link_other = servidor
+            other = servidor
             servidor = 'directo'
         elif servidor == 'analu':
-            link_other = servidor
+            other = servidor
             servidor = 'directo'
         elif servidor == 'utorrent':
-            link_other = 'torrent'
+            other = 'torrent'
             servidor = 'directo'
 
-        else: link_other = ''
+        elif '/vimeos.' in url:
+            other = 'Vimeos'
+            servidor = 'zures'
 
-        if servidor == 'various': link_other = servertools.corregir_other(srv)
+        if servidor == 'various': other = servertools.corregir_other(srv)
+        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
         if url.endswith('.torrent'): servidor = 'torrent'
         elif 'magnet:?' in url: servidor = 'torrent'
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = link_other ))
+        qlty = scrapertools.find_single_match(idio_qlty, '.*?-(.*?)$').strip()
+
+        lang = scrapertools.find_single_match(idio_qlty, '(.*?)-').strip()
+
+        if 'Latino/Ingles' in lang: lang = 'Lat'
+        elif 'Castellano/Ingles' in lang: lang = 'Esp'
+        elif 'Castellano' in lang: lang = 'Esp'
+        elif 'Latino' in lang: lang = 'Lat'
+        elif 'Subtitulado' in lang: lang = 'Vose'
+        elif 'Version Original' in lang: lang = 'VO'
+        else: lang = '?'
+
+        if 'Subtítulos Latino - ' in qlty:
+            qlty = qlty.replace('Subtítulos Latino - ', '').strip()
+            lang = 'Vose'
+
+        quality_num = puntuar_calidad(qlty)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url=url, server=servidor, title = '',
+                              quality = qlty, quality_num = quality_num, language = lang, other = other.capitalize() ))
 
     # ~ Descargas
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">(.*?)</tr>')
@@ -595,17 +628,45 @@ def findvideos(item):
 
         if not servidor: continue
 
-        if servidor == 'utorrent': servidor = 'torrent'
-        else: servidor = servertools.corregir_servidor(servidor)
+        other = 'D'
+
+        if servidor == 'lamovie': servidor = 'clipwatching'
+        elif servidor == 'utorrent': servidor = 'torrent'
+		
+        elif '/vimeos.' in url:
+            other = 'Vimeos'
+            servidor = 'zures'
+
+        else:
+            if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
+            else: servidor = servertools.corregir_servidor(servidor)
 
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
         if url.endswith('.torrent'): servidor = 'torrent'
         elif 'magnet:?' in url: servidor = 'torrent'
 
-        other = 'D'
+        qlty = scrapertools.find_single_match(match, '<!-- <td>.*?<td><span>(.*?)</span>')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '', language = 'Lat', other = other ))
+        lang = scrapertools.find_single_match(match, '<!-- <td><span>(.*?)</span>')
+
+        if 'Latino/Ingles' in lang: lang = 'Lat'
+        elif 'Castellano/Ingles' in lang: lang = 'Esp'
+        elif 'Castellano' in lang: lang = 'Esp'
+        elif 'Latino' in lang: lang = 'Lat'
+        elif 'Subtitulado' in lang: lang = 'Vose'
+        elif 'Version Original' in lang: lang = 'VO'
+        else: lang = '?'
+
+        if 'Subtítulos Latino - ' in qlty:
+            qlty = qlty.replace('Subtítulos Latino - ', '').strip()
+            lang = 'Vose'
+
+        quality_num = puntuar_calidad(qlty)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', url=url, server=servidor, title = '',
+                              quality = qlty, quality_num = quality_num, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -613,6 +674,12 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def puntuar_calidad(txt):
+    orden = ['CAMRip', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'Full HD', 'HD', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'HD', 'WEBRip 1080p', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
 
 
 def play(item):
@@ -659,12 +726,13 @@ def play(item):
                 itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
                 return itemlist
 
-            if item.server == 'mega':
-                if '/file/' in url_base64:
-                    url = url_base64.replace(host + 'file/', 'https://mega.nz/#!')
+            else:
+               if url_base64:
+                   new_server = servertools.get_server_from_url(url_base64)
+                   new_server = servertools.corregir_other(new_server)				   
 
-                    itemlist.append(item.clone( url = url, server = 'mega' ))
-                    return itemlist
+                   if not new_server == 'directo':
+                       url = url_base64
  
         if url.endswith('.torrent'):
             itemlist.append(item.clone( url = url, server = 'torrent' ))
@@ -689,7 +757,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 

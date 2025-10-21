@@ -673,10 +673,10 @@ def get_generic_call(
         if not alfa_s:
             logger.info("##Assistant headers: %s" % headers)
 
-    timeout = int(timeout) + extraPostDelay
-    serverCall += "&extraPostDelay=%s" % (extraPostDelay * 1000)
+    timeout = int(timeout + extraPostDelay)
+    serverCall += "&extraPostDelay=%s" % int(extraPostDelay * 1000)
     if not alfa_s:
-        logger.info("##Assistant delay-after-js-load: %s" % str(extraPostDelay * 1000))
+        logger.info("##Assistant delay-after-js-load: %s" % str(int(extraPostDelay * 1000)))
     serverCall += "&removeAllCookies=%s" % removeAllCookies
     if not alfa_s:
         logger.info("##Assistant removeAllCookies: %s" % str(removeAllCookies))
@@ -1195,7 +1195,7 @@ def check_webview_version(wvbVersion):
         return
 
     # Comparar la versión de WebView que tiene el Android donde reside la APP con la versión mínima adecuada
-    ver_min = 117
+    ver_min = 133
 
     wvbVersion_list = wvbVersion.split(".")
     wvbVersion_msg = config.get_setting("wvbVersion_msg", default=0)

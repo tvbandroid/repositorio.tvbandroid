@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://gnula.center/'
+host = 'https://gnulahd.lat/'
 
 
 def item_configurar_proxies(item):
@@ -43,6 +43,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://gnula.center/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if not headers: headers = {'Referer': host}
 
     hay_proxies = False
@@ -180,7 +186,7 @@ def list_all(item):
         if year: title = title.replace('(' + year + ')', '').strip()
         else: year = '-'
 
-        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s")
+        title = title.replace('&#8230;', '').replace('&#8211;', '').replace('&#038;', '').replace('&#8217;s', "'s").replace('&amp;', '&')
 
         tipo = 'movie' if '/pelicula/' in url else 'tvshow'
         sufijo = '' if item.search_type != 'all' else tipo
@@ -317,7 +323,14 @@ def episodios(item):
 
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
 
-        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace(' - ' + str(epis), '').strip()
+
+        if 'episodie' in titulo.lower() or 'episodio' in titulo.lower() or 'capítulo' in titulo.lower() or 'capitulo' in titulo.lower():
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
@@ -393,7 +406,11 @@ def play(item):
 
             if not url: url = new_url
             else:
-               if item.other == 'Waaw': url = url.replace('/tmdbcdn.lat/', '/waaw.to/')
+               if item.other == 'Waaw': url = url.replace('/tmdbcdn.lat/', '/waaw.to/').replace('/latlat.xyz/', '/waaw.to/')
+
+    if item.other == 'Nupload':
+        if not config.get_setting('developer_mode', default=False): url = ''
+        else: return 'Servidor aún [COLOR goldenrod]NO programado[/COLOR]'
 
     if url:
         servidor = servertools.get_server_from_url(url)
@@ -403,7 +420,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

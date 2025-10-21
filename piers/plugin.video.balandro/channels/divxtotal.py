@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://divxtotal.io/'
+host = 'https://www2.divxtotal.lol/'
 
 
 # ~ por si viene de enlaces guardados
@@ -23,7 +23,8 @@ ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://
              'https://www.divxtotal.ms/', 'https://www.divxtotal.fi/', 'https://www.divxtotal.cat/',
              'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
              'https://www1.divxtotal.zip/', 'https://www2.divxtotal.zip/', 'https://www2.divxtotal.mov/',
-             'https://www3.divxtotal.mov/', 'https://www4.divxtotal.mov/', 'https://www5.divxtotal.mov/']
+             'https://www3.divxtotal.mov/', 'https://www4.divxtotal.mov/', 'https://www5.divxtotal.mov/',
+             'https://divxtotal.io/', 'https://www1.divxtotal.lol/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -168,7 +169,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-6/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host, group = 'lasts', search_type = 'tvshow', text_color='cyan' ))
 
@@ -180,7 +181,7 @@ def calidades(item):
     itemlist = []
 
     itemlist.append(item.clone( title = 'En DVDR', action = 'list_all', url = host + 'peliculas-dvdr/', search_type = 'movie', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas-hd-5/', search_type = 'movie', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas-hd/', search_type = 'movie', text_color = 'moccasin' ))
     itemlist.append(item.clone( title = 'En 3D', action = 'list_all', url = host + 'peliculas-3-d/', search_type = 'movie', text_color = 'moccasin' ))
 
     return itemlist
@@ -201,6 +202,8 @@ def generos(item):
 
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
+
+        if url.startswith('?'): url = host[:-1] + url
 
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
@@ -226,7 +229,8 @@ def list_all(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
     if not matches:
-        if item.search_type == 'tvshow': matches = scrapertools.find_multiple_matches(bloque, '<div class="col-lg-3 col-md-3 col-md-4 col-xs-6">(.*?)</div>')
+        if item.search_type == 'tvshow':
+             matches = scrapertools.find_multiple_matches(bloque, '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 serie-card">(.*?)</div>')
 
     if not matches:
         if item.group == 'lasts': matches = scrapertools.find_multiple_matches(bloque, '<div class="row">(.*?)</div></div>')
@@ -408,6 +412,10 @@ def findvideos(item):
         if not link.startswith('http'):
             if link.startswith('/'): link = host[:-1] + link
             else: other = 'Directo'
+
+        if not other:
+           if '/short-info.' in link: other = 'Short'
+           elif '/download_tt.php?' in link: other = 'Down'
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language = lang, quality = qlty, other = other))
 

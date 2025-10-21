@@ -7,11 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.veronline.mov/'
+host = 'https://www.veronline.bond/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/']
+ant_hosts = ['https://www.veronline.sh/', 'https://www.veronline.cc/', 'https://www.veronline.in/',
+             'https://www.veronline.mov/', 'https://www.veronline.cfd/']
 
 domain = config.get_setting('dominio', 'veronline', default='')
 
@@ -98,9 +99,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_veronline', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='veronline', folder=False, text_color='chartreuse' ))
@@ -112,9 +113,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', thumbnail=config.get_thumb('veronlie'), text_color='turquoise' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cuales son sus Clones[/B]', text_color='turquoise' ))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'veronline', thumbnail=config.get_thumb('veronline') ))
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'veronline' ))
 
     platformtools.itemlist_refresh()
 
@@ -137,10 +138,27 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
 
+    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', search_type = 'tvshow' ))
+
+    return itemlist
+
+
+def paises(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'América', action = 'list_all', url = host + 'series-online/pais/usa.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Brasil', action = 'list_all', url = host + 'series-online/pais/br.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'España', action = 'list_all', url = host + 'series-online/pais/es.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Colombia', action = 'list_all', url = host + 'series-online/pais/co.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'series-online/pais/mx.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Reino Unido', action = 'list_all', url = host + 'series-online/pais/gb.html', text_color='hotpink' ))
+    itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'series-online/pais/tr.html', text_color='hotpink' ))
 
     return itemlist
 
@@ -158,7 +176,7 @@ def generos(item):
     for url, title in matches:
         title = title.replace('&amp;', '&').strip()
 
-        itemlist.append(item.clone( title = title, action = 'list_all', url = url, genre = title, text_color = 'hotpink' ))
+        itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'hotpink' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -197,9 +215,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<span>Veronline.mov</span>(.*?)>mas vistas<')
+    bloque = scrapertools.find_single_match(data, '<span>Veronline.bond</span>(.*?)>mas vistas<')
 
-    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.mov</span>(.*?)>mas vistas<')
+    if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline.bond</span>(.*?)>mas vistas<')
 
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>veronline</span>(.*?)>mas vistas<')
     if not bloque: bloque = scrapertools.find_single_match(data, '<span>Veronline</span>(.*?)>mas vistas<')
@@ -217,7 +235,7 @@ def list_all(item):
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
-        title = title.replace('online gratis', '').replace('&#039;', "'").replace('&amp;', '&').strip()
+        title = title.replace('online gratis', '').replace('&#039;', "'").replace('&amp;', '&').replace(' online', '').strip()
 
         year = '-'
         if '/series-online/año/' in item.url:
@@ -273,7 +291,7 @@ def last_epis(item):
 
         if not epis: epis = 1
 
-        title = title.replace(' T ', '[COLOR tan]Temp. [/COLOR]')
+        title = title.replace(' T ', '[COLOR tan] Temp. [/COLOR]')
 
         title = title.replace('Capítulo ', '[COLOR goldenrod]Epis. [/COLOR]')
 
@@ -391,7 +409,14 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break

@@ -23,11 +23,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -40,6 +41,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + '/en' ))
 
+    itemlist.append(item.clone( title = 'Por etiqueta', action = 'etiquetas', url = host + '/en' ))
+
     return itemlist
 
 
@@ -49,7 +52,9 @@ def categorias(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('&nbsp;<a href="([^"]+)" class="link1b">([^"]+)</a>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '<div class="bloc-centre">(.*?)>Tags&nbsp;')
+
+    matches = re.compile('&nbsp;<a href="(.*?)".*?class="link1b">(.*?)</a>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         url = url.replace('..', '')
@@ -59,6 +64,30 @@ def categorias(item):
         url = host + url
 
         itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'moccasin' ))
+
+    return sorted(itemlist,key=lambda x: x.title)
+
+
+def etiquetas(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '<div class="bloc-centre">.*?>Tags&nbsp;(.*?)>More sites')
+
+    matches = re.compile('&nbsp;<a href="(.*?)".*?class="link1b">(.*?)</a>', re.DOTALL).findall(bloque)
+
+    for url, title in matches:
+        if title == 'All tags': continue
+
+        url = url.replace('..', '')
+
+        url = url.replace('.html', '_date.html')
+
+        url = host + url
+
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'pink' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -97,6 +126,13 @@ def list_all(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)

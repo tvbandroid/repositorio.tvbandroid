@@ -4,7 +4,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://(?:www.|)(?:nonktube|leslez|teenxy).com/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:nonktube|leslez|teenxy|fleshed|xrares|bigboobsxxx).com/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -72,10 +72,6 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)koreanpornmovie.com/[A-z0-9-]+(?:/|))",
-        "url": "\\1"
-      },
-      {
         "pattern": "(vagina.nl/sexfilms/view/[A-z0-9-]+(?:/|))",
         "url": "https://en.\\1"
       },
@@ -100,6 +96,9 @@
         "url": "\\1"
       },
      {
+        "pattern": "(https://(?:www.|)efukt.com/[A-z0-9-_]+.html)",
+        "url": "\\1"
+      },     {
         "pattern": "(https://(?:www.|)(?:yrprno|youcrazyx|trendyporn|yespornplease|hentaiprno|daftsextube).(?:com|sexy)/video/[A-z0-9-]+.html)",
         "url": "\\1"
       },
@@ -108,7 +107,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:zzztube|bestpornstars|24porn|bigfuck).(?:tv|xxx|com)/(?:video/|)[0-9]+)",
+        "pattern": "(https://(?:zzztube|bestpornstars|24porn).(?:tv|xxx|com)/(?:video/|)[0-9]+)",
         "url": "\\1"
       },
       {
@@ -129,10 +128,6 @@
       },
       {
         "pattern": "(https://cheemsporn.com/videos/[0-9]+/[0-9-]+(?:/|))",
-        "url": "\\1"
-      },
-     {
-        "pattern": "(https://(?:www.|)pornxs.com/(?:embed/|)[0-9]+)",
         "url": "\\1"
       },
      {
@@ -168,7 +163,23 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://www.pornoxo.com/(?:videos|embed)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://www.playvids.com/(?:es/|)[A-z0-9]+/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://www.serviporno.com/video/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://bunkr.\\w{2,4}/e/[A-z0-9]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://www.peekvids.com/v/[A-z0-9-]+/[A-z0-9-_]+(?:/|))",
         "url": "\\1"
       },
       {

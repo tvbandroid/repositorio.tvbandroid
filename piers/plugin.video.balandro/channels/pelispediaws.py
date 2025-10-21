@@ -7,12 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://w-ww.pelistv.top/'
+host = 'https://wc5n.gnularetro.lat/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://www.pelispedia.ws/', 'https://ww7.pelispedia.ws/', 'https://www.gnula4.cc/',
-             'https://www.pelistv.top/']
+             'https://www.pelistv.top/', 'https://w-ww.pelistv.top/', 'https://www.gnularetro.lat/']
 
 
 domain = config.get_setting('dominio', 'pelispediaws', default='')
@@ -89,7 +89,7 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    bloque = scrapertools.find_single_match(data, '>GÉNEROS<(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '>GENERO<(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)".*?>(.*?)</a>')
 
@@ -212,6 +212,8 @@ def findvideos(item):
 
         if 'trailer' in servidor: continue
 
+        servidor = servertools.corregir_servidor(servidor)
+ 
         if servertools.is_server_available(servidor):
             if not servertools.is_server_enabled(servidor): continue
         else:
@@ -263,7 +265,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 

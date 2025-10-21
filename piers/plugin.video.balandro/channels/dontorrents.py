@@ -15,7 +15,8 @@ from core import httptools, scrapertools, tmdb
 
 host = 'https://4144-don.mirror.pm/'
 
-# ~ 19/2/25 last domain  'https://dontorrent.trade/'
+
+# ~ 17/10/25 last domain  'https://dontorrent.kiwi/'
 
 
 try:
@@ -38,6 +39,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.win/', 'https://dontorrent.rs/', 'https://dontorrent.bz/',
              'https://dontorrent.men/', 'https://dontorrent.fit/', 'https://dontorrent.art/',
              'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/',
+             # ~ 2022
              'https://dontorrent.li/', 'https://dontorrent.it/', 'https://dontorrent.red/',
              'https://dontorrent.nu/', 'https://dontorrent.si/', 'https://dontorrent.sk/',
              'https://dontorrent.eu/', 'https://dontorrent.top/', 'https://dontorrent.pm/',
@@ -54,6 +56,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.fans/', 'https://dontorrent.ltd/', 'https://dontorrent.me/',
              'https://dontorrent.gs/', 'https://dontorrent.gy/', 'https://dontorrent.click/',
              'https://dontorrent.fail/', 'https://dontorrent.futbol/', 'https://dontorrent.mba/',
+             # ~ 2023
              'https://dontorrent.army/', 'https://dontorrent.blue/', 'https://dontorrent.beer/',
              'https://dontorrent.surf/', 'https://dontorrent.how/', 'https://dontorrent.casa/',
              'https://dontorrent.chat/', 'https://dontorrent.plus/', 'https://dontorrent.ninja/',
@@ -67,6 +70,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.tokyo/', 'https://dontorrent.boston/', 'https://dontorrent.rodeo/',
              'https://dontorrent.durban/', 'https://dontorrent.party/', 'https://dontorrent.joburg/',
              'https://dontorrent.wales/', 'https://dontorrent.nagoya/', 'https://dontorrent.contact/',
+             # ~ 2024
              'https://dontorrent.cymru/', 'https://dontorrent.capetown/', 'https://dontorrent.yokohama/',
              'https://dontorrent.makeup/', 'https://dontorrent.band/', 'https://dontorrent.center/',
              'https://dontorrent.cooking/', 'https://dontorrent.cyou/', 'https://dontorrent.agency/',
@@ -79,8 +83,17 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.education/', 'https://dontorrent.exposed/', 'https://dontorrent.faith/',
              'https://dontorrent.gratis/', 'https://dontorrent.equipment/', 'https://dontorrent.fashion/',
              'https://dontorrent.gallery/', 'https://dontorrent.yoga/', 'https://dontorrent.foundation/',
+             # ~ 2025
              'https://dontorrent.co/', 'https://dontorrent.auction/', 'https://dontorrent.football/',
-             'https://dontorrent.wiki/', 'https://dontorrent.games/', 'https://dontorrent.tube/']
+             'https://dontorrent.wiki/', 'https://dontorrent.games/', 'https://dontorrent.tube/',
+             'https://dontorrent.trade/', 'https://dontorrent.webcam/', 'https://dontorrent.schule/',
+             'https://dontorrent.stream/', 'https://dontorrent.website/', 'https://dontorrent.group/',
+             'https://dontorrent.download/', 'https://dontorrent.gift/', 'https://dontorrent.report/',
+             'https://dontorrent.homes/', 'https://dontorrent.haus/', 'https://dontorrent.news/',
+             'https://dontorrent.institute/', 'https://dontorrent.jetzt/', 'https://dontorrent.loan/',
+             'https://dontorrent.graphics/', 'https://dontorrent.international/', 'https://dontorrent.irish/',
+             'https://dontorrent.lighting/', 'https://dontorrent.istanbul/', 'https://dontorrent.onl/',
+             'https://dontorrent.kids/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')

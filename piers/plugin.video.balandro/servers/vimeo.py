@@ -1,8 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import sys
 
-from core import httptools, scrapertools
+if sys.version_info[0] >= 3:
+    import xbmcvfs
+
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time
+
+from core import filetools,httptools, scrapertools
 from platformcode import config, logger, platformtools
 
 
@@ -14,8 +26,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -64,6 +75,12 @@ def get_video_url(page_url, url_referer=''):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Vimeo[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))
 
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'vimeo.py'))
+
+            existe = filetools.exists(path)
+            if not existe:
+                return 'El Plugin No existe en Resolveurl'
+
             try:
                 import_libs('script.module.resolveurl')
 
@@ -92,16 +109,22 @@ def get_video_url(page_url, url_referer=''):
                     trace = traceback.format_exc()
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
+
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
 
+                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                    return 'Archivo inexistente'
+
                 elif '<urlopen error' in traceback.format_exc():
-                    if ' alert protocol version ' in traceback.format_exc():
-                         return 'Acceso Denegado CloudFlare'
+                    if ' alert protocol version' in traceback.format_exc(): return 'Acceso Denegado CloudFlare'
 
                     return 'No se puede establecer la conexión'
 
                 return 'Sin Respuesta ResolveUrl'
+
+        else:
+            return 'Falta ResolveUrl'
 
     return video_urls
 

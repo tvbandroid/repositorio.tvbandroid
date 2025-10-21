@@ -160,7 +160,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#x27;', "'")
+        title = title.replace('&#x27;', "'").replace('&amp;', "&")
 
         if url.startswith("/"): url = host[:-1] + url
 
@@ -225,6 +225,8 @@ def last_epis(item):
         titulo = titulo.replace(temp_epis, '').strip()
 
         title = titulo
+
+        title = title.replace('&#x27;', "'").replace('&amp;', "&")
 
         if not url or not title: continue
 
@@ -344,7 +346,11 @@ def episodios(item):
     for title, epis, thumb in matches[item.page * item.perpage:]:
         url = item.url + '/temporada/' + str(item.contentSeason) + '/episodio/' + epis
 
-        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace(str(item.contentSeason) + 'x' + str(epis), '').strip()
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+        titulo = titulo.replace('\\u0026', "&")
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
@@ -423,7 +429,8 @@ def findvideos(item):
                        else:
                            if not config.get_setting('developer_mode', default=False): continue
 
-                   itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = lang, quality = qlty, other = other.capitalize() ))
+                   itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url,
+                                         language = lang, quality = qlty, other = other.capitalize() ))
 
     # ~ download
     matches = scrapertools.find_multiple_matches(data, '<span class="Num">#(.*?)</td></tr>')
@@ -543,7 +550,7 @@ def play(item):
     if url:
         if '/plustream.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
-		
+
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
@@ -551,7 +558,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(server = servidor, url = url))
 

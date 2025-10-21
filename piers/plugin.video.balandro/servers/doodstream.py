@@ -80,7 +80,7 @@ def get_video_url(page_url, url_referer=''):
 
                 page_url = ini_page_url
 
-                return 'No se pudo Reproducir el Vídeo con ResolveUrl'
+                return 'ResolveUrl No se pudo Reproducir el Vídeo'
 
             except:
                 import traceback
@@ -90,8 +90,12 @@ def get_video_url(page_url, url_referer=''):
                     trace = traceback.format_exc()
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
+
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                    return 'Archivo inexistente'
 
                 elif '<urlopen error' in traceback.format_exc():
                     return 'No se puede establecer la conexión'
@@ -99,7 +103,7 @@ def get_video_url(page_url, url_referer=''):
                 return 'Sin Respuesta ResolveUrl'
 
         else:
-           return 'Acceso Denegado, Falta ResolveUrl' # ~ Cloudflare recaptcha
+           return 'Falta ResolveUrl'
 
     url = scrapertools.find_single_match(data, "get\('(/pass_md5/[^']+)")
     if url:
@@ -134,7 +138,7 @@ def get_video_url(page_url, url_referer=''):
 
                     page_url = ini_page_url
 
-                    return 'No se pudo Reproducir el Vídeo con ResolveUrl'
+                    return 'ResolveUrl No se pudo Reproducir el Vídeo'
 
                 except:
                    import traceback
@@ -144,8 +148,12 @@ def get_video_url(page_url, url_referer=''):
                        trace = traceback.format_exc()
                        if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                            return 'Archivo inexistente ó eliminado'
+
                        elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                            return 'Fichero sin link al vídeo ó restringido'
+
+                   elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                       return 'Archivo inexistente'
 
                    elif '<urlopen error' in traceback.format_exc():
                        return 'No se puede establecer la conexión'
@@ -153,15 +161,14 @@ def get_video_url(page_url, url_referer=''):
                    return 'Sin Respuesta ResolveUrl'
 
             else:
-               return 'Acceso Denegado (2do.), Falta ResolveUrl' # ~ Cloudflare recaptcha
+               return 'Falta ResolveUrl'
 
-        token = scrapertools.find_single_match(data, '"?token=([^"&]+)')
-        if not token: return video_urls
+        token = scrapertools.find_single_match(data2, '"?token=([^"&]+)')
+        if not token:
+            a = ''.join([random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') for i in range(10)])
+            a += '?token=' + token + '&expiry=' + str(int(time.time()*1000))
 
-        a = ''.join([random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789') for i in range(10)])
-        a += '?token=' + token + '&expiry=' + str(int(time.time()*1000))
-
-        video_urls.append(['mp4', data2 + a + '|Referer=%s' % page_url])
+            video_urls.append(['mp4', data2 + a + '|Referer=%s' % page_url])
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
@@ -187,7 +194,7 @@ def get_video_url(page_url, url_referer=''):
 
                 page_url = ini_page_url
 
-                return 'No se pudo Reproducir el Vídeo con ResolveUrl'
+                return 'ResolveUrl No se pudo Reproducir el Vídeo'
 
             except:
                import traceback
@@ -197,8 +204,12 @@ def get_video_url(page_url, url_referer=''):
                    trace = traceback.format_exc()
                    if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                        return 'Archivo inexistente ó eliminado'
+
                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                        return 'Fichero sin link al vídeo ó restringido'
+
+               elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                   return 'Archivo inexistente'
 
                elif '<urlopen error' in traceback.format_exc():
                    return 'No se puede establecer la conexión'
@@ -206,6 +217,6 @@ def get_video_url(page_url, url_referer=''):
                return 'Sin Respuesta ResolveUrl'
 
         else:
-           return 'Acceso Denegado (3ro.), Falta ResolveUrl' # ~ Cloudflare recaptcha
+           return 'Falta ResolveUrl'
 
     return video_urls

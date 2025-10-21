@@ -74,6 +74,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -235,6 +237,8 @@ def list_all(item):
             else:
                 thumb if "http" in thumb else "https:" + thumb
 
+            title = title.replace('[4K]', '[COLOR limegreen]4K[/COLOR]')
+
             itemlist.append(item.clone( action='findvideos', url=host[:-1] + url, title=title, thumbnail=thumb,
                                         contentType='movie', contentTitle=titulo, infoLabels={'year': "-"} ))
 
@@ -337,13 +341,17 @@ def list_last(item):
             elif "[" in title: titulo = title.split("[")[0]
             else: titulo = title
 
-            itemlist.append(item.clone( action='findvideos', url=host + url, title=title, contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))
+            title = title.replace('[4K]', '[COLOR limegreen]4K[/COLOR]')
+
+            itemlist.append(item.clone( action='findvideos', url=host + url, title=title,
+                                        contentType=item.search_type, contentTitle=titulo, infoLabels={'year': "-"} ))
         else:
             SerieName = corregir_SerieName(title)
 
             title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-            itemlist.append(item.clone( action='episodios', url=host + url, title=title, contentType=item.search_type, contentSerieName=SerieName, infoLabels={'year': "-"} ))
+            itemlist.append(item.clone( action='episodios', url=host + url, title=title,
+                                        contentType=item.search_type, contentSerieName=SerieName, infoLabels={'year': "-"} ))
 
     tmdb.set_infoLabels(itemlist)
 

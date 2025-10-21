@@ -3,6 +3,7 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
 
+
 import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; _dict = dict
@@ -20,6 +21,9 @@ list_quality_tvshow = []
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_A
 forced_proxy_opt = 'ProxySSL'
+
+######      No muestr fotos hay que cambiar x216 x217 
+######      Fallan fotos  https://familyporn.tv/contents/videos_screenshots/60000/60916/289x217/1.jpg
 
 canonical = {
              'channel': 'familypornTV', 
@@ -57,11 +61,11 @@ finds = {'find':  dict([('find', [{'tag': ['div'], 'id': ['list_videos_videos_li
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
          'profile_labels': {
-                            'list_all_thumbnail': {'find': [{'tag': ['img'], '@ARG': 'data-webp'}]}, 
-                            'list_all_canal': dict([('find', [{'tag': ['a'], 'class': ['site']}]),
-                                                    ('get_text', [{'tag': '', 'strip': True}])]), # FALTA incluir en AH External Labels
-                            'section_cantidad': dict([('find', [{'tag': ['span', 'div'], 'class': ['videos', 'thumb_string']}]),
-                                                      ('get_text', [{'tag': '', 'strip': True, '@TEXT': '(\d+)'}])])
+                            # 'list_all_thumbnail': {'find': [{'tag': ['img'], '@ARG': 'data-webp'}]}, 
+                            # 'list_all_canal': dict([('find', [{'tag': ['a'], 'class': ['site']}]),
+                                                    # ('get_text', [{'tag': '', 'strip': True}])]), # FALTA incluir en AH External Labels
+                            # 'section_cantidad': dict([('find', [{'tag': ['span', 'div'], 'class': ['videos', 'thumb_string']}]),
+                                                      # ('get_text', [{'tag': '', 'strip': True, '@TEXT': '(\d+)'}])])
                             },
          'controls': {'url_base64': False, 'cnt_tot': 24, 'reverse': False, 'profile': 'default'},  ##'jump_page': True, ##Con last_page  aparecerá una línea por encima de la de control de página, permitiéndote saltar a la página que quieras
          'timeout': timeout}
@@ -126,7 +130,10 @@ def list_all_matches(item, matches_int, **AHkwargs):
             elem_json['thumbnail'] = elem.img.get('data-thumb_url', '') or elem.img.get('data-original', '') \
                                      or elem.img.get('data-src', '') \
                                      or elem.img.get('src', '')
+            logger.debug(elem_json['thumbnail'])
             elem_json['thumbnail'] = elem_json['thumbnail'].replace('x216', 'x217')## ESTA LINEA OBLIGA list_all_matches
+            # elem_json['thumbnail'] += "|Referer=%s" % host
+            # elem_json['thumbnail'] += "|verifypeer=false"
             elem_json['stime'] = elem.find(class_='duration').get_text(strip=True) if elem.find(class_='duration') else ''
             if elem.find('span', class_=['hd-thumbnail', 'is-hd']):
                 elem_json['quality'] = elem.find('span', class_=['hd-thumbnail', 'is-hd']).get_text(strip=True)

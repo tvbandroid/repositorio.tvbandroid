@@ -3,7 +3,7 @@
   "name": "Mega1Link",
   "thumbnail": "mega1link.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["all", "movie", "tvshow"],
@@ -13,5 +13,5 @@
 
   "clusters": ["torrents", "languages", "qualityes", "kids", "docs", "vos"],
 
-  "notes": "Canal con enlaces Streaming y Torrent. Películas por idiomas, géneros y calidad. Series por Géneros."
+  "notes": "Web CERRADA. Canal con enlaces Streaming y Torrent. Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://fhd.seriesturcastv.to/'
+host = 'https://tbg.seriesturcastv.to/'
 
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://fhd.seriesturcastv.to/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/ano/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -285,6 +291,7 @@ def findvideos(item):
         elif '/fembuki.' in url:continue
         elif '/esprinahy.' in url: continue
         elif '/argtesa.' in url: continue
+        elif '/aporodiko.' in url: continue
 
         url = url.replace('/netusia.xyz/', '/waaw.to/')
 
@@ -319,13 +326,17 @@ def play(item):
 
         url = scrapertools.find_single_match(data, 'data-hash="(.*?)"')
 
+    if '.turboviplay.' in url: url = ''
+
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 

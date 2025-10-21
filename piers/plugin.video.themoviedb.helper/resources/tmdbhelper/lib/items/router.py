@@ -1,23 +1,36 @@
-from urllib.parse import unquote_plus
+from tmdbhelper.lib.addon.logger import kodi_log
 from jurialmunkey.parser import parse_paramstring, reconfigure_legacy_params
+
+""" Lazyimports
+from tmdbhelper.lib.player.players import Players
+from tmdbhelper.lib.api.tmdb.api import TMDb
+from tmdbhelper.lib.script.method import related_lists
+from tmdbhelper.lib.items.routes import get_container
+"""
 
 
 class Router():
     def __init__(self, handle, paramstring):
         # plugin:// params configuration
         self.handle = handle  # plugin:// handle
-        self.paramstring, *secondary_params = paramstring.split('&&')  # plugin://plugin.video.themoviedb.helper?paramstring
+        self.paramstring = paramstring  # plugin://plugin.video.themoviedb.helper?paramstring
         self.params = reconfigure_legacy_params(**parse_paramstring(self.paramstring))  # paramstring dictionary
-        self.params.update(self.configure_paths(secondary_params))
-
-    def configure_paths(self, secondary_params):
-        paths = [unquote_plus(self.params.pop(k)) for k in tuple(self.params.keys()) if k.startswith('paths')]
-        paths.extend([unquote_plus(i) for i in secondary_params])
-        return {'paths': paths} if paths else {}
 
     def play_external(self):
-        from tmdbhelper.lib.player.method.play import play_external
-        play_external(handle=self.handle if self.handle != -1 else None, **self.params)
+        from tmdbhelper.lib.player.players import Players
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        kodi_log(['lib.container.router - Attempting to play item\n', self.params], 1)
+        if not self.params.get('tmdb_id'):
+            self.params['tmdb_id'] = TMDb().get_tmdb_id(**self.params)
+        Players(**self.params).play(handle=self.handle if self.handle != -1 else None)
+
+    def context_related(self):
+        from tmdbhelper.lib.script.method import related_lists
+        from tmdbhelper.lib.api.tmdb.api import TMDb
+        if not self.params.get('tmdb_id'):
+            self.params['tmdb_id'] = TMDb().get_tmdb_id(**self.params)
+        self.params['container_update'] = True
+        related_lists(include_play=True, **self.params)
 
     def get_directory(self, items_only=False, build_items=True):
         from tmdbhelper.lib.items.routes import get_container
@@ -28,4 +41,6 @@ class Router():
     def run(self):
         if self.params.get('info') == 'play':
             return self.play_external()
+        if self.params.get('info') == 'related':
+            return self.context_related()
         self.get_directory()

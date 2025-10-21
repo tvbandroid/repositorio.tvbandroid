@@ -1,6 +1,6 @@
 import re
 import random
-from tmdbhelper.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type
+from tmdbhelper.lib.addon.plugin import PLUGINPATH, convert_type, convert_trakt_type, get_setting
 from jurialmunkey.parser import try_int, try_str, del_empty_keys, get_params, partition_list
 from tmdbhelper.lib.addon.tmdate import date_in_range
 from tmdbhelper.lib.items.filters import is_excluded
@@ -31,6 +31,8 @@ def _sort_itemlist(items, sort_by=None, sort_how=None, trakt_type=None):
         return sorted(items, key=lambda i: _item_lambda_parent(i, sort_key) or sort_fallback, reverse=sort_reverse)
 
     def _sort_lambda_ignore(items, sort_key: str, sort_fallback=None, sort_reverse=False):
+        if not get_setting('trakt_sortignorearticle'):
+            return _sort_lambda_parent(items, sort_key, sort_fallback, sort_reverse)
         return sorted(items, key=lambda i: re.sub(REGEX_DEFARTICLE, '', _item_lambda_parent(i, sort_key) or sort_fallback), reverse=sort_reverse)
 
     def _sort_lambda_max_of(items, sort_keys: list, sort_fallback=None, sort_reverse=False):
@@ -110,16 +112,12 @@ def _get_item_infolabels(item, item_type=None, infolabels=None, show=None):
 def _get_item_infoproperties(item, item_type=None, infoproperties=None, show=None, main=None):
     infoproperties = infoproperties or {}
     infoproperties['tmdb_type'] = convert_trakt_type(item_type)
-
-    def _set_main_infoproperties():
-        if not main:
-            return
-        for k, v in main.items():
-            if v is None or not isinstance(v, (str, int, float,)):
-                continue
-            infoproperties[f'trakt_{k}'] = f'{v}'
-
-    _set_main_infoproperties()
+    for k, v in (main or []).items():
+        if v is None:
+            continue
+        if not isinstance(v, (str, int, float,)):
+            continue
+        infoproperties[f'trakt_{k}'] = f'{v}'
     return del_empty_keys(infoproperties)
 
 

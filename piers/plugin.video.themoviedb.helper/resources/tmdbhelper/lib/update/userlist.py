@@ -1,37 +1,18 @@
-from xbmc import executebuiltin
 from xbmcgui import Dialog
-from tmdbhelper.lib.items.directories.mdblist.lists_lists import ListMDbListListsUser
-from tmdbhelper.lib.items.directories.trakt.lists_static import ListTraktStaticOwned, ListTraktStaticLiked
 from tmdbhelper.lib.addon.dialog import BusyDialog
 from tmdbhelper.lib.addon.plugin import get_setting, get_localized, set_setting
 from tmdbhelper.lib.update.library import add_to_library
 from tmdbhelper.lib.update.update import get_userlist
+from tmdbhelper.lib.api.trakt.api import TraktAPI
 from tmdbhelper.lib.addon.logger import kodi_log
 
 
 def get_monitor_userlists(list_slugs=None, user_slugs=None):
     saved_lists = list_slugs or get_setting('monitor_userlist', 'str') or ''
     saved_users = user_slugs or get_setting('monitor_userslug', 'str') or ''
-    if not saved_lists or not saved_users:
-        return []
     saved_lists = saved_lists.split(' | ') or []
     saved_users = saved_users.split(' | ') or []
-    return [(i, saved_users[x]) for x, i in enumerate(saved_lists) if i]
-
-
-def get_mdblist_lists():
-
-    def get_formatted_mdblist_item(i):
-        i['params']['user_slug'] = '__api_mdblist__'
-        i['params']['list_slug'] = str(i['params'].get('list_id'))
-        i['label'] = f'MDbList: {i.get("label")}'
-        return i
-
-    return [
-        get_formatted_mdblist_item(i)
-        for i in ListMDbListListsUser(-1, '').get_items() or []
-        if i and 'params' in i
-    ] if get_setting('mdblist_apikey', 'str') else []
+    return [(i, saved_users[x]) for x, i in enumerate(saved_lists)]
 
 
 def monitor_userlist():
@@ -42,11 +23,8 @@ def monitor_userlist():
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/movies'}},
             {'label': f'{get_localized(32193)} {get_localized(20343)}',
                 'params': {'user_slug': 'me', 'list_slug': 'watchlist/shows'}}]
-
-        user_lists += ListTraktStaticOwned(-1, '').get_items(tmdb_type='both') or []
-        user_lists += ListTraktStaticLiked(-1, '').get_items(tmdb_type='both') or []
-        user_lists += get_mdblist_lists()
-
+        user_lists += TraktAPI().get_list_of_lists('users/me/lists', authorize=True, next_page=False) or []
+        user_lists += TraktAPI().get_list_of_lists('users/likes/lists', authorize=True, next_page=False) or []
         saved_lists = get_monitor_userlists()
         dialog_list = [i['label'] for i in user_lists]
         preselected = [
@@ -83,9 +61,6 @@ def monitor_userlist():
 def library_autoupdate(list_slugs=None, user_slugs=None, busy_spinner=False, force=False):
     kodi_log(u'UPDATING LIBRARY', 1)
     Dialog().notification('TMDbHelper', f'{get_localized(32167)}...')
-
-    # Clean library if forcing to make sure dead entries removed
-    executebuiltin('CleanLibrary("video")', True) if force else None
 
     # Update library from Trakt lists
     library_adder = None

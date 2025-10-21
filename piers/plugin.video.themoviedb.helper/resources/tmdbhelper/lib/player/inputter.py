@@ -2,12 +2,12 @@
 from xbmc import Monitor
 from tmdbhelper.lib.api.kodi.rpc import get_jsonrpc
 from tmdbhelper.lib.addon.plugin import get_condvisibility
-from tmdbhelper.lib.addon.thread import SafeThread
+from threading import Thread
 
 
-class KeyboardInputter(SafeThread):
+class KeyboardInputter(Thread):
     def __init__(self, action=None, text=None, timeout=300):
-        SafeThread.__init__(self)
+        Thread.__init__(self)
         self.text = text
         self.action = action
         self.exit = False

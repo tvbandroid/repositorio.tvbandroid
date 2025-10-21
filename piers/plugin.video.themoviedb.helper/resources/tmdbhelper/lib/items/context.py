@@ -1,6 +1,3 @@
-# Module: default
-# Author: jurialmunkey
-# License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 from tmdbhelper.lib.addon.plugin import get_setting
 
 
@@ -16,16 +13,17 @@ CONTEXT_MENU_ITEMS = {
     '$ADDON[plugin.video.themoviedb.helper 32295]': {
         'command': 'RunScript(plugin.video.themoviedb.helper,sync_trakt,{})',
         'setting': 'contextmenu_sync_trakt',
-        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
-        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
-        'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
-    },
-    # TMDb User Options
-    '$ADDON[plugin.video.themoviedb.helper 32522]': {
-        'command': 'RunScript(plugin.video.themoviedb.helper,sync_tmdb,{})',
-        'setting': 'contextmenu_sync_tmdb',
         'episode': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
         'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
+    },
+    # Manage Artwork
+    '$ADDON[plugin.video.themoviedb.helper 32222]': {
+        'command': 'RunScript(plugin.video.themoviedb.helper,manage_artwork,{})',
+        'setting': 'contextmenu_manage_artwork',
+        'movie': {'tmdb_type': 'movie', 'tmdb_id': '{tmdb_id}'},
+        'tvshow': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}'},
+        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
+        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'}
     },
     # Refresh Details
     '$ADDON[plugin.video.themoviedb.helper 32233]': {
@@ -34,15 +32,6 @@ CONTEXT_MENU_ITEMS = {
         'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
         'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
         'other': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'}
-    },
-    # Modify Artwork
-    '$ADDON[plugin.video.themoviedb.helper 32118]': {
-        'command': 'RunScript(plugin.video.themoviedb.helper,modify_artwork,{})',
-        'setting': 'contextmenu_modify_artwork',
-        'movie': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'},
-        'tvshow': {'tmdb_type': '{tmdb_type}', 'tmdb_id': '{tmdb_id}'},
-        'episode': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}', 'episode': '{episode}'},
-        'season': {'tmdb_type': 'tv', 'tmdb_id': '{tmdb_id}', 'season': '{season}'},
     },
     # Add to Library
     '$LOCALIZE[20444]': {

@@ -2728,7 +2728,7 @@ provider-name="jurialmunkey">
 	</extension>
 </addon>
 
-<addon id="repository.dregs" name="[COLOR red]Dr[/COLOR]e[COLOR black]Gs[/COLOR] [COLORcyan]Repository[/COLOR]" version="1.22" provider-name="Black Eagle">
+<addon id="repository.dregs" name="[COLOR red]Dr[/COLOR]e[COLOR black]Gs[/COLOR] [COLORcyan]Repository[/COLOR]" version="2.36" provider-name="[COLORchocolate]@by_black[COLORgold]_eagle[/COLOR]">
   <requires>
     <import addon="xbmc.addon" version="12.0.0"/>
   </requires>
@@ -2739,6 +2739,18 @@ provider-name="jurialmunkey">
     <datadir zip="true">https://raw.github.com/dregs1/dregs1.github.io/master</datadir>
     <hashes>false</hashes>
 </dir>
+<dir minversion="29.9.9">
+      <info compressed="true">https://raw.github.com/dregs1/dregs1.github.io/master/piers/addons.xml</info>
+      <checksum>https://raw.github.com/dregs1/dregs1.github.io/master/piers/addons.xml.md5</checksum>
+      <datadir zip="true">https://raw.github.com/dregs1/dregs1.github.io/master/piers</datadir>
+      <hashes>false</hashes>
+  </dir>
+<dir minversion="20.0.0">
+      <info compressed="true">https://raw.github.com/dregs1/dregs1.github.io/master/omega/addons.xml</info>
+      <checksum>https://raw.github.com/dregs1/dregs1.github.io/master/omega/addons.xml.md5</checksum>
+      <datadir zip="true">https://raw.github.com/dregs1/dregs1.github.io/master/omega</datadir>
+      <hashes>false</hashes>
+  </dir>
   <dir minversion="19.9.9">
       <info compressed="true">https://raw.github.com/dregs1/dregs1.github.io/master/nexus/addons.xml</info>
       <checksum>https://raw.github.com/dregs1/dregs1.github.io/master/nexus/addons.xml.md5</checksum>
@@ -3214,30 +3226,6 @@ provider-name="jurialmunkey">
 		<summary lang="en">White Weather Icons</summary>
 		<description lang="en">White Weather Icons</description>
 		<platform>all</platform>
-	</extension>
-</addon>
-
-<addon id="script.colorbox" name="colorbox Script" version="3.0.0" provider-name="BADMS, Angelinas">
-	<requires>
-		<import addon="xbmc.python" version="3.0.0"/>
-		<import addon="script.module.simplejson" version="2.0.10"/>
-	</requires>
-    <extension point="xbmc.python.script" library="default.py">
-        <provides>executable</provides>
-    </extension>
-	<extension point="xbmc.addon.metadata">
-	    <summary lang="en_GB">Image manipulator and colour matching tools</summary>
-		<description lang="en_GB">Provides image tools for skinners</description>
-		<platform>all</platform>
-		<license>GNU GENERAL PUBLIC LICENSE Version 2, June 1991</license>
-		<forum>http://forum.kodi.tv/</forum>
-		<source>https://github.com/BADMS/script.colorbox</source>
-		<email>philipkdick@gmail.com</email>
-		<assets>
-			<icon>resources/icon.png</icon>
-			<fanart>resources/fanart.jpg</fanart>
-			<screenshot>resources/fanart.jpg</screenshot>
-		</assets>
 	</extension>
 </addon>
 

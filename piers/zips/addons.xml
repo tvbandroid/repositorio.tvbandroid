@@ -2232,9 +2232,9 @@ provider-name="jurialmunkey">
   </requires>
   <extension
     point="kodi.pvrclient"
-    library_osx="pvr.iptvsimple.22.5.2.dylib"/>
+    library_windows="pvr.iptvsimple.dll"/>
   <extension point="xbmc.addon.metadata">
-    <platform>osx-arm64</platform>
+    <platform>windows-x86_64</platform>
     <license>GPL-2.0-or-later</license>
     <source>https://github.com/kodi-pvr/pvr.iptvsimple</source>
     <forum>https://forum.kodi.tv/forumdisplay.php?fid=215</forum>

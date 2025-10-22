@@ -1,0 +1,17 @@
+{
+  "id": "redhard",
+  "name": "RedHard",
+  "thumbnail": "redhard.jpg",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["classic", "lasts", "vos", "bibles"],
+
+  "notes": "Web ANULADA. Películas y Series. Con temas bíblicos."
+}

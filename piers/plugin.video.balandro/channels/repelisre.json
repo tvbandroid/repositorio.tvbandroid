@@ -1,0 +1,18 @@
+{
+  "id": "repelisre",
+  "name": "RePelisRe",
+  "thumbnail": "repelisre.jpg",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow", "torrent"],
+  "language": ["cast", "lat", "vose"],
+
+  "clusters": ["kids", "docs", "vos"],
+
+  "notes": "Web ANULADA. Canal con enlaces Streaming y Torrent. Películas por géneros."
+
+}

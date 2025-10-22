@@ -1,0 +1,17 @@
+{
+  "id": "nextdede",
+  "name": "NextDede",
+  "thumbnail": "nextdede.jpg",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast", "lat", "vose", "vo"],
+
+  "clusters": ["news", "rankings", "years", "lists", "lasts", "kids", "docs", "vos"],
+
+  "notes": "Web ANULADA. Películas por géneros. Series por Géneros."
+}

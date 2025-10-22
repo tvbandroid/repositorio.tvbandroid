@@ -1,0 +1,17 @@
+{
+  "id": "yaskeorg",
+  "name": "YaskeOrg",
+  "thumbnail": "yaskeorg.jpg",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["lat"],
+
+  "clusters": ["notice", "kids"],
+
+  "notes": "Web CERRADA. Películas por géneros."
+}

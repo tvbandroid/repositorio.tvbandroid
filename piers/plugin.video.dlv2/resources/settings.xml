@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="Settings">
+	    <setting id="autoplay" type="bool" label="Enable Autoplay. Plays the first player link automatically. Disable if links don't work to attempt optional players." default="false" />
+	    <setting id="timeshift" type="bool" label="Enable Timeshift. Allows pause and rewind but uses a lot of storage.  Disable if you have low storage on your device" default="false" />
+		<setting id="adult_pw" type="text" label="Adult Channels Password" default="Enter Here!" />
+    </category>
+</settings>

@@ -3596,20 +3596,15 @@ v1.1.25
     </extension>
 </addon>
 
-<addon id="script.youtube.api.autousb" version="1.0.0" name="YouTube API AutoUSB" provider-name="TJoseATeba">
-    <requires>
-       <extension point="xbmc.python.script" library="default.py" />
-       <extension point="xbmc.addon.metadata">
-	</requires>
-
-    <summary lang="es">Instala claves API de YouTube desde USB automáticamente</summary>
-        <description lang="es">Busca api_keys.json en memorias USB, OTG o almacenamiento Local y configura el addon oficial de YouTube.</description>
-		<disclaimer lang="es">[COLOR tan][B]Creado por [COLOR azure]JoseATeb [COLOR tan]y Protegido por los Derechos del Autor.[/B][/COLOR]</disclaimer>
+<addon id="script.youtube.api.autousb"
+       name="YouTube API Auto USB Instalar (N: soporte)"
+       version="4.0.1"
+       provider-name="JoseATeba">
+    <extension point="xbmc.python.script" library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary>Instala API Keys desde USB (busca N:\ and others)</summary>
+        <description>Busca api_keys.json o apikeys.json en unidades externas (incluye N:\) y los instala en YouTube.</description>
         <platform>all</platform>
-    <assets>
-	    <icon>icon.png</icon>
-        <fanart>fanart.jpg</fanart>
-	</assets>
     </extension>
 </addon>
 

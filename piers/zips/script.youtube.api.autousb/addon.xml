@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.youtube.api.autousb"
+       name="YouTube API Auto USB Instalar (N: soporte)"
+       version="4.0.1"
+       provider-name="JoseATeba">
+    <extension point="xbmc.python.script" library="default.py"/>
+    <extension point="xbmc.addon.metadata">
+        <summary>Instala API Keys desde USB (busca N:\ and others)</summary>
+        <description>Busca api_keys.json o apikeys.json en unidades externas (incluye N:\) y los instala en YouTube.</description>
+        <platform>all</platform>
+    </extension>
+</addon>

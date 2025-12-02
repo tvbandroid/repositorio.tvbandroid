@@ -2482,7 +2482,7 @@ provider-name="jurialmunkey">
   </extension>
 </addon>
 
-<addon id="repository.acestream-channels" name="[COLOR FF00FFFF]Gunter25 Addons[/COLOR]" version="1.2.0" provider-name="Gunter25">
+<addon id="repository.acestream-channels" name="[COLOR FF00FFFF]Gunter25 Addons[/COLOR]" version="1.2.3" provider-name="Gunter25">
     <extension point="xbmc.addon.repository" name="Gunter25 Addons">
         <dir>
             <info compressed="false">https://gunter257.github.io/repoachannels/addons.xml</info>

@@ -24,7 +24,8 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, le damos unos mi
 [COLOR white][B]¤ [COLOR orange]NUEVOS  Reparos.[/B][/COLOR].
 [COLOR white][B]¤ [COLOR orange]Quitado [COLOR plum]Cine KinKi[/COLOR] Por problemas.
 
-[COLOR white][B]* PARCHE NUEVO[COLOR gold]PALANTIR [COLOR khaki]N.15 [COLOR white]del 2 de Diciembre [COLOR gold]!!![/B][/COLOR]
+
+[COLOR white][B]* PARCHE NUEVO[COLOR gold]PALANTIR [COLOR khaki]D.2 [COLOR white]del 2 de Diciembre [COLOR gold]!!![/B][/COLOR]
 [COLOR white][B]-[COLOR tan] Nuevos Reparos[/B][/COLOR]
 
 [COLOR white][B]* PARCHE ORIGINAL[COLOR gold]PALANTIR [COLOR khaki]f.16[/B][/COLOR]

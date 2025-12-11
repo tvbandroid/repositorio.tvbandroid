@@ -770,7 +770,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.acestream_channels" version="1.2.4" name="AceStream Channels" provider-name="Gunter25">
+<addon id="plugin.video.acestream_channels" version="1.2.3" name="AceStream Channels" provider-name="Gunter25">
     <extension point="xbmc.python.pluginsource" library="addon.py">
         <provides>video</provides>
     </extension>
@@ -1820,7 +1820,7 @@ provider-name="ElSupremo">
   </extension>
 </addon>
 
-<addon id="plugin.video.palantir3" name="[COLOR gold]Palantir 3[/COLOR]" version="3.3.8" provider-name="The Lords Of Flix">
+<addon id="plugin.video.palantir3" name="[COLOR gold]Palantir 3[/COLOR]" version="3.3.3" provider-name="The Lords Of Flix">
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
     <import addon="script.module.inputstreamhelper" version="0.5.0"/>
@@ -1854,7 +1854,7 @@ provider-name="ElSupremo">
         <screenshot>resources/media/Captura3.png</screenshot>
         <screenshot>resources/media/Captura4.png</screenshot>
     </assets>
-    <forum>https://matrix.to/#/#palantir-3:matrix.org</forum>
+    <forum>https://t.me/addon_palantir</forum>
   </extension>
 </addon>
 
@@ -2482,7 +2482,7 @@ provider-name="jurialmunkey">
   </extension>
 </addon>
 
-<addon id="repository.acestream-channels" name="[COLOR FF00FFFF]Gunter25 Addons[/COLOR]" version="1.2.3" provider-name="Gunter25">
+<addon id="repository.acestream-channels" name="[COLOR FF00FFFF]Gunter25 Addons[/COLOR]" version="1.2.0" provider-name="Gunter25">
     <extension point="xbmc.addon.repository" name="Gunter25 Addons">
         <dir>
             <info compressed="false">https://gunter257.github.io/repoachannels/addons.xml</info>

@@ -29,7 +29,7 @@ except ImportError:
 
 from resources.libs.common.config import CONFIG
 
-DEFAULT_SKINS = ['skin.auramod.andtvban', 'skin.estuary', 'skin.estouchy']
+DEFAULT_SKINS = ['skin.estuary', 'skin.estouchy']
 
 
 def _get_old(old_key):
@@ -92,7 +92,7 @@ def skin_to_default(title):
     else:
         from resources.libs.common import logging
         logging.log('[COLOR {0}]{1}: Omitir el cambio de Skin [/COLOR]'.format(CONFIG.COLOR2, title))
-        return True
+        return False
 
 
 def look_and_feel_data(do='save'):

@@ -152,14 +152,7 @@ class Wizard:
                 if os.path.exists(os.path.join(CONFIG.USERDATA, '.enableall')):
                 	CONFIG.set_setting('enable_all', 'true')
 
-                self.dialog.notification(
-                    "[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]",
-                    "[B][COLOR darkkhaki]Actualización Instalada Correctamente![/COLOR]\n"
-                    "[B][COLOR white]TVBan se Cerrará Automáticamente.[/COLOR][/B]".format(CONFIG.COLOR2)
-                )
-
-                xbmc.sleep(4000)
-                #self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
+                self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
                 tools.kill_kodi(over=True)
             else:
                 from resources.libs.gui import window
@@ -221,14 +214,7 @@ class Wizard:
             installed = db.grab_addons(lib)
             db.addon_database(installed, 1, True)
 
-            self.dialog.notification(
-                    "[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]",
-                    "[B][COLOR darkkhaki]Actualización Instalada Correctamente![/COLOR]\n"
-                    "[B][COLOR white]TVBan se Cerrará Ahora Automáticamente.[/COLOR][/B]".format(CONFIG.COLOR2)
-                )
-
-            xbmc.sleep(4000)
-            #self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
+            self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
             tools.kill_kodi(over=True)
         else:
             logging.log_notify(CONFIG.ADDONTITLE,
@@ -329,14 +315,7 @@ class Wizard:
             installed = db.grab_addons(lib)
             db.addon_database(installed, 1, True)
 
-            self.dialog.notification(
-                    "[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]",
-                    "[B][COLOR darkkhaki]Actualización Instalada Correctamente![/COLOR]\n"
-                    "[B][COLOR white]TVBan se Cerrará Ahora Automáticamente.[/COLOR][/B]".format(CONFIG.COLOR2)
-                )
-
-            xbmc.sleep(4000)
-            #self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
+            self.dialog.ok(CONFIG.ADDONTITLE, "[COLOR {0}][B]Para guardar los cambios, ahora necesita Forzar el Cierre de Kodi.[/B] \n\nPresione [B]OK[/B] para Forzar el Cierre de Kodi.[/COLOR]".format(CONFIG.COLOR2))
             tools.kill_kodi(over=True)
             
             if test2:

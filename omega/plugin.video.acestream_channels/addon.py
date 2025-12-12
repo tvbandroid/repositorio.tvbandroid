@@ -51,17 +51,16 @@ COLOR_EVENT_DETAILS = "FFFFFFFF"
 SCRAPING_URL = "https://www.socialcreator.com/xupimarc2/?s=289267"
 
 # --- Configuración para la agenda (Con URL de respaldo) ---
-# MODIFICADO: Se ha cambiado la URL principal por la nueva con el sufijo /index.html
-# y se ha eliminado la URL de respaldo antigua que no funcionaba.
 AGENDA_URLS = [
-    "https://eventos-eight-dun.vercel.app/index.html", # Nueva URL principal
-    "https://eventos-uvl7.vercel.app/" # Dejamos esta como una posible URL de respaldo
+    "https://fr.4everproxy.com/direct/aHR0cHM6Ly9jaXJpYWNvLWxpYXJ0LnZlcmNlbC5hcHAv",
+    "https://eventos-uvl7.vercel.app/" 
 ]
 
 CHANGELOG = {
-    "1.2.4": [
-        "Añadida una nueva URL para la Agenda.",
+    "1.2.3": [
+        "Añadida una URL de respaldo para la Agenda en caso de que la URL principal no funcione.",
         "Mejoras en el manejo de errores de conexión para la sección Agenda.",
+	"Sección de ajustes configurada con opción de reproductor externo sin HOURS.",
     ],
 }
 
@@ -375,10 +374,7 @@ def raspar_desde_url_respaldo(url):
 
         for fila in tabla_eventos.find_all('tr')[1:]:
             columnas = fila.find_all('td')
-            # La tabla de respaldo tiene 6 columnas, como la nueva.
-            if len(columnas) >= 6: 
-                # El mapeo de columnas es: 
-                # [0] Día | [1] Hora | [2] Deporte | [3] Competición | [4] Partido | [5] Canales Acestream
+            if len(columnas) >= 6:
                 hora = columnas[1].text.strip()
                 deporte = columnas[2].text.strip()
                 competicion = columnas[3].text.strip()
@@ -392,7 +388,6 @@ def raspar_desde_url_respaldo(url):
                     canales.append({"name": nombre, "url": url_id})
                 
                 if canales:
-                    # Se combina Competición y Evento (Partido) para mostrar, como se hacía en la otra versión.
                     eventos.append({
                         "hora": hora,
                         "categoria": deporte,
@@ -406,22 +401,19 @@ def raspar_desde_url_respaldo(url):
     return eventos
 
 def obtener_eventos_desde_html():
-    # MODIFICADO: Usamos la URL principal (con index.html)
-    url_principal = AGENDA_URLS[0]
-    eventos = []
     try:
+        url_principal = AGENDA_URLS[0]
         try:
             timeout = int(ADDON.getSetting('scraping_timeout'))
         except (ValueError, TypeError):
             timeout = 10
         
         xbmc.log(f"[Acestream Channels] DEBUG: Usando timeout de {timeout} segundos para la agenda desde {url_principal}.", xbmc.LOGDEBUG)
-        
-        # Realizamos la petición a la URL que incluye explícitamente el index.html
-        response = requests.get(url_principal, timeout=timeout) 
+        response = requests.get(url_principal, timeout=timeout)
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, 'html.parser')
+        eventos = []
         tabla_eventos = soup.find('table')
         
         if not tabla_eventos:
@@ -429,45 +421,40 @@ def obtener_eventos_desde_html():
         else:
             for fila in tabla_eventos.find_all('tr')[1:]:
                 columnas = fila.find_all('td')
-                # La nueva estructura HTML tiene 6 columnas: Día, Hora, Deporte, Competición, Partido, Canales
-                if len(columnas) >= 6: 
-                    # El mapeo de columnas es: 
-                    # [0] Día | [1] Hora | [2] Deporte | [3] Competición | [4] Partido | [5] Canales Acestream
-                    hora = columnas[1].text.strip()
-                    deporte = columnas[2].text.strip()
-                    competicion = columnas[3].text.strip()
-                    evento = columnas[4].text.strip() # Esto es el 'Partido'
-                    canales_html = columnas[5].find_all('a')
+                if len(columnas) >= 5:
+                    hora = columnas[0].text.strip()
+                    deporte = columnas[1].text.strip()
+                    competicion = columnas[2].text.strip()
+                    evento = columnas[3].text.strip()
+                    canales_html = columnas[4].find_all('a')
                     canales = []
                     for canal in canales_html:
                         nombre = canal.text.strip()
                         url_id = canal.get('href').replace("acestream://", "")
                         canales.append({"name": nombre, "url": url_id})
                     if canales:
-                        # Combinamos Competicion y Partido, como se hacía originalmente con la URL de respaldo
-                        eventos.append({ 
+                        eventos.append({
                             "hora": hora,
                             "categoria": deporte,
-                            "evento": f"{competicion} - {evento}", 
+                            "evento": evento,
                             "enlaces": canales
                         })
             xbmc.log(f"[Acestream Channels] DEBUG: Se encontraron {len(eventos)} eventos en la agenda desde {url_principal}", xbmc.LOGDEBUG)
-        
         if eventos:
             return eventos
-
     except (requests.exceptions.RequestException, requests.exceptions.Timeout) as e:
         xbmc.log(f"[Acestream Channels] ERROR: Fallo al acceder a la URL principal {url_principal}: {e}", xbmc.LOGERROR)
     except Exception as e:
         xbmc.log(f"[Acestream Channels] ERROR: Error al procesar la URL principal {url_principal}: {e}", xbmc.LOGERROR)
 
-    # Si la URL principal falla, intentamos con la de respaldo.
-    if len(AGENDA_URLS) > 1:
+    try:
         url_respaldo = AGENDA_URLS[1]
         xbmc.log(f"[Acestream Channels] DEBUG: Intentando con la URL de respaldo: {url_respaldo}.", xbmc.LOGDEBUG)
         eventos = raspar_desde_url_respaldo(url_respaldo)
         if eventos:
             return eventos
+    except Exception as e:
+        xbmc.log(f"[Acestream Channels] ERROR: Fallo al acceder a la URL de respaldo {url_respaldo}: {e}", xbmc.LOGERROR)
 
     xbmcgui.Dialog().notification("Error AGENDA", "No se pudo acceder a ninguna URL de la agenda.", xbmcgui.NOTIFICATION_ERROR)
     return []

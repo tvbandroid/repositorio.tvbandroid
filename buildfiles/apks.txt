@@ -1,5 +1,13 @@
 name="[COLOR aqua]Yatse [COLOR lightseagreen]Kodi [COLOR white]Remote_11.6.0_Mod.Pro_arm-v7a[/COLOR]"
 section="no"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/Ace_Stream.apk"
+icon="https://tse1.mm.bing.net/th/id/OIP.8_ljsen8BzEUc11_CKV_bQHaBv?rs=1&pid=ImgDetMain&o=7&rm=3" 
+fanart="https://www.todoandroid.es/wp-content/uploads/2024/12/AceStream-840x560.png"
+adult="no"
+description="Yatse.Kodi.Remote_11.6.0_Mod.Pro"
+
+name="[COLOR aqua]Yatse [COLOR lightseagreen]Kodi [COLOR white]Remote_11.6.0_Mod.Pro_arm-v7a[/COLOR]"
+section="no"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/Yatse.Kodi.Remote_11.6.0_Mod.Pro_arm-v7a.apk"
 icon="https://i.imgur.com/4CJftb0.png" 
 fanart="https://i.imgur.com/8mzZuyL.jpg"

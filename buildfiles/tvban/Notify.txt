@@ -1,4 +1,4 @@
-73
+74
 |||
 
 [COLOR yellowgreen][B]¡¡¡ BIENVENIDOS A LA [COLOR azure]BUILD TVBAN [COLOR cyan]MATNEXON [COLOR tan]- ORIGINAL !!![B][/COLOR]
@@ -17,14 +17,16 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, le damos unos mi
 
 [COLOR tan]Para instalar un parche, deberemos seleccionar la Build que tengamos instalada, por ejemplo [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]- v1[COLOR tan], dentro veremos [B][COLOR white]el/os PARCHE/S[/B],[COLOR tan] por ejemplo: [B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1.1[/B] [COLOR tan]y damos a instalar.[/COLOR]
 
-[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE!! [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]D.8 [COLOR white]del 8 de Diciembre [COLOR gold]!!![/B][/COLOR]
-[COLOR white][B]¤ [COLOR orange]Felciitación[/B][/COLOR].
+[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE!! [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]Rey [COLOR white]del 2 de Enero [COLOR gold]!!![/B][/COLOR]
+[COLOR white][B]¤ [COLOR orange]Felciitación. Reparado: Peliculas Retro, Plataforma Series y Canales de TV, TV[/B][/COLOR].
 [COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE!! [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]D.3 [COLOR white]del 3 de Diciembre [COLOR gold]!!![/B][/COLOR]
 [COLOR white][B]¤ [COLOR orange]Reparado: Plataformas en Películas y Series.[/B] Nuevo acceso [COLOR dodgerblue]AceStreams [/COLOR].
 [COLOR white][B]**[COLOR gold] ANTERIOR [COLOR dodgerblue]PARCHE [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]J.2 [COLOR white]del 2 de Junio [COLOR gold]!!![/B][/COLOR]
 [COLOR white][B]¤ [COLOR orange]NUEVOS Películas,reparado Plataformas., Series:[/B][/COLOR] APPLE TV, DISNEY+, [COLOR blue]HBO MAX, [COLOR red]Netflix, [COLOR dodgerblue]Prime [COLOR white]Video[/COLOR].
 [COLOR white][B]¤ [COLOR orange]Quitado [COLOR plum]Cine KinKi[/COLOR] Por problemas.
 
+[COLOR white][B]* PARCHE NUEVO[COLOR gold]PALANTIR [COLOR khaki]Rey [COLOR white]del 2 de Enero [COLOR gold]!!![/B][/COLOR]
+[COLOR white][B]¤ [COLOR orange]Felciitación, Canales de TV, TV[/B][/COLOR].
 [COLOR white][B]* PARCHE NUEVO[COLOR gold]PALANTIR [COLOR khaki]D.8 [COLOR white]del 8 de Diciembre [COLOR gold]!!![/B][/COLOR]
 [COLOR white][B]* PARCHE ORIGINAL[COLOR gold]PALANTIR [COLOR khaki]f.16[/B][/COLOR]
 [COLOR orange]                   ****** [COLOR red]¡ATENCION!: [COLOR azure]SOLO PARA USUARIOS QUE USAN [COLOR gold]PALANTIR [COLOR orange]******                 [/COLOR] 

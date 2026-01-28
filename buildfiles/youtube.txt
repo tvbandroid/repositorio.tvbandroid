@@ -16,7 +16,7 @@ description="Scorpions."
 name="[B][COLOR green]Pink Floyd[/COLOR] [COLOR white]Delicate Sound of Thunder (1988 - Full HD Concert)[/COLOR][/B]"
 section="no"
 url="https://www.youtube.com/watch?v=jbiQKQj2YAM&list=RDjbiQKQj2YAM&start_radio=1"
-icon="https://i.ibb.co/v6qyj2Hc/PFC.jpg"
+icon="https://i.ibb.co/Myj4G1qy/PF.png"
 fanart="http://"
 description="Pink Floyd."
 

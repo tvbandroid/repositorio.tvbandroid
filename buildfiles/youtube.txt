@@ -1,7 +1,7 @@
 name="[B][COLOR white]HÉROES DEL SILENCIO [COLOR red]TOUR 2007[/COLOR][/B]"
 section="no"
 url="https://www.youtube.com/watch?v=sSrhUJk6szU"
-icon="https://i.ibb.co/zTKyDXGj/HDS.png"
+icon="https://i.ibb.co/2Q7dC7Q/HDSt.png"
 fanart="http://"
 description="HÉROES DEL SILENCIO."
 

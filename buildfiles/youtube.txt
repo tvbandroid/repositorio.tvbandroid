@@ -1,4 +1,12 @@
-name="[B][COLOR red]Scorpions[/COLOR] [COLOR white]Live At Hellfest 2015 (Full Concert)[/COLOR][/B]"Scorpions - 
+name="[B][COLOR white]HÉROES DEL SILENCIO [COLOR red]TOUR 2007[/COLOR][/B]"
+section="no"
+url="https://www.youtube.com/watch?v=sSrhUJk6szU"
+icon="https://i.ibb.co/zTKyDXGj/HDS.png"
+fanart="http://"
+description="HÉROES DEL SILENCIO."
+
+https://www.youtube.com/watch?v=sSrhUJk6szU
+name="[B][COLOR red]Scorpions[/COLOR] [COLOR white]Live At Hellfest 2015 (Full Concert)[/COLOR][/B]"
 section="no"
 url="https://www.youtube.com/watch?v=bSDeAdSi31A"
 icon="https://i.ibb.co/xq23gsDC/Scorpions.jpg"

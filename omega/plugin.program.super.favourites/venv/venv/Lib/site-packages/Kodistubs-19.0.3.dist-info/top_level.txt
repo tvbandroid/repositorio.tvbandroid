@@ -1,0 +1,6 @@
+xbmc
+xbmcaddon
+xbmcdrm
+xbmcgui
+xbmcplugin
+xbmcvfs

@@ -1,0 +1,37 @@
+import requests
+
+API = "https://api.pluto.tv/v2/channels"
+OUT = "pluto_all.m3u"
+
+headers = {
+    "User-Agent": "Mozilla/5.0"
+}
+
+data = requests.get(API, headers=headers).json()
+
+with open(OUT, "w", encoding="utf-8") as f:
+    f.write("#EXTM3U\n")
+
+    for ch in data:
+        name = ch.get("name", "Pluto TV")
+        slug = ch.get("slug", "")
+        number = ch.get("number", "")
+        group = ch.get("category", "Pluto TV")
+        logo = ch.get("colorLogoPNG", {}).get("path", "")
+
+        urls = ch.get("stitched", {}).get("urls", [])
+
+        for u in urls:
+            if u.get("type") == "hls":
+                stream = u.get("url")
+
+                f.write(
+                    f'#EXTINF:-1 tvg-id="{slug}" '
+                    f'tvg-name="{name}" '
+                    f'tvg-logo="{logo}" '
+                    f'tvg-chno="{number}" '
+                    f'group-title="{group}",{name}\n'
+                )
+                f.write(stream + "\n")
+
+print("Archivo creado: pluto_all.m3u")

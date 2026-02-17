@@ -837,7 +837,7 @@
 
 </addon>
 
-<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="16.2.26" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
+<addon id="plugin.program.tvbanwizard" name="[B][COLOR azure]TVBAN[/COLOR] [COLOR tan]WIZARD[/COLOR][/B]" version="17.2.26" provider-name="[B][COLOR azure]tvban, JoseaAnd[/COLOR][/B]">
     <requires>
         <import addon="xbmc.python" version="3.0.1" />
         <import addon="script.module.requests" />
@@ -867,6 +867,9 @@
 		<license>GNU GPL v3</license>
         <source>https://andtvban.github.io/tvban/</source>
 		<news>
+• [COLOR green]17/02/2026[/COLOR]
+- Arreglo
+
 • [COLOR darkorange]3/07/2024[/COLOR]
 - Nuevo color.
 

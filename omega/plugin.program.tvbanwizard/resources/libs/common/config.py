@@ -188,7 +188,7 @@ class Config:
                              os.path.join(self.HOME, 'cache'),
                              os.path.join(self.HOME, 'system'),
                              os.path.join(self.HOME, 'temp'),
-                             os.path.join(self.HOME, 'Mis_Builds'),
+                             os.path.join(self.HOME, 'mi_build'),
                              os.path.join(self.HOME, 'cdm'),
                              os.path.join(self.ADDONS, 'temp'),
                              os.path.join(self.ADDONS, 'packages'),
@@ -267,7 +267,7 @@ class Config:
 
         # Backup variables
         self.BACKUPLOCATION = xbmcvfs.translatePath(self.get_setting('path') if not self.get_setting('path') == '' else self.HOME)
-        self.MYBUILDS = os.path.join(self.BACKUPLOCATION, 'Mis_Builds')
+        self.MYBUILDS = os.path.join(self.BACKUPLOCATION, 'mi_build')
 
         # Logging variables
         self.DEBUGLEVEL = self.get_setting('debuglevel')

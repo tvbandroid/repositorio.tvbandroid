@@ -646,7 +646,7 @@ def proxy2_thread(name,iconImage,url_to_play):
 def proxy2_player(url,name,iconImage):
     xbmcplugin.endOfDirectory(handle, cacheToDisc=False)
     url_to_play = server.prepare_url(url)
-    infoDialog('ABRIENDO PROXY...',iconimage='INFO', time=6000)
+    infoDialog('ABRINDO PROXY...',iconimage='INFO', time=6000)
     server.mediaserver().start()
     t1 = threading.Thread(target=proxy2_thread, args=(name,iconImage,url_to_play))
     t1.start()
@@ -663,7 +663,7 @@ def proxy2_player(url,name,iconImage):
 @route
 def main():    
     xbmcplugin.setContent(handle, 'movies')
-    item({'name': 'MIS LISTAS DE REPRODUCCIÓN', 'action': 'myplaylists'})
+    item({'name': 'MINHAS PLAYLISTS', 'action': 'myplaylists'})
     item({'name': 'AJUSTES', 'action': 'settings'})
     xbmcplugin.endOfDirectory(handle)
     SetView('WideList') 
@@ -684,7 +684,7 @@ def myplaylists(param):
         xbmcplugin.endOfDirectory(handle)
         SetView('WideList')
     else:
-        infoDialog('SIN LISTA DE REPRODUCCIÓN AÑADIDA', iconimage='INFO')  
+        infoDialog('SEM PLAYLIST ADICIONADA', iconimage='INFO')  
 
 @route
 def settings(param):
@@ -733,7 +733,7 @@ def playitem(param):
         else:
             confirmation = True
             if ask == 'true':
-                index = dialog.select('Selecione un Jugador', ['[COLOR peachpuff]inputstream.ffmpegdirect[/COLOR]', '[COLOR darkkhaki]F4mProxy[/COLOR]', '[COLOR khaki]Proxy 2[/COLOR]'])
+                index = dialog.select('Selecione um player', ['inputstream.ffmpegdirect', 'F4mProxy', 'Proxy 2'])
                 if index >= 0:
                     player_type = index
                 else:

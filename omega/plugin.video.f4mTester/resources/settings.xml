@@ -12,7 +12,7 @@
 	<setting label="LISTA 10" id="lista10" type="text" default=""/>	
 </category>
 <category label="PLAYER">
-	<setting label="TIPO DE JUDADOR" id="player_type" type="enum" values="inputstream.ffmpegdirect|F4mProxy|Proxy 2" default="1" />
+	<setting label="TIPO DE PLAYER" id="player_type" type="enum" values="inputstream.ffmpegdirect|F4mProxy|Proxy 2" default="1" />
 	<setting label="PERGUNTAR?" id="ask" type="bool" default="false" />
 </category>
 </settings>

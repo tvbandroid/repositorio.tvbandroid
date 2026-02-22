@@ -6,7 +6,7 @@ fanart="https://www.todoandroid.es/wp-content/uploads/2024/12/AceStream-840x560.
 adult="no"
 description="AceStream-3.1.80.0_armv8_64"
 
-name="[COLOR white]RBTV[COLOR orange]+ [COLOR white]-[COLOR steelblue]3.0.314[/COLOR]"
+name="[COLOR white]RBTV[COLOR orange]+ [COLOR white]-[COLOR white]3.0.314[/COLOR]"
 section="no"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/0.1/RBTV+_3.0.314.apk"
 icon="https://i.imgur.com/YFfUb6a.png" 

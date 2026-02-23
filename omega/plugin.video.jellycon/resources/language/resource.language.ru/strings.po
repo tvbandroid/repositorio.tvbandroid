@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-05-03 23:28+0000\n"
-"Last-Translator: Mikhail Arkhipov <arkhipov.ms@gmail.com>\n"
+"PO-Revision-Date: 2025-12-23 08:05+0000\n"
+"Last-Translator: Gallyam Biktashev <gallyamb@gmail.com>\n"
 "Language-Team: Russian <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/ru/>\n"
 "Language: ru\n"
@@ -10,7 +10,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.4.2\n"
+"X-Generator: Weblate 5.14\n"
 
 msgctxt "#30332"
 msgid "Stop media playback on screensaver activation"
@@ -345,11 +345,11 @@ msgstr "Фильмы - Недавно добавленные"
 
 msgctxt "#30299"
 msgid "Cache Images"
-msgstr "Кэшировать рисунки"
+msgstr "Кэшировать изображения"
 
 msgctxt "#30293"
 msgid "Cache images"
-msgstr "Кэшировать рисунки"
+msgstr "Кэшировать изображения"
 
 msgctxt "#30288"
 msgid " - Latest"
@@ -1155,3 +1155,75 @@ msgstr "Далее Повторный просмотр"
 msgctxt "#30451"
 msgid "Rewatch Days (0 = Disabled)"
 msgstr "Дни повторного просмотра (0 = отключено)"
+
+msgctxt "#30454"
+msgid " - Totally Unwatched"
+msgstr " Общее непросмотренное"
+
+msgctxt "#30672"
+msgid "Skip"
+msgstr "Пропустить"
+
+msgctxt "#30667"
+msgid "Action to take"
+msgstr "Действие для выполнения"
+
+msgctxt "#30668"
+msgid "Start Offset (seconds)"
+msgstr "Начальное смещение (в секундах)"
+
+msgctxt "#30669"
+msgid "End Offset (seconds)"
+msgstr "Конечное смещение (в секундах)"
+
+msgctxt "#30666"
+msgid "Segment Skipper"
+msgstr "Пропуск сегментов"
+
+msgctxt "#30673"
+msgid "Ask"
+msgstr "Спросить"
+
+msgctxt "#30674"
+msgid "Do Nothing"
+msgstr "Ничего не делать"
+
+msgctxt "#30670"
+msgid "Intro Skipper"
+msgstr "Пропуск вступления"
+
+msgctxt "#30671"
+msgid "Credit Skipper"
+msgstr "Пропуск титров"
+
+msgctxt "#30675"
+msgid "Commercial Skipper"
+msgstr "Пропуск рекламы"
+
+msgctxt "#30676"
+msgid "Preview Skipper"
+msgstr "Пропуск обзора"
+
+msgctxt "#30677"
+msgid "Recap Skipper"
+msgstr "Пропуск повтора"
+
+msgctxt "#30455"
+msgid "TV Shows - Random"
+msgstr "Телешоу - случайно"
+
+msgctxt "#30456"
+msgid "All - Random"
+msgstr "Всё - случайно"
+
+msgctxt "#30457"
+msgid "All - Recently Added"
+msgstr "Всё - недавно добавленные"
+
+msgctxt "#30458"
+msgid "All - Favorites"
+msgstr "Всё - избранное"
+
+msgctxt "#30678"
+msgid "TV Shows per page"
+msgstr "Телешоу на странице"

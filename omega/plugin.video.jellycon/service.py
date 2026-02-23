@@ -11,7 +11,7 @@ import xbmcgui
 from resources.lib.lazylogger import LazyLogger
 from resources.lib.play_utils import Service, PlaybackService, send_progress
 from resources.lib.kodi_utils import HomeWindow
-from resources.lib.widgets import set_background_image, set_random_movies
+from resources.lib.widgets import set_background_image, set_random_movies, set_random_tvshows, set_random_all
 from resources.lib.websocket_client import WebSocketClient
 from resources.lib.menu_functions import set_library_window_values
 from resources.lib.server_detect import check_server, check_connection_speed
@@ -20,6 +20,7 @@ from resources.lib.datamanager import clear_old_cache_data
 from resources.lib.tracking import set_timing_enabled
 from resources.lib.image_server import HttpImageServerThread
 from resources.lib.playnext import PlayNextService
+from resources.lib.intro_skipper import IntroSkipperService
 
 settings = xbmcaddon.Addon()
 
@@ -63,6 +64,8 @@ last_progress_update = time.time()
 last_content_check = time.time()
 last_background_update = 0
 last_random_movie_update = 0
+last_random_tvshow_update = 0
+last_random_all_update = 0
 
 # start the library update monitor
 library_change_monitor = LibraryChangeMonitor()
@@ -87,6 +90,10 @@ if context_menu:
     context_monitor = ContextMonitor()
     context_monitor.start()
 
+# Start the skip service monitor
+intro_skipper = IntroSkipperService(monitor)
+intro_skipper.start()
+
 background_interval = int(settings.getSetting('background_interval'))
 newcontent_interval = int(settings.getSetting('new_content_check_interval'))
 random_movie_list_interval = int(settings.getSetting('random_movie_refresh_interval'))
@@ -104,7 +111,6 @@ first_run = True
 home_window.set_property('exit', 'False')
 
 while home_window.get_property('exit') == 'False':
-
     try:
         if xbmc.Player().isPlaying():
             last_random_movie_update = time.time() - (random_movie_list_interval - 15)
@@ -140,6 +146,14 @@ while home_window.get_property('exit') == 'False':
                 if user_changed or (random_movie_list_interval != 0 and (time.time() - last_random_movie_update) > random_movie_list_interval):
                     last_random_movie_update = time.time()
                     set_random_movies()
+
+                if user_changed or (random_movie_list_interval != 0 and (time.time() - last_random_tvshow_update) > random_movie_list_interval):
+                    last_random_tvshow_update = time.time()
+                    set_random_tvshows()
+
+                if user_changed or (random_movie_list_interval != 0 and (time.time() - last_random_all_update) > random_movie_list_interval):
+                    last_random_all_update = time.time()
+                    set_random_all()
 
                 if user_changed or (newcontent_interval != 0 and (time.time() - last_content_check) > newcontent_interval):
                     last_content_check = time.time()
@@ -183,6 +197,9 @@ if play_next_service:
 # call stop on the context menu monitor
 if context_monitor:
     context_monitor.stop_monitor()
+
+if intro_skipper:
+    intro_skipper.stop_service()
 
 # clear user and token when logging off
 home_window.clear_property("user_name")

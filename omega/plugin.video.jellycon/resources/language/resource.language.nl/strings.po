@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-07-02 22:41+0000\n"
-"Last-Translator: exbu <meharmsen@me.com>\n"
+"PO-Revision-Date: 2025-05-11 01:54+0000\n"
+"Last-Translator: C2gl <lievens.guillaume@gmail.com>\n"
 "Language-Team: Dutch <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/nl/>\n"
 "Language: nl\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.2\n"
+"X-Generator: Weblate 5.10.4\n"
 
 msgctxt "#30257"
 msgid "Movies - Recently Added"
@@ -1152,3 +1152,55 @@ msgstr "Samenvoegen in de plaats van vervangen (kan vertragingen veroorzaken)"
 msgctxt "#30453"
 msgid "Hide number of items to show on entry title"
 msgstr "Verberg aantal items bij weergeven van titel"
+
+msgctxt "#30454"
+msgid " - Totally Unwatched"
+msgstr " Geheel niet bekeken"
+
+msgctxt "#30667"
+msgid "Action to take"
+msgstr "Uit te voeren actie"
+
+msgctxt "#30672"
+msgid "Skip"
+msgstr "Overslaan"
+
+msgctxt "#30673"
+msgid "Ask"
+msgstr "Vragen"
+
+msgctxt "#30674"
+msgid "Do Nothing"
+msgstr "Niets doen"
+
+msgctxt "#30666"
+msgid "Segment Skipper"
+msgstr "Segment Overslagen"
+
+msgctxt "#30668"
+msgid "Start Offset (seconds)"
+msgstr "Start Offset (seconden)"
+
+msgctxt "#30669"
+msgid "End Offset (seconds)"
+msgstr "Einde Offset (seconden)"
+
+msgctxt "#30670"
+msgid "Intro Skipper"
+msgstr "Intro Skipper"
+
+msgctxt "#30671"
+msgid "Credit Skipper"
+msgstr "Krediet Skipper"
+
+msgctxt "#30675"
+msgid "Commercial Skipper"
+msgstr "Reclame Skipper"
+
+msgctxt "#30676"
+msgid "Preview Skipper"
+msgstr "Preview Skipper"
+
+msgctxt "#30677"
+msgid "Recap Skipper"
+msgstr "Samenvatting Skipper"

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-05-21 08:41+0000\n"
-"Last-Translator: Mathias Dejerud <smallmustard@gmail.com>\n"
+"PO-Revision-Date: 2025-09-10 20:11+0000\n"
+"Last-Translator: Ärik <kwakz4life@gmail.com>\n"
 "Language-Team: Swedish <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/sv/>\n"
 "Language: sv\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.2\n"
+"X-Generator: Weblate 5.11.4\n"
 
 msgctxt "#30283"
 msgid "Play Next Episode?"
@@ -361,7 +361,7 @@ msgstr "Uppspelning"
 
 msgctxt "#30000"
 msgid "Host"
-msgstr "Host"
+msgstr "Värd"
 
 msgctxt "#30290"
 msgid "All"
@@ -517,7 +517,7 @@ msgstr "Använd cachad widget data"
 
 msgctxt "#30440"
 msgid "Play next"
-msgstr "Spela härnest"
+msgstr "Spela härnäst"
 
 msgctxt "#30250"
 msgid "Unknown"
@@ -1149,3 +1149,55 @@ msgstr "Titta Igen Dagar (0 = Avaktiverat)"
 msgctxt "#30453"
 msgid "Hide number of items to show on entry title"
 msgstr "Göm antal objekt som visas på huvudmenyn"
+
+msgctxt "#30454"
+msgid " - Totally Unwatched"
+msgstr " - Helt obevakad"
+
+msgctxt "#30668"
+msgid "Start Offset (seconds)"
+msgstr "Inledande förskjutning (sekunder)"
+
+msgctxt "#30669"
+msgid "End Offset (seconds)"
+msgstr "Avslutande förskjutning (sekunder)"
+
+msgctxt "#30672"
+msgid "Skip"
+msgstr "Hoppa över"
+
+msgctxt "#30673"
+msgid "Ask"
+msgstr "Fråga"
+
+msgctxt "#30674"
+msgid "Do Nothing"
+msgstr "Gör ingenting"
+
+msgctxt "#30667"
+msgid "Action to take"
+msgstr "Åtgärd"
+
+msgctxt "#30666"
+msgid "Segment Skipper"
+msgstr "Segmenthoppare"
+
+msgctxt "#30671"
+msgid "Credit Skipper"
+msgstr "Sluttextshoppare"
+
+msgctxt "#30670"
+msgid "Intro Skipper"
+msgstr "Introhoppare"
+
+msgctxt "#30675"
+msgid "Commercial Skipper"
+msgstr "Reklamhoppare"
+
+msgctxt "#30676"
+msgid "Preview Skipper"
+msgstr "Förhandsgranskningshoppare"
+
+msgctxt "#30677"
+msgid "Recap Skipper"
+msgstr "Sammanfattningshoppare"

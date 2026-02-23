@@ -1,8 +1,8 @@
-version: '0.8.3'
+version: '0.9.1'
 changelog: |-
-  CI & build changes
-  ------------------
-  + Swap legacy secrets for current secrets (#371) @joshuaboniface
+  Bug Fixes
+  ---------
+  + Implement proper keepalives for websocket (#401) @mcarlton00
 dependencies:
   py2:
     - addon: 'xbmc.python'

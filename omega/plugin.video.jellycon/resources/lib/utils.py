@@ -424,7 +424,7 @@ def translate_path(path):
         return xbmc.translatePath(path)
 
 
-def download_external_sub(language, codec, url):
+def download_external_sub(language, codec, url, title):
     addon_settings = xbmcaddon.Addon()
     verify_cert = addon_settings.getSetting('verify_cert') == 'true'
 
@@ -433,7 +433,7 @@ def download_external_sub(language, codec, url):
     r.raise_for_status()
 
     # Write the subtitle file to the local filesystem
-    file_name = 'Stream.{}.{}'.format(language, codec)
+    file_name = 'Stream.{}.{}.{}'.format(title, language, codec)
     file_path = py2_decode(
         translate_path('special://temp/{}'.format(file_name))
     )
@@ -458,3 +458,9 @@ def get_filtered_items_count_text():
         return ""
     else:
         return " (" + settings.getSetting("show_x_filtered_items") + ")"
+    
+def seconds_to_ticks(seconds:float):
+    return seconds * 10000000
+
+def ticks_to_seconds(ticks:int):
+    return round(ticks / 10000000, 1)

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-11-04 20:00+0000\n"
-"Last-Translator: Justin <derjustin05@gmail.com>\n"
+"PO-Revision-Date: 2025-12-15 22:55+0000\n"
+"Last-Translator: tct123 <tct1234@protonmail.com>\n"
 "Language-Team: German <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/de/>\n"
 "Language: de\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7.2\n"
+"X-Generator: Weblate 5.14\n"
 
 msgctxt "#30120"
 msgid "Show load progress"
@@ -1124,7 +1124,7 @@ msgstr "Maximale Länge der Warteschlange"
 
 msgctxt "#30448"
 msgid "Shuffle"
-msgstr "Zufallswiedergabe"
+msgstr "Shuffle"
 
 msgctxt "#30449"
 msgid "Instant Mix"
@@ -1165,3 +1165,71 @@ msgstr "Verstecke Anzahl der angezeigten Elemente im Eintragstitel"
 msgctxt "#30454"
 msgid " - Totally Unwatched"
 msgstr " - Gesamt ungesehene"
+
+msgctxt "#30666"
+msgid "Segment Skipper"
+msgstr "Segmentüberspringer"
+
+msgctxt "#30667"
+msgid "Action to take"
+msgstr "Zu ergreifende Maßnahmen"
+
+msgctxt "#30668"
+msgid "Start Offset (seconds)"
+msgstr "Startverzögerung (Sekunden)"
+
+msgctxt "#30669"
+msgid "End Offset (seconds)"
+msgstr "Endverzögerung (Sekunden)"
+
+msgctxt "#30670"
+msgid "Intro Skipper"
+msgstr "Introüberspringer"
+
+msgctxt "#30671"
+msgid "Credit Skipper"
+msgstr "Endüberspringer"
+
+msgctxt "#30672"
+msgid "Skip"
+msgstr "Überspringen"
+
+msgctxt "#30673"
+msgid "Ask"
+msgstr "Fragen"
+
+msgctxt "#30674"
+msgid "Do Nothing"
+msgstr "Nichts tun"
+
+msgctxt "#30675"
+msgid "Commercial Skipper"
+msgstr "Komierzeller Skipper"
+
+msgctxt "#30676"
+msgid "Preview Skipper"
+msgstr "Vorschauskipper"
+
+msgctxt "#30677"
+msgid "Recap Skipper"
+msgstr "Rückblickskipper"
+
+msgctxt "#30455"
+msgid "TV Shows - Random"
+msgstr "Fernsehsendungen - Zufällig"
+
+msgctxt "#30456"
+msgid "All - Random"
+msgstr "Alle - Zufällig"
+
+msgctxt "#30457"
+msgid "All - Recently Added"
+msgstr "Alle – Kürzlich hinzugefügt"
+
+msgctxt "#30458"
+msgid "All - Favorites"
+msgstr "Alle – Favoriten"
+
+msgctxt "#30678"
+msgid "TV Shows per page"
+msgstr "Fernsehsendungen pro Seite"

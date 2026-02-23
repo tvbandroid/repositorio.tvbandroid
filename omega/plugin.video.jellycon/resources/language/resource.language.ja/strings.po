@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-11-11 04:00+0000\n"
-"Last-Translator: okaits#7534 <okaits@okaits7534.net>\n"
+"PO-Revision-Date: 2025-09-23 16:39+0000\n"
+"Last-Translator: S H <translate@hayakawa.work>\n"
 "Language-Team: Japanese <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/ja/>\n"
 "Language: ja\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.7.2\n"
+"X-Generator: Weblate 5.11.4\n"
 
 msgctxt "#30112"
 msgid "Loading Content"
@@ -700,3 +700,71 @@ msgid "JellyCon needs to prompt for resume on partily played items, Kodi can als
 msgstr ""
 "JellyConは途中まで再生したアイテムを途中から再生するか質問しますが、Kodiも同"
 "じ質問をすることがあります。重複した質問を取り除きますか？"
+
+msgctxt "#30114"
+msgid "Jump back seconds"
+msgstr "数秒戻す"
+
+msgctxt "#30120"
+msgid "Show load progress"
+msgstr "読込み状況を表示"
+
+msgctxt "#30125"
+msgid "Done"
+msgstr "完了"
+
+msgctxt "#30135"
+msgid "Error"
+msgstr "エラー"
+
+msgctxt "#30020"
+msgid "Flatten single season"
+msgstr "1シーズンを畳む"
+
+msgctxt "#30116"
+msgid "Add unwatched counts to names"
+msgstr "名前に未視聴の数を追加"
+
+msgctxt "#30121"
+msgid "On resume"
+msgstr "再開時"
+
+msgctxt "#30126"
+msgid "Processing Item : "
+msgstr "次の項目を処理中:"
+
+msgctxt "#30139"
+msgid "No Media Type Set"
+msgstr "メディアタイプ未設定"
+
+msgctxt "#30163"
+msgid "Add (cc) if subtitle is available"
+msgstr "字幕がある場合(cc)を追加する"
+
+msgctxt "#30166"
+msgid "Select Server"
+msgstr "サーバーを選択する"
+
+msgctxt "#30167"
+msgid "Selected Server Address"
+msgstr "選択されたサーバーアドレス"
+
+msgctxt "#30169"
+msgid "Address: "
+msgstr "アドレス:"
+
+msgctxt "#30180"
+msgid "Select User"
+msgstr "ユーザー選択"
+
+msgctxt "#30026"
+msgid "Widget item select action"
+msgstr "ウィジェット項目選択操作"
+
+msgctxt "#30200"
+msgid "URL error"
+msgstr "URLエラー"
+
+msgctxt "#30201"
+msgid "Unable to connect to server"
+msgstr "サーバーに接続できません"

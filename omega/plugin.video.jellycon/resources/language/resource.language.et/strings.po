@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2022-01-03 18:05+0000\n"
+"PO-Revision-Date: 2026-01-05 12:25+0000\n"
 "Last-Translator: rimasx <riks_12@hot.ee>\n"
 "Language-Team: Estonian <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/et/>\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.5.2\n"
+"X-Generator: Weblate 5.15.1\n"
 
 msgctxt "#30021"
 msgid "Show all episodes item"
@@ -37,7 +37,7 @@ msgstr "Jellyfin"
 
 msgctxt "#30012"
 msgid "[Change user]"
-msgstr "[Muuda kasutajat]"
+msgstr "[Vaheta kasutajat]"
 
 msgctxt "#30011"
 msgid "[Detect local server]"
@@ -73,15 +73,15 @@ msgstr "Port"
 
 msgctxt "#30366"
 msgid "Manually enter user details"
-msgstr "Sisesta kasutaja andmed käsitsi"
+msgstr "Sisesta kasutajaandmed käsitsi"
 
 msgctxt "#30241"
 msgid "Force transcode mpeg4"
-msgstr "Transkoodi jõuga mpeg4"
+msgstr "Sunni mpeg4 transkoodimine"
 
 msgctxt "#30240"
 msgid "Force transcode msmpeg4v3 (divx)"
-msgstr "Transkoodi jõuga msmpeg4v3 (divx)"
+msgstr "Sunni msmpeg4v3 (divx) transkoodimine"
 
 msgctxt "#30365"
 msgid "Manual Login"
@@ -97,15 +97,15 @@ msgstr "Kas salvestada parool?"
 
 msgctxt "#30362"
 msgid " - Recordings"
-msgstr "- salvestised"
+msgstr "- Salvestised"
 
 msgctxt "#30361"
 msgid " - Programs"
-msgstr "- saated"
+msgstr "- Saated"
 
 msgctxt "#30360"
 msgid " - Channels"
-msgstr "- kanalid"
+msgstr "- Kanalid"
 
 msgctxt "#30359"
 msgid "Building full image list"
@@ -133,19 +133,19 @@ msgstr "Ava seriaal"
 
 msgctxt "#30353"
 msgid " - Frequently Played"
-msgstr "- sageli esitatud"
+msgstr "- Sageli esitatud"
 
 msgctxt "#30321"
 msgid " - Album Artists"
-msgstr "– albumi esitajad"
+msgstr "- Albumi esitajad"
 
 msgctxt "#30319"
 msgid "Music - All Album Artists"
-msgstr "Muusika – kõik albumi esitajad"
+msgstr "Muusika - Kõik albumi esitajad"
 
 msgctxt "#30352"
 msgid "Music - Frequently Played"
-msgstr "Muusika – sageli esitatud"
+msgstr "Muusika - Sageli esitatud"
 
 msgctxt "#30327"
 msgid "Go To Season"
@@ -157,31 +157,31 @@ msgstr "Faili otserada"
 
 msgctxt "#30263"
 msgid "Episodes - Recently Added"
-msgstr "Episoodid – viimati lisatud"
+msgstr "Episoodid - Viimati lisatud"
 
 msgctxt "#30257"
 msgid "Movies - Recently Added"
-msgstr "Filmid – viimati lisatud"
+msgstr "Filmid - Viimati lisatud"
 
 msgctxt "#30349"
 msgid " - Recently Played"
-msgstr "- viimati esitatud"
+msgstr "- Viimati esitatud"
 
 msgctxt "#30268"
 msgid " - Recently Added"
-msgstr "- viimati lisatud"
+msgstr "- Viimati lisatud"
 
 msgctxt "#30351"
 msgid "Music - Recently Played"
-msgstr "Muusika – viimati esitatud"
+msgstr "Muusika - Viimati esitatud"
 
 msgctxt "#30350"
 msgid "Music - Recently Added"
-msgstr "Muusika – viimati lisatud"
+msgstr "Muusika - Viimati lisatud"
 
 msgctxt "#30348"
 msgid "Add user ratings"
-msgstr "Lisa kasutajahinded"
+msgstr "Kaasa kasutajahinded"
 
 msgctxt "#30347"
 msgid "Getting Existing Images"
@@ -245,7 +245,7 @@ msgstr "Filme lehel"
 
 msgctxt "#30330"
 msgid "Show change user dialog"
-msgstr "Kuva kasutaja muutmise dialoog"
+msgstr "Kuva kasutaja vahetamise aken"
 
 msgctxt "#30329"
 msgid "Screensaver"
@@ -257,7 +257,7 @@ msgstr "Kuva tühjad kaustad (saated, hooajad, kogumikud)"
 
 msgctxt "#30325"
 msgid " - Genres"
-msgstr "- žanrid"
+msgstr "- Žanrid"
 
 msgctxt "#30322"
 msgid "Auto resume"
@@ -265,11 +265,11 @@ msgstr "Automaatne jätkamine"
 
 msgctxt "#30320"
 msgid " - Albums"
-msgstr "- albumid"
+msgstr "- Albumid"
 
 msgctxt "#30318"
 msgid "Music - Albums"
-msgstr "Muusika – albumid"
+msgstr "Muusika - Albumid"
 
 msgctxt "#30317"
 msgid "Play All"
@@ -281,7 +281,7 @@ msgstr "Ühenduse viga"
 
 msgctxt "#30315"
 msgid "Suppress notifications for connection errors"
-msgstr "Lülita ühenduse veateavitused välja"
+msgstr "Peida ühenduse veateavitused"
 
 msgctxt "#30314"
 msgid "Play"
@@ -305,7 +305,7 @@ msgstr "Luba Jellyfini kaugjuhtimine"
 
 msgctxt "#30309"
 msgid "Select Media Source"
-msgstr "Vali meedia allikas"
+msgstr "Vali meediaallikas"
 
 msgctxt "#30308"
 msgid "Select Trailer"
@@ -345,7 +345,7 @@ msgstr "Kas salvestada kõik Jellyfini pildid vahemällu kohalike Kodi piltidena
 
 msgctxt "#30299"
 msgid "Cache Images"
-msgstr "Pildid vahemällu"
+msgstr "Salvesta pildid vahemällu"
 
 msgctxt "#30298"
 msgid "Deleting Kodi Images"
@@ -369,7 +369,7 @@ msgstr "Märkus"
 
 msgctxt "#30293"
 msgid "Cache images"
-msgstr "Pildid vahemällu"
+msgstr "Salvesta pildid vahemällu"
 
 msgctxt "#30292"
 msgid "Select Subtitle Stream"
@@ -385,23 +385,23 @@ msgstr "Kõik"
 
 msgctxt "#30289"
 msgid "TV Shows - Genres"
-msgstr "Sarjad - žanrid"
+msgstr "Sarjad - Žanrid"
 
 msgctxt "#30288"
 msgid " - Latest"
-msgstr "- uued"
+msgstr "- Uued"
 
 msgctxt "#30287"
 msgid "TV Shows - Latest"
-msgstr "Sarjad - uued"
+msgstr "Sarjad - Uued"
 
 msgctxt "#30286"
 msgid "Movies - Unwatched"
-msgstr "Filmid - vaatamata"
+msgstr "Filmid - Vaatamata"
 
 msgctxt "#30285"
 msgid " - Unwatched"
-msgstr "- vaatamata"
+msgstr "- Vaatamata"
 
 msgctxt "#30283"
 msgid "Play Next Episode?"
@@ -413,25 +413,25 @@ msgstr "Kohtvõrgus ei tuvastatud Jellyfini servereid."
 
 msgctxt "#30281"
 msgid "Refresh Cached Images"
-msgstr "Värskenda vahemällu salvestatud pilte"
+msgstr "Värskenda puhverdatud pilte"
 
 msgctxt "#30280"
 msgid "Missing Title"
-msgstr "Puuduv pealkiri"
+msgstr "Puuduv nimetus"
 
 msgctxt "#30279"
 msgid "TV Shows - Unwatched"
-msgstr "Sarjad - vaatamata"
+msgstr "Sarjad - Vaatamata"
 
 msgctxt "#30278"
 msgid " - Next Up"
-msgstr "- järgmisena"
+msgstr "- Järgmine"
 
 msgctxt "#30277"
 msgid "JellyCon needs to prompt for resume on partily played items, Kodi can also prompt, this can cause a double prompt. Do you want to remove the double prompt?"
 msgstr ""
 "JellyCon peab küsima jätkamist osaliselt esitatud üksuste puhul. Kodi võib "
-"samuti küsida ja see võib põhjustada päringu. Kas soovid topeltpäringu "
+"samuti küsida ja see võib põhjustada topeltpäringu. Kas soovid topeltpäringu "
 "eemaldada?"
 
 msgctxt "#30276"
@@ -440,7 +440,7 @@ msgstr "Tuvastati täiendav jätkamise päring"
 
 msgctxt "#30275"
 msgid "Force Transcode"
-msgstr "Sunnitud transkoodimine"
+msgstr "Sunni transkoodimine"
 
 msgctxt "#30274"
 msgid "Delete"
@@ -460,27 +460,27 @@ msgstr "Märgi vaadatuks"
 
 msgctxt "#30269"
 msgid "Movies - Random"
-msgstr "Filmid – juhuslikud"
+msgstr "Filmid - Juhuslikud"
 
 msgctxt "#30267"
 msgid " - In Progress"
-msgstr "- pooleli"
+msgstr "- Pooleli"
 
 msgctxt "#30266"
 msgid "Movies - Pages"
-msgstr "Filmid – lehed"
+msgstr "Filmid - Lehed"
 
 msgctxt "#30265"
 msgid "Episodes - Next Up"
-msgstr "Episoodid – järgmine"
+msgstr "Episoodid - Järgmine"
 
 msgctxt "#30264"
 msgid "Episodes - In Progress"
-msgstr "Episoodid – pooleli"
+msgstr "Episoodid - Pooleli"
 
 msgctxt "#30262"
 msgid "TV Shows - Favorites"
-msgstr "Sarjad - lemmikud"
+msgstr "Sarjad - Lemmikud"
 
 msgctxt "#30261"
 msgid "TV Shows"
@@ -492,11 +492,11 @@ msgstr "Kogumikud"
 
 msgctxt "#30259"
 msgid "Movies - Favorites"
-msgstr "Filmid – lemmikud"
+msgstr "Filmid - Lemmikud"
 
 msgctxt "#30258"
 msgid "Movies - In Progress"
-msgstr "Filmid – pooleli"
+msgstr "Filmid - Pooleli"
 
 msgctxt "#30256"
 msgid "Movies"
@@ -508,15 +508,15 @@ msgstr "Sarjad - A-Ü"
 
 msgctxt "#30254"
 msgid "Show add-on settings"
-msgstr "Kuva lisamooduli seaded"
+msgstr "Lisamooduli seaded"
 
 msgctxt "#30252"
 msgid "Movies - A-Z"
-msgstr "Filmid – A-Ü"
+msgstr "Filmid - A-Ü"
 
 msgctxt "#30251"
 msgid "Movies - Genres"
-msgstr "Filmid – žanrid"
+msgstr "Filmid - Žanrid"
 
 msgctxt "#30250"
 msgid "Unknown"
@@ -528,11 +528,11 @@ msgstr "Otsi"
 
 msgctxt "#30239"
 msgid "Force transcode mpeg2"
-msgstr "Transkoodi jõuga mpeg2"
+msgstr "Sunni mpeg2 transkoodimine"
 
 msgctxt "#30238"
 msgid "Playback stream options"
-msgstr "Taasesituse striimimise valikud"
+msgstr "Taasesitusvoo valikud"
 
 msgctxt "#30237"
 msgid "Start from beginning"
@@ -540,7 +540,7 @@ msgstr "Alusta algusest"
 
 msgctxt "#30236"
 msgid "Force transcode h265 (hevc)"
-msgstr "Transkoodi jõuga h265 (hevc)"
+msgstr "Sunni h265 (hevc) transkoodimine"
 
 msgctxt "#30235"
 msgid "Episodes"
@@ -584,7 +584,7 @@ msgstr "Üksuse üksikasjad"
 
 msgctxt "#30215"
 msgid "On playback stop (100% = disabled)"
-msgstr "Taasesituse peatamisel (100% = keelatud)"
+msgstr "Taasesituse peatumisel (100% = keelatud)"
 
 msgctxt "#30214"
 msgid "Events"
@@ -604,7 +604,7 @@ msgstr "HTTP otsevoog"
 
 msgctxt "#30000"
 msgid "Host"
-msgstr "Peremeesmasin"
+msgstr "Server"
 
 msgctxt "#30182"
 msgid "Include media stream info"
@@ -656,7 +656,7 @@ msgstr "Vali server"
 
 msgctxt "#30163"
 msgid "Add (cc) if subtitle is available"
-msgstr "Lisa (cc) subtiitrite olemasolul"
+msgstr "Lisa (cc), kui subtiitrid on saadaval"
 
 msgctxt "#30139"
 msgid "No Media Type Set"
@@ -676,7 +676,7 @@ msgstr "Tehtud"
 
 msgctxt "#30121"
 msgid "On resume"
-msgstr "Jätkamisel"
+msgstr "Taasesituse jätkamisel"
 
 msgctxt "#30120"
 msgid "Show load progress"
@@ -684,11 +684,11 @@ msgstr "Kuva laadimise edenemine"
 
 msgctxt "#30116"
 msgid "Add unwatched counts to names"
-msgstr "Lisa nimedele vaatamata arv"
+msgstr "Lisa nimedele vaatamata episoodide arv"
 
 msgctxt "#30118"
 msgid "Add resume percent to names"
-msgstr "Lisa nimedele jätkamise protsent"
+msgstr "Lisa nimedele vaatemise oleku protsent"
 
 msgctxt "#30114"
 msgid "Jump back seconds"
@@ -716,7 +716,7 @@ msgstr "Hoiatus: see toiming kustutab meediafailid serverist."
 
 msgctxt "#30091"
 msgid "Confirm delete?"
-msgstr "Kas kinnitada kustutamine?"
+msgstr "Kas kustutamine kinnitada?"
 
 msgctxt "#30063"
 msgid "N/A"
@@ -744,7 +744,7 @@ msgstr "Luba silumislogimine"
 
 msgctxt "#30026"
 msgid "Widget item select action"
-msgstr "Vidina toiming üksuse valikul"
+msgstr "Toiming vidina elemendi valimisel"
 
 msgctxt "#30025"
 msgid "Password:"
@@ -756,8 +756,468 @@ msgstr "Kasutajanimi:"
 
 msgctxt "#30023"
 msgid "Hide unwatched episode details"
-msgstr "Peida vaatamata episoodi üksikasjad"
+msgstr "Peida vaatamata episoodide üksikasjad"
 
 msgctxt "#30022"
 msgid "Advanced"
 msgstr "Täpsem"
+
+msgctxt "#30019"
+msgid "Filtered episode name format"
+msgstr "Filtreeritud episoodi nime vorming"
+
+msgctxt "#30213"
+msgid "Video force 8 bit"
+msgstr "Sunni 8 bitine video"
+
+msgctxt "#30368"
+msgid "Clear Password?"
+msgstr "Parool kustutada?"
+
+msgctxt "#30373"
+msgid "Scanning for local servers"
+msgstr "Kohalike serverite skaneerimine"
+
+msgctxt "#30376"
+msgid "Checking server url"
+msgstr "Serveri URL-i kontroll"
+
+msgctxt "#30323"
+msgid "Artists"
+msgstr "Esitajad"
+
+msgctxt "#30371"
+msgid "Could not connect to the URL you entered, do you want to try again?"
+msgstr "Sisestatud URL-iga ei õnnestunud ühenduda, kas soovid uuesti proovida?"
+
+msgctxt "#30377"
+msgid "Sending request"
+msgstr "Päringu saatmine"
+
+msgctxt "#30242"
+msgid "Force transcode av1"
+msgstr "Sunni av1 transkoodimine"
+
+msgctxt "#30370"
+msgid "Do you want to manually enter a server url?"
+msgstr "Kas soovid serveri URL-i sisestada käsitsi?"
+
+msgctxt "#30372"
+msgid "Server URL"
+msgstr "Serveri URL"
+
+msgctxt "#30380"
+msgid "Never"
+msgstr "Mitte kunagi"
+
+msgctxt "#30381"
+msgid "More than one"
+msgstr "Rohkem kui üks"
+
+msgctxt "#30382"
+msgid "Always"
+msgstr "Alati"
+
+msgctxt "#30383"
+msgid "System - "
+msgstr "Süsteem -"
+
+msgctxt "#30225"
+msgid "Interface Mode"
+msgstr "Kasutajaliidese olek"
+
+msgctxt "#30226"
+msgid "Default"
+msgstr "Vaikimisi"
+
+msgctxt "#30227"
+msgid "Simple"
+msgstr "Lihtne"
+
+msgctxt "#30247"
+msgid "Custom Widget Content"
+msgstr "Kohandatud vidina sisu"
+
+msgctxt "#30273"
+msgid "Unset Favourite"
+msgstr "Tühista lemmikuks määramine"
+
+msgctxt "#30367"
+msgid "Allow fast user switching password saving"
+msgstr "Luba muudetud kasutajaparooli kiire salvestamine"
+
+msgctxt "#30369"
+msgid "Do you want to clear your saved password?"
+msgstr "Kas soovid oma salvestatud parooli kustutada?"
+
+msgctxt "#30374"
+msgid "Sending request"
+msgstr "Päringu saatmine"
+
+msgctxt "#30375"
+msgid "Receiving data packet"
+msgstr "Andmepaketi vastuvõtt"
+
+msgctxt "#30378"
+msgid "Persist user details"
+msgstr "Säilita kasutajaandmed"
+
+msgctxt "#30379"
+msgid "External subtitle prompt"
+msgstr "Paku väliseid subtiitreid"
+
+msgctxt "#30439"
+msgid "Show play next episode at time left in seconds"
+msgstr "Kuva \"Esita järgmine episood\" enne video lõppu (sek)"
+
+msgctxt "#30384"
+msgid "Random movies interval minutes (0 = disabled)"
+msgstr "Juhuslike filmide värskendamise intervall (0 = keelatud)"
+
+msgctxt "#30388"
+msgid "Server details"
+msgstr "Serveri andmed"
+
+msgctxt "#30392"
+msgid "HTTPS"
+msgstr "HTTPS"
+
+msgctxt "#30398"
+msgid "Refresh Jellyfin Metadata"
+msgstr "Värskenda Jellyfini metaandmeid"
+
+msgctxt "#30406"
+msgid "Jellyfin Libraries"
+msgstr "Jellyfini meediakogud"
+
+msgctxt "#30407"
+msgid "Global Lists"
+msgstr "Globaalsed loendid"
+
+msgctxt "#30416"
+msgid "HTTP timeout seconds"
+msgstr "HTTP ajalõpp sekundites"
+
+msgctxt "#30418"
+msgid "Audio bitrate (Kbits)"
+msgstr "Heli bitikiirus (kbps)"
+
+msgctxt "#30419"
+msgid "Audio codec"
+msgstr "Helikoodek"
+
+msgctxt "#30423"
+msgid "NotSet"
+msgstr "Määramata"
+
+msgctxt "#30425"
+msgid "Year"
+msgstr "Aasta"
+
+msgctxt "#30426"
+msgid "Title"
+msgstr "Pealkiri"
+
+msgctxt "#30437"
+msgid "Playback options"
+msgstr "Taasesituse valikud"
+
+msgctxt "#30440"
+msgid "Play next"
+msgstr "Esita järgmisena"
+
+msgctxt "#30409"
+msgid "Add-on Actions"
+msgstr "Lisamooduli toimingud"
+
+msgctxt "#30395"
+msgid "Clear cached server data"
+msgstr "Tühjenda vahemällu salvestatud serveri andmed"
+
+msgctxt "#30446"
+msgid "There was an error logging in"
+msgstr "Ilmes viga sisselogimisel"
+
+msgctxt "#30449"
+msgid "Instant Mix"
+msgstr "Kiirmiks"
+
+msgctxt "#30447"
+msgid "Max Play Queue Size"
+msgstr "Esitusjärjekorra maksimaalne suurus"
+
+msgctxt "#30389"
+msgid "User details"
+msgstr "Kasutaja andmed"
+
+msgctxt "#30387"
+msgid "Unused images removed : "
+msgstr "Kasutamata pildid eemaldati:"
+
+msgctxt "#30405"
+msgid " - Show All"
+msgstr "- Kuva kõik"
+
+msgctxt "#30415"
+msgid " - Favorite Collections"
+msgstr "- Lemmikkogumikud"
+
+msgctxt "#30454"
+msgid " - Totally Unwatched"
+msgstr " - Täiesti vaatamata"
+
+msgctxt "#30385"
+msgid "Existing images before delete : "
+msgstr "Olemasolevaid pilte enne kustutamist:"
+
+msgctxt "#30386"
+msgid "Unused Jellyfin images : "
+msgstr "Kasutamata Jellyfini pildid:"
+
+msgctxt "#30390"
+msgid "Protocol"
+msgstr "Protokoll"
+
+msgctxt "#30391"
+msgid "HTTP"
+msgstr "HTTP"
+
+msgctxt "#30393"
+msgid "Clear Cache Result"
+msgstr "Vahemälu tühjendamise tulemus"
+
+msgctxt "#30394"
+msgid "Cache files deleted"
+msgstr "Vahemälu failid kustutati"
+
+msgctxt "#30399"
+msgid "Hide"
+msgstr "Peida"
+
+msgctxt "#30401"
+msgid "Info"
+msgstr "Info"
+
+msgctxt "#30402"
+msgid "Add to Kodi Playlist"
+msgstr "Lisa Kodi esitusloendisse"
+
+msgctxt "#30403"
+msgid "Movies - Recommendations"
+msgstr "Filmid - Soovitused"
+
+msgctxt "#30400"
+msgid "Cache images interval minutes (0 = disabled)"
+msgstr "Piltide vahemällu salvestamise intervall (0 = keelatud)"
+
+msgctxt "#30408"
+msgid "Custom Widgets"
+msgstr "Kohandatud vidinad"
+
+msgctxt "#30410"
+msgid " - Collections"
+msgstr "- Kogumikud"
+
+msgctxt "#30404"
+msgid " - A-Z"
+msgstr "- A-Ü"
+
+msgctxt "#30413"
+msgid " - Tags"
+msgstr "- Sildid"
+
+msgctxt "#30411"
+msgid " - Years"
+msgstr "- Aastad"
+
+msgctxt "#30412"
+msgid " - Decades"
+msgstr "- Kümnendid"
+
+msgctxt "#30414"
+msgid " - Favorites"
+msgstr "- Lemmikud"
+
+msgctxt "#30417"
+msgid "You do not have permision to delete this item"
+msgstr "Sul pole selle üksuse kustutamiseks õigusi"
+
+msgctxt "#30420"
+msgid "Audio max channels"
+msgstr "Maksimaalne helikanalite arv"
+
+msgctxt "#30422"
+msgid "Sorting"
+msgstr "Järjestus"
+
+msgctxt "#30424"
+msgid "Default"
+msgstr "Vaikimisi"
+
+msgctxt "#30427"
+msgid "Added"
+msgstr "Lisatud"
+
+msgctxt "#30428"
+msgid "Rating"
+msgstr "Hinne"
+
+msgctxt "#30429"
+msgid "Genre"
+msgstr "Žanr"
+
+msgctxt "#30432"
+msgid "Hide watched items in lists"
+msgstr "Peida vaadatud üksused loendites"
+
+msgctxt "#30433"
+msgid "Allow direct file playback"
+msgstr "Luba failide otseesitus"
+
+msgctxt "#30434"
+msgid "Force transcode stream bitrate (Kbits)"
+msgstr "Sunni transkoodimisvoo bitikiirus (kbps)"
+
+msgctxt "#30435"
+msgid "Connection speed test"
+msgstr "Ühenduse kiirustest"
+
+msgctxt "#30436"
+msgid "Speed test data size (MB)"
+msgstr "Kiirustesti andmesuurus (MB)"
+
+msgctxt "#30442"
+msgid "Simple new content check"
+msgstr "Lihtne uue sisu kontroll"
+
+msgctxt "#30441"
+msgid "Use cached widget data"
+msgstr "Kasuta vahemällu salvestatud vidina andmeid"
+
+msgctxt "#30443"
+msgid "Quick Connect"
+msgstr "Kiirühendus"
+
+msgctxt "#30444"
+msgid "Login using Quick Connect"
+msgstr "Logi sisse kiirühenduse abil"
+
+msgctxt "#30445"
+msgid "Continue Watching"
+msgstr "Jätka vaatamist"
+
+msgctxt "#30452"
+msgid "Combine instead of replace (might cause slow-down)"
+msgstr "Ühenda asendamise asemel (võib jõudlust aeglustada)"
+
+msgctxt "#30667"
+msgid "Action to take"
+msgstr "Sooritatav toiming"
+
+msgctxt "#30668"
+msgid "Start Offset (seconds)"
+msgstr "Käivitusviivitus (sekundites)"
+
+msgctxt "#30669"
+msgid "End Offset (seconds)"
+msgstr "Lõpuviivitus (sekundites)"
+
+msgctxt "#30672"
+msgid "Skip"
+msgstr "Jäta vahele"
+
+msgctxt "#30673"
+msgid "Ask"
+msgstr "Küsi"
+
+msgctxt "#30674"
+msgid "Do Nothing"
+msgstr "Ära tee midagi"
+
+msgctxt "#30431"
+msgid "Seasons"
+msgstr "Hooajad"
+
+msgctxt "#30448"
+msgid "Shuffle"
+msgstr "Segamine"
+
+msgctxt "#30397"
+msgid " - Pages"
+msgstr "- Lehed"
+
+msgctxt "#30451"
+msgid "Rewatch Days (0 = Disabled)"
+msgstr "Kordusvaatamise päevad (0 = keelatud)"
+
+msgctxt "#30453"
+msgid "Hide number of items to show on entry title"
+msgstr "Peida kuvatavate üksuste arv avalehel"
+
+msgctxt "#30455"
+msgid "TV Shows - Random"
+msgstr "Sarjad - Juhuslik"
+
+msgctxt "#30456"
+msgid "All - Random"
+msgstr "Kõik - Juhuslik"
+
+msgctxt "#30457"
+msgid "All - Recently Added"
+msgstr "Kõik - Viimati lisatud"
+
+msgctxt "#30458"
+msgid "All - Favorites"
+msgstr "Kõik - Lemmikud"
+
+msgctxt "#30678"
+msgid "TV Shows per page"
+msgstr "Sarjade arv lehel"
+
+msgctxt "#30020"
+msgid "Flatten single season"
+msgstr "Ära kuva üksikut hooaega"
+
+msgctxt "#30224"
+msgid "Interaction"
+msgstr "Interaktsioon"
+
+msgctxt "#30430"
+msgid "Label"
+msgstr "Silt"
+
+msgctxt "#30438"
+msgid "Play cinema intros"
+msgstr "Esita filmi intro"
+
+msgctxt "#30666"
+msgid "Segment Skipper"
+msgstr "Segmendi vahelejätja"
+
+msgctxt "#30670"
+msgid "Intro Skipper"
+msgstr "Sissejuhatuse vahelejätja"
+
+msgctxt "#30671"
+msgid "Credit Skipper"
+msgstr "Lõputiitrite vahelejätja"
+
+msgctxt "#30675"
+msgid "Commercial Skipper"
+msgstr "Reklaamide vahelejätja"
+
+msgctxt "#30676"
+msgid "Preview Skipper"
+msgstr "Eelvaatuse vahelejätja"
+
+msgctxt "#30677"
+msgid "Recap Skipper"
+msgstr "Kokkuvõtte vahelejätja"
+
+msgctxt "#30421"
+msgid "Views"
+msgstr "Vaated"
+
+msgctxt "#30450"
+msgid "Next Up Rewatching"
+msgstr "Järgmisena kordusvaatamisel"

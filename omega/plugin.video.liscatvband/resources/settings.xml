@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings>
+
+    <category label="General">
+
+        <setting
+            id="cache_time"
+            type="number"
+            label="Tiempo de cache (minutos)"
+            default="30"
+        />
+
+        <setting
+            id="orden_alfabetico"
+            type="bool"
+            label="Ordenar canales alfabéticamente"
+            default="false"
+        />
+
+        <setting
+            id="usar_logos_remotos"
+            type="bool"
+            label="Usar logos oficiales TDT"
+            default="true"
+        />
+		
+		<setting 
+		     id="server_logo"
+			 type="file" 
+			 label="Logo IPTV (opcional)" 
+			 default="true"
+	    />
+
+    </category>
+
+    <category label="EPG">
+
+        <setting
+            id="activar_epg"
+            type="bool"
+            label="Activar soporte EPG (próximamente)"
+            default="false"
+        />
+
+    </category>
+
+    <!-- Setting -->
+    <setting
+        id="legal_shown"
+        type="bool"
+        default="false"
+        visible="false"
+    />
+	<category label="PLAYER">
+	<setting id="play_mode"
+         type="enum"
+         label="Modo de reproducción"
+         values="Live (/live/)|Get.php (Cloudflare)"
+         default="0" 
+    />
+    </category>
+</settings>

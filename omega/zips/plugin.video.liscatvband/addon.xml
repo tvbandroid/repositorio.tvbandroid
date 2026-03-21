@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.liscatvband"
+       name="[B][COLOR orangered]Lisca[COLOR white]TVband[/COLOR][/B]"
+       version="1.2.4"
+       provider-name="[COLOR darkorange]JoseaTeba[/COLOR]">
+
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.requests" version="2.9.1"/>
+        <import addon="script.module.dateutil" version="2.8.1"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="default.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+
+        <summary lang="es">LiscaTVband</summary>
+
+        <description lang="es">
+[COLOR lime][B]CRÉDITOS[/B][/COLOR]
+[COLOR white][B]• Developers:[/B]      [COLOR darkorange]JoseaTeba[/COLOR]
+        </description>
+
+        <disclaimer lang="es">
+[B][COLOR orange]AVISO LEGAL[COLOR white]!!
+[COLOR orangered]Lisca[COLOR white]TVband [COLOR tan]es únicamente un cliente multimedia.
+[COLOR khaki]No proporciona, aloja, no distribuye contenido.
+[COLOR red]* [COLOR white]EL USUARIO ES RESPONSABLE DEL USO QUE HAGA DEL ADDON.[/COLOR][/B]
+				
+[COLOR tan][B]Está prohibida su distribución. Reservado por el autor y creador [COLOR azure]JoseaTeba.[/B][/COLOR]
+        </disclaimer>
+
+        <platform>all</platform>
+
+        <news>
+- Nuevo 1.2.4
+        </news>
+
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 1.0, Febrero 2026</license>
+    </extension>
+
+</addon>

@@ -1,0 +1,51 @@
+[
+    {
+        "type": "m3u",
+        "name": "[B][COLOR darkturquoise]DEPORTES [COLOR white]FREE[/COLOR][/B]",
+        "url": "https://raw.githubusercontent.com/HelmerLuzo/FreeLiveSportsTV_HL/refs/heads/main/tv/m3u/FreeLiveSportsTV_tv.m3u",
+		"logo": "https://i.imgur.com/qUryCtg.png",
+		"fanart": "https://i.imgur.com/mrAhcHR.jpeg"
+    },
+	{
+        "type": "m3u",
+        "name": "[B][COLOR yellowgreen]LISTESP [COLOR white]TV[/B][/COLOR]",
+        "url": "https://iptv-org.github.io/iptv/languages/spa.m3u",
+        "logo": "special://home/addons/plugin.video.liscatvband/resources/media/logos/listesp_tv.gif",
+        "fanart": "https://i.imgur.com/a5Muv55.jpg"
+    },
+	{
+        "type": "m3u",
+        "name": "[B][COLOR red]RAKUTEN [COLOR white]TV[/B][/COLOR]",
+        "url": "https://raw.githubusercontent.com/HelmerLuzo/RakutenTV_HL/main/tv/m3u/RakutenTV_tv.m3u",
+        "logo": "https://i.imgur.com/eVyf80j.png",
+        "fanart": "https://i.imgur.com/2BMnt0s.jpg"
+    },
+	{
+        "type": "m3u",
+        "name": "[B][COLOR gold]RUNTIME [COLOR white]TV[/COLOR][/B]",
+        "url": "https://raw.githubusercontent.com/Paradise-91/ParaTV/refs/heads/main/playlists/samsungtvplus/group/es/es.m3u",
+        "logo": "https://i.imgur.com/nqObZiF.png",
+        "fanart": "https://i.imgur.com/BZCNSjx.jpeg"
+    },
+    {
+        "type": "m3u",
+        "name": "[B][COLOR white]SAMSUNG TV PLUS[/COLOR][/B]",
+        "url": "https://raw.githubusercontent.com/HelmerLuzo/SamsungTVPlus_HL/refs/heads/main/tv/m3u/SamsungTVPlus_tv_ES.m3u",
+        "logo": "https://i.imgur.com/q0dHtq3.png",
+        "fanart": "https://i.imgur.com/gfG9yg0.jpg"
+    },
+    {
+        "type": "m3u",
+        "name": "[B][COLOR gold]TELEVISON [COLOR white]FREE[/COLOR][/B]",
+        "url": "https://raw.githubusercontent.com/HelmerLuzo/RadTV_HL/refs/heads/main/tv/m3u/RadTV_tv.m3u",
+		"logo": "https://i.imgur.com/G9zHpQ9.png",
+		"fanart": "https://i.imgur.com/xAl1axz.jpeg"	
+    },
+	{
+        "type": "m3u",
+        "name": "[B][COLOR white]XXX iPTV [COLOR red]ADULTO[/COLOR][/B]",
+        "url": "https://raw.githubusercontent.com/dzh0ni/iPTV-FREE-LIST/refs/heads/master/iPTV-Free-List_XXX.m3u",
+		"logo": "https://i.imgur.com/lnTiwZ6.png",
+		"fanart": "https://i.imgur.com/mejKmhp.jpeg"
+    }
+]

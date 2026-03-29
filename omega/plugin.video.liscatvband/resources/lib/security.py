@@ -1,2 +1,166 @@
-import base64,zlib
-exec(zlib.decompress(base64.b64decode(b'eJyVV91u2zYUvi/QdyCUG3lwVDtN0saALxRb3TQocqDIAQbXEGiJttkookpKToKiF7vZA2xPsAfY1R4hb7In2aH+LMl16wiOZZLnj+d85yNzhI5/OkY+C2i0GqA0WR6/R78yQbBLFliuvX71+hW9jxlP0OPi3m8MNkvRGK9S2hjjIGBRNbPGYh3SRTUWT1vtT6ImmPIQ5DROPqdEJNU0EzIWfTye2Gi4ta/p8lvtyMUjNPzuIyWmjoUmo6nl6ofIB2SJvFTtDF6/QvA8gudZ/lM+/d5pt98/L/5O4O+se/a+e/pOfuSg3+tnCxdyeJq/zrPZ07Nu3c57WOjnKiBwepYNL2C2l4tfXBSavdIIvGAdvmtmCo+gLi30MqHKdu+tHJ6eZ5GUgWWrvUYs0n+ume3oJNtLISbDyDR7+U+YeZerzvMXJ0nKI6Qo2idGI3Xmr7lKO2jJOKKIRuhxnhXqsFKNjVtzZCBzjIwbV7+0DKTeTKwJutJHnUOLtyKJF5AN9YlHg6yOeaAJfxpsN32P/QJTGiiY0ZJZeEFCVbFJ8sD4nXaFfcAZJ0IondKEfOgSRSzJ9GGLmZkhUnq9QfOj1Hxt/Sn2xIO9ePk+lbrdIo9Fz2hijU/OzlVQ00gE3UrUTkdbk8eArqBF1M5s0D+Za2kcE65W8ZFHn8TJYMeoYjjOxKk5Pawat7pljvWR+fyXjRzjauLqSB1BL7oTy3B0e2TqBxdlg0MaYO6FUJbIp1iVBLRiXipSzCnbV6WmFCSwOQGMEYfYJ6pyrHQBgp1tQkoLFRJAuYWMevYDnGCQkKykBel9LNQvzfopgTLYGuu2FkNYbIa2FfjaqSrYrPdncNhkPs3J32rTvKSjlkcZ71B+tebXBAeEi+EXZcSihETJsfsUE4hOwXEMyccJZdEbuU3l61azFZjYDQyGLCaRCuMuSug9YWkyfNdpaKVhUqYwZDgQICzAAIZUawEpMNxqpVxNtqCqsDulI5up32qdAsQuT8k3GuYDDgXZ2wBHaGTpt8YACYqWOAwxUFJCeETgdEGC8A0NoIv/++NPZE/QImSwW8x3fJSuD2sb3XZNYCzbvJ5aefccfO74a+LfeYKEy+oAajbEEjLseUsaEs/b4SQmtBgna408UpEIddlpJxJTQZCR5QhgoCqEc8aVzj7y2Ct+aCYM23X0sY5ujJ+nzsGnryB+yokH4OVPNf5uJKecXEGzBTiQvZvdEySSbkiSwOVGVUqy8UqpLZMfoRsT/aYj1zRsA1nAi5LOSiBcAcHB+eOgq+ffb3IFSHFpZdBI/A6zlWI72a9jqZwkAN6W3JGM4HLiOOC/Csye2iP9h20RUByyVXGuwd1MG2cTJR8ewIU/rlAudQ0g1y1LR/2X6OXxaeyuRnDK7HI+G8Eh70D/Yf9uruVPMcc4jlaEk2BuApgm4ylcD8BtlZixgfSRa97mjTZ7k2nNZ28u50qNGpc1Lw9rmpD56PlfSdeQkxCNqYiZoAndsEHdwsfoY6Q0jOQWnkgYsocVJySag90vVR6/Sq3SQkt7JwIj2jz/A/lAMeYYOcSnC8pRkiKrQJLW2E1u6cWFMu3rqVul6yW6JaABLEXdaBSnSat026q408rNoJ3/BA6hYQnKLCRPt65/0e3pVWtfBZWVzmu9Af89SGZLXg7W/B7jvETpW41d/thSknxy2hHfpZ1utZ/mpSNPK+yXLoujuXXyKztdYFHh4waO3NsFjoISK0r7alLIZmjNgTsvAYZ0HzAv2XPEOCd+gu+BdIm2z1ZZQHvimh/Mke6aE9sz7Q+TltzbXq+393KxQ1oFBe6kpcES9a00aKL1FCIyU9mddw8/7Gap1ZxVikzo0r8lELQ2M7RVzOy+JRs6IMhOyYZ9q4F3MrKF9f+6UAtQ')))
+# -*- coding: utf-8 JoseaTeba -*-
+
+import xbmc
+import xbmcvfs
+import xbmcgui
+import xbmcaddon
+import hashlib
+import sys
+import json
+import urllib.request
+import os
+
+ADDON = xbmcaddon.Addon()
+
+# CONTROL SESIÓN (CLAVE)
+YA_VALIDADO = False
+
+# ==============================
+# URL OCULTA
+# ==============================
+def _u():
+    x = [
+        104,116,116,112,115,58,47,47,115,101,112,97,114,97,116,101,45,
+        108,111,115,116,45,111,98,106,101,99,116,100,97,116,97,98,97,
+        115,101,45,45,106,97,108,111,103,97,46,114,101,112,108,105,
+        116,46,97,112,112,47,108,105,99,101,110,99,105,97
+    ]
+    return "".join([chr(i) for i in x])
+
+
+# ==============================
+# DEVICE ID ESTABLE
+# ==============================
+def get_device_id():
+
+    try:
+        mac = xbmc.getInfoLabel("Network.MacAddress")
+
+        if not mac or mac == "00:00:00:00:00:00":
+            mac = "NO_MAC_DEVICE"
+
+        return hashlib.sha256(mac.encode()).hexdigest()[:12].upper()
+
+    except:
+        return "ERRORDEVICE"
+
+
+# ==============================
+# VALIDACIÓN REMOTA
+# ==============================
+def validar_licencia(codigo_usuario):
+
+    try:
+        codigo_usuario = codigo_usuario.replace("-", "").upper()
+        device_id = get_device_id()
+
+        data = json.dumps({
+            "d": device_id,
+            "l": codigo_usuario
+        }).encode()
+
+        req = urllib.request.Request(
+            _u(),
+            data=data,
+            headers={"Content-Type": "application/json"}
+        )
+
+        res = urllib.request.urlopen(req, timeout=7)
+        result = json.loads(res.read().decode())
+
+        return result.get("ok") == 1
+
+    except:
+        # si falla internet NO bloquear
+        return True
+
+
+# ==============================
+# ANTI MANIPULACIÓN
+# ==============================
+def _check_self():
+    try:
+        f = __file__
+        if not os.path.exists(f):
+            raise Exception("error")
+    except:
+        raise Exception("error")
+
+
+# ==============================
+# ENTRADA SEGURA (ARREGLADA)
+# ==============================
+def secure_entry():
+
+    global YA_VALIDADO
+
+    # YA VALIDADO → NO HACER NADA MÁS
+    if YA_VALIDADO:
+        return True
+
+    _check_self()
+
+    guardada = ADDON.getSetting("licencia_guardada")
+
+    # ==============================
+    # SI YA TIENE LICENCIA → VALIDAR UNA VEZ
+    # ==============================
+    if guardada:
+
+        if validar_licencia(guardada):
+            YA_VALIDADO = True
+            return True
+        else:
+            # NO BORRAR Y NO MOLESTAR
+            YA_VALIDADO = True
+            return True
+
+    dialog = xbmcgui.Dialog()
+    device_id = get_device_id()
+
+    # ==============================
+    # PANTALLA ID
+    # ==============================
+    dialog.ok(
+        "[B][COLOR black].......[COLOR orangered]INTRODUCE LA LICENCIA DE ACTIVACIÓN[/COLOR][/B]",
+        f"[B][COLOR white]Código del Dispositivo:[/COLOR][/B]\n\n"
+        f"[COLOR yellowgreen][B]{device_id}[/B][/COLOR]\n\n"
+        "[B][COLOR white]Envíalo para Recibir tu Licencia.[/COLOR][/B]"
+    )
+
+    # ==============================
+    # INPUT LICENCIA
+    # ==============================
+    licencia = dialog.input(
+        "[B]INTRODUCE TU LICENCIA:[/B]",
+        type=xbmcgui.INPUT_ALPHANUM
+    )
+
+    if not licencia:
+        sys.exit()
+
+    # ==============================
+    # VALIDAR
+    # ==============================
+    if validar_licencia(licencia):
+
+        ADDON.setSetting("licencia_guardada", licencia)
+
+        dialog.notification(
+            "[COLOR orangered]Lisca[COLOR white]TVband[/COLOR]",
+            "[COLOR greenyellow]Licencia Activada Correctamente.[/COLOR]",
+            xbmcgui.NOTIFICATION_INFO,
+            3000
+        )
+
+        YA_VALIDADO = True
+        return True
+
+    else:
+
+        dialog.ok(
+            "[COLOR black]......................[COLOR red]ERROR DE ACTIVACIÓN[/COLOR]",
+            "[B][COLOR white]Licencia Inválida.[/COLOR][/B]\n\n[B][COLOR white]Intentalo de Nuevo.[/COLOR][/B]"
+        )
+
+        sys.exit()

@@ -1,6 +1,13 @@
 # TVBANWIZAZRD #
 
-name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]A.7 [COLOR white]Nuevo!![/COLOR][/B]"
+name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]A.12 [COLOR white]Nuevo!![/COLOR][/B]"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.MatnexomAb12.zip"
+icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
+fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
+adult="no"
+description="[COLOR azure][B]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/B][/COLOR] para [COLOR teal][B]KODI: 21 Omega[/B][/COLOR]"
+
+name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]A.7[/COLOR][/B]"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.MatnexomAb7.zip"
 icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
 fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
@@ -15,6 +22,13 @@ adult="no"
 description="[COLOR azure][B]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/B][/COLOR] para [COLOR teal][B]KODI: 21 Omega[/B][/COLOR]"
 
 # TVBANWIZAZRD #
+
+name="[B][COLOR yellowgreen]TVban matnexom [COLOR gold]Palantir [COLOR khaki]A.12[/COLOR][/B]"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.PalantirAb12.zip"
+icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
+fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
+adult="no"
+description="[COLOR azure][B]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/B][/COLOR] para [COLOR teal][B]KODI: 21 Omega[/B][/COLOR]"
 
 name="[B][COLOR yellowgreen]TVban matnexom [COLOR gold]Palantir [COLOR khaki]A.7 [COLOR white]Nuevo!![/COLOR][/B]"
 url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.PalantirAb7.zip"

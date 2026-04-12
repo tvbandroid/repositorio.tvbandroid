@@ -1,4 +1,4 @@
-89
+90
 |||
 
 [COLOR yellowgreen][B]¡¡¡ BIENVENIDOS A LA [COLOR azure]BUILD TVBAN [COLOR cyan]MATNEXON [COLOR tan]- ORIGINAL !!![B][/COLOR]
@@ -17,11 +17,11 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, le damos unos mi
 
 [COLOR tan]Para instalar un parche, deberemos seleccionar la Build que tengamos instalada, por ejemplo [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]- v1[COLOR tan], dentro veremos [B][COLOR white]el/os PARCHE/S[/B],[COLOR tan] por ejemplo: [B][COLOR yellowgreen]TVban matnexom [COLOR khaki]v1.1[/B] [COLOR tan]y damos a instalar.[/COLOR]
 
-[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE!! [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]A.7 [COLOR white]del 7 de Abril [COLOR gold]!!![/B][/COLOR]
+[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE!! [COLOR yellowgreen][B]TVban matnexom [COLOR khaki]A.12 [COLOR white]del 12 de Abril [COLOR gold]!!![/B][/COLOR]
 [COLOR white][B]¤ [COLOR orange]Añadido el Nuevo addon en Configurar Incio, PELICULAS: Películas, TELEVISION - Plataformas. [COLOR white]dentro del [COLOR tan]NUEVO ADDON creado propio de la casa [COLOR orangered]LISCA[COLOR white]TVBAND[/B][/COLOR].
 
 
-[COLOR white][B]**PARCHE NUEVO[COLOR gold]PALANTIR [COLOR khaki]A.6 [COLOR white]del 6 de Abril [COLOR gold]!!![/B][/COLOR]
+[COLOR white][B]**PARCHE NUEVO[COLOR gold]PALANTIR [COLOR khaki]A.12 [COLOR white]del 12 de Abril [COLOR gold]!!![/B][/COLOR]
 [COLOR white][B]¤ [COLOR orange]Añadido el Nuevo addon en Configurar Incio, TELEVISION - Plataformas. [COLOR white]dentro del [COLOR tan]NUEVO ADDON creado propio de la casa [COLOR orangered]LISCA[COLOR white]TVBAND[/B][/COLOR].
 
 [COLOR orange]                   ****** [COLOR red]¡ATENCION!: [COLOR azure]SOLO PARA USUARIOS QUE USAN [COLOR gold]PALANTIR [COLOR orange]******                 [/COLOR] 

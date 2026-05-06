@@ -133,11 +133,11 @@ msgstr "- Colecciones"
 
 msgctxt "#30409"
 msgid "Add-on Actions"
-msgstr "Acciones del complemento"
+msgstr "Acciones del Complemento"
 
 msgctxt "#30407"
 msgid "Global Lists"
-msgstr "Listas globales"
+msgstr "Listas Globales: Películas y Series"
 
 msgctxt "#30406"
 msgid "Jellyfin Libraries"
@@ -145,7 +145,7 @@ msgstr "Bibliotecas de Jellyfin"
 
 msgctxt "#30405"
 msgid " - Show All"
-msgstr "- Mostrar todo"
+msgstr "- Mostrar Todo"
 
 msgctxt "#30404"
 msgid " - A-Z"
@@ -157,7 +157,7 @@ msgstr "Películas - Recomendaciones"
 
 msgctxt "#30402"
 msgid "Add to Kodi Playlist"
-msgstr "Añadir a la lista de reproducción de Kodi"
+msgstr "Añadir a la Lista de Reproducción de Kodi"
 
 msgctxt "#30401"
 msgid "Info"
@@ -169,7 +169,7 @@ msgstr "Esconder"
 
 msgctxt "#30398"
 msgid "Refresh Jellyfin Metadata"
-msgstr "Recargar metadatos de Jellyfin"
+msgstr "Recargar Metadatos de Jellyfin"
 
 msgctxt "#30397"
 msgid " - Pages"
@@ -185,7 +185,7 @@ msgstr "Archivos del caché borrados"
 
 msgctxt "#30393"
 msgid "Clear Cache Result"
-msgstr "Borrar caché del resultado"
+msgstr "Borrar Caché del Resultado"
 
 msgctxt "#30392"
 msgid "HTTPS"

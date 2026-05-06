@@ -1,0 +1,9 @@
+Dentro Jacktook nos vamos a Ajustes del addon y nos ubicamos en la pestaña Servicios, 
+habilitamos Torrents (P2P) y seleccionamos el cliente Elementum
+
+Ahora nos ubicamos en la pestaña Fuentes y seleccionamos Agregar Complemento Personalizado
+
+En la URL colocamos 
+https://torrentio.strem.fun/manifest.json 
+
+y damos Aceptar

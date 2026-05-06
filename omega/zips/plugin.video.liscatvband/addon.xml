@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="plugin.video.liscatvband"
        name="[B][COLOR orangered]Lisca[COLOR white]TVband[/COLOR][/B]"
-       version="1.4.1"
+       version="1.4.0"
        provider-name="[COLOR darkorange]JoseaTeba[/COLOR]">
 
     <requires>

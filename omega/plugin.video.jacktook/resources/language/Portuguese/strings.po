@@ -88,11 +88,11 @@ msgid "TMDB"
 msgstr "TMDB"
 
 msgctxt "#30102"
-msgid "TMDB Configuration:"
+msgid "TMDB Configuration"
 msgstr "Configuração do TMDB:"
 
 msgctxt "#30103"
-msgid "TMDB Api Key"
+msgid "API Key"
 msgstr "Chave de API do TMDB"
 
 msgctxt "#30104"
@@ -124,8 +124,8 @@ msgid "Client Secret"
 msgstr "Segredo do cliente"
 
 msgctxt "#30150"
-msgid "Debrid"
-msgstr "Debrid"
+msgid "Services"
+msgstr "Services"
 
 msgctxt "#30152"
 msgid "Real Debrid Configuration"
@@ -196,8 +196,8 @@ msgid "Search on AniList:"
 msgstr "Pesquisar no AniList:"
 
 msgctxt "#30243"
-msgid "Search for torrents:"
-msgstr "Pesquisar por torrents:"
+msgid "Search for a keyword:"
+msgstr "Pesquisar por uma palavra-chave:"
 
 msgctxt "#30244"
 msgid "Cache cleared"
@@ -428,8 +428,8 @@ msgid "Authorize add-on to access Real-Debrid account."
 msgstr "Autorizar a extensão a acessar a conta Real-Debrid."
 
 msgctxt "#30836"
-msgid "Enable torrent-based media content. Disabling this restricts the addon to cached debrid content only."
-msgstr "Habilitar conteúdo de mídia via torrent. Desabilitar isso restringe o addon apenas ao conteúdo em cache do debrid."
+msgid "Enable torrent-based media content"
+msgstr "Habilitar conteúdo de mídia via torrent."
 
 msgctxt "#30837"
 msgid "Indicates if Real-Debrid account is linked."
@@ -516,7 +516,7 @@ msgid "Enable Zilean integration for metadata fetching."
 msgstr "Habilitar integração do Zilean para obtenção de metadados."
 
 msgctxt "#30858"
-msgid "Your TMDB API key (required for metadata)"
+msgid "Your API Key (required for metadata)"
 msgstr "Sua chave da API TMDB (necessária para metadados)."
 
 msgctxt "#30859"
@@ -528,12 +528,12 @@ msgid "Others"
 msgstr "Outros"
 
 msgctxt "#30861"
-msgid "Results"
-msgstr "Resultados"
+msgid "Filters"
+msgstr "Filters"
 
 msgctxt "#30862"
-msgid "Torrent"
-msgstr "Torrent"
+msgid "Torrent (P2P) Configuration"
+msgstr "Torrent (P2P) Configuration"
 
 msgctxt "#30863"
 msgid "Specify the torrent client"
@@ -654,3 +654,93 @@ msgstr "Idioma de destino do Deepl"
 msgctxt "#30893"
 msgid "Stremio Subtitle Configuration"
 msgstr "Configuração de legendas do Stremio"
+
+msgctxt "#90139"
+msgid "Playback"
+msgstr "Playback"
+
+msgctxt "#90145"
+msgid "Precaching Enabled"
+msgstr "Pré-carregamento Ativado"
+
+msgctxt "#90146"
+msgid "Enable or disable precaching of next episodes."
+msgstr "Ativar ou desativar o pré-carregamento dos próximos episódios."
+
+msgctxt "#90147"
+msgid "Precaching Episode Count"
+msgstr "Contagem de Episódios para Pré-carregar"
+
+msgctxt "#90148"
+msgid "Number of next episodes to precache."
+msgstr "Número de próximos episódios para pré-carregar."
+
+
+
+msgctxt "#90150"
+msgid "Stremio: General"
+msgstr "Stremio: Geral"
+
+msgctxt "#90151"
+msgid "Stremio: Account"
+msgstr "Stremio: Conta"
+
+msgctxt "#90152"
+msgid "Stremio: Addons & Catalogs"
+msgstr "Stremio: Addons e catálogos"
+
+msgctxt "#90153"
+msgid "Stremio: Torrentio"
+msgstr "Stremio: Torrentio"
+
+msgctxt "#90200"
+msgid "Continue Watching"
+msgstr "Continuar a Ver"
+
+msgctxt "#90201"
+msgid "Library"
+msgstr "Biblioteca"
+
+msgctxt "#90202"
+msgid "My Shows"
+msgstr "Minhas Séries"
+
+msgctxt "#90203"
+msgid "My Movies"
+msgstr "Meus Filmes"
+
+msgctxt "#90204"
+msgid "Remove from Library"
+msgstr "Remover da Biblioteca"
+
+msgctxt "#90205"
+msgid "Add to Library"
+msgstr "Adicionar à Biblioteca"
+
+msgctxt "#90206"
+msgid "Remove"
+msgstr "Remover"
+
+msgctxt "#90215"
+msgid "Downgrade"
+msgstr "Reverter"
+
+msgctxt "#90220"
+msgid "Easynews"
+msgstr "Easynews"
+
+msgctxt "#90221"
+msgid "Enable EasyNews as a direct stream provider."
+msgstr "Habilitar o EasyNews como fornecedor de stream direto."
+
+msgctxt "#90222"
+msgid "Your EasyNews username."
+msgstr "Nome de utilizador do EasyNews."
+
+msgctxt "#90223"
+msgid "Your EasyNews password."
+msgstr "Palavra-passe do EasyNews."
+
+msgctxt "#90224"
+msgid "Request timeout in seconds."
+msgstr "Tempo limite do pedido em segundos."

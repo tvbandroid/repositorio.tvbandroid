@@ -40,7 +40,7 @@ msgid "Jackett Configuration:"
 msgstr ""
 
 msgctxt "#30023"
-msgid "Api Key"
+msgid "Client Key"
 msgstr ""
 
 msgctxt "#30025"
@@ -76,7 +76,7 @@ msgid "Prowlarr Configuration:"
 msgstr ""
 
 msgctxt "#30051"
-msgid "Api Key"
+msgid "Client Key"
 msgstr ""
 
 msgctxt "#30052"
@@ -96,11 +96,11 @@ msgid "TMDB"
 msgstr ""
 
 msgctxt "#30102"
-msgid "TMDB Configuration:"
+msgid "TMDB Configuration"
 msgstr ""
 
 msgctxt "#30103"
-msgid "TMDB Api Key"
+msgid "Client Key"
 msgstr ""
 
 msgctxt "#30104"
@@ -136,7 +136,7 @@ msgid "Client Secret"
 msgstr ""
 
 msgctxt "#30150"
-msgid "Debrid"
+msgid "Services"
 msgstr ""
 
 msgctxt "#30152"
@@ -144,7 +144,7 @@ msgid "Real Debrid Configuration"
 msgstr ""
 
 msgctxt "#30154"
-msgid "Token:"
+msgid "Token"
 msgstr ""
 
 msgctxt "#30200"
@@ -160,7 +160,7 @@ msgid "Client ID"
 msgstr ""
 
 msgctxt "#30221"
-msgid "No API key provided for"
+msgid "No Client Key provided for"
 msgstr ""
 
 msgctxt "#30223"
@@ -224,7 +224,7 @@ msgid "Search on AniList:"
 msgstr ""
 
 msgctxt "#30243"
-msgid "Search for torrents:"
+msgid "Search for a keyword:"
 msgstr ""
 
 msgctxt "#30244"
@@ -364,7 +364,7 @@ msgid "General"
 msgstr ""
 
 msgctxt "#30713"
-msgid "Use Torrent"
+msgid "Enable"
 msgstr ""
 
 msgctxt "#30714"
@@ -380,7 +380,7 @@ msgid "Elementum"
 msgstr ""
 
 msgctxt "#30717"
-msgid "Playback"
+msgid "General"
 msgstr ""
 
 msgctxt "#30718"
@@ -580,7 +580,7 @@ msgid "Jackgram Configuration"
 msgstr ""
 
 msgctxt "#30768"
-msgid "Jackgram Host"
+msgid "Host"
 msgstr ""
 
 msgctxt "#30769"
@@ -648,7 +648,7 @@ msgid "Enabled"
 msgstr ""
 
 msgctxt "#30787"
-msgid "Token:"
+msgid "Token"
 msgstr ""
 
 msgctxt "#30788"
@@ -726,6 +726,62 @@ msgstr "Show Changelog"
 msgctxt "#30895"
 msgid "View the latest changes and updates to the addon."
 msgstr "View the latest changes and updates to the addon."
+
+msgctxt "#30896"
+msgid "Calendar"
+msgstr "Calendar"
+
+msgctxt "#30897"
+msgid "Use broadcast day adjustment"
+msgstr "Use broadcast day adjustment"
+
+msgctxt "#30898"
+msgid "Adjust broadcast day based on manual offset"
+msgstr "Adjust broadcast day based on manual offset"
+
+msgctxt "#30899"
+msgid "Broadcast Offset (Hours)"
+msgstr "Broadcast Offset (Hours)"
+
+msgctxt "#30900"
+msgid "Manual hour adjustment for broadcast day simulation"
+msgstr "Manual hour adjustment for broadcast day simulation"
+
+msgctxt "#30905"
+msgid "Trakt Calendar Previous Days"
+msgstr "Trakt Calendar Previous Days"
+
+msgctxt "#30906"
+msgid "Number of days in the past to show in the Trakt calendar."
+msgstr "Number of days in the past to show in the Trakt calendar."
+
+msgctxt "#30907"
+msgid "Trakt Calendar Future Days"
+msgstr "Trakt Calendar Future Days"
+
+msgctxt "#30908"
+msgid "Number of days in the future to show in the Trakt calendar."
+msgstr "Number of days in the future to show in the Trakt calendar."
+
+msgctxt "#30909"
+msgid "Show All Shows in Calendar"
+msgstr "Show All Shows in Calendar"
+
+msgctxt "#30910"
+msgid "Show all airing shows instead of just your watchlist/collection."
+msgstr "Show all airing shows instead of just your watchlist/collection."
+
+msgctxt "#30911"
+msgid "Your Torbox account username/email."
+msgstr "Your Torbox account username/email."
+
+msgctxt "#30912"
+msgid "Authorize add-on to access Torbox account."
+msgstr "Authorize add-on to access Torbox account."
+
+msgctxt "#30913"
+msgid "Revoke Torbox account access."
+msgstr "Revoke Torbox account access."
 
 msgctxt "#40000"
 msgid "Arabic (United Arab Emirates)"
@@ -1020,7 +1076,7 @@ msgid "Display torrents not yet cached on your debrid service."
 msgstr ""
 
 msgctxt "#30808"
-msgid "Fanart.tv API client ID (for artwork)."
+msgid "Fanart.tv Client Key (for artwork)."
 msgstr ""
 
 msgctxt "#30809"
@@ -1044,11 +1100,11 @@ msgid "Hours before cached data is automatically refreshed (e.g., 24)."
 msgstr ""
 
 msgctxt "#30814"
-msgid "Premiumize API token (get from account page)."
+msgid "Premiumize Client Token (get from account page)."
 msgstr ""
 
 msgctxt "#30815"
-msgid "Jackett server URL (e.g., http://localhost:9117)."
+msgid "Jackett server URL (e.g., http://localhost)."
 msgstr ""
 
 msgctxt "#30816"
@@ -1072,7 +1128,7 @@ msgid "Seconds before Zilean requests time out (e.g., 30)."
 msgstr ""
 
 msgctxt "#30821"
-msgid "Your Jackett API key (found in dashboard)."
+msgid "Your Jackett Client Key (found in dashboard)."
 msgstr ""
 
 msgctxt "#30822"
@@ -1100,7 +1156,7 @@ msgid "Jackgram server URL (e.g., http://localhost:9117)."
 msgstr ""
 
 msgctxt "#30828"
-msgid "Debrider API key for authentication."
+msgid "Debrider Client Key for authentication."
 msgstr ""
 
 msgctxt "#30829"
@@ -1116,7 +1172,7 @@ msgid "Enable Debrider cached torrent support."
 msgstr ""
 
 msgctxt "#30832"
-msgid "Torbox API token (found in account settings)."
+msgid "Torbox Client Token (found in account settings)."
 msgstr ""
 
 msgctxt "#30833"
@@ -1132,7 +1188,7 @@ msgid "Authorize add-on to access Real-Debrid account."
 msgstr ""
 
 msgctxt "#30836"
-msgid "Enable torrent-based media content. Disabling this restricts the addon to cached debrid content only."
+msgid "Enable torrent-based media content"
 msgstr ""
 
 msgctxt "#30837"
@@ -1164,7 +1220,7 @@ msgid "Enable Torbox.de cloud torrent integration."
 msgstr ""
 
 msgctxt "#30844"
-msgid "Trakt API access token (auto-filled after auth)."
+msgid "Trakt Access Token (auto-filled after auth)."
 msgstr ""
 
 msgctxt "#30845"
@@ -1180,7 +1236,7 @@ msgid "Click to delete all cached data immediately."
 msgstr ""
 
 msgctxt "#30848"
-msgid "Real-Debrid API token (auto-filled after auth)."
+msgid "Real-Debrid Client Token (auto-filled after auth)."
 msgstr ""
 
 msgctxt "#30849"
@@ -1192,7 +1248,7 @@ msgid "Enable Jackgram integration for enhanced search."
 msgstr ""
 
 msgctxt "#30851"
-msgid "Prowlarr instance URL (e.g., http://localhost:9696)."
+msgid "Prowlarr instance URL (e.g., http://localhost)."
 msgstr ""
 
 msgctxt "#30852"
@@ -1204,7 +1260,7 @@ msgid "Revoke Real-Debrid account access."
 msgstr ""
 
 msgctxt "#30854"
-msgid "Prowlarr API key (found in Settings > General)."
+msgid "Prowlarr Client Key (found in Settings > General)."
 msgstr ""
 
 msgctxt "#30855"
@@ -1220,7 +1276,7 @@ msgid "Enable Zilean integration for metadata fetching."
 msgstr ""
 
 msgctxt "#30858"
-msgid "Your TMDB API key (required for metadata)"
+msgid "Your Client Key (required for metadata)"
 msgstr ""
 
 msgctxt "#30859"
@@ -1232,11 +1288,11 @@ msgid "Others"
 msgstr ""
 
 msgctxt "#30861"
-msgid "Results"
+msgid "Filters"
 msgstr ""
 
 msgctxt "#30862"
-msgid "Torrent"
+msgid "Torrent (P2P) Configuration"
 msgstr ""
 
 msgctxt "#30863"
@@ -1268,7 +1324,7 @@ msgid "Enable Stremio add-ons integration."
 msgstr "Habilitar la integración de complementos de Stremio."
 
 msgctxt "#30870"
-msgid "Select Addons"
+msgid "Select Stream Addons"
 msgstr ""
 
 msgctxt "#30871"
@@ -1300,7 +1356,7 @@ msgid "Enable Trakt.tv Scrobbling"
 msgstr ""
 
 msgctxt "#30878"
-msgid "Auto-select subtitle when playing"
+msgid "Automatically select subtitle when playing"
 msgstr ""
 
 msgctxt "#30879"
@@ -1348,7 +1404,7 @@ msgid "Deepl Enabled"
 msgstr ""
 
 msgctxt "#30890"
-msgid "Deepl Api key"
+msgid "Deepl Client Key"
 msgstr ""
 
 msgctxt "#30891"
@@ -1447,8 +1503,9 @@ msgctxt "#90021"
 msgid "TV Calendar"
 msgstr ""
 
+
 msgctxt "#90022"
-msgid "If you enjoy using Jacktook and appreciate the time and effort that goes into developing this addon, please consider supporting me with a contribution:"
+msgid "If you enjoy using Jacktook and want to support its development, you can buy me a coffee! Your support helps keep the project active and enables future improvements:"
 msgstr ""
 
 msgctxt "#90023"
@@ -1536,15 +1593,15 @@ msgid "Most Watched"
 msgstr ""
 
 msgctxt "#90044"
-msgid "Torrentio Settings"
+msgid "Torrentio Configuration"
 msgstr ""
 
 msgctxt "#90045"
-msgid "Enable"
+msgid "Enable Torrentio Settings"
 msgstr ""
 
 msgctxt "#90046"
-msgid "Enable or disable the Torrentio settings"
+msgid "Enable or disable the Torrentio Configuration"
 msgstr ""
 
 msgctxt "#90047"
@@ -1654,7 +1711,7 @@ msgid "Trakt Lists"
 msgstr ""
 
 msgctxt "#90073"
-msgid "MDbList"
+msgid "Metadata"
 msgstr ""
 
 msgctxt "#90074"
@@ -1703,6 +1760,10 @@ msgstr ""
 
 msgctxt "#90085"
 msgid "Include TV show Specials"
+msgstr ""
+
+msgctxt "#90086"
+msgid "Airing Today"
 msgstr ""
 
 msgctxt "#90099"
@@ -1775,9 +1836,488 @@ msgid "History cleared"
 msgstr ""
 
 msgctxt "#90115"
-msgid "Sources selection"
+msgid "Source Select"
 msgstr ""
 
 msgctxt "#90116"
 msgid "Open Settings"
 msgstr ""
+
+msgctxt "#90117"
+msgid "Select Torrentio Providers"
+msgstr ""
+
+msgctxt "#90118"
+msgid "Port"
+msgstr ""
+
+msgctxt "#90119"
+msgid "Jackett port (default:9117)"
+msgstr ""
+
+msgctxt "#90120"
+msgid "Prowlarr port (default:9696)"
+msgstr ""
+
+msgctxt "#90121"
+msgid "All Debrid Configuration"
+msgstr ""
+
+msgctxt "#90122"
+msgid "Automatically download subtitles"
+msgstr ""
+
+msgctxt "#90123"
+msgid "Stremio Timeout"
+msgstr ""
+
+msgctxt "#90124"
+msgid "Webdav Client Configuration"
+msgstr ""
+
+msgctxt "#90126"
+msgid "Host"
+msgstr ""
+
+msgctxt "#90127"
+msgid "Username"
+msgstr ""
+
+msgctxt "#90128"
+msgid "Password"
+msgstr ""
+
+msgctxt "#90129"
+msgid "Test Connection"
+msgstr ""
+
+msgctxt "#90131"
+msgid "Webdav"
+msgstr ""
+
+msgctxt "#90132"
+msgid "Remote Path"
+msgstr ""
+
+msgctxt "#90133"
+msgid "The hostname or IP address of your WebDAV server (e.g., http://mywebdav.com or https://192.168.1.100)."
+msgstr ""
+
+msgctxt "#90134"
+msgid "The username required for authenticating with your WebDAV server"
+msgstr ""
+
+msgctxt "#90135"
+msgid "The password for the specified username to authenticate with your WebDAV server"
+msgstr ""
+
+msgctxt "#90136"
+msgid "The base path or directory on the WebDAV server where your media files are located (e.g., /movies)."
+msgstr ""
+
+msgctxt "#90137"
+msgid "Click to verify if the WebDAV client can successfully connect to the configured server using the provided credentials."
+msgstr ""
+
+msgctxt "#90138"
+msgid "Remove Custom Addon"
+msgstr "Remove Custom Addon"
+
+msgctxt "#90139"
+msgid "Playback"
+msgstr "Playback"
+
+msgctxt "#90140"
+msgid "Super quick play"
+msgstr ""
+
+msgctxt "#90141"
+msgid "Re-ask to play last played torrent"
+msgstr ""
+
+msgctxt "#90142"
+msgid "Replay Dialog"
+msgstr "Replay Dialog"
+
+msgctxt "#90143"
+msgid "Do you want to play last watched?"
+msgstr "Do you want to play last watched?"
+
+msgctxt "#90144"
+msgid "Could not resolve playback URL"
+msgstr "Could not resolve playback URL"
+
+msgctxt "#90145"
+msgid "Precaching Enabled"
+msgstr "Precaching Enabled"
+
+msgctxt "#90146"
+msgid "Enable or disable precaching of next episodes."
+msgstr "Enable or disable precaching of next episodes."
+
+msgctxt "#90147"
+msgid "Precaching Episode Count"
+msgstr "Precaching Episode Count"
+
+msgctxt "#90148"
+msgid "Number of next episodes to precache."
+msgstr "Number of next episodes to precache."
+
+msgctxt "#30901"
+msgid "Show Only Stremio Catalogs"
+msgstr ""
+
+msgctxt "#30902"
+msgid "Hides embedded items (TMDb, Trakt, etc.) and shows only Stremio catalogs in menus."
+msgstr ""
+
+msgctxt "#30903"
+msgid "Select Live TV Addons"
+msgstr ""
+
+msgctxt "#30904"
+msgid "Choose specific Stremio addons for Live TV content"
+msgstr ""
+
+msgctxt "#30920"
+msgid "Clear Trakt Cache"
+msgstr "Clear Trakt Cache"
+
+msgctxt "#30921"
+msgid "Clear TMDB Cache"
+msgstr "Clear TMDB Cache"
+
+msgctxt "#30922"
+msgid "Clear Providers Cache"
+msgstr "Clear Providers Cache"
+
+msgctxt "#30923"
+msgid "Clear Settings Cache"
+msgstr "Clear Settings Cache"
+
+msgctxt "#30924"
+msgid "Clear Database Cache"
+msgstr "Clear Database Cache"
+
+msgctxt "#30925"
+msgid "Clear Stremio Cache"
+msgstr "Clear Stremio Cache"
+
+msgctxt "#30926"
+msgid "Clear Debrid Cache"
+msgstr "Clear Debrid Cache"
+
+msgctxt "#30927"
+msgid "Clear MDBList Cache"
+msgstr "Clear MDBList Cache"
+msgctxt "#90149"
+msgid "Maintenance"
+msgstr "Maintenance"
+
+msgctxt "#90150"
+msgid "Stremio: General"
+msgstr "Stremio: General"
+
+msgctxt "#90151"
+msgid "Stremio: Account"
+msgstr "Stremio: Account"
+
+msgctxt "#90152"
+msgid "Stremio: Addons & Catalogs"
+msgstr "Stremio: Addons & Catalogs"
+
+msgctxt "#90153"
+msgid "Stremio: Torrentio"
+msgstr "Stremio: Torrentio"
+
+msgctxt "#90154"
+msgid "Trending Recent"
+msgstr ""
+
+msgctxt "#32300"
+msgid "Filter by Quality"
+msgstr ""
+
+msgctxt "#32301"
+msgid "Filter by Provider"
+msgstr ""
+
+msgctxt "#32302"
+msgid "Filter by Source"
+msgstr ""
+
+msgctxt "#32303"
+msgid "Filter by Language"
+msgstr ""
+
+msgctxt "#32304"
+msgid "Filter by Torrents"
+msgstr ""
+
+msgctxt "#32305"
+msgid "Filter by Debrid"
+msgstr ""
+
+msgctxt "#32306"
+msgid "Reset Filter"
+msgstr ""
+
+msgctxt "#30930"
+msgid "Ping Addons"
+msgstr "Ping Addons"
+
+msgctxt "#30931"
+msgid "Check availability of addons and show only reachable ones"
+msgstr "Check availability of addons and show only reachable ones"
+
+msgctxt "#90155"
+msgid "Skip Intro / Recap"
+msgstr "Skip Intro / Recap"
+
+msgctxt "#90156"
+msgid "Enable Skip Intro"
+msgstr "Enable Skip Intro"
+
+msgctxt "#90157"
+msgid "Detect intros and recaps using IntroDB and offer to skip them during playback"
+msgstr "Detect intros and recaps using IntroDB and offer to skip them during playback"
+
+msgctxt "#90158"
+msgid "Auto-skip"
+msgstr "Auto-skip"
+
+msgctxt "#90159"
+msgid "Automatically skip intros and recaps without showing the button"
+msgstr "Automatically skip intros and recaps without showing the button"
+
+msgctxt "#90160"
+msgid "Skip Intro"
+msgstr "Skip Intro"
+
+msgctxt "#90161"
+msgid "Skip Recap"
+msgstr "Skip Recap"
+
+msgctxt "#90162"
+msgid "Manage from Phone"
+msgstr "Manage from Phone"
+
+msgctxt "#90163"
+msgid "Start a local web server and show a QR code to manage Stremio sources from your phone"
+msgstr "Start a local web server and show a QR code to manage Stremio sources from your phone"
+
+msgctxt "#90200"
+msgid "Continue Watching"
+msgstr "Continue Watching"
+
+msgctxt "#90201"
+msgid "Library"
+msgstr "Library"
+
+msgctxt "#90202"
+msgid "My Shows"
+msgstr "My Shows"
+
+msgctxt "#90203"
+msgid "My Movies"
+msgstr "My Movies"
+
+msgctxt "#90204"
+msgid "Remove from Library"
+msgstr "Remove from Library"
+
+msgctxt "#90205"
+msgid "Add to Library"
+msgstr "Add to Library"
+
+msgctxt "#90206"
+msgid "Remove"
+msgstr "Remove"
+
+msgctxt "#90207"
+msgid "Search Movies & TV"
+msgstr ""
+
+msgctxt "#90208"
+msgid "Recent Searches"
+msgstr ""
+
+msgctxt "#90209"
+msgid "Recent Direct Searches"
+msgstr ""
+
+msgctxt "#90210"
+msgid "Clear All Search History"
+msgstr ""
+
+msgctxt "#90211"
+msgid "Bypass Stremio Addons Native Sorting"
+msgstr ""
+
+msgctxt "#90212"
+msgid "If enabled, addons specified in BYPASS_FILTER_ADDONS won't have their results re-ordered or filtered by Jacktook's native quality and size thresholds."
+msgstr ""
+
+msgctxt "#90213"
+msgid "Select Bypassed Addons"
+msgstr ""
+
+msgctxt "#90214"
+msgid "Select which Stremio addons bypass Jacktook's native size and quality filtering."
+msgstr ""
+
+msgctxt "#90215"
+msgid "Downgrade"
+msgstr ""
+
+msgctxt "#30932"
+msgid "Update Action"
+msgstr ""
+
+msgctxt "#30933"
+msgid "Choose how to handle background update checks."
+msgstr ""
+
+msgctxt "#30934"
+msgid "Ask"
+msgstr ""
+
+msgctxt "#30935"
+msgid "Notify"
+msgstr ""
+
+msgctxt "#90216"
+msgid "Volume Check Enabled"
+msgstr "Volume Check Enabled"
+
+msgctxt "#90217"
+msgid "Automatically limits volume if it is above the threshold before playback."
+msgstr "Automatically limits volume if it is above the threshold before playback."
+
+msgctxt "#90218"
+msgid "Volume Threshold"
+msgstr "Volume Threshold"
+
+msgctxt "#90219"
+msgid "The volume percentage above which the warning triggers."
+msgstr "The volume percentage above which the warning triggers."
+
+msgctxt "#90220"
+msgid "High Volume Warning"
+msgstr "High Volume Warning"
+
+msgctxt "#90221"
+msgid "High volume detected. Adjusting to %s%% for safety."
+msgstr "High volume detected. Adjusting to %s%% for safety."
+
+msgctxt "#90222"
+msgid "Fanart.tv Configuration"
+msgstr ""
+
+msgctxt "#90223"
+msgid "Client Key"
+msgstr ""
+
+msgctxt "#90224"
+msgid "Your personal Fanart.tv client key for higher quality assets."
+msgstr ""
+
+msgctxt "#90225"
+msgid "Debrid Notifications"
+msgstr ""
+
+msgctxt "#90226"
+msgid "Debrid Expiration Notification"
+msgstr ""
+
+msgctxt "#90227"
+msgid "Enable or disable notifications when your Debrid subscription is about to expire."
+msgstr ""
+
+msgctxt "#90228"
+msgid "Expiration Threshold (Days)"
+msgstr ""
+
+msgctxt "#90229"
+msgid "How many days before expiration to start notifying."
+msgstr ""
+
+msgctxt "#90230"
+msgid "%s expires in %d days."
+msgstr ""
+
+msgctxt "#90231"
+msgid "%s expires today!"
+msgstr ""
+
+msgctxt "#90232"
+msgid "Easynews"
+msgstr ""
+
+msgctxt "#90233"
+msgid "Enable EasyNews as a direct stream provider."
+msgstr ""
+
+msgctxt "#90234"
+msgid "Your EasyNews username."
+msgstr ""
+
+msgctxt "#90235"
+msgid "Your EasyNews password."
+msgstr ""
+
+msgctxt "#90236"
+msgid "Request timeout in seconds."
+msgstr ""
+
+msgctxt "#90237"
+msgid "Account Information"
+msgstr ""
+
+msgctxt "#90238"
+msgid "Search Dialog Style"
+msgstr "Search Dialog Style"
+
+msgctxt "#90239"
+msgid "Background"
+msgstr "Background"
+
+msgctxt "#90240"
+msgid "Detailed Status"
+msgstr "Detailed Status"
+
+msgctxt "#90241"
+msgid "Search Status"
+msgstr "Search Status"
+
+msgctxt "#90242"
+msgid "Cancel"
+msgstr "Cancel"
+
+msgctxt "#90243"
+msgid "Results found: "
+msgstr "Results found: "
+
+msgctxt "#90244"
+msgid "Pending"
+msgstr "Pending"
+
+msgctxt "#90245"
+msgid "In Progress"
+msgstr "In Progress"
+
+msgctxt "#90246"
+msgid "Completed"
+msgstr "Completed"
+
+msgctxt "#90247"
+msgid "Failed"
+msgstr "Failed"
+
+msgctxt "#90248"
+msgid "Cancelled"
+msgstr "Cancelled"
+
+msgctxt "#90249"
+msgid "Your personal Jackgram API token for authentication."
+msgstr "Your personal Jackgram API token for authentication."

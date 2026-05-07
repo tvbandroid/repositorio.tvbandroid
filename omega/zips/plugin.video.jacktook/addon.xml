@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<addon id="plugin.video.jacktook" name="Jacktook" version="0.15.1" provider-name="Sam-Max">
+<addon id="plugin.video.jacktook" name="Darktook" version="1.4.2" provider-name="DarkTower">
   <requires>
     <import addon="xbmc.python" version="3.00.0"/>
     <import addon="script.module.requests" version="2.25.1"/>
@@ -8,19 +8,15 @@
   <extension point="xbmc.python.pluginsource" library="jacktook.py">
     <provides>video</provides>
   </extension>
-  <extension point="xbmc.service" library="service.py" />
+  <extension point="xbmc.service" library="service.py"/>
   <extension point="xbmc.python.module" library="lib"/>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">jacktook</summary>
-    <description lang="en">Kodi addon for torrent streaming</description>
+    <summary lang="en">Darktook</summary>
+    <description lang="en">Jacktook modificado para usar con Torrentio y Peerflix</description>
     <license>GPL-2.0-only</license>
-    <source>https://github.com/Sam-Max/plugin.video.jacktook</source>
-    <assets>
+        <assets>
       <icon>icon.png</icon>
       <fanart>fanart.png</fanart>
-      <screenshot>resources/screenshots/home.png</screenshot>
-      <screenshot>resources/screenshots/tv.png</screenshot>
-    </assets>
+          </assets>
  </extension>
 </addon>
-

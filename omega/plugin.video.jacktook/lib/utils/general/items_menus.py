@@ -1,4 +1,5 @@
-from lib.utils.kodi.utils import translation
+from lib.utils.kodi.utils import translation, get_setting
+from lib.utils.views.continue_watching import has_continue_watching_items
 
 
 tv_items = [
@@ -10,10 +11,17 @@ tv_items = [
         "icon": "tmdb.png",
     },
     {
-        "name": translation(90064),  
+        "name": translation(90064),
         "mode": "tv",
         "api": "tmdb",
         "query": "tmdb_popular",
+        "icon": "tmdb.png",
+    },
+    {
+        "name": translation(90086),
+        "mode": "tv",
+        "api": "tmdb",
+        "query": "tmdb_airing_today",
         "icon": "tmdb.png",
     },
     {
@@ -122,6 +130,27 @@ tv_items = [
         "query": "trakt_watchlist",
         "icon": "trakt.png",
     },
+    {
+        "name": "Collection",
+        "mode": "tv",
+        "api": "trakt",
+        "query": "trakt_collection",
+        "icon": "trakt.png",
+    },
+    {
+        "name": "Calendar",
+        "mode": "tv",
+        "api": "trakt",
+        "query": "trakt_calendar",
+        "icon": "trakt.png",
+    },
+    {
+        "name": "Up Next",
+        "mode": "tv",
+        "api": "trakt",
+        "query": "trakt_up_next",
+        "icon": "trakt.png",
+    },
 ]
 
 
@@ -134,7 +163,7 @@ movie_items = [
         "icon": "tmdb.png",
     },
     {
-        "name": translation(90064),  
+        "name": translation(90064),
         "mode": "movies",
         "api": "tmdb",
         "query": "tmdb_popular",
@@ -246,6 +275,13 @@ movie_items = [
         "query": "trakt_watchlist",
         "icon": "trakt.png",
     },
+    {
+        "name": "Collection",
+        "mode": "movies",
+        "api": "trakt",
+        "query": "trakt_collection",
+        "icon": "trakt.png",
+    },
 ]
 
 
@@ -272,6 +308,13 @@ anime_items = [
         "icon": "tmdb.png",
     },
     {
+        "name": translation(90042),
+        "mode": "anime",
+        "category": "Anime_Top_Rated",
+        "api": "tmdb",
+        "icon": "tmdb.png",
+    },
+    {
         "name": translation(90040),
         "mode": "anime",
         "category": "Anime_Years",
@@ -293,9 +336,23 @@ anime_items = [
         "icon": "trakt.png",
     },
     {
+        "name": translation(90154),
+        "mode": "anime",
+        "category": "Anime_Trending_Recent",
+        "api": "trakt",
+        "icon": "trakt.png",
+    },
+    {
         "name": translation(90043),
         "mode": "anime",
         "category": "Anime_Most_Watched",
+        "api": "trakt",
+        "icon": "trakt.png",
+    },
+    {
+        "name": translation(90030),
+        "mode": "anime",
+        "category": "Anime_Favorited",
         "api": "trakt",
         "icon": "trakt.png",
     },
@@ -316,4 +373,49 @@ animation_items = [
         "api": "tmdb",
         "icon": "tmdb.png",
     },
+]
+
+root_menu_items = [
+    {
+        "name": 90006,
+        "icon": "search.png",
+        "action": "search_menu",
+    },
+    {
+        "name": 90200,
+        "icon": "continue_watching.png",
+        "action": "continue_watching_menu",
+        "condition": has_continue_watching_items,
+    },  # Continue Watching
+    {"name": 90007, "icon": "tv.png", "action": "tv_shows_items"},
+    {"name": 90008, "icon": "movies.png", "action": "movies_items"},
+    {"name": 90009, "icon": "anime.png", "action": "anime_menu"},
+    {"name": 90010, "icon": "tv.png", "action": "tv_menu"},
+    {"name": 90201, "icon": "library.png", "action": "library_menu"},  # Library
+    {"name": 90012, "icon": "magnet2.png", "action": "torrents"},
+    {
+        "name": 90013,
+        "icon": "telegram.png",
+        "action": "telegram_menu",
+        "condition": lambda: get_setting("show_telegram_menu"),
+    },
+    {"name": 90014, "icon": "cloud2.png", "action": "cloud"},
+    {"name": 90015, "icon": "download2.png", "action": "downloads_menu"},
+    {"name": 90016, "icon": "settings.png", "action": "settings"},
+]
+
+history_menu_items = [
+    {"name": 90019, "icon": "history.png", "action": "files_history"},
+    {"name": 90020, "icon": "history.png", "action": "titles_history"},
+    {"name": 90021, "icon": "history.png", "action": "titles_calendar"},
+]
+
+library_menu_items = [
+    {"name": 90202, "icon": "tv.png", "action": "library_shows"},  # My Shows
+    {"name": 90203, "icon": "movies.png", "action": "library_movies"},  # My Movies
+    {
+        "name": 90021,
+        "icon": "history.png",
+        "action": "library_calendar",
+    },  # Upcoming Episodes
 ]

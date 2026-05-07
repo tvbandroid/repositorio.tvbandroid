@@ -42,6 +42,14 @@ class TraktCache:
         except:
             pass
 
+    def clear_all(self):
+        try:
+            dbcon = connect_database("trakt_db")
+            dbcon.execute("DELETE FROM trakt_data")
+            dbcon.execute("VACUUM")
+        except:
+            pass
+
 
 trakt_cache = TraktCache()
 
@@ -77,6 +85,14 @@ class TraktWatched:
         self._delete(PROGRESS_DELETE, ("episode",))
         self._executemany(PROGRESS_INSERT, insert_list)
 
+    def clear_all(self):
+        try:
+            self._delete("DELETE FROM watched", ())
+            self._delete("DELETE FROM progress", ())
+            self._delete("DELETE FROM watched_status", ())
+        except:
+            pass
+
     def _executemany(self, command, insert_list):
         dbcon = connect_database("trakt_db")
         dbcon.executemany(command, insert_list)
@@ -85,6 +101,40 @@ class TraktWatched:
         dbcon = connect_database("trakt_db")
         dbcon.execute(command, args)
         dbcon.execute("VACUUM")
+
+    def get_watched_status(self, db_type, media_id, season=None, episode=None):
+        try:
+            dbcon = connect_database("trakt_db")
+            if db_type == "movie":
+                command = "SELECT 1 FROM watched WHERE db_type=? AND media_id=?"
+                args = (db_type, media_id)
+            else:
+                command = "SELECT 1 FROM watched WHERE db_type=? AND media_id=? AND season=? AND episode=?"
+                args = (db_type, media_id, season, episode)
+
+            result = dbcon.execute(command, args).fetchone()
+            return result is not None
+        except:
+            return False
+
+    def get_progress(self, db_type, media_id, season=None, episode=None):
+        try:
+            dbcon = connect_database("trakt_db")
+            if db_type == "movie":
+                command = (
+                    "SELECT resume_point FROM progress WHERE db_type=? AND media_id=?"
+                )
+                args = (db_type, media_id)
+            else:
+                command = "SELECT resume_point FROM progress WHERE db_type=? AND media_id=? AND season=? AND episode=?"
+                args = (db_type, media_id, season, episode)
+
+            result = dbcon.execute(command, args).fetchone()
+            if result:
+                return float(result[0])
+            return 0.0
+        except:
+            return 0.0
 
 
 trakt_watched_cache = TraktWatched()

@@ -2,25 +2,38 @@ import os
 import re
 import hashlib
 import unicodedata
+import json
+from urllib.parse import unquote
 import requests
 from typing import Dict, List
 from zipfile import ZipFile
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 
-from lib.api.fanart.fanart import FanartTv
-from lib.clients.aisubtrans.utils import get_language_code
+from lib.api.fanart.fanart import get_fanart
+from lib.clients.subtitle.utils import get_language_code
 from lib.gui.qr_progress_dialog import QRProgressDialog
+from lib.api.trakt.trakt_cache import trakt_watched_cache, trakt_cache
+from lib.api.trakt.lists_cache import lists_cache
+from lib.api.trakt.main_cache import main_cache
 from lib.utils.debrid.qrcode_utils import make_qrcode
 from lib.utils.general.processors import PostProcessBuilder, PreProcessBuilder
 from lib.clients.base import TorrentStream
 from lib.api.tvdbapi.tvdbapi import TVDBAPI
 from lib.db.cached import cache
+from lib.clients.stremio.constants import (
+    STREMIO_ADDONS_KEY,
+    STREMIO_ADDONS_CATALOGS_KEY,
+    STREMIO_TV_ADDONS_KEY,
+    STREMIO_USER_ADDONS,
+)
 from lib.db.pickle_db import PickleDatabase
 from lib.utils.kodi.utils import (
     ADDON_HANDLE,
     ADDON_PATH,
+    EPISODES_TYPE,
     MOVIES_TYPE,
+    SEASONS_TYPE,
     SHOWS_TYPE,
     TITLES_TYPE,
     build_url,
@@ -174,6 +187,7 @@ class DebridType(Enum):
     TB = "Torbox"
     ED = "EasyDebrid"
     DB = "Debrider"
+    AD = "AllDebrid"
 
 
 class IndexerType(Enum):
@@ -195,6 +209,7 @@ class Indexer(Enum):
     ELHOSTED = "Elfhosted"
     BURST = "Burst"
     ZILEAN = "Zilean"
+    EASYNEWS = "Easynews"
 
 
 class Players(Enum):
@@ -209,10 +224,13 @@ class Anime(Enum):
     POPULAR = "Anime_Popular"
     POPULAR_RECENT = "Anime_Popular_Recent"
     TRENDING = "Anime_Trending"
+    TRENDING_RECENT = "Anime_Trending_Recent"
     AIRING = "Anime_On_The_Air"
     MOST_WATCHED = "Anime_Most_Watched"
+    FAVORITED = "Anime_Favorited"
     YEARS = "Anime_Years"
     GENRES = "Anime_Genres"
+    TOP_RATED = "Anime_Top_Rated"
 
 
 class Animation(Enum):
@@ -240,6 +258,14 @@ torrent_indexers = [
     Indexer.ELHOSTED,
     Indexer.BURST,
 ]
+
+
+PROVIDER_COLORS = {
+    "debrid": "FF1E90FF",  # dodger blue
+    "direct": "FFFFA500",  # orange
+    "stremio": "FF8A2BE2",  # blue-violet
+    "torrent": "FFFFD700",  # gold
+}
 
 
 class DialogListener:
@@ -278,12 +304,18 @@ def check_debrid_enabled(debrid_type):
         return is_tb_enabled()
     elif debrid_type == DebridType.DB:
         return is_debrider_enabled()
+    elif debrid_type == DebridType.AD:
+        return is_ad_enabled()
     else:
         kodilog(f"Unknown debrid type: {debrid_type}", level=xbmc.LOGERROR)
 
 
 def is_rd_enabled():
     return get_setting("real_debrid_enabled")
+
+
+def is_ad_enabled():
+    return get_setting("alldebrid_enabled")
 
 
 def is_pm_enabled():
@@ -303,7 +335,7 @@ def is_ed_enabled():
 
 
 def build_list_item(label, icon="", poster_path=""):
-    item = ListItem(label)
+    item = ListItem(label=label)
     item.setArt(
         {
             "poster": poster_path,
@@ -333,49 +365,37 @@ def make_listing(data):
     data["id"] = ids.get("tmdb_id")
     data["imdb_id"] = ids.get("imdb_id")
 
-    set_media_infoTag(list_item, data=data, mode=mode)
+    set_media_infoTag(list_item, data=data, mode=mode, detailed=True)
 
     return list_item
 
 
-def set_media_infoTag(list_item, data, fanart_data={}, mode="video"):
+def set_media_infoTag(list_item, data, fanart_data={}, mode="video", detailed=False):
     info_tag = list_item.getVideoInfoTag()
 
-    # General Video Info
+    _set_basic_info(info_tag, data)
+    _set_media_type(info_tag, mode)
+    _set_identification(info_tag, data)
+    _set_artwork(list_item, data, fanart_data)
+    _set_released_info(info_tag, data)
+    _set_watched_status(info_tag, data, mode)
+
+    if mode == "tv" or mode == "season" or mode == "episode":
+        _set_show_info(info_tag, data, mode)
+
+    if detailed:
+        _set_detailed_info(info_tag, data, mode)
+
+
+def _set_basic_info(info_tag, data):
     info_tag.setTitle(data.get("title", data.get("name", "")))
     info_tag.setOriginalTitle(
         data.get("original_title", data.get("original_name", data.get("title", "")))
     )
     info_tag.setPlot(data.get("overview") or data.get("biography", "No overview"))
 
-    # Year & Dates
-    if "first_air_date" in data:
-        first_air_date = data["first_air_date"]
-        if first_air_date:
-            info_tag.setFirstAired(first_air_date)
-            info_tag.setYear(int(first_air_date.split("-")[0]))
-    elif "air_date" in data:
-        info_tag.setFirstAired(data["air_date"])  # Setting air_date for episodes
-    elif "release_date" in data:
-        release_date = data["release_date"]
-        if release_date:
-            info_tag.setPremiered(release_date)
-            info_tag.setYear(int(release_date.split("-")[0]))
 
-    if "runtime" in data:
-        runtime = data.get("runtime")
-        if runtime:
-            info_tag.setDuration(runtime * 60)  # Convert to seconds
-
-    # Rating
-    info_tag.setRating(
-        data.get("vote_average", data.get("rating", 0)),
-        votes=data.get("vote_count", data.get("votes", 0)),
-    )
-
-    info_tag.setUserRating(int(float(data.get("popularity", 0))))
-
-    # Media Type
+def _set_media_type(info_tag, mode):
     if mode == "movies":
         info_tag.setMediaType("movie")
     elif mode == "tv":
@@ -387,18 +407,8 @@ def set_media_infoTag(list_item, data, fanart_data={}, mode="video"):
     else:
         info_tag.setMediaType("video")
 
-    # Classification
-    genres = data.get("genre_ids", data.get("genres", []))
-    final_genres = extract_genres(genres, mode)
-    info_tag.setGenres(final_genres)
 
-    # Countries
-    countries = list(data.get("origin_country", data.get("countries", [])))
-    if isinstance(countries, str):
-        countries = [countries]  # Ensure it's a List
-    info_tag.setCountries(countries)
-
-    # Identification
+def _set_identification(info_tag, data):
     if "imdb_id" in data:
         info_tag.setIMDBNumber(data["imdb_id"])
     if "id" in data:
@@ -407,11 +417,79 @@ def set_media_infoTag(list_item, data, fanart_data={}, mode="video"):
             "imdb": data.get("imdb_id", ""),
             "tvdb": data.get("tvdb_id", ""),
         }
-        info_tag.setUniqueIDs(unique_ids, "tmdb")
+        unique_ids = {k: str(v) for k, v in unique_ids.items() if v}
+        if unique_ids:
+            info_tag.setUniqueIDs(unique_ids, "tmdb")
 
-    # Artwork
+
+def _set_artwork(list_item, data, fanart_data):
     set_listitem_artwork(list_item, data, fanart_data)
 
+
+def _set_released_info(info_tag, data):
+    if "first_air_date" in data:
+        first_air_date = data["first_air_date"]
+        if first_air_date:
+            info_tag.setFirstAired(first_air_date)
+            info_tag.setYear(int(first_air_date.split("-")[0]))
+    elif "air_date" in data:
+        info_tag.setFirstAired(data["air_date"])
+    elif "release_date" in data:
+        release_date = data["release_date"]
+        if release_date:
+            info_tag.setPremiered(release_date)
+            info_tag.setYear(int(release_date.split("-")[0]))
+
+    if "runtime" in data:
+        runtime = data.get("runtime")
+        if runtime:
+            info_tag.setDuration(runtime * 60)
+
+
+def _set_detailed_info(info_tag, data, mode):
+    # Rating
+    info_tag.setRating(
+        data.get("vote_average", data.get("rating", 0)),
+        votes=data.get("vote_count", data.get("votes", 0)),
+    )
+    info_tag.setUserRating(int(float(data.get("popularity", 0))))
+
+    # Classification
+    genres = data.get("genre_ids", data.get("genres", []))
+    final_genres = extract_genres(genres, mode)
+    info_tag.setGenres(final_genres)
+
+    # Countries
+    countries = list(data.get("origin_country", data.get("countries", [])))
+    if isinstance(countries, str):
+        countries = [countries]
+    info_tag.setCountries(countries)
+
+    # Cast & crew
+    info_tag.setCast(get_cast_and_crew(data))
+
+
+def _set_watched_status(info_tag, data, mode):
+    tmdb_id = str(data.get("id") or data.get("tmdb_id", ""))
+    if not tmdb_id:
+        return
+
+    is_watched = False
+    if mode == "movies":
+        is_watched = trakt_watched_cache.get_watched_status("movie", tmdb_id)
+    elif mode == "episode":
+        season = data.get("season")
+        episode = data.get("episode")
+        if season is not None and episode is not None:
+            is_watched = trakt_watched_cache.get_watched_status(
+                "episode", tmdb_id, int(season), int(episode)
+            )
+
+    if is_watched:
+        info_tag.setPlaycount(1)
+
+
+def _set_show_info(info_tag, data, mode):
     if "seasons" in data:
         seasons = list(data["seasons"])
         if isinstance(seasons, list):
@@ -423,10 +501,7 @@ def set_media_infoTag(list_item, data, fanart_data={}, mode="video"):
         else:
             info_tag.addSeason(seasons.get("season_number", 0), seasons.get("name", ""))
 
-    info_tag.setCast(get_cast_and_crew(data))
-
-    # Episode & Season Info (for TV shows/episodes)
-    if mode == "tv":
+    if mode == "tv" or mode == "season":
         info_tag.setTvShowTitle(data.get("title", data.get("name", "")))
         info_tag.setSeason(int(data.get("season", data.get("season_number", 0))))
     elif mode == "episode":
@@ -539,22 +614,21 @@ def build_actor(member, is_cast=True):
 
 
 def set_listitem_artwork(list_item, data, fanart_data):
-    def tmdb_url(path, size):
-        return f"http://image.tmdb.org/t/p/{size}{path}" if path else ""
-
     thumb_sources = [
         (data.get("poster_path"), "w780"),
-        (data.get("still_path"), "w1280"),
+        (data.get("still_path"), "w780"),
     ]
     poster_sources = [
-        (data.get("poster_path"), "w500"),
-        (data.get("still_path"), "w1280"),
-        (data.get("profile_path"), "w500"),
+        (data.get("poster_path"), "w780"),
+        (data.get("still_path"), "w780"),
+        (data.get("profile_path"), "w780"),
     ]
     fanart_sources = [
         (data.get("backdrop_path"), "w1280"),
         (data.get("still_path"), "w1280"),
     ]
+
+    clear_logo = [(extract_tmdb_logo_url(data), "original")]
 
     def first_valid(sources, fallback_key=""):
         for path, size in sources:
@@ -573,13 +647,26 @@ def set_listitem_artwork(list_item, data, fanart_data):
             "icon": first_valid(poster_sources),
             "banner": first_valid(fanart_sources, "banner"),
             "clearart": first_valid(fanart_sources, "clearart"),
-            "clearlogo": first_valid([], "clearlogo"),
+            "clearlogo": first_valid(clear_logo, "clearlogo"),
             "tvshow.clearart": first_valid(fanart_sources, "clearart"),
-            "tvshow.clearlogo": first_valid([], "clearlogo"),
+            "tvshow.clearlogo": first_valid(clear_logo, "clearlogo"),
             "tvshow.landscape": first_valid(fanart_sources, "landscape"),
             "tvshow.banner": first_valid(fanart_sources, "banner"),
         }
     )
+
+
+def extract_tmdb_logo_url(data):
+    images = data.get("images", {}) or {}
+    logos = images.get("logos", []) or []
+    if logos:
+        file_path = logos[0].get("file_path")
+        if file_path:
+            return file_path
+
+
+def tmdb_url(path, size):
+    return f"http://image.tmdb.org/t/p/{size}{path}" if path else ""
 
 
 def build_media_metadata(ids, mode: str) -> dict:
@@ -608,16 +695,31 @@ def build_media_metadata(ids, mode: str) -> dict:
 
     tmdb_id = ids.get("tmdb_id", "")
     tvdb_id = ids.get("tvdb_id", "")
+    imdb_id = ids.get("imdb_id", "")
+
+    if not tmdb_id and imdb_id:
+        from lib.clients.tmdb.utils.utils import tmdb_get
+
+        res = tmdb_get("find_by_imdb_id", imdb_id)
+        if mode == "movies" and getattr(res, "movie_results", []):
+            tmdb_id = str(res.movie_results[0]["id"])
+            ids["tmdb_id"] = tmdb_id
+        elif mode in ("tv", "episode", "season", "anime") and getattr(
+            res, "tv_results", []
+        ):
+            tmdb_id = str(res.tv_results[0]["id"])
+            ids["tmdb_id"] = tmdb_id
 
     metadata["tmdb_id"] = str(tmdb_id)
     metadata["tvdb_id"] = str(tvdb_id)
+
+    tmdb_logo_path = None
 
     # TMDB details
     if tmdb_id:
         from lib.clients.tmdb.utils.utils import get_tmdb_media_details
 
         details = get_tmdb_media_details(tmdb_id, mode)
-
         poster_path = getattr(details, "poster_path", "")
         metadata["poster"] = f"{TMDB_POSTER_URL}{poster_path}" if poster_path else ""
         metadata["overview"] = getattr(details, "overview", "")
@@ -635,22 +737,24 @@ def build_media_metadata(ids, mode: str) -> dict:
         metadata["vote_count"] = getattr(details, "vote_count", 0)
         metadata["popularity"] = getattr(details, "popularity", 0)
         metadata["cast"] = extract_cast(details)
+        tmdb_logo_path = extract_tmdb_logo_url(details) or ""
+        if tmdb_logo_path:
+            metadata["clearlogo"] = tmdb_url(tmdb_logo_path, "original")
+
+        backdrop_path = getattr(details, "backdrop_path", "")
+        if backdrop_path:
+            metadata["fanart"] = tmdb_url(backdrop_path, "original")
 
     # Fanart details
     if tmdb_id or tvdb_id:
         fanart_details = get_fanart_details(tvdb_id=tvdb_id, tmdb_id=tmdb_id, mode=mode)
-        metadata["fanart"] = (
-            fanart_details.get("fanart")
-            or fanart_details.get("poster")
-            or metadata["poster"]
-        )
-        metadata["clearlogo"] = fanart_details.get("clearlogo") or fanart_details.get(
-            "clearart", ""
-        )
-        metadata["clearart"] = fanart_details.get("clearart", "")
-        metadata["keyart"] = fanart_details.get("keyart", "")
-        metadata["banner"] = fanart_details.get("banner", "")
-        metadata["landscape"] = fanart_details.get("landscape", "")
+
+        if not tmdb_logo_path and fanart_details.get("clearlogo"):
+            metadata["clearlogo"] = fanart_details.get("clearlogo")
+
+        for key in ("fanart", "clearart", "keyart", "banner", "landscape"):
+            if fanart_details.get(key):
+                metadata[key] = fanart_details.get(key)
 
     return metadata
 
@@ -659,10 +763,14 @@ def set_watched_file(data):
     title = data.get("title", "")
     is_torrent = data.get("is_torrent", False)
     is_direct = data.get("type", "") == IndexerType.DIRECT
+    is_stremio = data.get("type", "") == IndexerType.STREMIO_DEBRID
 
     if is_direct:
         color = get_random_color("Direct", formatted=False)
         title = f"[B][COLOR {color}][Direct][/COLOR][/B] - {title}"
+    elif is_stremio:
+        color = get_random_color("Stremio", formatted=False)
+        title = f"[B][COLOR {color}][Stremio Debrid][/COLOR][/B] - {title}"
     elif is_torrent:
         color = get_random_color("Torrent", formatted=False)
         title = f"[B][COLOR {color}][Torrent][/COLOR][/B] - {title}"
@@ -686,68 +794,59 @@ def set_watched_title(title, ids, mode, tg_data="", media_type=""):
             "tg_data": tg_data,
         },
     )
+    add_to_library(
+        {
+            "title": title,
+            "ids": ids,
+            "mode": media_type if mode == "multi" else mode,
+            "tg_data": tg_data,
+            "timestamp": datetime.now().strftime("%a, %d %b %Y %I:%M %p"),
+        }
+    )
+
+
+def add_to_library(data):
+    title = data.get("title")
+    if not title:
+        return
+
+    pickle_db.set_item(key="jt:lib", subkey=title, value=data)
+
+
+def remove_from_library(title):
+    pickle_db.delete_item(key="jt:lib", subkey=title)
+
+
+def is_in_library(title):
+    return pickle_db.get_item("jt:lib", title) is not None
 
 
 def get_fanart_details(tvdb_id="", tmdb_id="", mode="tv"):
     identifier = "{}|{}".format(
         "fanart.tv", tvdb_id if tvdb_id and tvdb_id != "None" else tmdb_id
     )
-    data = cache.get(identifier)
-    if data:
-        return data
-    fanart = FanartTv(client_key="fa836e1c874ba95ab08a14ee88e05565")
-    if mode == "tv":
-        results = fanart.get_show(tvdb_id)
-    else:
-        results = fanart.get_movie(tmdb_id)
-    data = get_fanart_data(results)
-    if data:
-        cache.set(
-            identifier,
-            data,
-            timedelta(hours=get_cache_expiration() if is_cache_enabled() else 0),
-        )
-    return data
-
-
-def get_fanart_data(res):
-    fanart_object = res.get("fanart_object")
-    if fanart_object is None:
-        art = {}
-    else:
-        art = fanart_object.get("art", {})
+    cached = cache.get(identifier)
+    if cached:
+        return cached
 
     from lib.clients.tmdb.utils.utils import LANGUAGES
 
-    language_index = get_setting("language", 18)
-    lang = LANGUAGES[int(language_index)].split("-")[0].strip()
+    try:
+        language_index = int(get_setting("language", 18))
+        lang = LANGUAGES[language_index].split("-")[0].strip()
+    except Exception:
+        lang = "en"
 
-    return {
-        "fanart": get_best_image(art.get("fanart", []), lang),
-        "clearlogo": get_best_image(art.get("clearlogo", []), lang),
-        "poster": get_best_image(art.get("poster", []), lang),
-        "clearart": get_best_image(art.get("clearart", []), lang),
-        "keyart": get_best_image(art.get("keyart", []), lang),
-        "banner": get_best_image(art.get("banner", []), lang),
-        "landscape": get_best_image(art.get("landscape", []), lang),
-    }
+    if mode == "tv":
+        data = get_fanart(mode, lang, tvdb_id)
+    else:
+        data = get_fanart(mode, lang, tmdb_id)
 
+    if data:
+        hours = get_cache_expiration() if is_cache_enabled() else 0
+        cache.set(identifier, data, timedelta(hours=hours))
 
-def get_best_image(images, lang="en"):
-    if not images:
-        return ""
-    # Try preferred language first
-    lang_matches = [img for img in images if img.get("language") == lang]
-    if lang_matches:
-        return max(lang_matches, key=lambda x: x.get("rating", 0)).get("url", "")
-
-    # 2. Fallback to English if preferred language not found
-    en_matches = [img for img in images if img.get("language") == "en"]
-    if en_matches:
-        return max(en_matches, key=lambda x: x.get("rating", 0)).get("url", "")
-
-    # 3. Fallback: highest rating overall
-    return max(images, key=lambda x: x.get("rating", 0)).get("url", "")
+    return data or {}
 
 
 def get_cached_results(query, mode, media_type, episode):
@@ -811,12 +910,30 @@ def set_pluging_category(heading: str):
 
 
 def set_content_type(mode, media_type="movies"):
-    if mode in ("tv", "anime") or media_type == "tv":
+    if mode == "season":
+        setContent(ADDON_HANDLE, SEASONS_TYPE)
+    elif mode == "episode":
+        setContent(ADDON_HANDLE, EPISODES_TYPE)
+    elif mode in ("tv", "anime") or media_type == "tv":
         setContent(ADDON_HANDLE, SHOWS_TYPE)
     elif mode == "movies" or media_type == "movies":
         setContent(ADDON_HANDLE, MOVIES_TYPE)
     else:
         setContent(ADDON_HANDLE, TITLES_TYPE)
+
+
+def get_provider_color(provider_name, formatted=True):
+    key = provider_name.lower()
+
+    if key in PROVIDER_COLORS:
+        color = PROVIDER_COLORS[key]
+    else:
+        color = get_random_color(provider_name, formatted=False)
+
+    if formatted:
+        return f"[B][COLOR {color}]{provider_name}[/COLOR][/B]"
+    else:
+        return color
 
 
 # This method was taken from script.elementum.jackett addon
@@ -865,7 +982,7 @@ def execute_thread_pool(results, func, *args, **kwargs):
 
 
 def execute_thread_pool_collection(results, func, *args, **kwargs):
-    thread_number = get_setting("thread_number", 8)
+    thread_number = get_setting("thread_number", 6)
     collected = []
 
     def wrapper(res):
@@ -893,6 +1010,76 @@ def clear_cache_on_update():
 
 def clear_all_cache():
     cache.clean_all()
+
+
+def clear_trakt_db_cache():
+    trakt_cache.clear_all()
+    trakt_watched_cache.clear_all()
+    lists_cache.delete_all_lists()
+    main_cache.delete_all()
+    notification(translation(30244))
+
+
+def clear_tmdb_cache():
+    prefixes = [
+        "search_%",
+        "movie_%",
+        "tv_%",
+        "season_%",
+        "episode_%",
+        "discover_%",
+        "trending_%",
+        "popular_%",
+        "person_%",
+        "find_%",
+        "anime_%",
+        "collection_%",
+        "get_imdb_id%",
+        "latest_%",
+    ]
+    cache.delete("movie_genres|None")
+    cache.delete("show_genres|None")
+
+    for prefix in prefixes:
+        cache.delete_like(f"{prefix}|%")
+    notification(translation(30240))
+
+
+def clear_database_cache():
+    clear_history_by_type("all")
+
+
+def clear_stremio_cache():
+    cache.delete(STREMIO_ADDONS_KEY)
+    cache.delete(STREMIO_ADDONS_CATALOGS_KEY)
+    cache.delete(STREMIO_TV_ADDONS_KEY)
+    cache.delete(STREMIO_USER_ADDONS)
+
+    cache.delete_like("search_catalog%")
+    cache.delete_like("list_catalog%")
+    cache.delete_like("list_stremio_%")
+    notification(translation(30244))
+
+
+def clear_debrid_cache():
+    cache.delete_like("%|%deb%")
+    cache.delete_like("real_debrid%")
+    cache.delete_like("premiumize%")
+    cache.delete_like("all_debrid%")
+    cache.delete_like("torbox%")
+    cache.delete_like("debrider%")
+    notification(translation(30244))
+
+
+def clear_mdblist_cache():
+    cache.delete("get_user_lists|None")
+    cache.delete("top_mdbd_lists|None")
+
+    cache.delete_like("get_user_lists%")
+    cache.delete_like("get_list_items%")
+    cache.delete_like("top_mdbd_lists%")
+    cache.delete_like("search_lists%")
+    notification(translation(30244))
 
 
 def clear_history_by_type(type="all", update=False):
@@ -954,17 +1141,16 @@ def pre_process(
     episode_name: str,
     episode: int,
     season: int,
+    skip_episode_filter: bool = False,
 ) -> List[TorrentStream]:
-    kodilog("Pre-processing results")
     builder = PreProcessBuilder(results).remove_duplicates()
-    if get_setting("stremio_enabled") and get_setting("torrent_enable"):
-        builder.filter_torrent_sources()
-    if mode == "tv":
+    if mode == "tv" and not skip_episode_filter:
         builder.filter_sources(episode_name, episode, season)
     builder.filter_by_quality()
     if get_setting("filter_size_enabled"):
         builder.filter_by_size()
-    return builder.get_results()
+    results = builder.get_results()
+    return results
 
 
 def post_process(results: List[TorrentStream], season: int = 0) -> List[TorrentStream]:
@@ -977,43 +1163,73 @@ def post_process(results: List[TorrentStream], season: int = 0) -> List[TorrentS
     )
 
 
-def filter_torrent_sources(results):
-    filtered_results = []
-    for res in results:
-        if res.get("infoHash") or res.get("guid"):
-            filtered_results.append(res)
-    return filtered_results
+def filter_debrid_episode(
+    files, episode_num: int, season_num: int, strict: bool = True
+) -> List[Dict]:
+    str_season, str_episode = str(season_num), str(episode_num)
+    season_fill, episode_fill = str_season.zfill(2), str_episode.zfill(2)
+    ep_plus_1 = str(episode_num + 1).zfill(2)
+    ep_minus_1 = str(episode_num - 1).zfill(2)
 
+    def get_filename(file):
+        return (
+            file.get("path")
+            or file.get("filename")
+            or file.get("name")
+            or file.get("n")
+            or ""
+        )
 
-def filter_debrid_episode(results, episode_num: int, season_num: int) -> List[Dict]:
-    episode_fill = f"{int(episode_num):02}"
-    season_fill = f"{int(season_num):02}"
+    # Normalize filenames for matching
+    def normalize_title(title):
+        title = unquote(title).replace("'", "")
+        title = re.sub(r"[^A-Za-z0-9-]+", ".", title)
+        return title.lower()
 
-    patterns = [
-        rf"S{season_fill}E{episode_fill}",  # SXXEXX format
-        rf"{season_fill}x{episode_fill}",  # XXxXX format
-        rf"\.S{season_fill}E{episode_fill}",  # .SXXEXX format
-        rf"E{episode_fill}",  # .EXX format
-        rf"\sS{season_fill}E{episode_fill}\s",  # season and episode surrounded by spaces
-        rf"Season[\s._-]?{season_fill}[\s._-]?Episode[\s._-]?{episode_fill}",  # Season X Episode Y
-        rf"Ep[\s._-]?{episode_fill}",  # EpXX
-        r"Cap\.",  # match "Cap."
-    ]
+    string_list = []
 
-    combined_pattern = "|".join(patterns)
+    # SXXEYY variants and S2 - 11 / S02.11
+    for s, e in [
+        (season_fill, episode_fill),
+        (str_season, episode_fill),
+        (season_fill, str_episode),
+        (str_season, str_episode),
+    ]:
+        string_list.append(rf"s{s}[.-]?e{e}")
+        string_list.append(rf"s{s}[.\s-]?{e}")  # S2 - 11 or S02.11
 
-    def get_filename(res):
-        # Real-Debrid uses 'path', fallback to 'filename' or 'name'
-        return res.get("path") or res.get("filename") or res.get("name") or ""
+    # Season X Episode Y or SxE patterns
+    for s, e in [
+        (season_fill, episode_fill),
+        (str_season, episode_fill),
+        (season_fill, str_episode),
+        (str_season, str_episode),
+    ]:
+        string_list.append(rf"(season[.-]?{s}[.-]?episode[.-]?{e})")
+        string_list.append(rf"{s}[x.]?{e}")  # 2x11 or 02.11
 
-    filtered = [
-        res
-        for res in results
-        if re.search(combined_pattern, get_filename(res), re.IGNORECASE)
-    ]
+    # Episode ±1
+    string_list.append(rf"s{season_fill}e{ep_minus_1}[.-]?e{episode_fill}")
+    string_list.append(rf"s{season_fill}e{episode_fill}[.-]?e{ep_plus_1}")
 
-    kodilog("Results after filtering:", level=xbmc.LOGDEBUG)
-    kodilog(filtered, level=xbmc.LOGDEBUG)
+    # Episode-only patterns
+    string_list.append(rf"episode[.-]?{episode_fill}")
+    string_list.append(rf"[.-]ep[.-]?{episode_fill}")
+    string_list.append(r"cap\.")
+
+    # Optional strict negative lookahead to avoid false positives like 10x11 matching 1x01
+    if strict:
+        lookahead = rf"^(?=.*\.e?0*{episode_fill}\.)(?:(?!((?:s|season)[.-]?\d+[.-x]?(?:ep?|episode)[.-]?\d+)|\d+x\d+).)*$"
+        string_list.append(lookahead)
+
+    combined_pattern = "|".join(string_list)
+    try:
+        regex = re.compile(combined_pattern, re.IGNORECASE)
+    except re.error as e:
+        kodilog(f"Regex compilation failed: {e}")
+        return files
+
+    filtered = [f for f in files if regex.search(normalize_title(get_filename(f)))]
     return filtered
 
 
@@ -1228,8 +1444,24 @@ def extract_publish_date(date):
     return match.group() if match else ""
 
 
+def extract_release_group(title):
+    if not title:
+        return ""
+    # Remove file extension if present
+    title = re.sub(r"\.[a-z0-9]{3,4}$", "", title, flags=re.IGNORECASE)
+    # Search for -GroupName at the end (common in scene releases)
+    match = re.search(r"-([a-zA-Z0-9]+)$", title)
+    if match:
+        return match.group(1)
+    # Search for [GroupName] at the beginning (common in anime/p2p)
+    match = re.search(r"^\[([a-zA-Z0-9]+)\]", title)
+    if match:
+        return match.group(1)
+    return ""
+
+
 def translate_weekday(weekday_name, lang="eng"):
-    sub_language = str(get_setting("auto_subtitle_lang"))
+    sub_language = str(get_setting("subtitle_language"))
     if sub_language and sub_language.lower() != "none":
         lang = get_language_code(sub_language)
     return WEEKDAY_TRANSLATIONS.get(lang, WEEKDAY_TRANSLATIONS["eng"]).get(
@@ -1277,3 +1509,19 @@ def parse_time(item):
             kodilog(e)
             return datetime.min
     return datetime.min
+
+
+def safe_json_loads(value, default=None):
+    """
+    Safely load JSON string. Returns default if parsing fails or value is None/empty.
+    """
+    if default is None:
+        default = {}
+
+    if not value:
+        return default
+
+    try:
+        return json.loads(value)
+    except (json.JSONDecodeError, TypeError, ValueError):
+        return default

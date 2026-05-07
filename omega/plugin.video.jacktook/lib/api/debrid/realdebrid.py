@@ -44,20 +44,53 @@ class RealDebrid(DebridClient):
 
     def _handle_service_specific_errors(self, error_data: dict, status_code: int):
         error_code = error_data.get("error_code")
-        if error_code == 9:
-            raise ProviderException("Real-Debrid Permission denied")
-        elif error_code == 22:
-            raise ProviderException("IP address not allowed")
-        elif error_code == 34:
-            raise ProviderException("Too many requests")
-        elif error_code == 35:
-            raise ProviderException("Content marked as infringing")
-        elif error_code == 25:
-            raise ProviderException("Service Unavailable")
-        elif error_code == 21:
-            raise ProviderException("Too many active downloads")
-        elif error_code == 35:
-            raise ProviderException("Infringing file")
+        messages = {
+            -1: "Internal error",
+            1: "Missing parameter",
+            2: "Bad parameter value",
+            3: "Unknown method",
+            4: "Method not allowed",
+            5: "Slow down",
+            6: "Resource unreachable",
+            7: "Resource not found",
+            8: "Bad token",
+            9: "Permission denied",
+            10: "Two-Factor authentication needed",
+            11: "Two-Factor authentication pending",
+            12: "Invalid login",
+            13: "Invalid password",
+            14: "Account locked",
+            15: "Account not activated",
+            16: "Unsupported hoster",
+            17: "Hoster in maintenance",
+            18: "Hoster limit reached",
+            19: "Hoster temporarily unavailable",
+            20: "Hoster not available for free users",
+            21: "Too many active downloads",
+            22: "IP address not allowed",
+            23: "Traffic exhausted",
+            24: "File unavailable",
+            25: "Service unavailable",
+            26: "Upload too big",
+            27: "Upload error",
+            28: "File not allowed",
+            29: "Torrent too big",
+            30: "Torrent file invalid",
+            31: "Action already done",
+            32: "Image resolution error",
+            33: "Torrent already active",
+            34: "Too many requests",
+            35: "Infringing file",
+            36: "Fair Usage Limit",
+            37: "Disabled endpoint",
+        }
+
+        if error_code in messages:
+            raise ProviderException(messages[error_code])
+        err = error_data.get("error") or error_data.get("message")
+        if err:
+            raise ProviderException(f"{err} (code {error_code})")
+        raise ProviderException(f"Real-Debrid error (code {error_code})")
 
     def _make_request(
         self,
@@ -155,13 +188,15 @@ class RealDebrid(DebridClient):
     def auth(self):
         response = self.get_device_code()
         if response:
-            interval = int(response["interval"])
+            sleep_interval = int(response["interval"])
             expires_in = int(response["expires_in"])
             device_code = response["device_code"]
             user_code = response["user_code"]
             auth_url = response["direct_verification_url"]
+
             qr_code = make_qrcode(auth_url)
             copy2clip(auth_url)
+
             progressDialog = QRProgressDialog("qr_dialog.xml", ADDON_PATH)
             progressDialog.setup(
                 "Real Debrid Auth",
@@ -171,9 +206,10 @@ class RealDebrid(DebridClient):
                 DebridType.RD,
             )
             progressDialog.show_dialog()
+
             start_time = time()
             while time() - start_time < expires_in:
-                ksleep(1000 * interval)
+                ksleep(1000 * sleep_interval)
                 if progressDialog.iscanceled:
                     progressDialog.close_dialog()
                     return
@@ -186,7 +222,9 @@ class RealDebrid(DebridClient):
                         self.token = response["token"]
                         set_setting("real_debrid_token", self.token)
                         set_setting("real_debid_authorized", "true")
+
                         self.initialize_headers()
+
                         set_setting("real_debrid_user", self.get_user()["username"])
                         progressDialog.update_progress(100, "Authentication completed.")
                         progressDialog.close_dialog()
@@ -197,8 +235,7 @@ class RealDebrid(DebridClient):
                         progressDialog.update_progress(percent)
                 except Exception as e:
                     progressDialog.close_dialog()
-                    kodilog(traceback.print_exc())
-                    dialog_ok("Error:", f"Error: {e}.")
+                    dialog_ok("Auth Error:", f"Error: {e}")
                     return
 
     def download(self, magnet_url, pack=False):
@@ -322,6 +359,31 @@ class RealDebrid(DebridClient):
 
     def get_user(self):
         return self._make_request("GET", f"{self.BASE_URL}/user")
+
+    def days_remaining(self):
+        try:
+            user = self.get_user()
+            if not user or "expiration" not in user:
+                return None
+
+            expiration = user["expiration"]
+            if not expiration:
+                return None
+
+            import datetime
+
+            try:
+                expires = datetime.datetime.strptime(
+                    expiration, "%Y-%m-%dT%H:%M:%S.%fZ"
+                )
+            except ValueError:
+                expires = datetime.datetime.strptime(expiration, "%Y-%m-%dT%H:%M:%SZ")
+
+            days = (expires - datetime.datetime.utcnow()).days
+            return days
+        except Exception as e:
+            kodilog(f"Error calculating RealDebrid days remaining: {e}")
+            return None
 
     def get_torrent_active_count(self):
         return self._make_request("GET", f"{self.BASE_URL}/torrents/activeCount")

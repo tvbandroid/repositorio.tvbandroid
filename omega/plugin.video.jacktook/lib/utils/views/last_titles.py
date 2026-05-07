@@ -1,4 +1,3 @@
-from datetime import datetime
 import json
 import os
 
@@ -11,11 +10,12 @@ from lib.utils.kodi.utils import (
     ADDON_PATH,
     build_url,
     container_refresh,
+    end_of_directory,
     translation,
 )
 
 from xbmcgui import ListItem
-from xbmcplugin import addDirectoryItem, endOfDirectory
+from xbmcplugin import addDirectoryItem
 
 
 pickle_db = PickleDatabase()
@@ -32,7 +32,7 @@ def show_last_titles(params):
 
     set_pluging_category(translation(90070))
 
-    per_page = 20
+    per_page = 10
     page = int(params.get("page", 1))
 
     all_items = list(reversed(pickle_db.get_key("jt:lth").items()))
@@ -70,7 +70,6 @@ def show_last_titles(params):
         list_item.setArt(
             {"icon": os.path.join(ADDON_PATH, "resources", "img", "trending.png")}
         )
-
         list_item.addContextMenuItems(
             [
                 (
@@ -83,7 +82,7 @@ def show_last_titles(params):
         if mode == "tv":
             addDirectoryItem(
                 ADDON_HANDLE,
-                build_url("tv_seasons_details", ids=ids, mode=mode),
+                build_url("show_seasons_details", ids=ids, mode=mode),
                 list_item,
                 isFolder=True,
             )
@@ -118,4 +117,4 @@ def show_last_titles(params):
             isFolder=True,
         )
 
-    endOfDirectory(ADDON_HANDLE)
+    end_of_directory()

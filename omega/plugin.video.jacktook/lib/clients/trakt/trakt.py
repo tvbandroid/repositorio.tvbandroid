@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 from lib.clients.tmdb.utils.utils import tmdb_get
 from lib.api.trakt.trakt import TraktAPI, TraktLists, TraktMovies, TraktTV
 from lib.api.trakt.trakt_utils import (
@@ -7,6 +8,7 @@ from lib.api.trakt.trakt_utils import (
     is_trakt_auth,
 )
 from lib.clients.trakt.utils import add_kodi_dir_item, extract_ids
+from lib.api.trakt.trakt_utils import add_trakt_collection_context_menu
 from lib.utils.general.utils import (
     Anime,
     Enum,
@@ -16,16 +18,17 @@ from lib.utils.general.utils import (
     set_media_infoTag,
 )
 from lib.utils.kodi.utils import (
-    ADDON_HANDLE,
     build_url,
+    end_of_directory,
+    get_datetime,
+    get_setting,
     kodilog,
     notification,
-    play_media,
+    kodi_play_media,
     translation,
 )
 from .paginator import paginator_db
 
-from xbmcplugin import endOfDirectory
 from xbmcgui import ListItem
 
 
@@ -40,6 +43,9 @@ class Trakt(Enum):
     POPULAR_LISTS = "trakt_popular_lists"
     WATCHED_HISTORY = "trakt_watched_history"
     WATCHLIST = "trakt_watchlist"
+    CALENDAR = "trakt_calendar"
+    UP_NEXT = "trakt_up_next"
+    COLLECTION = "trakt_collection"
 
 
 class BaseTraktClient:
@@ -50,7 +56,7 @@ class BaseTraktClient:
                 [
                     (
                         translation(90049),
-                        play_media(
+                        kodi_play_media(
                             name="search",
                             mode=mode,
                             query=title,
@@ -62,6 +68,7 @@ class BaseTraktClient:
                 + (
                     add_trakt_watchlist_context_menu("movies", ids)
                     + add_trakt_watched_context_menu("movies", ids=ids)
+                    + add_trakt_collection_context_menu("movies", ids)
                     if is_trakt_auth()
                     else []
                 )
@@ -82,11 +89,12 @@ class BaseTraktClient:
                 list_item.addContextMenuItems(
                     add_trakt_watchlist_context_menu("shows", ids)
                     + add_trakt_watched_context_menu("shows", ids=ids)
+                    + add_trakt_collection_context_menu("shows", ids)
                 )
             add_kodi_dir_item(
                 list_item=list_item,
                 url=build_url(
-                    "tv_seasons_details",
+                    "show_seasons_details",
                     ids=ids,
                     mode=mode,
                     media_type=media_type,
@@ -102,7 +110,9 @@ class TraktClient:
         handlers = {
             "movies": TraktClient.handle_trakt_movie_query,
             "tv": TraktClient.handle_trakt_show_query,
-            "anime": lambda q, m, p: TraktClient.handle_trakt_anime_query(category, p),
+            "anime": lambda q, m, p: TraktClient.handle_trakt_anime_query(
+                category, p, submode
+            ),
         }
         handler = handlers.get(mode)
         if handler:
@@ -129,6 +139,7 @@ class TraktClient:
                 list_type="popular", page_no=page
             ),
             Trakt.WATCHLIST: lambda: TraktLists().trakt_watchlist(mode),
+            Trakt.COLLECTION: lambda: TraktMovies().trakt_collection(page),
         }
 
         if query in query_handlers:
@@ -156,6 +167,9 @@ class TraktClient:
                 list_type="popular", page_no=page
             ),
             Trakt.WATCHLIST: lambda: TraktLists().trakt_watchlist(mode),
+            Trakt.COLLECTION: lambda: TraktTV().trakt_collection(page),
+            Trakt.CALENDAR: lambda: TraktClient.handle_calendar_request(),
+            Trakt.UP_NEXT: lambda: TraktTV().trakt_up_next(),
         }
 
         if query in query_handlers:
@@ -164,11 +178,15 @@ class TraktClient:
             return list_handlers[query]()
 
     @staticmethod
-    def handle_trakt_anime_query(query, page):
+    def handle_trakt_anime_query(query, page, submode="tv"):
         if query == Anime.TRENDING:
-            return TraktAPI().anime.trakt_anime_trending(page)
+            return TraktAPI().anime.trakt_anime_trending(page, submode)
+        elif query == Anime.TRENDING_RECENT:
+            return TraktAPI().anime.trakt_anime_trending_recent(page, submode)
         elif query == Anime.MOST_WATCHED:
-            return TraktAPI().anime.trakt_anime_most_watched(page)
+            return TraktAPI().anime.trakt_anime_most_watched(page, submode)
+        elif query == Anime.FAVORITED:
+            return TraktAPI().anime.trakt_anime_most_favorited(page, submode)
 
     @staticmethod
     def trakt_add_to_watchlist(params):
@@ -218,7 +236,61 @@ class TraktClient:
             notification("Failed to mark as unwatched on Trakt", time=3000)
 
     @staticmethod
+    def trakt_add_to_collection(params):
+        media_type = params.get("media_type")
+        ids = json.loads(params.get("ids", "{}"))
+        try:
+            TraktAPI().lists.add_to_collection(media_type, ids)
+            notification("Added to Trakt collection", time=3000)
+        except Exception as e:
+            kodilog(f"Error adding to Trakt collection: {e}")
+            notification("Failed to add to Trakt collection", time=3000)
+
+    @staticmethod
+    def trakt_remove_from_collection(params):
+        media_type = params.get("media_type")
+        ids = json.loads(params.get("ids", "{}"))
+        try:
+            TraktAPI().lists.remove_from_collection(media_type, ids)
+            notification("Removed from Trakt collection", time=3000)
+        except Exception as e:
+            kodilog(f"Error removing from Trakt collection: {e}")
+            notification("Failed to remove from Trakt collection", time=3000)
+
+    @staticmethod
+    def handle_calendar_request():
+        previous_days = int(get_setting("trakt_calendar_previous_days", 0))
+        future_days = int(get_setting("trakt_calendar_future_days", 14))
+
+        # Calculate start date
+        start_date_obj = get_datetime(string=False) - timedelta(days=previous_days)
+        start_date = start_date_obj.strftime("%Y-%m-%d")
+
+        # Calculate total days (past + future + today)
+        days = previous_days + future_days + 1
+
+        # Log user identity logic
+        try:
+            user_settings = TraktAPI().auth.get_user_settings()
+            if user_settings and "user" in user_settings:
+                username = user_settings.get("user", {}).get("username")
+                kodilog(f"Trakt Calendar Request for user: {username}")
+        except Exception as e:
+            kodilog(f"Error fetching Trakt user profile: {e}")
+
+        if get_setting("trakt_calendar_show_all"):
+            return TraktAPI().calendar.trakt_all_shows_calendar(
+                start_date=start_date, days=days
+            )
+
+        return TraktAPI().calendar.trakt_my_calendar(start_date=start_date, days=days)
+
+    @staticmethod
     def process_trakt_result(results, query, category, mode, submode, api, page):
+        if not results:
+            if query in (Trakt.CALENDAR, Trakt.UP_NEXT):
+                notification("No results found", time=3000)
+
         query_handlers = {
             Trakt.TRENDING: lambda: execute_thread_pool(
                 results, TraktPresentation.show_common_categories, mode
@@ -247,13 +319,28 @@ class TraktClient:
             Trakt.WATCHED_HISTORY: lambda: execute_thread_pool(
                 results, TraktPresentation.show_watched_history
             ),
+            Trakt.COLLECTION: lambda: execute_thread_pool(
+                results, TraktPresentation.show_common_categories, mode
+            ),
+            Trakt.CALENDAR: lambda: execute_thread_pool(
+                results, TraktPresentation.show_calendar_items
+            ),
+            Trakt.UP_NEXT: lambda: execute_thread_pool(
+                results, TraktPresentation.show_calendar_items
+            ),
         }
 
         anime_handlers = {
             Anime.TRENDING: lambda: execute_thread_pool(
                 results, TraktPresentation.show_anime_common, submode
             ),
+            Anime.TRENDING_RECENT: lambda: execute_thread_pool(
+                results, TraktPresentation.show_anime_common, submode
+            ),
             Anime.MOST_WATCHED: lambda: execute_thread_pool(
+                results, TraktPresentation.show_anime_common, submode
+            ),
+            Anime.FAVORITED: lambda: execute_thread_pool(
                 results, TraktPresentation.show_anime_common, submode
             ),
         }
@@ -272,7 +359,7 @@ class TraktClient:
             submode=submode,
             api=api,
         )
-        endOfDirectory(ADDON_HANDLE)
+        end_of_directory()
 
     @staticmethod
     def show_trakt_list_content(list_type, mode, user, slug, with_auth, page):
@@ -283,21 +370,25 @@ class TraktClient:
         items = paginator_db.get_page(page)
         execute_thread_pool(items, TraktPresentation.show_lists_content_items)
         add_next_button("list_trakt_page", page, mode=mode)
-        endOfDirectory(ADDON_HANDLE)
+        end_of_directory()
 
     @staticmethod
     def show_list_trakt_page(page, mode):
         items = paginator_db.get_page(page)
         execute_thread_pool(items, TraktPresentation.show_lists_content_items)
         add_next_button("list_trakt_page", page, mode=mode)
-        endOfDirectory(ADDON_HANDLE)
+        end_of_directory()
 
 
 class TraktPresentation:
     @staticmethod
     def show_anime_common(res, mode):
-        ids = extract_ids(res)
-        title = res["show"]["title"]
+        ids = extract_ids(res, mode)
+        # Handle both show and movie responses
+        if mode == "movies" and "movie" in res:
+            title = res["movie"]["title"]
+        else:
+            title = res["show"]["title"]
 
         tmdb_id = ids["tmdb_id"]
         if mode == "tv":
@@ -383,7 +474,9 @@ class TraktPresentation:
         )
 
         list_item = ListItem(list_title)
-        list_item.setInfo("video", info_labels)
+        info_tag = list_item.getVideoInfoTag()
+        info_tag.setTitle(list_title)
+        info_tag.setPlot(description)
 
         add_kodi_dir_item(
             list_item,
@@ -482,4 +575,57 @@ class TraktPresentation:
             title=title,
             ids=ids,
             media_type=res.get("media_type"),
+        )
+
+    @staticmethod
+    def show_calendar_items(res):
+        show_title = res.get("show", {}).get("title")
+        ep_data = res.get("episode", {})
+        title = ep_data.get("title")
+        season = ep_data.get("season")
+        episode = ep_data.get("number")
+
+        first_aired = res.get("first_aired")
+
+        tmdb_id = res.get("show", {}).get("ids", {}).get("tmdb")
+        imdb_id = res.get("show", {}).get("ids", {}).get("imdb")
+        tvdb_id = res.get("show", {}).get("ids", {}).get("tvdb")
+
+        if not tmdb_id:
+            return
+
+        display_title = f"{show_title} - S{season}E{episode} - {title}"
+        if first_aired:
+            date_part = first_aired.split("T")[0]
+            display_title = f"{date_part} | {display_title}"
+
+        ids = {"tmdb_id": tmdb_id, "imdb_id": imdb_id, "tvdb_id": tvdb_id}
+
+        details = tmdb_get("tv_details", tmdb_id) or {}
+
+        list_item = ListItem(label=display_title)
+        set_media_infoTag(list_item, data=details, mode="tv")
+
+        # Override title
+        list_item.setLabel(display_title)
+        info_tag = list_item.getVideoInfoTag()
+        info_tag.setTitle(display_title)
+        info_tag.setPlot(details.get("overview", ""))
+
+        url = build_url(
+            "search",
+            ids=ids,
+            mode="tv",
+            query=show_title,
+            tv_data={
+                "name": title,
+                "episode": episode,
+                "season": season,
+            },
+        )
+
+        add_kodi_dir_item(
+            list_item=list_item,
+            url=url,
+            is_folder=True,
         )

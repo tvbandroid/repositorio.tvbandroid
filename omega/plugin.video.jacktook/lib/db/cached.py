@@ -4,6 +4,7 @@ import sqlite3
 import sys
 import threading
 import traceback
+import re
 
 from base64 import b64encode, b64decode
 from datetime import datetime, timedelta
@@ -62,22 +63,17 @@ class _BaseCache(object):
         return cls.__instance
 
     def _get(self, key, default=None, hashed_key=False, identifier=""):
-        result = self._get(self._generate_key(key, hashed_key, identifier))
-        ret = default
-        if result:
-            data, expires = result
-            if expires > datetime.utcnow():
-                ret = self._process(data)
-        return ret
+        result = self.get(self._generate_key(key, hashed_key, identifier))
+        return result if result is not None else default
 
     def _set(self, key, data, expiry_time, hashed_key=False, identifier=""):
         if expiry_time == timedelta(0):
             return  # Do nothing, as it will expire immediately
 
-        self._set(
+        self.set(
             self._generate_key(key, hashed_key, identifier),
-            self._prepare(data),
-            datetime.utcnow() + expiry_time,
+            data,
+            expiry_time,
         )
 
     def close(self):
@@ -126,19 +122,150 @@ class MemoryCache(_BaseCache):
     def get(self, key):
         data = self._window.getProperty(self._database + key)
         if data:
-            decoded_data = self._load_func(b64decode(data))
-            return decoded_data
+            try:
+                decoded_data = self._load_func(b64decode(data))
+                # Check for (data, expires) tuple format
+                if isinstance(decoded_data, tuple) and len(decoded_data) == 2:
+                    val, expires = decoded_data
+                    if isinstance(expires, datetime):
+                        if expires > datetime.utcnow():
+                            return val
+                        else:
+                            self.delete(key)
+                            return None
+                return decoded_data
+            except Exception:
+                return None
 
-    def set(self, key, data):
+    def set(self, key, data, expires=timedelta(hours=24)):
+        self._add_key_to_index(key)
         try:
-            blob = self._dump_func(data)
+            # Wrap data with expiry
+            expiry_dt = datetime.utcnow() + expires
+            val_to_store = (data, expiry_dt)
+
+            blob = self._dump_func(val_to_store)
             self._window.setProperty(self._database + key, b64encode(blob).decode())
         except Exception as e:
             kodilog(f"[MemoryCache] Error storing key {key!r}: {str(e)}")
             kodilog(traceback.format_exc())
 
     def delete(self, key):
+        self._remove_key_from_index(key)
         self._window.clearProperty(self._database + key)
+
+    def delete_like(self, pattern):
+        # Convert SQL LIKE pattern to regex
+        regex_pattern = (
+            re.escape(pattern)
+            .replace(r"\%", ".*")
+            .replace("%", ".*")
+            .replace(r"\_", ".")
+            .replace("_", ".")
+        )
+        regex = re.compile(f"^{regex_pattern}$")
+
+        keys = self._get_key_index()
+        to_delete = [k for k in keys if regex.match(k)]
+
+        for k in to_delete:
+            self.delete(k)
+
+    def clean_all(self):
+        keys = self._get_key_index()
+        for k in keys:
+            self._window.clearProperty(self._database + k)
+        self._window.clearProperty(self._database + "_KEY_INDEX_")
+
+    def _get_key_index(self):
+        try:
+            data = self._window.getProperty(self._database + "_KEY_INDEX_")
+            if data:
+                return self._load_func(b64decode(data))
+        except:
+            pass
+        return set()
+
+    def _save_key_index(self, index):
+        try:
+            blob = self._dump_func(index)
+            self._window.setProperty(
+                self._database + "_KEY_INDEX_", b64encode(blob).decode()
+            )
+        except:
+            pass
+
+    def _add_key_to_index(self, key):
+        index = self._get_key_index()
+        if key not in index:
+            index.add(key)
+            self._save_key_index(index)
+
+    def _remove_key_from_index(self, key):
+        index = self._get_key_index()
+        if key in index:
+            index.remove(key)
+            self._save_key_index(index)
+
+
+class HybridCache(_BaseCache):
+    def __init__(self):
+        self.memory = MemoryCache()
+        self.db = SQLiteCache()
+
+    def get(self, key):
+        # L1: Memory
+        data = self.memory.get(key)
+        if data is not None:
+            return data
+
+        # L2: Database
+        data = self.db.get(key)
+        if data is not None:
+            self.memory.set(key, data, expires=timedelta(minutes=30))
+            return data
+        return None
+
+    def set(self, key, data, expires=timedelta(hours=24)):
+        # Write to both
+        self.memory.set(key, data, expires)
+        self.db.set(key, data, expires)
+
+    def delete(self, key):
+        self.memory.delete(key)
+        self.db.delete(key)
+
+    def add_to_list(self, key, item, expires):
+        existing_data = self.get_list(key)
+        if item in existing_data:
+            existing_data.remove(item)
+        existing_data.append(item)
+        self.set(key, existing_data, expires)
+
+    def get_list(self, key):
+        result = self.get(key)
+        if result:
+            seen = set()
+            deduped = []
+            for item in reversed(result):
+                t = tuple(item)
+                if t not in seen:
+                    seen.add(t)
+                    deduped.append(t)
+            deduped.reverse()
+            return deduped
+        return []
+
+    def clear_list(self, key):
+        self.set(key, [], expires=timedelta(seconds=1))
+
+    def clean_all(self):
+        self.memory.clean_all()
+        self.db.clean_all()
+
+    def delete_like(self, pattern):
+        self.memory.delete_like(pattern)
+        self.db.delete_like(pattern)
 
 
 class SQLiteCache(_BaseCache):
@@ -177,6 +304,8 @@ class SQLiteCache(_BaseCache):
     def add_to_list(self, key, item, expires):
         """Append an item to a list stored under the given key."""
         existing_data = self.get_list(key)
+        if item in existing_data:
+            existing_data.remove(item)
         existing_data.append(item)
         self.set(
             key,
@@ -188,7 +317,15 @@ class SQLiteCache(_BaseCache):
         """Retrieve the list stored under the given key."""
         result = self.get(key)
         if result:
-            return [tuple(item) for item in result]
+            seen = set()
+            deduped = []
+            for item in reversed(result):
+                t = tuple(item)
+                if t not in seen:
+                    seen.add(t)
+                    deduped.append(t)
+            deduped.reverse()
+            return deduped
         return []
 
     def get(self, key):
@@ -248,6 +385,10 @@ class SQLiteCache(_BaseCache):
         """Remove a single key from the SQLite store."""
         self._conn.execute("DELETE FROM `cached` WHERE key = ?", (key,))
 
+    def delete_like(self, pattern):
+        """Remove keys matching a pattern from the SQLite store."""
+        self._conn.execute("DELETE FROM `cached` WHERE key LIKE ?", (pattern,))
+
     def _set_version(self, version):
         self._conn.execute("PRAGMA user_version={}".format(version))
 
@@ -279,4 +420,4 @@ class SQLiteCache(_BaseCache):
         self._conn.close()
 
 
-cache = SQLiteCache()
+cache = HybridCache()

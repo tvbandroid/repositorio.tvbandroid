@@ -4,7 +4,6 @@ import json
 import re
 import sys
 import time
-import sqlite3 as database
 from typing import Any, Union
 
 from urllib.parse import quote, urlencode
@@ -15,7 +14,7 @@ import xbmcaddon
 import xbmcgui
 
 from xbmcgui import Window, ListItem
-from xbmcplugin import setResolvedUrl
+from xbmcplugin import setResolvedUrl, endOfDirectory
 from xbmcvfs import (
     translatePath as translate_path,
     delete as xbmc_delete,
@@ -38,10 +37,16 @@ ELEMENTUM_ADDON_ID = "plugin.video.elementum"
 JACKTOOK_BURST_ADOON_ID = "script.jacktook.burst"
 
 
-try:
-    JACKTORR_ADDON = xbmcaddon.Addon(JACKTORR_ADDON_ID)
-except:
-    JACKTORR_ADDON = None
+def _get_jacktorr_addon():
+    try:
+        if xbmc.getCondVisibility(f"System.HasAddon({JACKTORR_ADDON_ID})"):
+            return xbmcaddon.Addon(JACKTORR_ADDON_ID)
+    except Exception:
+        pass
+    return None
+
+
+JACKTORR_ADDON = _get_jacktorr_addon()
 
 ADDON = xbmcaddon.Addon()
 try:
@@ -73,12 +78,12 @@ def get_jacktorr_setting(value, default=None):
     value = JACKTORR_ADDON.getSetting(value)
     if not value:
         return default
-    if value == "true":
-        return True
-    elif value == "false":
-        return False
-    else:
-        return value
+    if isinstance(value, str):
+        if value.lower() == "true":
+            return True
+        elif value.lower() == "false":
+            return False
+    return value
 
 
 def get_setting(id, default=None):
@@ -87,10 +92,11 @@ def get_setting(id, default=None):
         val = ADDON.getSetting(id)
         if not val:
             return default
-    if val.lower() == "true":
-        return True
-    if val.lower() == "false":
-        return False
+    if isinstance(val, str):
+        if val.lower() == "true":
+            return True
+        if val.lower() == "false":
+            return False
     return val
 
 
@@ -148,6 +154,8 @@ def is_jacktorr_addon():
 
 def is_jacktorr_addon_enabled():
     try:
+        if not xbmc.getCondVisibility(f"System.HasAddon({JACKTORR_ADDON_ID})"):
+            return False
         addon = xbmcaddon.Addon(JACKTORR_ADDON_ID)
         # If the addon is disabled, this will raise RuntimeError
         return True
@@ -222,6 +230,10 @@ def compat(line1, line2, line3):
     return message
 
 
+def kodi_refresh():
+	execute_builtin('UpdateLibrary(video,special://skin/foo)')
+
+
 def refresh():
     xbmc.executebuiltin("Container.Refresh")
 
@@ -258,6 +270,11 @@ def dialogyesno(header, text):
         return True
     else:
         return False
+
+
+def dialog_select(heading, _list):
+    dialog = xbmcgui.Dialog()
+    return dialog.select(heading, _list)
 
 
 def close_all_dialog():
@@ -306,7 +323,7 @@ def buffer_and_play(info_hash, file_id, path):
     return f"PlayMedia({url})"
 
 
-def play_media(name, *args, **kwargs):
+def kodi_play_media(name, *args, **kwargs):
     return "PlayMedia({})".format(build_url(name, *args, **kwargs))
 
 
@@ -368,6 +385,8 @@ def disable_enable_addon(addon_name=ADDON_NAME):
 
 def update_kodi_addons_db(addon_name=ADDON_NAME):
     try:
+        import sqlite3 as database
+        
         date = time.strftime("%Y-%m-%d %H:%M:%S")
         dbcon = database.connect(
             translate_path("special://database/Addons33.db"), timeout=40.0
@@ -393,11 +412,18 @@ def bytes_to_human_readable(size: int, unit: str = "B") -> str:
 
 def convert_size_to_bytes(size_str: str) -> int:
     """Convert size string to bytes."""
-    match = re.match(r"(\d+(?:\.\d+)?)\s*(GB|MB)", size_str, re.IGNORECASE)
+    match = re.match(r"(\d+(?:\.\d+)?)\s*(GB|MB|KB|B)", size_str, re.IGNORECASE)
     if match:
         size, unit = match.groups()
         size = float(size)
-        return int(size * 1024**3) if "GB" in unit.upper() else int(size * 1024**2)
+        unit = unit.upper()
+        if unit == "GB":
+            return int(size * 1024**3)
+        if unit == "MB":
+            return int(size * 1024**2)
+        if unit == "KB":
+            return int(size * 1024)
+        return int(size)
     return 0
 
 
@@ -487,8 +513,22 @@ def cancel_playback():
     PLAYLIST.clear()
     close_busy_dialog()
     close_all_dialog()
+    try:
+        xbmc.Player().stop()
+    except Exception:
+        pass
     setResolvedUrl(ADDON_HANDLE, False, ListItem(offscreen=True))
 
 
 def kodilog(message, level=xbmc.LOGINFO):
     xbmc.log("[###JACKTOOKLOG###] " + str(message), level)
+
+
+def is_widget():
+    return "jacktook" not in xbmc.getInfoLabel("Container.PluginName")
+
+
+def end_of_directory(cache=True):
+    endOfDirectory(
+        ADDON_HANDLE, cacheToDisc=False if is_widget() or not cache else True
+    )

@@ -1,4 +1,5 @@
-from datetime import timedelta
+import json
+from datetime import datetime, timedelta
 import os
 import threading
 from typing import List, Optional
@@ -22,12 +23,14 @@ from lib.utils.kodi.utils import (
     ADDON_HANDLE,
     ADDON_PATH,
     container_update,
+    execute_builtin,
     kodilog,
-    play_media,
+    kodi_play_media,
     translation,
 )
 from lib.utils.kodi.settings import get_cache_expiration, is_cache_enabled
 from lib.utils.general.utils import execute_thread_pool
+from urllib import parse
 
 from lib.db.cached import cache
 from xbmcplugin import addDirectoryItem
@@ -262,13 +265,19 @@ def tmdb_get(path, params=None) -> Optional[AsObj]:
         return data
 
     handlers = {
-        "search_tv": lambda p: Search().tv_shows(p),
-        "search_movie": lambda p: Search().movies(p),
+        "search_tv": lambda p: Search().tv_shows(
+            term=p["query"], page=p.get("page", 1), release_year=p.get("year")
+        ),
+        "search_movie": lambda p: Search().movies(
+            term=p["query"], page=p.get("page", 1), year=p.get("year")
+        ),
         "search_multi": lambda p: Search().multi(p["query"], page=p["page"]),
         "search_collections": lambda p: Search().collections(p["query"], p["page"]),
         "search_people": lambda p: Search().people(p["query"], p["page"]),
-        "movie_details": lambda p: Movie().details(p),
-        "tv_details": lambda p: TV().details(p),
+        "movie_details": lambda p: Movie().details(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "tv_details": lambda p: TV().details(p["id"] if isinstance(p, dict) else p),
         "season_details": lambda p: Season().details(p["id"], p["season"]),
         "episode_details": lambda p: Episode().details(
             p["id"], p["season"], p["episode"]
@@ -283,22 +292,43 @@ def tmdb_get(path, params=None) -> Optional[AsObj]:
         "popular_movie": lambda p: Movie().popular(page=p),
         "trending_tv": lambda p: Trending().tv_week(page=p),
         "popular_shows": lambda p: TV().popular(page=p),
+        "airing_today": lambda p: TV().airing_today(page=p),
         "popular_people": lambda p: Person().popular(page=p),
         "trending_people": lambda p: Trending().person_week(page=p),
         "latest_people": lambda p: Person().latest(),
-        "person_details": lambda p: Person().details(p),
-        "person_credits": lambda p: Person().combined_credits(p),
-        "person_tv_credits": lambda p: Person().tv_credits(p),
-        "person_movie_credits": lambda p: Person().movie_credits(p),
-        "tv_credits": lambda p: TV().credits(p),
-        "movie_credits": lambda p: Movie().credits(p),
-        "person_ids": lambda p: Person().external_ids(p),
-        "find_by_tvdb": lambda p: Find().find_by_tvdb_id(p),
-        "find_by_imdb_id": lambda p: Find().find_by_imdb_id(p),
+        "person_details": lambda p: Person().details(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "person_credits": lambda p: Person().combined_credits(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "person_tv_credits": lambda p: Person().tv_credits(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "person_movie_credits": lambda p: Person().movie_credits(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "tv_credits": lambda p: TV().credits(p["id"] if isinstance(p, dict) else p),
+        "movie_credits": lambda p: Movie().credits(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "person_ids": lambda p: Person().external_ids(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "find_by_tvdb": lambda p: Find().find_by_tvdb_id(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "find_by_imdb_id": lambda p: Find().find_by_imdb_id(
+            p["id"] if isinstance(p, dict) else p
+        ),
         "anime_year": lambda p: TmdbAnime().anime_year(p),
         "anime_genres": lambda p: TmdbAnime().anime_genres(p),
-        "collection_details": lambda p: Collection().details(p),
-        "collection_images": lambda p: Collection().images(p),
+        "collection_details": lambda p: Collection().details(
+            p["id"] if isinstance(p, dict) else p
+        ),
+        "collection_images": lambda p: Collection().images(
+            p["id"] if isinstance(p, dict) else p
+        ),
         "tv_recommendations": lambda p: TV().recommendations(
             tv_id=p["id"], page=p["page"]
         ),
@@ -307,6 +337,10 @@ def tmdb_get(path, params=None) -> Optional[AsObj]:
         ),
         "tv_similar": lambda p: TV().similar(tv_id=p["id"], page=p["page"]),
         "movie_similar": lambda p: Movie().similar(movie_id=p["id"], page=p["page"]),
+        "movie_images": lambda p: Movie().images(movie_id=p["id"]),
+        "tv_images": lambda p: TV().images(tv_id=p["id"]),
+        "movie_reviews": lambda p: Movie().reviews(movie_id=p["id"], page=p["page"]),
+        "tv_reviews": lambda p: TV().reviews(tv_id=p["id"], page=p["page"]),
     }
 
     try:
@@ -401,23 +435,33 @@ def filter_anime_by_keyword(results, mode):
     return results
 
 
-def add_tmdb_movie_context_menu(mode, title=None, ids={}):
+def add_tmdb_movie_context_menu(mode, media_type, title=None, ids={}):
     return [
         (
             translation(90049),
-            play_media(
-                name="search",
+            kodi_play_media(
+                name="rescrape_tmdb_media",
                 mode=mode,
+                media_type=media_type,
                 query=title,
-                ids=ids,
+                tmdb_id=ids.get("tmdb_id"),
                 rescrape=True,
             ),
         ),
         (
             translation(90115),
-            play_media(
-                name="search_with_sources",
+            kodi_play_media(
+                name="rescrape_tmdb_media",
+                mode=mode,
+                media_type=media_type,
+                query=title,
+                tmdb_id=ids.get("tmdb_id"),
+                force_select=True,
             ),
+        ),
+         (
+            "Extras",
+            f"RunPlugin(plugin://plugin.video.jacktook/?action=extras&id={ids.get('tmdb_id')}&imdb_id={ids.get('imdb_id', '')}&media_type={media_type}&title={parse.quote(title or '')})",
         ),
         (
             translation(90050),
@@ -441,6 +485,20 @@ def add_tmdb_movie_context_menu(mode, title=None, ids={}):
                 name="search_people_by_id",
                 mode=mode,
                 ids=ids,
+            ),
+        ),
+        (
+            translation(90205),
+            kodi_play_media(
+                name="add_to_library",
+                data=json.dumps(
+                    {
+                        "title": title,
+                        "ids": ids,
+                        "mode": media_type,
+                        "timestamp": datetime.now().strftime("%a, %d %b %Y %I:%M %p"),
+                    }
+                ),
             ),
         ),
         (
@@ -453,6 +511,10 @@ def add_tmdb_movie_context_menu(mode, title=None, ids={}):
 def add_tmdb_show_context_menu(mode, ids={}):
     return [
         (
+            "Extras",
+            f"RunPlugin(plugin://plugin.video.jacktook/?action=extras&id={ids.get('tmdb_id')}&imdb_id={ids.get('imdb_id', '')}&media_type=tv&title={parse.quote(ids.get('name') or ids.get('title') or '')})",
+        ),
+        (
             translation(90050),
             container_update(
                 name="search_tmdb_recommendations",
@@ -474,6 +536,20 @@ def add_tmdb_show_context_menu(mode, ids={}):
                 name="search_people_by_id",
                 mode=mode,
                 ids=ids,
+            ),
+        ),
+        (
+            translation(90205),
+            kodi_play_media(
+                name="add_to_library",
+                data=json.dumps(
+                    {
+                        "title": ids.get("name") or ids.get("title"),
+                        "ids": ids,
+                        "mode": mode,
+                        "timestamp": datetime.now().strftime("%a, %d %b %Y %I:%M %p"),
+                    }
+                ),
             ),
         ),
         (
@@ -487,7 +563,7 @@ def add_tmdb_episode_context_menu(mode, tv_name=None, tv_data=None, ids={}):
     return [
         (
             translation(90049),
-            play_media(
+            kodi_play_media(
                 name="search",
                 mode=mode,
                 query=tv_name,
@@ -498,7 +574,14 @@ def add_tmdb_episode_context_menu(mode, tv_name=None, tv_data=None, ids={}):
         ),
         (
             translation(90115),
-            play_media(name="search_with_sources"),
+            kodi_play_media(
+                name="search",
+                mode=mode,
+                query=tv_name,
+                ids=ids,
+                tv_data=tv_data,
+                force_select=True,
+            ),
         ),
         (
             translation(90050),

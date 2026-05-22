@@ -36,14 +36,14 @@
     },
     {
         "type": "m3u",
-        "name": "[B][COLOR gold]TELEVISON [COLOR white]FREE[/COLOR][/B]",
+        "name": "[B][COLOR gold]TELEVISION [COLOR white]FREE[/COLOR][/B]",
         "url": "https://raw.githubusercontent.com/HelmerLuzo/RadTV_HL/refs/heads/main/tv/m3u/RadTV_tv.m3u",
 		"logo": "https://i.imgur.com/G9zHpQ9.png",
 		"fanart": "https://i.imgur.com/xAl1axz.jpeg"	
     },
 	{
         "type": "m3u",
-        "name": "[B][COLOR white]XXX iPTV [COLOR red]ADULTO[/COLOR][/B]",
+        "name": "[B][COLOR white]XXX iPTV [COLOR red]ADULTOS[/COLOR][/B]",
         "url": "https://raw.githubusercontent.com/dzh0ni/iPTV-FREE-LIST/refs/heads/master/iPTV-Free-List_XXX.m3u",
 		"logo": "https://i.imgur.com/lnTiwZ6.png",
 		"fanart": "https://i.imgur.com/mejKmhp.jpeg"

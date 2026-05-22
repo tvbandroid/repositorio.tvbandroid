@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2024-11-11 04:00+0000\n"
-"Last-Translator: SullensCR <sullenscr@protonmail.com>\n"
+"PO-Revision-Date: 2025-12-18 13:55+0000\n"
+"Last-Translator: pol busquets <canpinetell@gmail.com>\n"
 "Language-Team: Spanish <https://translate.jellyfin.org/projects/jellycon/"
 "jellycon/es/>\n"
 "Language: es\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7.2\n"
+"X-Generator: Weblate 5.14\n"
 
 msgctxt "#30442"
 msgid "Simple new content check"
@@ -133,11 +133,11 @@ msgstr "- Colecciones"
 
 msgctxt "#30409"
 msgid "Add-on Actions"
-msgstr "Acciones del Complemento"
+msgstr "Acciones del complemento"
 
 msgctxt "#30407"
 msgid "Global Lists"
-msgstr "Listas Globales: Películas y Series"
+msgstr "Listas globales / Películas y Series"
 
 msgctxt "#30406"
 msgid "Jellyfin Libraries"
@@ -145,7 +145,7 @@ msgstr "Bibliotecas de Jellyfin"
 
 msgctxt "#30405"
 msgid " - Show All"
-msgstr "- Mostrar Todo"
+msgstr "- Mostrar todo"
 
 msgctxt "#30404"
 msgid " - A-Z"
@@ -157,7 +157,7 @@ msgstr "Películas - Recomendaciones"
 
 msgctxt "#30402"
 msgid "Add to Kodi Playlist"
-msgstr "Añadir a la Lista de Reproducción de Kodi"
+msgstr "Añadir a la lista de reproducción de Kodi"
 
 msgctxt "#30401"
 msgid "Info"
@@ -169,7 +169,7 @@ msgstr "Esconder"
 
 msgctxt "#30398"
 msgid "Refresh Jellyfin Metadata"
-msgstr "Recargar Metadatos de Jellyfin"
+msgstr "Recargar metadatos de Jellyfin"
 
 msgctxt "#30397"
 msgid " - Pages"
@@ -185,7 +185,7 @@ msgstr "Archivos del caché borrados"
 
 msgctxt "#30393"
 msgid "Clear Cache Result"
-msgstr "Borrar Caché del Resultado"
+msgstr "Borrar caché del resultado"
 
 msgctxt "#30392"
 msgid "HTTPS"
@@ -1138,14 +1138,6 @@ msgctxt "#30227"
 msgid "Simple"
 msgstr "Simple"
 
-msgctxt "#30100"
-msgid "Clone default skin"
-msgstr "Clonar skin predeterminada"
-
-msgctxt "#30101"
-msgid "All Movies"
-msgstr "Todas las Películas"
-
 msgctxt "#30452"
 msgid "Combine instead of replace (might cause slow-down)"
 msgstr "Combinar en vez de reemplazar (podría causar una bajada rendimiento)"
@@ -1165,3 +1157,75 @@ msgstr "Días para volver a verlo (0 = deshabilitado)"
 msgctxt "#30453"
 msgid "Hide number of items to show on entry title"
 msgstr "Ocultar el número de ítems que se enseñan en el título"
+
+msgctxt "#30454"
+msgid " - Totally Unwatched"
+msgstr " - Totalmente no visto"
+
+msgctxt "#30667"
+msgid "Action to take"
+msgstr "Acción para tomar"
+
+msgctxt "#30672"
+msgid "Skip"
+msgstr "Omitir"
+
+msgctxt "#30673"
+msgid "Ask"
+msgstr "Preguntar"
+
+msgctxt "#30674"
+msgid "Do Nothing"
+msgstr "Hacer nada"
+
+msgctxt "#30675"
+msgid "Commercial Skipper"
+msgstr "Omitidor de Anuncios"
+
+msgctxt "#30677"
+msgid "Recap Skipper"
+msgstr "Saltador de resúmenes"
+
+msgctxt "#30666"
+msgid "Segment Skipper"
+msgstr "Saltador de segmento"
+
+msgctxt "#30668"
+msgid "Start Offset (seconds)"
+msgstr "Desfase de inicio (segundos)"
+
+msgctxt "#30669"
+msgid "End Offset (seconds)"
+msgstr "Desfase de final (segundos)"
+
+msgctxt "#30670"
+msgid "Intro Skipper"
+msgstr "Saltador de introducción"
+
+msgctxt "#30671"
+msgid "Credit Skipper"
+msgstr "Saltador de créditos"
+
+msgctxt "#30676"
+msgid "Preview Skipper"
+msgstr "Saltador de previsualizaciones"
+
+msgctxt "#30455"
+msgid "TV Shows - Random"
+msgstr "Programas de TV"
+
+msgctxt "#30456"
+msgid "All - Random"
+msgstr "Todo en aleatorio"
+
+msgctxt "#30457"
+msgid "All - Recently Added"
+msgstr "Todo - Recientemente Añadido"
+
+msgctxt "#30458"
+msgid "All - Favorites"
+msgstr "Todo - Favoritos"
+
+msgctxt "#30678"
+msgid "TV Shows per page"
+msgstr "Series por página"

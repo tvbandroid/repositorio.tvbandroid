@@ -22,15 +22,16 @@ from resolveurl.lib import helpers
 
 class DropLoadResolver(ResolveGeneric):
     name = 'DropLoad'
-    domains = ['dropload.io']
-    pattern = r'(?://|\.)(dropload\.io)/(?:embed-|e/|d/)?([0-9a-zA-Z]+)'
+    domains = ['dropload.io', 'dropload.tv', 'dropload.pro', 'dropload.co', 'dr0pstream.com']
+    pattern = r'(?://|\.)(dr[0o]p(?:load|stream)\.(?:io|tv|com?|pro))/(?:embed-|e/|d/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         return helpers.get_media_url(
             self.get_url(host, media_id),
             patterns=[r'''sources:\s*\[{\s*file:\s*["'](?P<url>[^"']+)'''],
-            generic_patterns=False
+            generic_patterns=False,
+            referer=False
         )
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://{host}/embed-{media_id}.html')
+        return self._default_get_url(host, media_id, template='https://{host}/e/{media_id}')

@@ -160,7 +160,7 @@ def scrape_sources(html, result_blacklist=None, scheme='http', patterns=None, ge
         patterns = []
 
     def __parse_to_list(_html, regex):
-        _blacklist = ['.jpg', '.jpeg', '.gif', '.png', '.js', '.css', '.htm', '.html', '.php', '.srt', '.sub', '.xml', '.swf', '.vtt', '.mpd']
+        _blacklist = ['.jpg', '.jpeg', '.gif', '.png', '.js', '.css', '.htm', '.html', '.php', '.srt', '.sub', '.xml', '.swf', '.vtt']
         _blacklist = set(_blacklist + result_blacklist)
         streams = []
         labels = []
@@ -288,8 +288,7 @@ def get_media_url(
     elif referer:
         headers.update({'Referer': rurl})
     response = net.http_GET(url, headers=headers, redirect=redirect)
-    response_headers = response.get_headers(as_dict=True)
-    cookie = response_headers.get('Set-Cookie', None)
+    cookie = response.get_cookies()
     if cookie:
         headers.update({'Cookie': cookie})
     html = response.content
@@ -480,8 +479,7 @@ def xor_string(encurl, key):
     Code adapted from https://github.com/vb6rocod/utils/
     Copyright (C) 2019 vb6rocod
     """
-    import base64
-    strurl = base64.b64decode(encurl).decode('utf-8')
+    strurl = b64decode(encurl)
     surl = ''
     for i in range(len(strurl)):
         surl += chr(ord(strurl[i]) ^ ord(key[i % len(key)]))
@@ -826,5 +824,15 @@ def b64decode(t, binary=False):
     return r if binary else six.ensure_str(r)
 
 
-def b64encode(b):
-    return six.ensure_str(base64.b64encode(b if isinstance(b, bytes) else six.b(b)))
+def b64encode(b, strip=False):
+    r = six.ensure_str(base64.b64encode(b if isinstance(b, bytes) else six.b(b)))
+    if strip:
+        r = r.rstrip('=')
+    return r
+
+
+def b64urlencode(b, strip=False):
+    r = six.ensure_str(base64.urlsafe_b64encode(b if isinstance(b, bytes) else six.b(b)))
+    if strip:
+        r = r.rstrip('=')
+    return r

@@ -18,32 +18,60 @@
 
 import re
 import json
+import six
+from six.moves import urllib_parse
+
 from resolveurl import common
 from resolveurl.lib import helpers
 from resolveurl.resolver import ResolveUrl, ResolverError
 
+from resolveurl.lib import pyaes
+
 
 class StreamUpResolver(ResolveUrl):
     name = 'StreamUp'
-    domains = ['streamup.ws']
-    pattern = r'(?://|\.)(streamup\.ws)/([0-9a-zA-Z]+)'
+    domains = ['streamup.ws', 'streamup.cc', 'strmup.to', 'strmup.cc', 'vfaststream.com']
+    pattern = r'(?://|\.)((?:vfast)?stre?a?m(?:up)?\.(?:ws|cc|to|com))/(?:v/)?([0-9a-zA-Z]+)'
 
     def get_media_url(self, host, media_id):
         web_url = self.get_url(host, media_id)
-        headers = {'User-Agent': common.RAND_UA}
-        html = self.net.http_GET(web_url, headers=headers).content
-        r = re.search(r'fetch\(`([^=]+=)[^`]+`\)\.then', html)
-        if r:
-            headers.update({
-                'Referer': 'https://{0}/'.format(host),
-                'Origin': 'https://{0}'.format(host)
-            })
-            surl = r.group(1) + media_id
-            sdata = json.loads(self.net.http_GET(surl, headers=headers).content)
-            s = sdata.get('streaming_url')
-            if s:
-                return s + helpers.append_headers(headers)
-        raise ResolverError('Video Link Not Found')
+        user_agent = common.RAND_UA
+        ref = urllib_parse.urljoin(web_url, '/')
+        stream_url = ''
+        headers = {"User-Agent": user_agent, "Referer": ref}
+        content = self.net.http_GET(web_url, headers=headers).content
+
+        session_id_match = re.search(r"'([a-f0-9]{32})'", content)
+        encrypted_data_match = re.search(r"'([A-Za-z0-9+/=]{200,})'", content)
+
+        if encrypted_data_match and session_id_match:
+            session_id = session_id_match.group(1)
+            encrypted_data_b64 = encrypted_data_match.group(1)
+            key_url = "{0}/ajax/stream?session={1}".format(ref[:-1], session_id)
+            key_b64 = self.net.http_GET(key_url, headers=headers).content
+            key = helpers.b64decode(key_b64, binary=True)
+            encrypted_data = helpers.b64decode(encrypted_data_b64, binary=True)
+            iv = encrypted_data[:16]
+            ciphertext = encrypted_data[16:]
+
+            decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
+            decrypted_data = decrypter.feed(ciphertext)
+            decrypted_data += decrypter.feed()
+
+            stream_info = json.loads(six.ensure_str(decrypted_data))
+            stream_url = stream_info.get("streaming_url")
+        else:
+            surl = '{0}/ajax/stream?filecode={1}'.format(ref[:-1], media_id)
+            sdata = self.net.http_GET(surl, headers=headers).content
+            stream_info = json.loads(sdata)
+            stream_url = stream_info.get("streaming_url")
+
+        if stream_url:
+            headers.update({"Origin": ref[:-1]})
+            stream_url = stream_url.replace('\r', '').replace('\n', '')
+            return stream_url + helpers.append_headers(headers)
+
+        raise ResolverError('Video cannot be located.')
 
     def get_url(self, host, media_id):
         return self._default_get_url(host, media_id, template='https://{host}/{media_id}')

@@ -3426,11 +3426,12 @@ provider-name="jurialmunkey">
     </extension>
 </addon>
 
-<addon id="script.module.resolveurl" name="ResolveURL" version="5.1.174" provider-name="gujal">
+<addon id="script.module.resolveurl" name="ResolveURL" version="5.1.199" provider-name="gujal">
     <requires>
         <!-- <import addon="xbmc.python" version="3.0.0" /> -->
         <import addon="script.module.six" />
         <import addon="script.module.kodi-six" />
+        <import addon="script.module.cloudrequest" optional="true" />
         <import addon="plugin.video.youtube" optional="true" />
         <import addon="script.module.python.twitch" optional="true" />
         <import addon="plugin.googledrive" optional="true" />

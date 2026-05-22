@@ -1,21 +1,17 @@
-Version 5.1.174 (Jun 08, 2025)
+Version 5.1.199 (May 20, 2026)
 - Code Base Changes:
-    - update useragents
+    - Add ByParr support
+    - Fix regression bug in helpers.py
 
 - Resolvers Added:
-    - up4stream
+    - brainzaps
+    - vidsonic
+    - vrra
 
 - Resolvers Fixed/Updated:
-    - abstream
-    - doodstream
-    - dzen
-    - filelions
-    - filemoon
-    - mixdrop
-    - poophd
-    - supervideo
-    - voe
-    - wecima
+    - byse
+    - doodstream (requires ByParr)
+    - vidmoly
 
 - Resolvers Removed
     - None

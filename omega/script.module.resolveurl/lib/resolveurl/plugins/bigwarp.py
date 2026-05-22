@@ -16,22 +16,49 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from resolveurl.plugins.__resolve_generic__ import ResolveGeneric
+import re
+from six.moves import urllib_parse
+
+from resolveurl import common
 from resolveurl.lib import helpers
+from resolveurl.resolver import ResolveUrl, ResolverError
 
 
-class BigWarpResolver(ResolveGeneric):
+class BigWarpResolver(ResolveUrl):
     name = 'BigWarp'
-    domains = ['bigwarp.io', 'bgwp.cc', 'bigwarp.art']
-    pattern = r'(?://|\.)((?:bigwarp|bgwp)\.(?:io|cc|art))/(?:e/|embed-)?([0-9a-zA-Z=]+)'
+    domains = ['bigwarp.io', 'bgwp.cc', 'bigwarp.art', 'bigwarp.cc', 'bigwarp.pro']
+    pattern = r'(?://|\.)((?:bigwarp|bgwp)\.(?:io|cc|art|pro))/(?:e/|embed-)?([0-9a-zA-Z=$:/.]+)'
 
     def get_media_url(self, host, media_id, subs=False):
-        return helpers.get_media_url(
-            self.get_url(host, media_id),
-            patterns=[r'''file\s*:\s*['"](?P<url>[^'"]+)['"],\s*label\s*:\s*['"](?P<label>\d+p?)'''],
-            subs=subs,
-            referer=False
-        )
+        web_url = self.get_url(host, media_id)
+        if '$$' in media_id:
+            media_id, referer = media_id.split('$$')
+            ref = urllib_parse.urljoin(referer, '/')
+        else:
+            ref = urllib_parse.urljoin(web_url, '/')
+
+        dl_url = urllib_parse.urljoin(web_url, '/dl')
+        post_data = {
+            'op': 'embed',
+            'file_code': media_id.replace('.html', ''),
+            'auto': '0'
+        }
+        headers = {
+            "User-Agent": common.RAND_UA,
+            "Referer": ref,
+            "Origin": ref[:-1]
+        }
+
+        html = self.net.http_POST(dl_url, form_data=post_data, headers=headers).content
+        s = re.search(r'''sources:\s*\[{\s*file\s*:\s*['"]([^'"]+)''', html)
+        if s:
+            url = s.group(1) + helpers.append_headers(headers)
+            if subs:
+                subtitles = helpers.scrape_subtitles(html, web_url)
+                return url, subtitles
+            return url
+
+        raise ResolverError("Unable to locate stream URL.")
 
     def get_url(self, host, media_id):
-        return self._default_get_url(host, media_id, template='https://bigwarp.art/embed-{media_id}.html')
+        return self._default_get_url(host, media_id, template='https://bigwarp.io/e/{media_id}')

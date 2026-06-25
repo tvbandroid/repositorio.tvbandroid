@@ -750,16 +750,16 @@ def default_settings():
 #====================================CONTENT=======================================#
 #==================================================================================#
 #==================== General
-{'setting_id': 'paginate.lists', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '1': 'Within Addon Only', '2': 'Widgets Only', '3': 'Both'}},
+{'setting_id': 'paginate.lists', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '1': 'Solo Dentro del Addon', '2': 'Solo Widgets', '3': 'Ambos'}},
 {'setting_id': 'paginate.limit_addon', 'setting_type': 'action', 'setting_default': '20'},
 {'setting_id': 'paginate.limit_widgets', 'setting_type': 'action', 'setting_default': '20'},
 {'setting_id': 'paginate.jump_to', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'ignore_articles', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'recommend_service', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Recomendado (TMDb)', '1': 'Más Como Este (IMDb)',
 '2': 'Similar (IA)', '3': 'Relacionado (Trakt)'}},
-{'setting_id': 'recommend_seed', 'setting_type': 'action', 'setting_default': '5', 'settings_options': {'1': 'Last Watched Only', '2': 'Last 2 Watched',
-'3': 'Last 3 Watched', '4': 'Last 4 Watched', '5': 'Last 5 Watched', '6': 'Last 6 Watched', '7': 'Last 7 Watched', '8': 'Last 8 Watched',
-'9': 'Last 9 Watched', '10': 'Last 10 Watched'}},
+{'setting_id': 'recommend_seed', 'setting_type': 'action', 'setting_default': '5', 'settings_options': {'1': 'Solo el Último Visto', '2': 'Solo el Último 2 Visto',
+'3': 'Solo el Último 3 Visto', '4': 'Solo el Último 4 Visto', '5': 'Solo el Último 5 Visto', '6': 'Solo el Último 6 Visto', '7': 'Solo el Último 7 Visto', '8': 'Solo el Último 8 Visto',
+'9': 'Solo el Último 9 Visto', '10': 'Solo el Último 10 Visto'}},
 {'setting_id': 'mpaa_region', 'setting_type': 'string', 'setting_default': 'US'},
 {'setting_id': 'lists_cache_duraton', 'setting_type': 'string', 'setting_default': '24'},
 {'setting_id': 'tv_progress_location', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Vistos', '1': 'En Progreso', '2': 'Ambos'}},
@@ -803,7 +803,7 @@ def default_settings():
 {'setting_id': 'widget_hide_watched', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'widget_hide_next_page', 'setting_type': 'boolean', 'setting_default': 'false'},
 #==================== RPDb Ratings Posters
-{'setting_id': 'rpdb_enabled', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'Movies', '2': 'TV Shows', '3': 'Both'}},
+{'setting_id': 'rpdb_enabled', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Películas', '2': 'Series TV', '3': 'Ambos'}},
 {'setting_id': 'rpdb_format', 'setting_type': 'string', 'setting_default': ''},
 #==================== Context Menu
 {'setting_id': 'context_menu.enabled', 'setting_type': 'string',
@@ -822,9 +822,9 @@ def default_settings():
 {'setting_id': 'single_ep_display_widget', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'TITLE: SxE - EPISODE', '1': 'SxE - EPISODE', '2': 'EPISODE'}},
 {'setting_id': 'single_ep_unwatched_episodes', 'setting_type': 'boolean', 'setting_default': 'false'},
 #==================== Next Episodes
-{'setting_id': 'nextep.method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Last Aired', '1': 'Last Watched'}},
-{'setting_id': 'nextep.sort_type', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Recently Watched', '1': 'Airdate', '2': 'Title'}},
-{'setting_id': 'nextep.sort_order', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Descending', '1': 'Ascending'}},
+{'setting_id': 'nextep.method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Última Emisión', '1': 'Último Visto'}},
+{'setting_id': 'nextep.sort_type', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Vistos Recientemente', '1': 'Fecha de Emisión', '2': 'Título'}},
+{'setting_id': 'nextep.sort_order', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Descendente', '1': 'Ascendente'}},
 {'setting_id': 'nextep.limit_history', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'nextep.limit', 'setting_type': 'action', 'setting_default': '20', 'min_value': '1', 'max_value': '200'},
 {'setting_id': 'nextep.include_unwatched', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'Watchlist', '2': 'Favorites', '3': 'Both'}},
@@ -1100,7 +1100,7 @@ def default_settings():
 {'setting_id': 'addon_icon_choice_name', 'setting_type': 'string', 'setting_default': 'icon.png'},
 {'setting_id': 'widget_refresh_timer_name', 'setting_type': 'string', 'setting_default': 'Off'},
 {'setting_id': 'mpaa_region_display_name', 'setting_type': 'string', 'setting_default': 'United States'},
-{'setting_id': 'lists_cache_duraton_display_name', 'setting_type': 'string', 'setting_default': '1 Day'},
+{'setting_id': 'lists_cache_duraton_display_name', 'setting_type': 'string', 'setting_default': '1 Día'},
 {'setting_id': 'results.limit_number_quality_name', 'setting_type': 'string', 'setting_default': 'Off'},
 {'setting_id': 'results.limit_number_total_name', 'setting_type': 'string', 'setting_default': 'Off'},
 {'setting_id': 'rpdb_format_name', 'setting_type': 'string', 'setting_default': 'Default'},

@@ -2030,6 +2030,35 @@ v3.0.0
   </extension>
 </addon>
 
+<addon id="plugin.video.redlight" name="[COLOR red]Red Light[/COLOR]" provider-name="[COLOR red]The Red Wizard[/COLOR]" version="1.4.8">
+    <requires>
+        <import addon="xbmc.python" version="3.0.1"/>
+        <import addon="script.module.pil" version="1.1.7"/>
+        <import addon="script.module.requests" version="2.19.1"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="resources/lib/redlight.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.service" library="resources/lib/service.py"/>
+    <extension point="xbmc.python.module" library="resources/lib/"/>
+    <extension point="xbmc.addon.metadata">
+        <reuselanguageinvoker>false</reuselanguageinvoker>
+        <summary lang="en">[COLOR red]The Red Light[/COLOR]</summary>
+        <description lang="es">[COLOR red]* No revocaremos nuestras claves de Trakt ni de TMDb.
+* No bloquearemos ninguna aplicación ni tema de terceros.
+* Nada de política
+* SIN DRAMA![/COLOR]</description>
+        <platform>all</platform>
+		<disclaimer lang="es">[COLOR red]El autor de este add-on no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido.[/COLOR]</disclaimer>
+        <license/>
+        <assets>
+            <icon>resources/media/addon_icons/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
+        </assets>
+        <news>[COLOR red]Check the Changelog in Tools &gt; Changelog &amp; Log Utils[/COLOR]</news>
+    </extension>
+</addon>
+
 <addon id="plugin.video.Rising.Tides" name="[COLOR red][B]R[/B][/COLOR][COLOR white][B]ising[/B][/COLOR] [COLOR pink][B]T[/B][/COLOR][COLOR white][B]ides[/B][/COLOR]" version="3.0.2" provider-name="[COLOR turquoise][B]mullafabz[/B][/COLOR]">
   <requires>
   <import addon="xbmc.python" version="3.0.0"/>

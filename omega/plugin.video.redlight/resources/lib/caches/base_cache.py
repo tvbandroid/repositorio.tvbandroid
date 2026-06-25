@@ -172,8 +172,8 @@ def check_databases_integrity(silent=False):
 	for database_name, tables in integrity_check.items(): _process(database_name, tables)
 	if database_errors:
 		make_databases()
-		if not silent: kodi_utils.ok_dialog(text='[B]Following Databases Rebuilt:[/B][CR][CR]%s' % ', '.join(database_errors))
-	elif not silent: kodi_utils.notification('No Corrupt or Missing Databases', time=3000)
+		if not silent: kodi_utils.ok_dialog(text='[B]Se Han Reconstruido las Siguientes Bases de Datos:[/B][CR][CR]%s' % ', '.join(database_errors))
+	elif not silent: kodi_utils.notification('No Hay Bases de Datos Dañadas ni Faltantes', time=3000)
 
 def get_size(file):
 	with kodi_utils.open_file(file) as f: s = f.size()
@@ -197,13 +197,13 @@ def clean_databases():
 		start_bytes = get_size(location)
 		result = function.clean_database()
 		if not result:
-			append('[B]%s: [COLOR red]FAILED[/COLOR][/B]' % name)
+			append('[B]%s: [COLOR red]FALLIDO[/COLOR][/B]' % name)
 			continue
 		end_bytes = get_size(location)
 		saved_bytes = start_bytes - end_bytes
-		append('[B]%s: [COLOR green]SUCCESS[/COLOR][/B][CR]    [B]Saved Size: %sMB[/B][CR]    Start Size/End Size: %sMB/%sMB' \
+		append('[B]%s: [COLOR green]CORRECTO[/COLOR][/B][CR]    [B]Espacio Recuperado: %sMB[/B][CR]    Tamaño Inicial/Tamaño Final: %sMB/%sMB') \
 		% (name, round(float(saved_bytes)/1024/1024, 2), round(float(start_bytes)/1024/1024, 2), round(float(end_bytes)/1024/1024, 2)))
-	return kodi_utils.show_text('Cache Clean Results', text='[CR]----------------------------------[CR]'.join(results), font_size='large')
+	return kodi_utils.show_text('Resultados de la Limpieza de Cache', text='[CR]----------------------------------[CR]'.join(results), font_size='large')
 
 def clear_cache(cache_type, silent=False):
 	def _confirm(): return silent or kodi_utils.confirm_dialog()
@@ -281,7 +281,7 @@ def clear_cache(cache_type, silent=False):
 		if not _confirm(): return
 		from caches.main_cache import main_cache
 		success = main_cache.delete_all()
-	if not silent and success: kodi_utils.notification('Success')
+	if not silent and success: kodi_utils.notification('Correcto')
 	return success
 
 def clear_all_cache():
@@ -303,7 +303,7 @@ def clear_all_cache():
 	except: pass
 	progressDialog.close()
 	kodi_utils.sleep(100)
-	kodi_utils.ok_dialog(text='Success')
+	kodi_utils.ok_dialog(text='Correcto')
 
 def refresh_cached_data(meta):
 	from caches.meta_cache import meta_cache
@@ -312,7 +312,7 @@ def refresh_cached_data(meta):
 	except: return kodi_utils.notification('Error')
 	from apis.imdb_api import refresh_imdb_meta_data
 	refresh_imdb_meta_data(imdb_id)
-	kodi_utils.notification('Success')
+	kodi_utils.notification('Correcto')
 	kodi_utils.kodi_refresh()
 
 def columns_in_table(database, table, check_existence=''):
@@ -333,8 +333,8 @@ def check_and_insert_new_columns(database, table, new_column, new_column_propert
 	try:
 		if not columns_in_table(database, table, new_column):
 			success = insert_new_column_in_table(database, table, new_column, new_column_properties)
-			if not success: kodi_utils.notification('Error with [B]%s[/B] Database. Missing Column [B]%s[/B]' % (database.upper(), new_column.upper()))
-	except: kodi_utils.notification('Error Checking Database Table/s: %s' % database)
+			if not success: kodi_utils.notification('Error en la Base de Datos [B]%s[/B]. Falta la Columna [B]%s[/B]' % (database.upper(), new_column.upper()))
+    except: kodi_utils.notification('Error al Comprobar la(s) Tabla(s) de la Base de Datos: %s' % database)
 
 class BaseCache(object):
 	def __init__(self, dbfile, table):

@@ -9,7 +9,7 @@ class Navigator:
 	def __init__(self, params):
 		self.params = params
 		self.params_get = self.params.get
-		self.category_name = self.params_get('name', 'Red Light')
+		self.category_name = self.params_get('name', 'Play TVBan')
 		self.list_name = self.params_get('action', 'RootList')
 		self.is_external = k.external()
 		self.make_listitem = lambda: k.make_listitem(False)
@@ -25,15 +25,17 @@ class Navigator:
 				try:
 					folder_params = dict(item)
 					url = k.build_folder_url(folder_params)
-					cm_items = [
-					('[B]Move[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.move', 'active_list': self.list_name, 'position': count})),
+					cm_items = []
+					if can_move:
+						cm_items.append(('[B]Move[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.move', 'active_list': self.list_name, 'position': count})))
+					cm_items.extend([
 					('[B]Remove[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.remove', 'active_list': self.list_name, 'position': count})),
 					('[B]Add Content[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.add', 'active_list': self.list_name, 'position': count})),
 					('[B]Restore Menu[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.restore', 'active_list': self.list_name, 'position': count})),
 					('[B]Check for New Menu Items[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.update', 'active_list': self.list_name, 'position': count})),
 					('[B]Reload Menu[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.reload', 'active_list': self.list_name, 'position': count})),
 					('[B]Browse Removed items[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.browse', 'active_list': self.list_name, 'position': count})),
-					('[B]Add to Shortcut Folder[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
+					('[B]Add to Shortcut Folder[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))])
 					icon = k.resolve_list_icon(item.get('iconImage', ''))
 					item['iconImage'] = icon
 					listitem = self.make_listitem()
@@ -48,18 +50,19 @@ class Navigator:
 		else: browse_list = nc.currently_used_list(self.list_name)
 		if not browse_list:
 			browse_list = list(nc.main_menus.get(self.list_name, []))
+		can_move = len(browse_list) > 1
 		results = sorted(list(_process()), key=lambda k: k[1])
 		if not results and browse_list:
-			k.logger('Red Light', 'menu build empty for %s (%s items expected)' % (self.list_name, len(browse_list)))
+			k.logger('Play TVBan', 'menu build empty for %s (%s items expected)' % (self.list_name, len(browse_list)))
 		handle = int(sys.argv[1])
 		if results:
 			k.add_items(handle, [i[0] for i in results])
 		if not self.is_external:
 			if self.list_name == 'RootList':
 				folder_path = k.folder_path()
-				if folder_path: k.set_property('redlight.exit_params', k.sanitize_folder_url(folder_path))
+				if folder_path: k.set_property('playtvban.exit_params', k.sanitize_folder_url(folder_path))
 			else:
-				k.set_property('redlight.exit_params', k.build_folder_url({'mode': 'navigator.main', 'action': 'RootList'}))
+				k.set_property('playtvban.exit_params', k.build_folder_url({'mode': 'navigator.main', 'action': 'RootList'}))
 		self.end_directory(cache_to_disc=bool(results), skip_view_mode=(self.list_name == 'RootList'))
 
 	def discover(self):
@@ -336,10 +339,10 @@ class Navigator:
 
 	def tools(self):
 		self.add({'mode': 'open_settings', 'isFolder': 'false'}, 'Settings', 'settings')
-		if get_setting('redlight.external_scraper.module') not in ('empty_setting', ''):
-			self.add({'mode': 'open_external_scraper_settings', 'isFolder': 'false'}, 'External Scraper Settings', 'settings')
+		if s.configured_external_scraper_slots():
+			self.add({'mode': 'open_external_scraper_settings', 'isFolder': 'false'}, s.external_scraper_settings_tools_label(), 'settings')
 		self.add({'mode': 'navigator.tips'}, 'Tips for Use', 'settings2')
-		if get_setting('redlight.use_viewtypes', 'true') == 'true' and not get_setting('redlight.manual_viewtypes', 'false') == 'true':
+		if get_setting('playtvban.use_viewtypes', 'true') == 'true' and not get_setting('playtvban.manual_viewtypes', 'false') == 'true':
 			self.add({'mode': 'navigator.set_view_modes'}, 'Set Views', 'settings2')
 		self.add({'mode': 'navigator.changelog_utils'}, 'Changelog & Log Utils', 'settings2')
 		self.add({'mode': 'build_next_episode_manager'}, 'TV Shows Progress Manager', 'settings2')
@@ -350,10 +353,10 @@ class Navigator:
 		self.end_directory()
 
 	def import_export(self):
-		self.add({'mode': 'settings_backup.import_settings', 'isFolder': 'false'}, 'Import Red Light Settings', 'settings')
-		self.add({'mode': 'settings_backup.export_settings', 'isFolder': 'false'}, 'Export Red Light Settings', 'settings')
-		self.add({'mode': 'local_backup.import_data', 'isFolder': 'false'}, 'Import Red Light Favorites & History', 'folder')
-		self.add({'mode': 'local_backup.export_data', 'isFolder': 'false'}, 'Export Red Light Favorites & History', 'folder')
+		self.add({'mode': 'settings_backup.import_settings', 'isFolder': 'false'}, 'Import Play TVBan Settings', 'settings')
+		self.add({'mode': 'settings_backup.export_settings', 'isFolder': 'false'}, 'Export Play TVBan Settings', 'settings')
+		self.add({'mode': 'local_backup.import_data', 'isFolder': 'false'}, 'Import Play TVBan Favorites & History', 'folder')
+		self.add({'mode': 'local_backup.export_data', 'isFolder': 'false'}, 'Export Play TVBan Favorites & History', 'folder')
 		self.add({'mode': 'kodi_favorites.import_favorites', 'isFolder': 'false'}, 'Import Kodi Favorites', 'favorites')
 		self.add({'mode': 'kodi_favorites.export_favorites', 'isFolder': 'false'}, 'Export Kodi Favorites', 'favorites')
 		self.end_directory()
@@ -365,23 +368,24 @@ class Navigator:
 		self.add({'mode': 'clear_all_cache', 'isFolder': 'false'}, 'Clear All Cache (Excluding Favorites)', 'settings')
 		self.add({'mode': 'clear_favorites_choice', 'isFolder': 'false'}, 'Clear Favorites Cache', 'settings')
 		self.add({'mode': 'search.clear_search', 'isFolder': 'false'}, 'Clear Search History Cache', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'ai_functions', 'isFolder': 'false'}, 'Clear AI Data Cache', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'list', 'isFolder': 'false'}, 'Clear Lists Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'main', 'isFolder': 'false'}, 'Clear Main Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'meta', 'isFolder': 'false'}, 'Clear Meta Cache', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'list', 'isFolder': 'false'}, 'Clear Lists Cache', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'ai_functions', 'isFolder': 'false'}, 'Clear AI Data Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'tmdb_list', 'isFolder': 'false'}, 'Clear TMDb Personal List Cache', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'imdb', 'isFolder': 'false'}, 'Clear IMDb Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'mdblist', 'isFolder': 'false'}, 'Clear MDBList Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'simkl', 'isFolder': 'false'}, 'Clear Simkl Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'trakt', 'isFolder': 'false'}, 'Clear Trakt Cache', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'imdb', 'isFolder': 'false'}, 'Clear IMDb Cache', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'internal_scrapers', 'isFolder': 'false'}, 'Clear Internal Scrapers Cache', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'subtitles', 'isFolder': 'false'}, 'Clear Subtitles Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'easynews_scrape', 'isFolder': 'false'}, 'Clear EasyNews Scrape Cache', 'settings')
 		self.add({'mode': 'search.clear_easynews_search_history', 'isFolder': 'false'}, 'Clear EasyNews Search History', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'external_scrapers', 'isFolder': 'false'}, 'Clear External Scrapers Cache', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'rd_cloud', 'isFolder': 'false'}, 'Clear Real Debrid Cache', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'pm_cloud', 'isFolder': 'false'}, 'Clear Premiumize Cache', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'internal_scrapers', 'isFolder': 'false'}, 'Clear Internal Scrapers Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'ad_cloud', 'isFolder': 'false'}, 'Clear All Debrid Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'oc_cloud', 'isFolder': 'false'}, 'Clear Offcloud Cache', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'pm_cloud', 'isFolder': 'false'}, 'Clear Premiumize Cache', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'rd_cloud', 'isFolder': 'false'}, 'Clear Real Debrid Cache', 'settings')
 		self.add({'mode': 'clear_cache', 'cache': 'tb_cloud', 'isFolder': 'false'}, 'Clear TorBox Cache', 'settings')
 		self.end_directory()
 
@@ -390,14 +394,14 @@ class Navigator:
 		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.movies', 'content': 'movies'}, 'Set Movies', 'movies')
 		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.tvshows', 'content': 'tvshows'}, 'Set TV Shows', 'tv')
 		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.seasons', 'content': 'seasons'}, 'Set Seasons', 'ontheair')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes', 'content': 'episodes'}, 'Set Episodes', 'next_episodes')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes_single', 'content': 'episodes', 'name': 'episode lists'}, 'Set Episode Lists', 'calender')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes', 'content': 'episodes'}, 'Set Episodes (show seasons)', 'next_episodes')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes_single', 'content': 'episodes', 'name': 'episode lists'}, 'Set Episode Lists (Next Episodes, etc.)', 'calender')
 		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.premium', 'content': 'files', 'name': 'premium files'}, 'Set Premium Files', 'premium')
 		self.end_directory()
 
 	def changelog_utils(self):
 		log_loc, old_log_loc = k.translate_path('special://logpath/kodi.log'), k.translate_path('special://logpath/kodi.old.log')
-		redlight_clogpath = k.translate_path('special://home/addons/plugin.video.redlight/resources/text/changelog.txt')
+		redlight_clogpath = k.translate_path('special://home/addons/plugin.video.playtvban/resources/text/changelog.txt')
 		self.add({'mode': 'show_text', 'heading': 'Changelog', 'file': redlight_clogpath, 'font_size': 'large', 'isFolder': 'false'}, 'Changelog', 'lists')
 		self.add({'mode': 'show_text', 'heading': 'Kodi Log Viewer', 'file': log_loc, 'kodi_log': 'true', 'isFolder': 'false'}, 'Kodi Log Viewer', 'lists')
 		self.add({'mode': 'show_text', 'heading': 'Kodi Log Viewer (Old)', 'file': old_log_loc, 'kodi_log': 'true', 'isFolder': 'false'}, 'Kodi Log Viewer (Old)', 'lists')
@@ -532,7 +536,7 @@ class Navigator:
 				self.add(url_params, key_id, 'calender', cm_items=cm_items)
 			except: pass
 		self.category_name = self.params_get('name') or 'History'
-		self.end_directory()
+		self.end_directory(cache_to_disc=False)
 
 	def keyword_results(self):
 		from apis.tmdb_api import tmdb_keywords_by_query
@@ -565,7 +569,13 @@ class Navigator:
 	def set_view(self):
 		view_type = self.params.get('view_type', 'view.main')
 		label = (self.params.get('name') or view_type.replace('view.', '').replace('_', ' ')).upper()
-		set_setting(view_type, str(k.current_window_object().getFocusId()))
+		view_id = str(k.current_window_object().getFocusId())
+		set_setting(view_type, view_id)
+		if view_type == 'view.episodes':
+			from caches.settings_cache import default_setting_values
+			episodes_single_default = (default_setting_values('view.episodes_single') or {}).get('setting_default', '55')
+			if str(get_setting('playtvban.view.episodes_single', episodes_single_default)) == str(episodes_single_default):
+				set_setting('view.episodes_single', view_id)
 		k.notification('%s: %s' % (label, k.get_infolabel('Container.Viewmode').upper()), time=500)
 
 	def shortcut_folders(self):
@@ -590,11 +600,17 @@ class Navigator:
 			return self.end_directory()
 		is_random = '[COLOR red][RANDOM][/COLOR]' in list_name
 		contents = nc.get_shortcut_folder_contents(list_name)
+		if not contents and not is_random:
+			random_name = '%s [COLOR red][RANDOM][/COLOR]' % list_name
+			contents = nc.get_shortcut_folder_contents(random_name)
+			if contents:
+				list_name, is_random = random_name, True
 		folder_icon = self.get_icon('folder')
 		if is_random:
 			from indexers.random_lists import random_shortcut_folders
 			return random_shortcut_folders(list_name.replace(' [COLOR red][RANDOM][/COLOR]', ''), contents)
 		if contents:
+			can_move = len(contents) > 1
 			for count, item in enumerate(contents):
 				item_get = item.get
 				iconImage = item_get('iconImage', None)
@@ -604,12 +620,14 @@ class Navigator:
 					else:
 						icon, original_image = k.resolve_list_icon(iconImage), False
 				else: icon, original_image = folder_icon, False
-				cm_items = [
-				('[B]Move[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'move'})),
+				cm_items = []
+				if can_move:
+					cm_items.append(('[B]Move[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'move'})))
+				cm_items.extend([
 				('[B]Remove[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'remove'})),
 				('[B]Add Content[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name})),
 				('[B]Rename[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'rename'})),
-				('[B]Clear All[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'clear'}))]
+				('[B]Clear All[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'clear'}))])
 				self.add(item, item_get('name'), icon, original_image, cm_items=cm_items)
 		elif is_random: pass
 		else: self.add({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name, 'isFolder': 'false'}, '[I]Add Content...[/I]', 'new')
@@ -640,7 +658,7 @@ class Navigator:
 			k.container_refresh()
 
 	def exit_media_menu(self):
-		params = k.get_property('redlight.exit_params')
+		params = k.get_property('playtvban.exit_params')
 		if not params: return
 		params = k.sanitize_folder_url(params)
 		k.container_refresh_input(params)
@@ -649,16 +667,16 @@ class Navigator:
 		if self.is_external: return
 		parent = {'movie': 'MovieList', 'tvshow': 'TVShowList', 'anime': 'AnimeList'}
 		if menu_type in parent:
-			k.set_property('redlight.exit_params', k.build_folder_url({'mode': 'navigator.main', 'action': parent[menu_type]}))
+			k.set_property('playtvban.exit_params', k.build_folder_url({'mode': 'navigator.main', 'action': parent[menu_type]}))
 		else:
-			k.set_property('redlight.exit_params', k.build_folder_url({'mode': 'navigator.main', 'action': 'RootList'}))
+			k.set_property('playtvban.exit_params', k.build_folder_url({'mode': 'navigator.main', 'action': 'RootList'}))
 
 	def _set_exit_params(self, parent_params):
 		if self.is_external: return
-		k.set_property('redlight.exit_params', k.build_folder_url(parent_params))
+		k.set_property('playtvban.exit_params', k.build_folder_url(parent_params))
 
 	def tips(self):
-		tips_location = 'special://home/addons/plugin.video.redlight/resources/text/tips'
+		tips_location = 'special://home/addons/plugin.video.playtvban/resources/text/tips'
 		files = sorted(k.list_dirs(tips_location)[1])
 		tips_location += '/%s'
 		tips_list = []
@@ -718,7 +736,7 @@ class Navigator:
 
 	def _safe_add(self, url_params, list_name, iconImage='folder', original_image=False, cm_items=[]):
 		try: self.add(url_params, list_name, iconImage, original_image, cm_items)
-		except Exception as e: k.logger('Red Light', 'my_lists add failed [%s]: %s' % (list_name, e))
+		except Exception as e: k.logger('Play TVBan', 'my_lists add failed [%s]: %s' % (list_name, e))
 
 	def add(self, url_params, list_name, iconImage='folder', original_image=False, cm_items=[]):
 		isFolder = url_params.get('isFolder', 'true') == 'true'

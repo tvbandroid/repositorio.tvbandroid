@@ -1975,6 +1975,74 @@ provider-name="ElSupremo">
   </extension>
 </addon>
 
+<addon id="plugin.video.playtvban" name="[COLOR deepskyblue]Play TVBan[/COLOR]" provider-name="TVBand" version="1.0.4">
+    <requires>
+        <import addon="xbmc.python" version="3.0.1"/>
+        <import addon="script.module.pil" version="1.1.7"/>
+        <import addon="script.module.requests" version="2.19.1"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource"
+               library="resources/lib/playtvban.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.service"
+               library="resources/lib/service.py"/>
+
+    <extension point="xbmc.python.module"
+               library="resources/lib/"/>
+
+    <extension point="xbmc.addon.metadata">
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="en">[COLOR deepskyblue]Play TVBan[/COLOR]</summary>
+        <description lang="en">[COLOR deepskyblue]Play TVBan add-on de vídeo mantenido por TVBand.[/COLOR]</description>
+        <platform>all</platform>
+        <disclaimer lang="en">El autor de este complemento no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido..</disclaimer>
+        <license/>
+        <assets>
+            <icon>resources/media/addon_icons/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
+        </assets>
+        <news>Bienvenido a Play TVBan v1.0.0</news>
+    </extension>
+
+</addon>
+
+<addon id="plugin.video.playtvban" name="[COLOR deepskyblue]PlayTVBan[/COLOR]" provider-name="TVBand" version="1.0.0">
+    <requires>
+        <import addon="xbmc.python" version="3.0.1"/>
+        <import addon="script.module.pil" version="1.1.7"/>
+        <import addon="script.module.requests" version="2.19.1"/>
+    </requires>
+
+    <extension point="xbmc.python.pluginsource"
+               library="resources/lib/redlight.py">
+        <provides>video</provides>
+    </extension>
+
+    <extension point="xbmc.service"
+               library="resources/lib/service.py"/>
+
+    <extension point="xbmc.python.module"
+               library="resources/lib/"/>
+
+    <extension point="xbmc.addon.metadata">
+        <reuselanguageinvoker>true</reuselanguageinvoker>
+        <summary lang="en">[COLOR deepskyblue]PlayTVBan[/COLOR]</summary>
+        <description lang="en">[COLOR deepskyblue]PlayTVBan add-on de vídeo mantenido por TVBand.[/COLOR]</description>
+        <platform>all</platform>
+        <disclaimer lang="en">El autor de este complemento no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido..</disclaimer>
+        <license/>
+        <assets>
+            <icon>resources/media/addon_icons/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
+        </assets>
+        <news>Bienvenido a PlayTVBan v1.0.0</news>
+    </extension>
+
+</addon>
+
 <addon id="plugin.video.redbull.tv" name="Red Bull TV" version="3.2.2+matrix.1" provider-name="piejanssens">
   <requires>
     <import addon="script.module.dateutil" version="2.8.0"/>

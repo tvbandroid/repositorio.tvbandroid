@@ -103,130 +103,130 @@ class Navigator:
 
 	def favorites(self):
 		self.add({'mode': 'build_movie_list', 'action': 'favorites_movies', 'name': 'Películas'}, 'Películas', 'movies')
-		self.add({'mode': 'build_tvshow_list', 'action': 'favorites_tvshows', 'name': 'Series de TV'}, 'Series de TV', 'tv'),
+		self.add({'mode': 'build_tvshow_list', 'action': 'favorites_tvshows', 'name': 'Series de TV'}, 'Series', 'tv'),
 		self.add({'mode': 'build_tvshow_list', 'action': 'favorites_anime', 'is_anime_list': 'true', 'name': 'Anime'}, 'Anime', 'anime'),
-		self.add({'mode': 'favorite_people', 'isFolder': 'false', 'name': 'People'}, 'People', 'empty_person')
+		self.add({'mode': 'favorite_people', 'isFolder': 'false', 'name': 'Personas'}, 'People', 'empty_person')
 		self.end_directory()
 
 	def my_content(self):
-		if s.trakt_user_active(): self.add({'mode': 'navigator.trakt_lists_personal'}, 'Trakt Lists', 'trakt')
-		self.add({'mode': 'navigator.trakt_lists_public'}, 'Trakt Public Lists', 'trakt')
-		if s.tmdblist_user_active(): self.add({'mode': 'navigator.tmdb_lists_personal'}, 'TMDb Lists', 'tmdb')
+		if s.trakt_user_active(): self.add({'mode': 'navigator.trakt_lists_personal'}, 'Listas de Trakt', 'trakt')
+		self.add({'mode': 'navigator.trakt_lists_public'}, 'Listas Públicas de Trakt', 'trakt')
+		if s.tmdblist_user_active(): self.add({'mode': 'navigator.tmdb_lists_personal'}, 'Listas de TMDb', 'tmdb')
 		# if s.tmdblist_user_active(): self.add({'mode': 'tmdblist.get_tmdb_lists'}, 'TMDb Lists', 'tmdb')
-		self.add({'mode': 'personal_lists.get_personal_lists'}, 'Personal Lists', 'lists')
-		self.add({'mode': 'navigator.discover_contents', 'media_type': 'movie', 'show_new': 'false'}, 'Discover Lists (Movies)', 'movies')
-		self.add({'mode': 'navigator.discover_contents', 'media_type': 'tvshow', 'show_new': 'false'}, 'Discover Lists (TV Shows)', 'tv')
+		self.add({'mode': 'personal_lists.get_personal_lists'}, 'Listas Personales', 'lists')
+		self.add({'mode': 'navigator.discover_contents', 'media_type': 'movie', 'show_new': 'false'}, 'Descubrir Listas (Películas)', 'movies')
+		self.add({'mode': 'navigator.discover_contents', 'media_type': 'tvshow', 'show_new': 'false'}, 'Descubrir Listas (Series)', 'tv')
 		self.end_directory()
 
 	def tmdb_lists_personal(self):
-		self.add({'mode': 'navigator.tmdb_watchlists'}, 'Lista de seguimiento', 'tmdb')
+		self.add({'mode': 'navigator.tmdb_watchlists'}, 'Lista de Seguimiento', 'tmdb')
 		self.add({'mode': 'navigator.tmdb_favorites'}, 'Favoritos', 'tmdb')
 		self.add({'mode': 'navigator.tmdb_recommendations'}, 'Recomendaciones', 'tmdb')
-		self.add({'mode': 'tmdblist.get_tmdb_lists'}, 'My Lists', 'tmdb')
+		self.add({'mode': 'tmdblist.get_tmdb_lists'}, 'Mis Listas', 'tmdb')
 		self.end_directory()
 
 	def tmdb_watchlists(self):
-		self.category_name = 'Lista de seguimiento'
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'movie', 'list_name': 'Movie Watchlist'}, 'Movies Watchlist', 'tmdb')
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'tv', 'list_name': 'TV Show Watchlist'}, 'TV Shows Watchlist', 'tmdb')
+		self.category_name = 'Lista de Seguimiento'
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'movie', 'list_name': 'Lista de Seguimiento de Películas'}, 'Lista de Seguimiento de Películas', 'tmdb')
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'tv', 'list_name': 'Lista de Seguimiento de Series'}, 'Lista de Seguimiento de Series', 'tmdb')
 		self.end_directory()
 
 	def tmdb_favorites(self):
 		self.category_name = 'Favoritos'
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'movie', 'list_name': 'Movie Favorites'}, 'Movie Favorites', 'tmdb')
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'tv', 'list_name': 'TV Show Favorites'}, 'TV Show Favorites', 'tmdb')
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'movie', 'list_name': 'Favoritos de Películas'}, 'Favoritos de Películas', 'tmdb')
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'tv', 'list_name': 'Favoritos de Series'}, 'Favoritos de Series', 'tmdb')
 		self.end_directory()
 
 	def tmdb_recommendations(self):
 		self.category_name = 'Recomendaciones'
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'movie', 'list_name': 'Movie Recommendations'}, 'Movie Recommendations', 'tmdb')
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'tv', 'list_name': 'TV Show Recommendations'}, 'TV Show Recommendations', 'tmdb')
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'movie', 'list_name': 'Recomendaciones de Películas'}, 'Recomendaciones de Películas', 'tmdb')
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'tv', 'list_name': 'Recomendaciones de Series'}, 'Recomendaciones de Series', 'tmdb')
 		self.end_directory()
 
 	def trakt_lists_personal(self):
-		self.add({'mode': 'navigator.trakt_collections'}, 'Collection', 'trakt')
-		self.add({'mode': 'navigator.trakt_watchlists'}, 'Lista de seguimiento', 'trakt')
-		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'my_lists', 'category_name': 'My Lists'}, 'MiS Listas', 'trakt')
-		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'liked_lists', 'category_name': 'Liked Lists'}, 'Liked Lists', 'trakt')
+		self.add({'mode': 'navigator.trakt_collections'}, 'Colección', 'trakt')
+		self.add({'mode': 'navigator.trakt_watchlists'}, 'Lista de Seguimiento', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'my_lists', 'category_name': 'Mis Listas'}, 'Mis Listas', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'liked_lists', 'category_name': 'Listas que Me Gustan'}, 'Listas que Me Gustan', 'trakt')
 		self.add({'mode': 'navigator.trakt_favorites', 'category_name': 'Favoritos'}, 'Favoritos', 'trakt')
-		self.add({'mode': 'navigator.trakt_recommendations', 'category_name': 'Recommended'}, 'Recommended', 'trakt')
-		self.add({'mode': 'build_my_calendar'}, 'Calendar', 'trakt')
+		self.add({'mode': 'navigator.trakt_recommendations', 'category_name': 'Recomendadas'}, 'Recomendadas', 'trakt')
+		self.add({'mode': 'build_my_calendar'}, 'Calendario', 'trakt')
 		self.end_directory()
 
 	def trakt_lists_public(self):
-		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'category_name': 'Trending User Lists'}, 'Trending User Lists', 'trakt')
-		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'category_name': 'Popular User Lists'}, 'Popular User Lists', 'trakt')
-		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Search User Lists', 'search')
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'category_name': 'Listas de Usuarios en Tendencia'}, 'Listas de Usuarios en Tendencia', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'category_name': 'Listas de Usuarios Populares'}, 'Listas de Usuarios Populares', 'trakt')
+		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Buscar Listas de Usuarios', 'search')
 		self.end_directory()
 
 	def random_lists(self):
-		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'movie'}, 'Listas de Películas Aleatorias', 'movies')
-		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'tvshow'}, 'Listas Aleatorias de Series de TV', 'tv')
+		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'movie'}, 'Listas Aleatorias de Películas', 'movies')
+		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'tvshow'}, 'Listas Aleatorias de Series', 'tv')
 		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'anime'}, 'Listas Aleatorias de Anime', 'anime')
-		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'because_you_watched'}, 'Aleatorio lo que has Visto', 'because_you_watched')
-		if s.tmdblist_user_active(): self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'tmdb_lists'}, 'Random TMDb Lists', 'tmdb')
+		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'because_you_watched'}, 'Aleatorio Según lo que Has Visto', 'because_you_watched')
+		if s.tmdblist_user_active(): self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'tmdb_lists'}, 'Listas Aleatorias de TMDb', 'tmdb')
 		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'personal_lists'}, 'Listas Personales Aleatorias', 'lists')
 		if s.trakt_user_active():
-			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_personal'}, 'Random Trakt Lists (Personal)', 'trakt')
-			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_public'}, 'Random Trakt Lists (Public)', 'trakt')
+			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_personal'}, 'Listas Aleatorias de Trakt (Personales)', 'trakt')
+			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_public'}, 'Listas Aleatorias de Trakt (Públicas)', 'trakt')
 		self.end_directory()
 
 	def trakt_collections(self):
-		self.category_name = 'Collection'
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_collection', 'category_name': 'Movies Collection'}, 'Movies Collection', 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_collection', 'category_name': 'TV Shows Collection'}, 'TV Shows Collection', 'trakt')
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_collection_lists', 'new_page': 'recent', 'category_name': 'Recently Added Movies'}, 'Recently Added Movies', 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_collection_lists', 'new_page': 'recent', 'category_name': 'Recently Added TV Shows'},
-					'Recently Added TV Shows', 'trakt')
-		self.add({'mode': 'build_my_calendar', 'recently_aired': 'true'}, 'Recently Aired Episodes', 'trakt')
+		self.category_name = 'Colección'
+		self.add({'mode': 'build_movie_list', 'action': 'trakt_collection', 'category_name': 'Colección de Películas'}, 'Colección de Películas', 'trakt')
+		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_collection', 'category_name': 'Colección de Series'}, 'Colección de Series', 'trakt')
+		self.add({'mode': 'build_movie_list', 'action': 'trakt_collection_lists', 'new_page': 'recent', 'category_name': 'Películas Añadidas Recientemente'}, 'Películas Añadidas Recientemente', 'trakt')
+		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_collection_lists', 'new_page': 'recent', 'category_name': 'Series Añadidas Recientemente'},
+					'Series Añadidas Recientemente', 'trakt')
+		self.add({'mode': 'build_my_calendar', 'recently_aired': 'true'}, 'Episodios Emitidos Recientemente', 'trakt')
 		self.end_directory()
 
 	def trakt_watchlists(self):
-		self.category_name = 'Lista de seguimiento'
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist', 'category_name': 'Movies Watchlist'}, 'Movies Watchlist', 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist', 'category_name': 'TV Shows Watchlist'}, 'TV Shows Watchlist', 'trakt')
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist_lists', 'new_page': 'recent', 'category_name': 'Recently Added Movies'}, 'Recently Added Movies', 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist_lists', 'new_page': 'recent', 'category_name': 'Recently Added TV Shows'},
-					'Recently Added TV Shows', 'trakt')
+		self.category_name = 'Lista de Seguimiento'
+		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist', 'category_name': 'Lista de Seguimiento de Películas'}, 'Lista de Seguimiento de Películas', 'trakt')
+		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist', 'category_name': 'Lista de Seguimiento de Series'}, 'Lista de Seguimiento de Series', 'trakt')
+		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist_lists', 'new_page': 'recent', 'category_name': 'Películas Añadidas Recientemente'}, 'Películas Añadidas Recientemente', 'trakt')
+		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist_lists', 'new_page': 'recent', 'category_name': 'Series Añadidas Recientemente'},
+					'Series Añadidas Recientemente', 'trakt')
 		self.end_directory()
 
 	def trakt_recommendations(self):
-		self.category_name = 'Recommended'
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_recommendations', 'category_name': 'Recommended Movies'}, 'Movies Recommended', 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_recommendations', 'category_name': 'Recommended TV Shows'}, 'TV Shows Recommended', 'trakt')
+		self.category_name = 'Recomendadas'
+		self.add({'mode': 'build_movie_list', 'action': 'trakt_recommendations', 'category_name': 'Películas Recomendadas'}, 'Películas Recomendadas', 'trakt')
+		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_recommendations', 'category_name': 'Series Recomendadas'}, 'Series Recomendadas', 'trakt')
 		self.end_directory()
 
 	def trakt_favorites(self):
 		self.category_name = 'Favoritos'
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_favorites', 'category_name': 'Favorite Movies'}, 'Películas', 'trakt')
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_favorites', 'category_name': 'Favorite TV Shows'}, 'Series de TV', 'trakt')
+		self.add({'mode': 'build_movie_list', 'action': 'trakt_favorites', 'category_name': 'Películas Favoritas'}, 'Películas', 'trakt')
+		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_favorites', 'category_name': 'Series Favoritas'}, 'Series', 'trakt')
 		self.end_directory()
 
 	def people(self):
 		self.add({'mode': 'build_tmdb_people', 'action': 'popular', 'isFolder': 'false', 'name': 'Popular'}, 'Popular', 'popular')
-		self.add({'mode': 'build_tmdb_people', 'action': 'day', 'isFolder': 'false', 'name': 'Trending'}, 'Trending', 'trending')
-		self.add({'mode': 'build_tmdb_people', 'action': 'week', 'isFolder': 'false', 'name': 'Trending This Week'}, 'Trending This Week', 'trending_recent')
+		self.add({'mode': 'build_tmdb_people', 'action': 'day', 'isFolder': 'false', 'name': 'Tendencias'}, 'Tendencias', 'trending')
+		self.add({'mode': 'build_tmdb_people', 'action': 'week', 'isFolder': 'false', 'name': 'Tendencias de Esta Semana'}, 'Tendencias de Esta Semana', 'trending_recent')
 		self.end_directory()
 
 	def search(self):
-		self.add({'mode': 'navigator.search_history', 'action': 'movie', 'name': 'Search History Movies'}, 'Buscar películas', 'movies')
-		self.add({'mode': 'navigator.search_history', 'action': 'tvshow', 'name': 'Search History TV Shows'}, 'Buscar series', 'tv')
-		self.add({'mode': 'navigator.search_history', 'action': 'anime', 'name': 'Search History Anime'}, 'Buscar Anime', 'anime')
-		self.add({'mode': 'navigator.search_history', 'action': 'tvshow_anime', 'name': 'Search History TV Show & Anime'}, 'Buscar Series de TV y Anime', 'tv_anime')
-		self.add({'mode': 'navigator.search_history', 'action': 'people', 'name': 'Search History People'}, 'Buscar Personas', 'people')
-		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_movie', 'name': 'Search History Keywords (Movies)'}, 'Palabras Clave de Búsqueda (Películas)', 'tmdb')
-		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_tvshow', 'name': 'Search History Keywords (Series)'}, 'Palabras Clave de Búsqueda (Series de TV)', 'tmdb')
-		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Buscar en las Listas de Usuarios de Trakt', 'trakt')
+		self.add({'mode': 'navigator.search_history', 'action': 'movie', 'name': 'Historial de Búsqueda de Películas'}, 'Buscar Películas', 'movies')
+		self.add({'mode': 'navigator.search_history', 'action': 'tvshow', 'name': 'Historial de Búsqueda de Series'}, 'Buscar Series', 'tv')
+		self.add({'mode': 'navigator.search_history', 'action': 'anime', 'name': 'Historial de Búsqueda de Anime'}, 'Buscar Anime', 'anime')
+		self.add({'mode': 'navigator.search_history', 'action': 'tvshow_anime', 'name': 'Historial de Búsqueda de Series y Anime'}, 'Buscar Series y Anime', 'tv_anime')
+		self.add({'mode': 'navigator.search_history', 'action': 'people', 'name': 'Historial de Búsqueda de Personas'}, 'Buscar Personas', 'people')
+		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_movie', 'name': 'Historial de Búsqueda por Palabras Clave (Películas)'}, 'Buscar por Palabras Clave (Películas)', 'tmdb')
+		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_tvshow', 'name': 'Historial de Búsqueda por Palabras Clave (Series)'}, 'Buscar por Palabras Clave (Series)', 'tmdb')
+		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Buscar Listas de Usuarios de Trakt', 'trakt')
 		if s.easynews_authorized():
-			self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar Vídeos Nuevos Fáciles', 'easynews')
-			self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar Imágenes Nuevos Fáciles Images', 'easynews')
+			self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar Vídeos en EasyNews', 'easynews')
+			self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar Imágenes en EasyNews', 'easynews')
 		self.end_directory()
 
 	def downloads(self):
-		self.add({'mode': 'downloader.manager', 'name': 'Download Manager', 'isFolder': 'false'}, 'Gestor de Descargas', 'downloads')
+		self.add({'mode': 'downloader.manager', 'name': 'Gestor de Descargas', 'isFolder': 'false'}, 'Gestor de Descargas', 'downloads')
 		self.add({'mode': 'downloader.viewer', 'folder_type': 'movie', 'name': 'Películas'}, 'Películas', 'movies')
-		self.add({'mode': 'downloader.viewer', 'folder_type': 'episode', 'name': 'Series de TV'}, 'Series de TV', 'tv')
-		self.add({'mode': 'downloader.viewer', 'folder_type': 'premium', 'name': 'Premium Files'}, 'Archivos Premium', 'premium')
+		self.add({'mode': 'downloader.viewer', 'folder_type': 'episode', 'name': 'Series'}, 'Series', 'tv')
+		self.add({'mode': 'downloader.viewer', 'folder_type': 'premium', 'name': 'Archivos Premium'}, 'Archivos Premium', 'premium')
 		self.add({'mode': 'browser_image', 'folder_path': s.download_directory('image'), 'isFolder': 'false'}, 'Imágenes', 'people')
 		self.end_directory()
 

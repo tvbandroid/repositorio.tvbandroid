@@ -201,7 +201,7 @@ def clean_databases():
 			continue
 		end_bytes = get_size(location)
 		saved_bytes = start_bytes - end_bytes
-		append('[B]%s: [COLOR green]CORRECTO[/COLOR][/B][CR]    [B]Espacio Recuperado: %sMB[/B][CR]    Tamaño Inicial/Tamaño Final: %sMB/%sMB') \
+		append('[B]%s: [COLOR green]CORRECTO[/COLOR][/B][CR]    [B]Tamaño Guardado: %sMB[/B][CR]    Tamaño Inicial/Tamaño Final: %sMB/%sMB' \
 		% (name, round(float(saved_bytes)/1024/1024, 2), round(float(start_bytes)/1024/1024, 2), round(float(end_bytes)/1024/1024, 2)))
 	return kodi_utils.show_text('Resultados de la Limpieza de Cache', text='[CR]----------------------------------[CR]'.join(results), font_size='large')
 
@@ -288,7 +288,7 @@ def clear_all_cache():
 	if not kodi_utils.confirm_dialog(): return
 	from modules.search import clear_easynews_search_history
 	progressDialog = kodi_utils.progress_dialog()
-	line = 'Clearing....[CR]%s'
+	line = 'Limpiando....[CR]%s'
 	caches = (('meta', 'Meta Cache'), ('internal_scrapers', 'Internal Scrapers Cache'), ('external_scrapers', 'External Scrapers Cache'), ('trakt', 'Trakt Cache'),
 			('simkl', 'Simkl Cache'), ('mdblist', 'MDBList Cache'), ('imdb', 'IMDb Cache'), ('list', 'List Data Cache'), ('ai_functions', 'AI Data Cache'), ('tmdb_list', 'TMDb Personal List Cache'), ('main', 'Main Cache'),
 			('pm_cloud', 'Premiumize Cloud'), ('rd_cloud', 'Real Debrid Cloud'), ('ad_cloud', 'All Debrid Cloud'),
@@ -333,8 +333,8 @@ def check_and_insert_new_columns(database, table, new_column, new_column_propert
 	try:
 		if not columns_in_table(database, table, new_column):
 			success = insert_new_column_in_table(database, table, new_column, new_column_properties)
-			if not success: kodi_utils.notification('Error en la Base de Datos [B]%s[/B]. Falta la Columna [B]%s[/B]' % (database.upper(), new_column.upper()))
-    except: kodi_utils.notification('Error al Comprobar la(s) Tabla(s) de la Base de Datos: %s' % database)
+			if not success: kodi_utils.notification('Error en la Base de Datos [B]%s[/B] Database. Falta la Columna [B]%s[/B]' % (database.upper(), new_column.upper()))
+	except: kodi_utils.notification('Error al Comprobar la(s) Tabla(s) de la Base de Datos: %s' % database)
 
 class BaseCache(object):
 	def __init__(self, dbfile, table):

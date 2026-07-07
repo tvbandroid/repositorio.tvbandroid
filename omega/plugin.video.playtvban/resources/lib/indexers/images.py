@@ -28,7 +28,7 @@ class Images():
 		elif self.mode == 'browser_image': self.browser_image()
 		hide_busy_dialog()
 		if self.direct_search_result: return
-		if len(self.list_items) == 0: return notification('None Found')
+		if len(self.list_items) == 0: return notification('No Se Encontró Ninguno')
 		if not 'in_progress' in params: self.open_window_xml()
 		else: return self.list_items, self.next_page_params
 

@@ -1,0 +1,25 @@
+
+Con Play TVBan, puedes asignar un botón de tu control remoto o teclado, mediante el mapa de teclas de Kodi, para ejecutar automáticamente una opción del menú contextual de Play TVBan.
+
+Las opciones para el parámetro de modo son:
+
+custom_key.extras_menu
+custom_key.options_menu
+custom_key.playback_options
+custom_key.browse_movie_set
+custom_key.browse_recommended
+custom_key.browse_more_like_this
+custom_key.browse_similar
+custom_key.browse_in_trakt_list
+custom_key.trakt_manager
+custom_key.personal_manager
+custom_key.tmdb_manager
+custom_key.favorites_manager
+
+Tu comando en el mapa de teclas se vería así:
+
+RunPlugin(plugin://plugin.video.playtvban/?mode=[OPCIÓN ELEGIDA])
+
+Reemplaza [OPCIÓN ELEGIDA] con el modo que hayas seleccionado.
+
+El complemento de Kodi "Editor de asignación de teclas" puede ser de gran ayuda para configurarlo, pero solo está dirigido a usuarios avanzados.

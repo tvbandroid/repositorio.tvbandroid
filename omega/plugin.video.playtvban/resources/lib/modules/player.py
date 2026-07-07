@@ -13,10 +13,14 @@ PROP_RESOLVE_CANCEL = 'playtvban.resolve_cancelled'
 PROP_PLAY_OPENING = 'playtvban.play_opening'
 PROP_NEXTEP_PENDING = 'playtvban.nextep_pending'
 PROP_NEXTEP_PREP_SCHEDULED = 'playtvban.nextep_prep_scheduled'
-PROP_NEXTEP_PREP_DECLINED = 'redlight.nextep_prep_declined'
+PROP_NEXTEP_PREP_DECLINED = 'playtvban.nextep_prep_declined'
+PROP_AUTOSCRAPE_NEXTEP_READY = 'playtvban.autoscrape_nextep_ready'
+PROP_NEXTEP_AUTOPLAY_CANCELLED = 'playtvban.nextep_autoplay_cancelled'
 # Movies-only: fire stingers alert ~3 min before other alert sources would (typical 90% vs 95% gap on ~1 hr).
 _STINGER_EARLY_OFFSET_SEC = 180
 _NEXTEP_SUB_FETCH_DEFER_SEC = 45
+_NEXTEP_CLOSE_EARLY_PLAY_SEC = 4
+_NEXTEP_CLOSE_POLL_MS = 250
 _INTRO_SKIP_PROMPT_EARLY_SEC = 15
 _INTRO_SKIP_PROMPT_COUNTDOWN_SEC = 15
 _INTRO_SKIP_EARLY_START_SEC = 120
@@ -28,7 +32,7 @@ _INTRO_CHAPTER_MIN_SEGMENT_SEC = 10
 _INTRO_CHAPTER_MIN_END_SEC = 15
 _INTRO_SKIP_POST_END_GRACE_SEC = 20
 
-class RedLightPlayer(xbmc.Player):
+class PlayTVBanPlayer(xbmc.Player):
 	def __init__ (self):
 		xbmc.Player.__init__(self)
 
@@ -42,7 +46,7 @@ class RedLightPlayer(xbmc.Player):
 		self.clear_playback_properties(clear_navigation=False)
 		if not url:
 			self.is_generic = obj == 'video'
-			return self.run_error('No playable link was returned.')
+			return self.run_error('No se devolvió ningún enlace reproducible.')
 		try: return self.play_video(url, obj)
 		except:
 			self.is_generic = obj == 'video'
@@ -90,7 +94,7 @@ class RedLightPlayer(xbmc.Player):
 					if not self.sources_object._resolve_user_cancelled:
 						self.kill_dialog()
 				else:
-					# Keep the resolver progress UI so play_file can try the next queued source.
+					# Mantener la interfaz de progreso del resolvedor para que play_file pueda probar la siguiente fuente en cola.
 					self.run_error()
 				self.safe_stop()
 		try: del self.kodi_monitor
@@ -194,13 +198,13 @@ class RedLightPlayer(xbmc.Player):
 				play_random_continual = self.sources_object.random_continual
 				play_random = self.sources_object.random
 				disable_autoplay_next_episode = self.sources_object.disable_autoplay_next_episode
-				if disable_autoplay_next_episode: ku.notification('Scrape with Custom Values - Autoplay Next Episode Cancelled', 4500)
-				if any((play_random_continual, play_random, disable_autoplay_next_episode)): self.autoplay_nextep, self.autoscrape_nextep = False, False
+				if disable_autoplay_next_episode: ku.notification('Búsqueda con Valores Personalizados - Reproducción Automática del Siguiente Episodio Cancelada', 4500)
+				if any((play_random_continual, play_random, disable_autoplay_next_episode)): self.autoplay_nextep, self.autoscrape_nextep = False, False, False
 				else: self.autoplay_nextep, self.autoscrape_nextep = self.sources_object.autoplay_nextep, self.sources_object.autoscrape_nextep
 				if self.autoplay_nextep or self.autoscrape_nextep:
-					self._log_nextep('Next episode monitor active: autoplay=%s autoscrape=%s' % (self.autoplay_nextep, self.autoscrape_nextep))
+					self._log_nextep('Monitor del siguiente episodio activo: reproducción_automática=%s búsqueda_automática=%s' % (self.autoplay_nextep, self.autoscrape_nextep))
 				elif st.autoscrape_next_episode() or st.autoplay_next_episode():
-					self._log_nextep('Next episode disabled this play (random=%s random_continual=%s custom_values=%s)' % (play_random, play_random_continual, disable_autoplay_next_episode))
+					self._log_nextep('Siguiente episodio deshabilitado en esta reproducción (aleatorio=%s aleatorio_continuo=%s valores_personalizados=%s)' % (play_random, play_random_continual, disable_autoplay_next_episode))
 			else:
 				show_stinger, stinger_alert_timing, stingers_percentage_fallback = st.stingers_show(), st.stingers_alert_timing(), st.stingers_percentage()
 				play_random_continual, self.autoplay_nextep, self.autoscrape_nextep = False, False, False
@@ -225,7 +229,15 @@ class RedLightPlayer(xbmc.Player):
 					if not ensure_dialog_dead:
 						ensure_dialog_dead = True
 						self.playback_close_dialogs()
-					ku.sleep(1000)
+					_monitor_sleep_ms = 1000
+					if self.media_type == 'episode' and getattr(self, '_nextep_close_wait', False) and not getattr(self, '_nextep_stash_play_scheduled', False):
+						try:
+							_rem = round(float(self.getTotalTime()) - float(self.getTime()))
+							if 0 < _rem <= 10:
+								_monitor_sleep_ms = _NEXTEP_CLOSE_POLL_MS
+						except:
+							pass
+					ku.sleep(_monitor_sleep_ms)
 					try: self.total_time, self.curr_time = self.getTotalTime(), self.getTime()
 					except: ku.sleep(250); continue
 					if not self._valid_playback_duration(self.total_time, self.curr_time):
@@ -257,25 +269,35 @@ class RedLightPlayer(xbmc.Player):
 							except: pass
 							if self._should_prep_next_ep(): self._schedule_next_ep()
 							self._try_autoplay_nextep_alert()
+							self._try_autoplay_early_stash_play()
+							self._try_autoscrape_nextep_ready_notify()
 							self._maybe_log_nextep_alert_pending()
 					elif show_stinger and not self.movie_stingers_run: 
 						final_chapter = self._stinger_trigger_point(stinger_alert_timing, stingers_percentage_fallback)
 						if self.current_point >= final_chapter: self.run_movie_stingers()
 				except: pass
 				if not self.subs_searched: self.run_subtitles()
-			ku.hide_busy_dialog()
+			autoplay_stash_scheduled = False
 			if self.autoplay_nextep:
 				try:
-					from modules.sources import clear_nextep_autoplay_stash, peek_nextep_autoplay_stash, schedule_nextep_stashed_play, take_nextep_autoplay_stash
-					if getattr(self, '_nextep_alert_shown', False):
+					from modules.sources import clear_nextep_autoplay_stash, clear_orphan_nextep_play_stash, nextep_autoplay_cancelled, peek_nextep_autoplay_stash, schedule_nextep_stashed_play, take_nextep_autoplay_stash
+					if nextep_autoplay_cancelled():
+						clear_nextep_autoplay_stash()
+						clear_orphan_nextep_play_stash()
+						self._log_nextep('Reproducción Automática del Siguiente Episodio: omitida al finalizar el episodio (cancelada por el usuario)')
+					elif getattr(self, '_nextep_stash_play_scheduled', False):
+						autoplay_stash_scheduled = True
+					elif getattr(self, '_nextep_alert_shown', False):
 						if peek_nextep_autoplay_stash():
 							stash = take_nextep_autoplay_stash()
 							if stash:
-								self._log_nextep('Autoplay next episode: playing stashed resolve at episode end')
-								schedule_nextep_stashed_play(stash)
+								self._log_nextep('Reproducción Automática del Siguiente Episodio: reproduciendo resolución almacenada al finalizar el episodio')
+								autoplay_stash_scheduled = schedule_nextep_stashed_play(stash)
 					else:
 						clear_nextep_autoplay_stash()
 				except: pass
+			if not autoplay_stash_scheduled:
+				ku.hide_busy_dialog()
 			if not self.media_marked: self.media_watched_marker()
 			self.clear_playback_properties(clear_navigation=False)
 		except:
@@ -453,18 +475,27 @@ class RedLightPlayer(xbmc.Player):
 		if started and (time.time() - started) > _NEXTEP_SUB_FETCH_DEFER_SEC: return False
 		return True
 
-    def decline_nextep_prep(self, reason=''):
+	def decline_nextep_prep(self, reason=''):
 		ku.set_property(PROP_NEXTEP_PREP_DECLINED, 'true')
 		if reason:
 			self._log_nextep('Next episode prep declined: %s' % reason)
 
 	def _should_prep_next_ep(self):
-        if ku.get_property(PROP_NEXTEP_PREP_DECLINED) == 'true':
+		if ku.get_property(PROP_NEXTEP_PREP_DECLINED) == 'true':
+			return False
+		if ku.get_property(PROP_NEXTEP_AUTOPLAY_CANCELLED) == 'true':
 			return False
 		if ku.get_property(PROP_NEXTEP_PENDING) == 'true':
 			return False
 		if ku.get_property(PROP_NEXTEP_PREP_SCHEDULED) == 'true':
 			return False
+		if self.autoplay_nextep and ku.get_property('playtvban.nextep_scrape_ready') == 'true':
+			try:
+				from modules.sources import peek_nextep_autoplay_stash
+				if peek_nextep_autoplay_stash():
+					return False
+			except:
+				pass
 		if not self._valid_playback_duration(self.total_time, self.curr_time):
 			return False
 		try:
@@ -577,6 +608,11 @@ class RedLightPlayer(xbmc.Player):
 	def _should_show_autoplay_nextep_alert(self):
 		if not self.autoplay_nextep or not getattr(self, 'nextep_settings', None): return False
 		if getattr(self, '_nextep_alert_shown', False): return False
+		try:
+			from modules.sources import nextep_autoplay_cancelled
+			if nextep_autoplay_cancelled(): return False
+		except:
+			pass
 		if ku.get_property('playtvban.nextep_scrape_ready') != 'true': return False
 		try:
 			from modules.sources import peek_nextep_autoplay_stash
@@ -589,6 +625,56 @@ class RedLightPlayer(xbmc.Player):
 			return False
 		window = int(self.nextep_settings.get('window_time', 0) or 0)
 		return remaining > 0 and remaining <= window
+
+	def _try_autoscrape_nextep_ready_notify(self):
+		if not self.autoscrape_nextep or getattr(self, '_autoscrape_ready_notified', False): return
+		if not ku.get_property(PROP_AUTOSCRAPE_NEXTEP_READY): return
+		if not getattr(self, 'nextep_settings', None): return
+		try:
+			remaining = round(float(self.total_time) - float(self.curr_time))
+		except:
+			return
+		window = int(self.nextep_settings.get('window_time', 0) or 0)
+		if remaining <= 0 or remaining > window: return
+		self._autoscrape_ready_notified = True
+		meta = {}
+		try:
+			raw = ku.get_property(PROP_AUTOSCRAPE_NEXTEP_READY)
+			if raw and raw != 'true':
+				meta = json.loads(raw)
+		except:
+			pass
+		ku.clear_property(PROP_AUTOSCRAPE_NEXTEP_READY)
+		title = meta.get('title') or self.meta_get('title', '')
+		season = meta.get('season', self.season)
+		episode = meta.get('episode', self.episode)
+		poster = meta.get('poster') or self.meta_get('poster')
+		ku.notification('[B]Siguiente Episodio Preparado:[/B] %s S%02dE%02d' % (title, season, episode), 6500, poster)
+		self._log_nextep('Búsqueda Automática del Siguiente Episodio preparada: restante=%ss ventana=%ss' % (remaining, window))
+
+	def _try_autoplay_early_stash_play(self):
+		if not self.autoplay_nextep or not getattr(self, '_nextep_close_wait', False):
+			return
+		if getattr(self, '_nextep_stash_play_scheduled', False) or not getattr(self, '_nextep_alert_shown', False):
+			return
+		try:
+			from modules.sources import nextep_autoplay_cancelled, peek_nextep_autoplay_stash, schedule_nextep_stashed_play, take_nextep_autoplay_stash
+			if nextep_autoplay_cancelled() or not peek_nextep_autoplay_stash():
+				return
+		except:
+			return
+		try:
+			remaining = round(float(self.total_time) - float(self.curr_time))
+		except:
+			return
+		if remaining > _NEXTEP_CLOSE_EARLY_PLAY_SEC or remaining <= 0:
+			return
+		stash = take_nextep_autoplay_stash()
+		if not stash:
+			return
+		if schedule_nextep_stashed_play(stash, show_busy=False):
+			self._nextep_stash_play_scheduled = True
+			self._log_nextep('Reproducción Automática del Siguiente Episodio: resolución almacenada iniciada anticipadamente con %ss restantes' % remaining)
 
 	def _try_autoplay_nextep_alert(self):
 		if not self._should_show_autoplay_nextep_alert(): return
@@ -607,7 +693,7 @@ class RedLightPlayer(xbmc.Player):
 			remaining = round(float(self.total_time) - float(self.curr_time))
 		except:
 			remaining = settings.get('window_time')
-		self._log_nextep('Autoplay next episode alert: remaining=%ss window=%ss method=%s' % (
+		self._log_nextep('Alerta de Reproducción Automática del Siguiente Episodio: restante=%ss ventana=%ss método=%s' % (
 			remaining, settings.get('window_time'), 'window' if use_window else 'notification'))
 		action = None
 		if use_window:
@@ -617,35 +703,39 @@ class RedLightPlayer(xbmc.Player):
 			except:
 				action = 'cancel'
 		else:
-			ku.notification('[B]Next Up:[/B] %s S%02dE%02d' % (dialog_meta.get('title'), dialog_meta.get('season'), dialog_meta.get('episode')), 6500, dialog_meta.get('poster'))
+			ku.notification('[B]A Continuación:[/B] %s S%02dE%02d' % (dialog_meta.get('title'), dialog_meta.get('season'), dialog_meta.get('episode')), 6500, dialog_meta.get('poster'))
 		if not action:
 			action = default_action if use_window else 'close'
 		if not action:
 			action = 'close'
 		if action == 'cancel':
-			take_nextep_autoplay_stash(clear_only=True)
+			try:
+				from modules.sources import mark_nextep_autoplay_cancelled
+				mark_nextep_autoplay_cancelled()
+			except:
+				pass
 			ku.clear_property(PROP_NEXTEP_PREP_SCHEDULED)
+			self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: cancelar')
 			return
 		if action == 'pause':
-			take_nextep_autoplay_stash(clear_only=True)
-			ku.clear_property(PROP_NEXTEP_PREP_SCHEDULED)
-			try: self.pause()
-			except: pass
+			self._nextep_close_wait = True
+			self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: pausar (esperando al usuario)')
 			return
 		if action == 'close':
-			self._log_nextep('Autoplay next episode alert action: close (waiting for episode end)')
+			self._nextep_close_wait = True
+			self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: cerrar (esperando al final del episodio)')
 			return
 		if action != 'play':
 			return
-		self._log_nextep('Autoplay next episode alert action: play')
+		self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: reproducir')
 		stash = take_nextep_autoplay_stash()
 		if not stash: return
 		try:
 			from modules.sources import schedule_nextep_stashed_play
 			if not schedule_nextep_stashed_play(stash):
-				ku.logger('Play TVBan', 'Autoplay next episode play failed: could not schedule resolve')
+				ku.logger('Play TVBan', 'Error en la Reproducción Automática del Siguiente Episodio: no se pudo programar la resolución')
 		except Exception as exc:
-			ku.logger('Play TVBan', 'Autoplay next episode play failed: %s' % exc)
+			ku.logger('Play TVBan', 'Error en la Reproducción Automática del Siguiente Episodio: %s' % exc)
 		return
 
 	def run_next_ep(self):
@@ -675,7 +765,7 @@ class RedLightPlayer(xbmc.Player):
 		if self.playback_percent > 0.0: listitem.setProperty('StartPercent', str(self.playback_percent))
 
 	def _disable_kodi_url_resume(self, listitem, keep_start_percent=False):
-		# Kodi stores resume by stream URL/filename; debrid links reuse the same name and can reopen near EOF.
+		# Kodi guarda el punto de reanudación según la URL del flujo o el nombre del archivo; los enlaces debrid reutilizan el mismo nombre y pueden reabrirse cerca del final del archivo (EOF).
 		if not keep_start_percent or float(listitem.getProperty('StartPercent') or 0) <= 0:
 			listitem.setProperty('StartPercent', '0')
 		listitem.setProperty('StartOffset', '0')
@@ -846,7 +936,7 @@ class RedLightPlayer(xbmc.Player):
 		self.start_prep = start_prep
 		self.nextep_settings['window_time'] = pop_at
 		self.nextep_settings['pipeline_headroom'] = pipeline
-		self._log_nextep('Next episode timing refreshed (chapters): pop_at=%ss start_prep=%ss' % (pop_at, start_prep))
+		self._log_nextep('Tiempo del siguiente episodio actualizado (capítulos): pop_at=%ss start_prep=%ss' % (pop_at, start_prep))
 
 	def _outro_credits_start(self, fetch=False):
 		if getattr(self, 'is_generic', False) or self.media_type != 'episode':
@@ -892,7 +982,7 @@ class RedLightPlayer(xbmc.Player):
 		self.nextep_settings['pipeline_headroom'] = pipeline
 		self.nextep_settings['outro_start'] = outro_start
 		outro_log = ' outro_start=%.1fs' % outro_start if outro_start is not None else ''
-		self._log_nextep('Next episode timing refreshed (introdb): pop_at=%ss start_prep=%ss%s' % (pop_at, start_prep, outro_log))
+		self._log_nextep('Temporización del siguiente episodio actualizada (IntroDB): mostrar_en=%ss iniciar_preparación=%ss%s' % (pop_at, start_prep, outro_log))
 
 	def _stinger_early_percentage(self, trigger_pct):
 		try:
@@ -943,8 +1033,13 @@ class RedLightPlayer(xbmc.Player):
 			self._playback_started_at = time.time()
 			ku.clear_property(PROP_NEXTEP_PENDING)
 			ku.clear_property(PROP_NEXTEP_PREP_SCHEDULED)
-            ku.clear_property(PROP_NEXTEP_PREP_DECLINED)
+			ku.clear_property(PROP_NEXTEP_PREP_DECLINED)
+			ku.clear_property(PROP_AUTOSCRAPE_NEXTEP_READY)
+			ku.clear_property(PROP_NEXTEP_AUTOPLAY_CANCELLED)
+			self._autoscrape_ready_notified = False
 			self._nextep_alert_pending_logged = False
+			self._nextep_close_wait = False
+			self._nextep_stash_play_scheduled = False
 			self.playing_item = self.sources_object.playing_item
 			self._intro_skip_active = False
 			self._intro_skip_done = False
@@ -1128,7 +1223,7 @@ class RedLightPlayer(xbmc.Player):
 			return
 		if self._intro_skip_past_segment(segment):
 			if getattr(self, '_intro_skip_approved', False):
-				self._log_intro_skip('Intro skip missed: past grace window')
+				self._log_intro_skip('Saltar introducción omitido: se superó el margen de tiempo')
 			self._intro_skip_done = True
 			return
 		try:
@@ -1161,20 +1256,20 @@ class RedLightPlayer(xbmc.Player):
 		if not getattr(self, '_intro_skip_approved', False):
 			return
 		if self._intro_skip_past_segment(segment):
-			self._log_intro_skip('Intro skip missed: past grace window')
+			self._log_intro_skip('Saltar introducción omitido: se superó el margen de tiempo')
 			self._intro_skip_done = True
 			return
 		if curr < start_sec:
 			return
 		if curr >= end_sec:
 			self._intro_skip_done = True
-			self._log_intro_skip('Intro skip: already past intro (%.1fs >= %.1fs)' % (curr, end_sec))
+			self._log_intro_skip('Saltar introducción: ya se ha superado la introducción (%.1fs >= %.1fs)' % (curr, end_sec))
 			return
 		try:
 			if self._execute_intro_skip_seek(start_sec, end_sec, segment.get('source', '?')):
 				self._intro_skip_done = True
 		except Exception as exc:
-			self._log_intro_skip('Intro skip failed: %s' % exc)
+			self._log_intro_skip('Error al saltar la introducción: %s' % exc)
 			self._intro_skip_done = True
 
 	def run_subtitles(self):
@@ -1253,17 +1348,17 @@ class RedLightPlayer(xbmc.Player):
 			pass
 		self.clear_playback_properties(clear_navigation=not self.is_generic)
 		if self.is_generic and ku.get_property('playtvban.browse_playback') == 'true':
-			return ku.notification('Playback Failed', 4000, settle_ms=400)
+			return ku.notification('Reproducción fallida', 4000, settle_ms=400)
 		# play_file walks the resolve queue and calls playback_failed_action after the last attempt.
 		if not self.is_generic and getattr(self, 'sources_object', None):
 			return
-		text = message or 'This link could not be played. It may be expired, removed, or unsupported on this device.'
+		text = message or 'No se pudo reproducir este enlace. Puede que haya caducado, haya sido eliminado o no sea compatible con este dispositivo.'
 		ku.hide_busy_dialog()
 		ku.sleep(400)
 		try:
-			return ku.kodi_dialog().ok('Playback failed', text)
+			return ku.kodi_dialog().ok('Reproducción fallida', text)
 		except Exception:
 			try:
-				return ku.ok_dialog(heading='Playback failed', text=text)
+				return ku.ok_dialog(heading='Reproducción fallida', text=text)
 			except Exception:
-				return ku.notification('Playback Failed', 4000, settle_ms=400)
+				return ku.notification('Reproducción fallida', 4000, settle_ms=400)

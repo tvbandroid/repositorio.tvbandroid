@@ -63,6 +63,7 @@ class SourcesResults(BaseDialog):
 
 	def onInit(self):
 		self.filter_applied = False
+		hide_busy_dialog()
 		if self.make_poster: self.set_poster()
 		self.add_items(self.window_id, self.item_list)
 		self.add_items(self.filter_window_id, self.filter_list)
@@ -72,7 +73,9 @@ class SourcesResults(BaseDialog):
 		self.doModal()
 		self.clearProperties()
 		self.clear_home_property('window_theme.sources')
-		hide_busy_dialog()
+		action = self.selected[0] if self.selected else None
+		if action != 'play':
+			hide_busy_dialog()
 		return self.selected
 
 	def get_provider_and_path(self, provider):
@@ -113,7 +116,7 @@ class SourcesResults(BaseDialog):
 				else: #cache_check_rescrape
 					self.selected = ('cache_change_rescrape', 'false' if self._any_cache_check_active() else 'true')
 					return self.close()
-			if not filtered_list: return ok_dialog(text='No Results')
+			if not filtered_list: return ok_dialog(text='Sin Resultados')
 			self.set_filter(filtered_list)
 
 	def _offer_full_scrape(self):
@@ -148,7 +151,10 @@ class SourcesResults(BaseDialog):
 				})
 			try:
 				if self.sources_ref:
-					self.sources_ref._prepare_resolve_ui()
+					if getattr(self.sources_ref, 'background', False):
+						self.sources_ref._make_resolve_dialog()
+					else:
+						self.sources_ref._prepare_resolve_ui()
 			except:
 				pass
 			self.selected = ('play', chosen_source)
@@ -351,12 +357,12 @@ class SourcesResults(BaseDialog):
 				'magnet_url': magnet_url,
 				'display_name': item_get('display_name', ''),
 			}
-		choices_append(('Info', 'results_info'))
-		if add_magnet_to_cloud_params: choices_append(('Add to Cloud', add_magnet_to_cloud_params))
-		if browse_pack_params: choices_append(('Browse', browse_pack_params))
-		if down_pack_params: choices_append(('Download Pack', down_pack_params))
-		if down_file_params: choices_append(('Download File', down_file_params))
-		if provider_source == 'rd_cloud': choices_append(('Delete from RD Cloud', 'rd_cloud_delete'))
+		choices_append(('Información', 'results_info'))
+		if add_magnet_to_cloud_params: choices_append(('Añadir a la Nube', add_magnet_to_cloud_params))
+		if browse_pack_params: choices_append(('Explorar', browse_pack_params))
+		if down_pack_params: choices_append(('Descargar Paquete', down_pack_params))
+		if down_file_params: choices_append(('Descargar Archivo', down_file_params))
+		if provider_source == 'rd_cloud': choices_append(('Eliminar de RD Cloud', 'rd_cloud_delete'))
 		list_items = [{'line1': i[0], 'icon': self.poster} for i in choices]
 		kwargs = {'items': json.dumps(list_items)}
 		choice = select_dialog([i[1] for i in choices], **kwargs)
@@ -369,7 +375,7 @@ class SourcesResults(BaseDialog):
 		self.setFocusId(self.window_id)
 		self.setProperty('total_results', str(len(filtered_list)))
 		self.setProperty('filter_applied', 'true')
-		self.setProperty('filter_info', '| Press [B]BACK[/B] to Cancel')
+		self.setProperty('filter_info', '| Presiona [B]ATRÁS[/B] para cancelar')
 
 	def clear_filter(self):
 		self.filter_applied = False
@@ -392,6 +398,9 @@ class SourcesPlayback(BaseDialog):
 		self.meta_get = self.meta.get
 		self.addon_fanart = addon_fanart()
 		self.enable_scraper()
+
+	def onInit(self):
+		hide_busy_dialog()
 
 	def run(self):
 		self.doModal()
@@ -459,13 +468,19 @@ class SourcesPlayback(BaseDialog):
 		self.setProperty('clearlogo', clearlogo)
 		self.setProperty('title', title)
 		self.setProperty('genre', ', '.join(genre))
+		self.setProperty('results_4k', '0')
+		self.setProperty('results_1080p', '0')
+		self.setProperty('results_720p', '0')
+		self.setProperty('results_sd', '0')
+		self.setProperty('results_total', '0')
+		self.setProperty('percent', '0')
 
 	def set_resolver_properties(self):
 		if self.meta_get('media_type') == 'movie': self.text = self.meta_get('plot')
 		else:
-			if avoid_episode_spoilers() and int(self.meta_get('playcount', '0')) == 0: plot = self.meta_get('tvshow_plot') or '* Hidden to Prevent Spoilers *'
+			if avoid_episode_spoilers() and int(self.meta_get('playcount', '0')) == 0: plot = self.meta_get('tvshow_plot') or '* Oculto para Evitar Spoilers *'
 			else: plot = self.meta_get('plot', '') or self.meta_get('tvshow_plot', '')
-			self.text = '[B]%02dx%02d - %s[/B][CR][CR]%s' % (self.meta_get('season'), self.meta_get('episode'), self.meta_get('ep_name', 'N/A').upper(), plot)
+			self.text = '[B]%02dx%02d - %s[/B][CR][CR]%s' % (self.meta_get('season'), self.meta_get('episode'), self.meta_get('ep_name', 'N/D').upper(), plot)
 		self.setProperty('window_mode', self.window_mode)
 		self.setProperty('text', self.text)
 
@@ -482,11 +497,11 @@ class SourcesPlayback(BaseDialog):
 		self.setProperty('results_720p', str(results_720p))
 		self.setProperty('results_sd', str(results_sd))
 		self.setProperty('results_total', str(results_total))
-		self.setProperty('percent', str(percent))
+		self.setProperty('percent', str(int(percent)))
 		self.set_text(2001, content)
 
 	def update_resolver(self, text='', percent=0):
-		try: self.setProperty('percent', str(percent))
+		try: self.setProperty('percent', str(int(percent)))
 		except: pass
 		if text: self.set_text(2002, text)
 

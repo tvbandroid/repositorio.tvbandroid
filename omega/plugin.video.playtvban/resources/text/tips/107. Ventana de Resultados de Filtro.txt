@@ -1,0 +1,18 @@
+
+Ahora puedes filtrar los resultados DESPUÉS de haberlos extraído en Red Light. Pulsa izquierda cuando se muestren los resultados para abrir el panel lateral de filtros.
+
+Puedes filtrar los resultados aquí por calidad o por proveedor.
+
+También puedes elegir uno de los tipos de filtro: "Filtrar por título" o "Filtrar por información adicional"...
+
+[B]Filtrar por título[/B]
+
+Usa esta opción para introducir una o varias palabras clave que Red Light utilizará para buscar en los títulos de los resultados. Red Light eliminará los resultados cuyos títulos no contengan las palabras clave.
+
+[B]Filtrar por información adicional[/B]
+
+Usa esta opción para elegir una o varias palabras clave que Red Light utilizará para buscar en la información adicional de los resultados. Red Light eliminará los resultados cuya información adicional no contenga las palabras clave.
+
+Para eliminar el filtro y volver a mostrar TODOS los resultados, simplemente pulsa "ATRÁS".
+
+¡Pruébalo!

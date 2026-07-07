@@ -1,0 +1,14 @@
+
+Play TVBan te permite crear carpetas personalizadas dentro de los menús principales (Raíz, Películas o Series). Esto te permite llenarlas con elementos de todas las demás listas o de las listas de Trakt. Puedes nombrar las carpetas como quieras, creando así carpetas temáticas con contenido diferente.
+
+Para crear una nueva carpeta de acceso directo, ve a Herramientas -> Administrador de carpetas de acceso directo y selecciona "Crear nueva carpeta de acceso directo". Esta carpeta aún no estará asignada a ninguna lista.
+
+Una vez creada la carpeta, selecciona "Añadir contenido" dentro de ella. Allí podrás explorar la estructura de carpetas de Play TVBan y seleccionar un elemento de la lista para añadirlo a la carpeta.
+
+Para añadir una carpeta de acceso directo predefinida a un menú principal (Raíz, Películas o Series), selecciona "Añadir contenido" y navega hasta la carpeta que deseas agregar.
+
+Además de añadir menús o listas a tus carpetas de accesos directos, también puedes reorganizar su orden dentro de la carpeta abriendo el menú contextual, seleccionando «Editar» y luego «Mover». A continuación, selecciona la nueva posición de los elementos. También puedes eliminar un elemento de la carpeta o borrar todo su contenido.
+
+Además, en Herramientas > Administrador de carpetas de accesos directos, puedes eliminar una carpeta de accesos directos por completo.
+
+Puedes tener tantas carpetas de accesos directos como quieras y colocarlas en más de un menú principal. Si eliminas una carpeta de un menú, seguirá existiendo y podrá colocarse en otro. Para eliminar una carpeta por completo, debes acceder al Administrador de carpetas de accesos directos.

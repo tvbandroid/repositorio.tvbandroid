@@ -1,0 +1,4 @@
+
+Dado que Red Light utiliza su propia ventana para mostrar los resultados, puedes cambiar su apariencia.
+
+Ve a Configuración > Resultados > Visualización y selecciona "Visualización de resultados". Aparecerá un cuadro de diálogo donde podrás elegir el estilo de ventana que prefieras para mostrar los resultados.

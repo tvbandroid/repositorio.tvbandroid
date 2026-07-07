@@ -1,0 +1,4 @@
+
+Play TVBan incluye un Log de Registros para que puedas subir tu archivo de registro actual de Kodi y recibir un enlace para publicarlo y obtener ayuda.
+
+Para acceder al Log de Registros, ve a Herramientas > Registro de Cambios y Utilidades de Registro > Subir Registro de Kodi a Pastebin.

@@ -1,0 +1,16 @@
+
+La función Descubrir te permite crear listas personalizadas con los filtros que especifiques. Solo necesitas asignar un valor a los filtros que quieras usar; los demás pueden quedar en blanco. Una vez configurados los filtros, selecciona «Guardar y Salir».
+
+Puedes ver tus listas seleccionándolas en la sección Descubrir y también añadirlas a cualquier lista principal de Play TVBan mediante la función Editar Menús Principales.
+
+Puedes crear muchas listas diferentes usando distintos filtros. A continuación, te mostramos un ejemplo:
+
+[B]EJEMPLO:[/B]
+Quieres crear una lista de películas de comedia y acción de los años 80 con clasificación PG:
+- Asigna el filtro "Año de Inicio" "1980"
+- Asigna el filtro "Año de Finalización" "1989"
+- Asigna el filtro "Géneros Incluidos" "Acción, Comedia"
+- Asigna el filtro "Clasificación" "PG"
+¿Solo quieres películas con Tom Hanks en tu nueva lista? Añade el filtro "Tom Hanks" en "Incluye Reparto".
+
+- [B]¡Disfruta de tu Noche de cine familiar de Acción y Comedia de los 80![/B]

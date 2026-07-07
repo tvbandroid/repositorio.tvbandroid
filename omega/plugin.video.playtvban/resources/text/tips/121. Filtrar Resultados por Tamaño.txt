@@ -1,0 +1,14 @@
+
+La opción para filtrar resultados por tamaño se encuentra en Ajustes -> Ordenar y filtrar.
+
+Al introducir tu velocidad de internet (en Mbit/s), Play TVBan determinará el tamaño máximo permitido para los resultados según la duración de la película o episodio.
+
+Por ejemplo, si configuras tu velocidad de internet a 20 Mbit/s, Play TVBan utilizará los siguientes tamaños máximos de archivo:
+10 min = ~1,35 GB
+30 min = ~4 GB
+60 min = ~8 GB
+90 min = ~12,5 GB
+120 min = ~16,2 GB, etc.
+Este cálculo se realiza automáticamente, por lo que cualquier duración tendrá un tamaño máximo de archivo equivalente.
+
+¡Pruébalo y compruébalo!...

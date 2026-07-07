@@ -6,7 +6,7 @@
             <width>1920</width>
             <height>1080</height>
             <control type="image">
-                <texture colordiffuse="FF000000">redlight_common/white.png</texture>
+                <texture colordiffuse="FF000000">playtvban_common/white.png</texture>
             </control>
             <control type="image">
                 <texture>$INFO[Window.Property(fanart)]</texture>
@@ -25,18 +25,18 @@
                     <height>60</height>
                     <align>top</align>
                     <aspectratio aligny="top">keep</aspectratio>
-                    <texture>$INFO[Window(10000).Property(redlight.addon_icon_mini)]</texture>
+                    <texture>$INFO[Window(10000).Property(playtvban.addon_icon_mini)]</texture>
                 </control>
                 <control type="label">
                     <left>70</left>
                     <top>22</top>
                     <width max="1160">auto</width>
                     <height>20</height>
-                    <font>font10</font> <!-- REDLIGHT_21 -->
+                    <font>font10</font> <!-- PLAYTVBAN_21 -->
                     <textcolor>FFFFFFFF</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[UPPERCASE]Press [B]BACK[/B] to Cancel[/UPPERCASE]</label>
+                    <label>[UPPERCASE]Pulsa [B]ATRAS[/B] para Cancelar[/UPPERCASE]</label>
                     <visible>String.IsEqual(Window.Property(window_mode),scraper)</visible>
                 </control>
                 <control type="label">
@@ -44,11 +44,11 @@
                     <top>22</top>
                     <width max="1160">auto</width>
                     <height>20</height>
-                    <font>font10</font> <!-- REDLIGHT_21 -->
+                    <font>font10</font> <!-- PLAYTVBAN_21 -->
                     <textcolor>FFFFFFFF</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[UPPERCASE]Press [B]BACK[/B] to Cancel [B]|[/B] Press [B]RIGHT[/B] to Skip[/UPPERCASE]</label>
+                    <label>[UPPERCASE]Pulsa [B]ATRAS[/B] para Cancelar [B]|[/B] Pulsa [B]DERECHA[/B] para Saltar[/UPPERCASE]</label>
                     <visible>String.IsEqual(Window.Property(window_mode),resolver) + !String.IsEqual(Window.Property(enable_busy_spinner),true)</visible>
                 </control>
             </control>
@@ -69,7 +69,7 @@
                     <top>400</top>
                     <width>1920</width>
                     <height>30</height>
-                    <font>lyr15b</font> <!-- REDLIGHT_60_BOLD -->
+                    <font>lyr15b</font> <!-- PLAYTVBAN_60_BOLD -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>center</align>
                     <aligny>bottom</aligny>
@@ -80,7 +80,7 @@
                     <top>480</top>
                     <width>1920</width>
                     <height>25</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>center</align>
                     <aligny>bottom</aligny>
@@ -95,7 +95,7 @@
                 <top>552</top>
                 <width>30</width>
                 <height>30</height>
-                <texture flipx="true" colordiffuse="FFFAFAFA">redlight_common/spinner.png</texture>
+                <texture flipx="true" colordiffuse="FFFAFAFA">playtvban_common/spinner.png</texture>
                 <animation effect="fade" time="320" delay="400">Visible</animation>
                 <animation effect="rotate" end="360" center="auto" time="1200" loop="true" reversible="false" condition="true">Conditional</animation>
                 <animation effect="fade" start="70" time="1200" condition="true" pulse="true">Conditional</animation>
@@ -109,147 +109,147 @@
                         <left>0</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),1)</visible>
                     </control>
                     <control type="image">
                         <left>20</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),5)</visible>
                     </control>
                     <control type="image">
                         <left>40</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),10)</visible>
                     </control>
                     <control type="image">
                         <left>60</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),15)</visible>
                     </control>
                     <control type="image">
                         <left>80</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),20)</visible>
                     </control>
                     <control type="image">
                         <left>100</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),25)</visible>
                     </control>
                     <control type="image">
                         <left>120</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),30)</visible>
                     </control>
                     <control type="image">
                         <left>140</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),35)</visible>
                     </control>
                     <control type="image">
                         <left>160</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),40)</visible>
                     </control>
                     <control type="image">
                         <left>180</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),45)</visible>
                     </control>
                     <control type="image">
                         <left>200</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),50)</visible>
                     </control>
                     <control type="image">
                         <left>220</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),55)</visible>
                     </control>
                     <control type="image">
                         <left>240</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),60)</visible>
                     </control>
                     <control type="image">
                         <left>260</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),65)</visible>
                     </control>
                     <control type="image">
                         <left>280</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),70)</visible>
                     </control>
                     <control type="image">
                         <left>300</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),75)</visible>
                     </control>
                     <control type="image">
                         <left>320</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),80)</visible>
                     </control>
                     <control type="image">
                         <left>340</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),85)</visible>
                     </control>
                     <control type="image">
                         <left>360</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),90)</visible>
                     </control>
                     <control type="image">
                         <left>380</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),95)</visible>
                     </control>
                     <control type="image">
                         <left>400</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF434343">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF434343">playtvban_common/white.png</texture>
                         <visible>Integer.IsLess(Window().Property(percent),99)</visible>
                     </control>
                 </control>
@@ -258,147 +258,147 @@
                         <left>0</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),1)</visible>
                     </control>
                     <control type="image">
                         <left>20</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),5)</visible>
                     </control>
                     <control type="image">
                         <left>40</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),10)</visible>
                     </control>
                     <control type="image">
                         <left>60</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),15)</visible>
                     </control>
                     <control type="image">
                         <left>80</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),20)</visible>
                     </control>
                     <control type="image">
                         <left>100</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),25)</visible>
                     </control>
                     <control type="image">
                         <left>120</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),30)</visible>
                     </control>
                     <control type="image">
                         <left>140</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),35)</visible>
                     </control>
                     <control type="image">
                         <left>160</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),40)</visible>
                     </control>
                     <control type="image">
                         <left>180</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),45)</visible>
                     </control>
                     <control type="image">
                         <left>200</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),50)</visible>
                     </control>
                     <control type="image">
                         <left>220</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),55)</visible>
                     </control>
                     <control type="image">
                         <left>240</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),60)</visible>
                     </control>
                     <control type="image">
                         <left>260</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),65)</visible>
                     </control>
                     <control type="image">
                         <left>280</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FF7C7C7C">redlight_common/white.png</texture>
+                        <texture colordiffuse="FF7C7C7C">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),70)</visible>
                     </control>
                     <control type="image">
                         <left>300</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FFB40025">redlight_common/white.png</texture>
+                        <texture colordiffuse="FFB40025">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),75)</visible>
                     </control>
                     <control type="image">
                         <left>320</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FFB40025">redlight_common/white.png</texture>
+                        <texture colordiffuse="FFB40025">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),80)</visible>
                     </control>
                     <control type="image">
                         <left>340</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FFB40025">redlight_common/white.png</texture>
+                        <texture colordiffuse="FFB40025">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),85)</visible>
                     </control>
                     <control type="image">
                         <left>360</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FFB40025">redlight_common/white.png</texture>
+                        <texture colordiffuse="FFB40025">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),90)</visible>
                     </control>
                     <control type="image">
                         <left>380</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FFB40025">redlight_common/white.png</texture>
+                        <texture colordiffuse="FFB40025">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),95)</visible>
                     </control>
                     <control type="image">
                         <left>400</left>
                         <width>15</width>
                         <height>15</height>
-                        <texture colordiffuse="FFB40025">redlight_common/white.png</texture>
+                        <texture colordiffuse="FFB40025">playtvban_common/white.png</texture>
                         <visible>Integer.IsGreaterOrEqual(Window().Property(percent),99)</visible>
                     </control>
                 </control>
@@ -418,7 +418,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FF7C7C7C][B]4K[/B][/COLOR]</label>
                         </control>
                         <control type="label">
@@ -428,7 +428,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FFFFFFFF][B]$INFO[Window.Property(results_4k)][/B][/COLOR]</label>
                         </control>
                     </control>
@@ -441,7 +441,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FF7C7C7C][B]1080[/B][/COLOR]</label>
                         </control>
                         <control type="label">
@@ -451,7 +451,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FFFFFFFF][B]$INFO[Window.Property(results_1080p)][/B][/COLOR]</label>
                         </control>
                     </control>
@@ -464,7 +464,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FF7C7C7C][B]720[/B][/COLOR]</label>
                         </control>
                         <control type="label">
@@ -474,7 +474,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FFFFFFFF][B]$INFO[Window.Property(results_720p)][/B][/COLOR]</label>
                         </control>
                     </control>
@@ -487,7 +487,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FF7C7C7C][B]SD[/B][/COLOR]</label>
                         </control>
                         <control type="label">
@@ -497,7 +497,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FFFFFFFF][B]$INFO[Window.Property(results_sd)][/B][/COLOR]</label>
                         </control>
                     </control>
@@ -510,7 +510,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FF7C7C7C][B]TOTAL[/B][/COLOR]</label>
                         </control>
                         <control type="label">
@@ -520,7 +520,7 @@
                             <height>0</height>
                             <align>center</align>
                             <aligny>center</aligny>
-                            <font>font12</font> <!-- REDLIGHT_26 -->
+                            <font>font12</font> <!-- PLAYTVBAN_26 -->
                             <label>[COLOR FFFFFFFF][B]$INFO[Window.Property(results_total)][/B][/COLOR]</label>
                         </control>
                     </control>
@@ -532,7 +532,7 @@
                     <height>310</height>
                     <align>center</align>
                     <aligny>bottom</aligny>
-                    <font>font12</font> <!-- REDLIGHT_26 -->
+                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                     <textcolor>FFFFFFFF</textcolor>
                 </control>
             </control>
@@ -544,7 +544,7 @@
                     <top>600</top>
                     <width>820</width>
                     <height>310</height>
-                    <font>font12</font> <!-- REDLIGHT_26 -->
+                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                     <align>center</align>
                     <aligny>bottom</aligny>
                     <textcolor>FFB7B4BB</textcolor>
@@ -555,7 +555,7 @@
                     <left>360</left>
                     <width>1200</width>
                     <height>100</height>
-                    <font>font12</font> <!-- REDLIGHT_26 -->
+                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                     <align>center</align>
                     <aligny>bottom</aligny>
                     <textcolor>FFB7B4BB</textcolor>
@@ -575,11 +575,11 @@
                     <onleft>12</onleft>
                     <onright>11</onright>
                     <label>Resume $INFO[Window.Property(resume_percent)]%</label>
-                    <font>font12</font> <!-- REDLIGHT_26 -->
+                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <focusedcolor>FF1F2020</focusedcolor>
-                    <texturefocus colordiffuse="CCCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                    <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme_contrast)]" border="30">redlight_common/circle.png</texturenofocus>
+                    <texturefocus colordiffuse="CCCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                    <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme_contrast)]" border="30">playtvban_common/circle.png</texturenofocus>
                     <align>center</align>
                     <aligny>center</aligny>
                 </control>
@@ -590,26 +590,26 @@
                     <onleft>10</onleft>
                     <onright>12</onright>
                     <label>Start Over</label>
-                    <font>font12</font> <!-- REDLIGHT_26 -->
+                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <focusedcolor>FF1F2020</focusedcolor>
-                    <texturefocus colordiffuse="CCCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                    <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme_contrast)]" border="30">redlight_common/circle.png</texturenofocus>
+                    <texturefocus colordiffuse="CCCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                    <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme_contrast)]" border="30">playtvban_common/circle.png</texturenofocus>
                     <align>center</align>
                     <aligny>center</aligny>
                 </control>
                 <control type="button" id="12">
-                    <description>Cancel</description>
+                    <description>Cancelar</description>
                     <width>200</width>
                     <height>60</height>
                     <onleft>11</onleft>
                     <onright>10</onright>
-                    <label>Cancel</label>
-                    <font>font12</font> <!-- REDLIGHT_26 -->
+                    <label>Cancelar</label>
+                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <focusedcolor>FF1F2020</focusedcolor>
-                    <texturefocus colordiffuse="CCCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                    <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme_contrast)]" border="30">redlight_common/circle.png</texturenofocus>
+                    <texturefocus colordiffuse="CCCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                    <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme_contrast)]" border="30">playtvban_common/circle.png</texturenofocus>
                     <align>center</align>
                     <aligny>center</aligny>
                 </control>

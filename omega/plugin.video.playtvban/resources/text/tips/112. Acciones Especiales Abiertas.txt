@@ -1,0 +1,2 @@
+
+En Configuración-->Funciones-->Acciones Especiales de Apertura hay una configuración para permitir que Play TVBan abra las ventanas "Extras" y/o "Conjunto de Películas" al seleccionar una Película y la Ventana "Extras" al seleccionar una Serie.

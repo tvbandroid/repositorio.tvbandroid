@@ -1,0 +1,11 @@
+
+Play TVBan te permite elegir cómo se usarán los colores para diferenciar los resultados de los web scrapers.
+
+Ve a Configuración -> Resultados -> Resaltado de resultados por color y elige primero la opción que prefieras para "Resaltar resultados según".
+
+Las 3 opciones son:
+* PROVEEDOR: Resalta los resultados según el proveedor (por ejemplo, un color para EasyNews, otro para Real-debrid, etc.).
+* CALIDAD: Resalta los resultados según su calidad (por ejemplo, un color para 4K, otro para 1080P, etc.).
+* COLOR ÚNICO: Resalta los resultados con un solo color para todos los tipos de resultados.
+
+Al cambiar la configuración anterior, se mostrarán las opciones de color correspondientes para que las ajustes según tus preferencias.

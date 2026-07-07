@@ -7,7 +7,7 @@
             <width>1920</width>
             <height>1080</height>
             <control type="image">
-                <texture colordiffuse="FF000000">redlight_common/white.png</texture>
+                <texture colordiffuse="FF000000">playtvban_common/white.png</texture>
             </control>
             <control type="image">
                 <texture>$INFO[Window.Property(fanart)]</texture>
@@ -25,7 +25,7 @@
                     <width>60</width>
                     <height>60</height>
                     <aspectratio aligny="top">keep</aspectratio>
-                    <texture>$INFO[Window(10000).Property(redlight.addon_icon_mini)]</texture>
+                    <texture>$INFO[Window(10000).Property(playtvban.addon_icon_mini)]</texture>
                 </control>
                 <control type="group">
                     <visible>!Control.HasFocus(2050) + !Control.HasFocus(2051) + !Control.HasFocus(2053)</visible>
@@ -34,7 +34,7 @@
                         <left>1590</left>
                         <width max="300">auto</width>
                         <height>20</height>
-                        <font>font_medium</font> <!-- REDLIGHT_38 -->
+                        <font>font_medium</font> <!-- PLAYTVBAN_38 -->
                         <textcolor>FFCCCCCC</textcolor>
                         <align>right</align>
                         <aligny>center</aligny>
@@ -45,7 +45,7 @@
                         <left>1540</left>
                         <width max="350">auto</width>
                         <height>20</height>
-                        <font>font10</font> <!-- REDLIGHT_21 -->
+                        <font>font10</font> <!-- PLAYTVBAN_21 -->
                         <textcolor>FFCCCCCC</textcolor>
                         <align>right</align>
                         <aligny>center</aligny>
@@ -62,12 +62,12 @@
                         <width>35</width>
                         <height>35</height>
                         <aspectratio>keep</aspectratio>
-                        <texture>redlight_common/info.png</texture>
+                        <texture>playtvban_common/info.png</texture>
                     </control>
                     <control type="label">
                         <width max="600">auto</width>
                         <height>20</height>
-                        <font>font10</font> <!-- REDLIGHT_21 -->
+                        <font>font10</font> <!-- PLAYTVBAN_21 -->
                         <textcolor>FFCCCCCC</textcolor>
                         <align>right</align>
                         <aligny>top</aligny>
@@ -83,7 +83,7 @@
                     <left>55</left>
                     <width max="1150">auto</width>
                     <height>30</height>
-                    <font>lyr15b</font> <!-- REDLIGHT_60_BOLD -->
+                    <font>lyr15b</font> <!-- PLAYTVBAN_60_BOLD -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>center</align>
                     <aligny>bottom</aligny>
@@ -95,7 +95,7 @@
                     <width>650</width>
                     <height>1000</height>
                     <aspectratio>keep</aspectratio>
-                    <texture diffuse="redlight_diffuse/poster-50.png" background="true">$INFO[Window.Property(image)]</texture>
+                    <texture diffuse="playtvban_diffuse/poster-50.png" background="true">$INFO[Window.Property(image)]</texture>
                 </control>
             </control>
             <!-- Top 2 Lines Info -->
@@ -107,7 +107,7 @@
                 <control type="label">
                     <width max="1150">auto</width>
                     <height>25</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFB7B4BB</textcolor>
                     <align>center</align>
                     <label>[I]$INFO[Window.Property(place_of_birth)][/I]</label>
@@ -117,7 +117,7 @@
                     <top>70</top>
                     <width max="1150">auto</width>
                     <height>25</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>center</align>
                 </control>
@@ -147,11 +147,11 @@
                             <onup>2053</onup>
                             <ondown>50</ondown>
                             <label>Images</label>
-                            <font>font13</font> <!-- REDLIGHT_30 -->
+                            <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
-                            <texturefocus colordiffuse="FFCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme.people)]" border="30">redlight_common/circle.png</texturenofocus>
+                            <texturefocus colordiffuse="FFCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme.people)]" border="30">playtvban_common/circle.png</texturenofocus>
                             <align>center</align>
                             <aligny>center</aligny>
                         </control>
@@ -164,11 +164,11 @@
                             <onup>2053</onup>
                             <ondown>50</ondown>
                             <label>Tagged Images</label>
-                            <font>font13</font> <!-- REDLIGHT_30 -->
+                            <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
-                            <texturefocus colordiffuse="FFCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme.people)]" border="30">redlight_common/circle.png</texturenofocus>
+                            <texturefocus colordiffuse="FFCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme.people)]" border="30">playtvban_common/circle.png</texturenofocus>
                             <align>center</align>
                             <aligny>center</aligny>
                         </control>
@@ -181,11 +181,11 @@
                             <onup>2053</onup>
                             <ondown>50</ondown>
                             <label>More Images</label>
-                            <font>font13</font> <!-- REDLIGHT_30 -->
+                            <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
-                            <texturefocus colordiffuse="FFCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme.people)]" border="30">redlight_common/circle.png</texturenofocus>
+                            <texturefocus colordiffuse="FFCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme.people)]" border="30">playtvban_common/circle.png</texturenofocus>
                             <align>center</align>
                             <aligny>center</aligny>
                             <visible>String.IsEqual(Window.Property(easynews_authorized),true)</visible>
@@ -200,11 +200,11 @@
                             <onup>2053</onup>
                             <ondown>50</ondown>
                             <label>Favorites Manager</label>
-                            <font>font13</font> <!-- REDLIGHT_30 -->
+                            <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
-                            <texturefocus colordiffuse="FFCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme.people)]" border="30">redlight_common/circle.png</texturenofocus>
+                            <texturefocus colordiffuse="FFCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme.people)]" border="30">playtvban_common/circle.png</texturenofocus>
                             <align>center</align>
                             <aligny>center</aligny>
                         </control>
@@ -218,7 +218,7 @@
                         <control type="label">
                             <width max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <align>left</align>
                             <aligny>bottom</aligny>
@@ -230,15 +230,15 @@
                             <height>390</height>
                             <onup>10</onup>
                             <ondown>2050</ondown>
-                            <texturefocus colordiffuse="FFCCCCCC" border="30">redlight_common/circle.png</texturefocus>
-                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(redlight.window_theme.people)]" border="30">redlight_common/circle.png</texturenofocus>
+                            <texturefocus colordiffuse="FFCCCCCC" border="30">playtvban_common/circle.png</texturefocus>
+                            <texturenofocus colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme.people)]" border="30">playtvban_common/circle.png</texturenofocus>
                         </control>
                         <control type="textbox">
                             <top>65</top>
                             <left>15</left>
                             <width>1150</width>
                             <height>340</height>
-                            <font>font13</font> <!-- REDLIGHT_30 -->
+                            <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <align>center</align>
                             <aligny>center</aligny>
                             <textcolor>FFCCCCCC</textcolor>
@@ -251,7 +251,7 @@
                             <left>15</left>
                             <width>1150</width>
                             <height>340</height>
-                            <font>font13</font> <!-- REDLIGHT_30 -->
+                            <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <align>center</align>
                             <aligny>center</aligny>
                             <textcolor>FF1F2020</textcolor>
@@ -269,7 +269,7 @@
                         <control type="label">
                             <width min="30" max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <label>[B]Movies $INFO[Window.Property(more_from_movie.number)][/B]</label>
                             <visible>!Control.HasFocus(2050)</visible>
@@ -277,7 +277,7 @@
                         <control type="label">
                             <width min="30" max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <label>[B]Movies | [/B]$INFO[Container(2050).ListItem.Property(name)] • $INFO[Container(2050).ListItem.Property(release_date)] • $INFO[Container(2050).ListItem.Property(vote_average)]</label>
                             <visible>Control.HasFocus(2050)</visible>
@@ -302,7 +302,7 @@
                                     <height max="344">auto</height>
                                     <width max="220">auto</width>
                                     <aspectratio>keep</aspectratio>
-                                    <texture diffuse="redlight_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
+                                    <texture diffuse="playtvban_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
                                 </control>
                             </itemlayout>
                             <focusedlayout height="360" width="236">
@@ -316,7 +316,7 @@
                                     <top>5</top>
                                     <height>350</height>
                                     <width>236</width>
-                                    <texture colordiffuse="FFCCCCCC">redlight_diffuse/poster-50.png</texture>
+                                    <texture colordiffuse="FFCCCCCC">playtvban_diffuse/poster-50.png</texture>
                                     <visible>Control.HasFocus(2050) | Control.HasFocus(4050)</visible>
                                 </control>
                                 <control type="image">
@@ -325,7 +325,7 @@
                                     <height max="344">auto</height>
                                     <width max="220">auto</width>
                                     <aspectratio>keep</aspectratio>
-                                    <texture diffuse="redlight_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
+                                    <texture diffuse="playtvban_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
                                 </control>
                             </focusedlayout>
                         </control>
@@ -336,9 +336,9 @@
                             <height>15</height>
                             <onup>2050</onup>
                             <ondown>2051</ondown>
-                            <texturesliderbackground colordiffuse="FF1F2020">redlight_common/white.png</texturesliderbackground>
-                            <texturesliderbar colordiffuse="FF555556">redlight_common/white.png</texturesliderbar>
-                            <texturesliderbarfocus colordiffuse="FFCCCCCC">redlight_common/white.png</texturesliderbarfocus>
+                            <texturesliderbackground colordiffuse="FF1F2020">playtvban_common/white.png</texturesliderbackground>
+                            <texturesliderbar colordiffuse="FF555556">playtvban_common/white.png</texturesliderbar>
+                            <texturesliderbarfocus colordiffuse="FFCCCCCC">playtvban_common/white.png</texturesliderbarfocus>
                             <showonepage>false</showonepage>
                             <orientation>Horizontal</orientation>
                             <visible>String.IsEqual(Window.Property(enable_scrollbars),true) + Control.IsVisible(2050) + [Control.HasFocus(2050) | Control.HasFocus(4050)]</visible>
@@ -348,7 +348,7 @@
                             <left>20</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2050) | Control.HasFocus(4050)] + Container(2050).HasPrevious</visible>
                         </control>
                         <control type="image">
@@ -356,7 +356,7 @@
                             <left>1135</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2050) | Control.HasFocus(4050)] + Container(2050).HasNext</visible>
                         </control>
                     </control>
@@ -369,7 +369,7 @@
                         <control type="label">
                             <width min="30" max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <label>[B]TV Shows $INFO[Window.Property(more_from_tvshow.number)][/B]</label>
                             <visible>!Control.HasFocus(2051)</visible>
@@ -377,7 +377,7 @@
                         <control type="label">
                             <width min="30" max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <label>[B]TV Shows | [/B]$INFO[Container(2051).ListItem.Property(name)] • $INFO[Container(2051).ListItem.Property(release_date)] • $INFO[Container(2051).ListItem.Property(vote_average)]</label>
                             <visible>Control.HasFocus(2051)</visible>
@@ -402,7 +402,7 @@
                                     <height max="344">auto</height>
                                     <width max="220">auto</width>
                                     <aspectratio>keep</aspectratio>
-                                    <texture diffuse="redlight_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
+                                    <texture diffuse="playtvban_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
                                 </control>
                             </itemlayout>
                             <focusedlayout height="360" width="236">
@@ -416,7 +416,7 @@
                                     <top>5</top>
                                     <height>350</height>
                                     <width>236</width>
-                                    <texture colordiffuse="FFCCCCCC">redlight_diffuse/poster-50.png</texture>
+                                    <texture colordiffuse="FFCCCCCC">playtvban_diffuse/poster-50.png</texture>
                                     <visible>Control.HasFocus(2051) | Control.HasFocus(4051)</visible>
                                 </control>
                                 <control type="image">
@@ -425,7 +425,7 @@
                                     <height max="344">auto</height>
                                     <width max="220">auto</width>
                                     <aspectratio>keep</aspectratio>
-                                    <texture diffuse="redlight_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
+                                    <texture diffuse="playtvban_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
                                 </control>
                             </focusedlayout>
                         </control>
@@ -436,9 +436,9 @@
                             <height>15</height>
                             <onup>2051</onup>
                             <ondown>2052</ondown>
-                            <texturesliderbackground colordiffuse="FF1F2020">redlight_common/white.png</texturesliderbackground>
-                            <texturesliderbar colordiffuse="FF555556">redlight_common/white.png</texturesliderbar>
-                            <texturesliderbarfocus colordiffuse="FFCCCCCC">redlight_common/white.png</texturesliderbarfocus>
+                            <texturesliderbackground colordiffuse="FF1F2020">playtvban_common/white.png</texturesliderbackground>
+                            <texturesliderbar colordiffuse="FF555556">playtvban_common/white.png</texturesliderbar>
+                            <texturesliderbarfocus colordiffuse="FFCCCCCC">playtvban_common/white.png</texturesliderbarfocus>
                             <showonepage>false</showonepage>
                             <orientation>Horizontal</orientation>
                             <visible>String.IsEqual(Window.Property(enable_scrollbars),true) + Control.IsVisible(2051) + [Control.HasFocus(2051) | Control.HasFocus(4051)]</visible>
@@ -448,7 +448,7 @@
                             <left>20</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2051) | Control.HasFocus(4050)] + Container(2051).HasPrevious</visible>
                         </control>
                         <control type="image">
@@ -456,7 +456,7 @@
                             <left>1135</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2051) | Control.HasFocus(4051)] + Container(2051).HasNext</visible>
                         </control>
                     </control>
@@ -469,7 +469,7 @@
                         <control type="label">
                             <width max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <align>left</align>
                             <aligny>bottom</aligny>
@@ -488,14 +488,14 @@
                                 <control type="image">
                                     <height>360</height>
                                     <width>580</width>
-                                    <texture colordiffuse="$INFO[Window(10000).Property(redlight.window_theme.people)]" border="30">redlight_common/circle.png</texture>
+                                    <texture colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme.people)]" border="30">playtvban_common/circle.png</texture>
                                 </control>
                                 <control type="textbox">
                                     <top>15</top>
                                     <left>20</left>
                                     <width>540</width>
                                     <height>308</height>
-                                    <font>font12</font> <!-- REDLIGHT_26 -->
+                                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                                     <align>center</align>
                                     <aligny>top</aligny>
                                     <textcolor>FFCCCCCC</textcolor>
@@ -507,14 +507,14 @@
                                 <control type="image">
                                     <height>360</height>
                                     <width>580</width>
-                                    <texture colordiffuse="FFCCCCCC" border="30">redlight_common/circle.png</texture>
+                                    <texture colordiffuse="FFCCCCCC" border="30">playtvban_common/circle.png</texture>
                                 </control>
                                 <control type="textbox">
                                     <top>15</top>
                                     <left>20</left>
                                     <width>540</width>
                                     <height>308</height>
-                                    <font>font12</font> <!-- REDLIGHT_26 -->
+                                    <font>font12</font> <!-- PLAYTVBAN_26 -->
                                     <align>center</align>
                                     <aligny>top</aligny>
                                     <textcolor>FF1F2020</textcolor>
@@ -529,9 +529,9 @@
                             <height>15</height>
                             <onup>2052</onup>
                             <ondown>2053</ondown>
-                            <texturesliderbackground colordiffuse="FF1F2020">redlight_common/white.png</texturesliderbackground>
-                            <texturesliderbar colordiffuse="FF555556">redlight_common/white.png</texturesliderbar>
-                            <texturesliderbarfocus colordiffuse="FFCCCCCC">redlight_common/white.png</texturesliderbarfocus>
+                            <texturesliderbackground colordiffuse="FF1F2020">playtvban_common/white.png</texturesliderbackground>
+                            <texturesliderbar colordiffuse="FF555556">playtvban_common/white.png</texturesliderbar>
+                            <texturesliderbarfocus colordiffuse="FFCCCCCC">playtvban_common/white.png</texturesliderbarfocus>
                             <showonepage>false</showonepage>
                             <orientation>Horizontal</orientation>
                             <visible>String.IsEqual(Window.Property(enable_scrollbars),true) + Control.IsVisible(2052) + [Control.HasFocus(2052) | Control.HasFocus(4052)]</visible>
@@ -541,7 +541,7 @@
                             <left>20</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2052) | Control.HasFocus(4052)] + Container(2052).HasPrevious</visible>
                         </control>
                         <control type="image">
@@ -549,7 +549,7 @@
                             <left>1125</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2052) | Control.HasFocus(4052)] + Container(2052).HasNext</visible>
                         </control>
                     </control>
@@ -562,7 +562,7 @@
                         <control type="label">
                             <width min="30" max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <label>[B]Movies Directed $INFO[Window.Property(more_from_director.number)][/B]</label>
                             <visible>!Control.HasFocus(2053)</visible>
@@ -570,7 +570,7 @@
                         <control type="label">
                             <width min="30" max="1160">auto</width>
                             <height>20</height>
-                            <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                            <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <label>[B]Movies Directed | [/B]$INFO[Container(2053).ListItem.Property(name)] • $INFO[Container(2053).ListItem.Property(release_date)] • $INFO[Container(2053).ListItem.Property(vote_average)]</label>
                             <visible>Control.HasFocus(2053)</visible>
@@ -595,7 +595,7 @@
                                     <height max="344">auto</height>
                                     <width max="220">auto</width>
                                     <aspectratio>keep</aspectratio>
-                                    <texture diffuse="redlight_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
+                                    <texture diffuse="playtvban_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
                                 </control>
                             </itemlayout>
                             <focusedlayout height="360" width="236">
@@ -609,7 +609,7 @@
                                     <top>5</top>
                                     <height>350</height>
                                     <width>236</width>
-                                    <texture colordiffuse="FFCCCCCC">redlight_diffuse/poster-50.png</texture>
+                                    <texture colordiffuse="FFCCCCCC">playtvban_diffuse/poster-50.png</texture>
                                     <visible>Control.HasFocus(2053) | Control.HasFocus(4053)</visible>
                                 </control>
                                 <control type="image">
@@ -618,7 +618,7 @@
                                     <height max="344">auto</height>
                                     <width max="220">auto</width>
                                     <aspectratio>keep</aspectratio>
-                                    <texture diffuse="redlight_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
+                                    <texture diffuse="playtvban_diffuse/poster-50.png" background="true">$INFO[ListItem.Property(thumbnail)]</texture>
                                 </control>
                             </focusedlayout>
                         </control>
@@ -629,9 +629,9 @@
                             <height>15</height>
                             <onup>2053</onup>
                             <ondown>10</ondown>
-                            <texturesliderbackground colordiffuse="FF1F2020">redlight_common/white.png</texturesliderbackground>
-                            <texturesliderbar colordiffuse="FF555556">redlight_common/white.png</texturesliderbar>
-                            <texturesliderbarfocus colordiffuse="FFCCCCCC">redlight_common/white.png</texturesliderbarfocus>
+                            <texturesliderbackground colordiffuse="FF1F2020">playtvban_common/white.png</texturesliderbackground>
+                            <texturesliderbar colordiffuse="FF555556">playtvban_common/white.png</texturesliderbar>
+                            <texturesliderbarfocus colordiffuse="FFCCCCCC">playtvban_common/white.png</texturesliderbarfocus>
                             <showonepage>false</showonepage>
                             <orientation>Horizontal</orientation>
                             <visible>String.IsEqual(Window.Property(enable_scrollbars),true) + Control.IsVisible(2053) + [Control.HasFocus(2053) | Control.HasFocus(4053)]</visible>
@@ -641,7 +641,7 @@
                             <left>20</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2053) | Control.HasFocus(4053)] + Container(2053).HasPrevious</visible>
                         </control>
                         <control type="image">
@@ -649,7 +649,7 @@
                             <left>1135</left>
                             <width>25</width>
                             <height>25</height>
-                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">redlight_common/arrow_left.png</texture>
+                            <texture colordiffuse="CCCCCCCC" background="true" flipx="true">playtvban_common/arrow_left.png</texture>
                             <visible>[Control.HasFocus(2053) | Control.HasFocus(4053)] + Container(2053).HasNext</visible>
                         </control>
                     </control>

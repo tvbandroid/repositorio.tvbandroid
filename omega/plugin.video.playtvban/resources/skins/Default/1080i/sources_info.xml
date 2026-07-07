@@ -6,7 +6,7 @@
             <top>0</top>
             <width>1920</width>
             <height>1080</height>
-            <texture colordiffuse="FF000000">redlight_common/white.png</texture>
+            <texture colordiffuse="FF000000">playtvban_common/white.png</texture>
             <animation effect="fade" end="85" time="120">WindowOpen</animation>
         </control>
         <control type="group">
@@ -17,7 +17,7 @@
                 <control type="image">
                     <width>1333</width>
                     <height>943</height>
-                    <texture colordiffuse="$INFO[Window(10000).Property(redlight.window_theme)]" border="30">redlight_common/circle.png</texture>
+                    <texture colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme)]" border="30">playtvban_common/circle.png</texture>
                 </control>
                 <control type="image">
                     <left>15</left>
@@ -26,7 +26,7 @@
                     <height>70</height>
                     <align>left</align>
                     <aspectratio aligny="top">keep</aspectratio>
-                    <texture>$INFO[Window(10000).Property(redlight.addon_icon_mini)]</texture>
+                    <texture>$INFO[Window(10000).Property(playtvban.addon_icon_mini)]</texture>
                 </control>
             </control>
             <control type="image">
@@ -55,7 +55,7 @@
                 <control type="label">
                     <width max="1275">auto</width>
                     <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -65,7 +65,7 @@
                     <top>50</top>
                     <width max="1275">auto</width>
                     <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -75,28 +75,17 @@
                     <top>100</top>
                     <width max="1275">auto</width>
                     <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
                     <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Site: [/B][/COLOR]$INFO[Window.Property(source_site)][/UPPERCASE]</label>
                 </control>
                 <control type="label">
-                    <visible>!String.IsEmpty(Window.Property(scraper_module))</visible>
-                    <top>125</top>
-                    <width max="1275">auto</width>
-                    <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
-                    <textcolor>FFCCCCCC</textcolor>
-                    <align>left</align>
-                    <aligny>center</aligny>
-                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Scraper: [/B][/COLOR]$INFO[Window.Property(scraper_module)][/UPPERCASE]</label>
-                </control>
-                <control type="label">
                     <top>150</top>
                     <width max="1275">auto</width>
                     <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -106,7 +95,7 @@
                     <top>200</top>
                     <width max="1275">auto</width>
                     <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -116,7 +105,7 @@
                     <top>250</top>
                     <width max="1275">auto</width>
                     <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -126,7 +115,7 @@
                     <top>300</top>
                     <width max="1275">auto</width>
                     <height>20</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -137,7 +126,7 @@
                     <left>0</left>
                     <width max="1275">auto</width>
                     <height>140</height>
-                    <font>category_widget_title</font> <!-- REDLIGHT_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>top</aligny>

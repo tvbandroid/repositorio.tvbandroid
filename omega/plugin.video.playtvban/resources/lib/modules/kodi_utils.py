@@ -5,8 +5,8 @@ import os
 from urllib.parse import urlencode, unquote
 
 def addon_themes():
-	return [{'name': 'Light', 'value': ('FF434343', 'FF2E2E2E'), 'icon': 'light'}, {'name': 'Medium', 'value': ('FF373737', 'FF4a4347'), 'icon': 'medium'},
-			{'name': 'Dark', 'value': ('FF1F2020', 'FF4F4F4F'), 'icon': 'dark'}]
+	return [{'name': 'Claro', 'value': ('FF434343', 'FF2E2E2E'), 'icon': 'light'}, {'name': 'Medium', 'value': ('FF373737', 'FF4a4347'), 'icon': 'medium'},
+			{'name': 'Oscuro', 'value': ('FF1F2020', 'FF4F4F4F'), 'icon': 'dark'}]
 
 def addon_themes_opacity():
 	return [{'name': '100%', 'value': 'FF'}, {'name': '95%', 'value': 'F2'}, {'name': '90%', 'value': 'E6'}, {'name': '85%', 'value': 'D9'}, {'name': '80%', 'value': 'CC'},
@@ -26,49 +26,49 @@ def random_episodes_check():
 
 def extras_button_label_values():
 	return {'movie':
-				{'movies_play': 'Play', 'show_trailers': 'Trailer', 'show_images': 'Images',  'show_extrainfo': 'Extra Info', 'show_genres': 'Genres',
-				'show_director': 'Director', 'show_options': 'Options', 'show_recommended': 'Recommended', 'show_related': 'Related', 'show_more_like_this': 'More Like This',
-				'show_similar': 'Similar', 'show_reviews': 'Reviews', 'show_comments': 'Comments', 'show_trivia': 'Trivia', 'show_blunders': 'Blunders',
-				'show_year': 'More Year', 'show_genre': 'More Genres', 'show_network': 'More Network',
-				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Simkl Lists', 'show_trakt_manager': 'Trakt Lists', 'show_tmdb_manager': 'TMDb Lists', 'show_personallists_manager': 'Personal Lists',
-				'show_favorites_manager': 'Favorites Lists', 'playback_choice': 'Play Options', 'show_plot': 'Plot', 'show_keywords': 'Keywords',
-				'show_in_trakt_lists': 'In Trakt Lists', 'close_all': 'Close'},
+				{'movies_play': 'Reproducir', 'show_trailers': 'Tráiler', 'show_images': 'Imágenes',  'show_extrainfo': 'Información Extra', 'show_genres': 'Géneros',
+				'show_director': 'Director', 'show_options': 'Opciones', 'show_recommended': 'Recomendadas', 'show_related': 'Relacionadas', 'show_more_like_this': 'Más Como Esta',
+				'show_similar': 'Similares', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
+				'show_year': 'Más del Año', 'show_genre': 'Más del Género', 'show_network': 'Más de la Cadena',
+				'show_mdblist_manager': 'Listas MDBList', 'show_simkl_manager': 'Listas Simkl', 'show_trakt_manager': 'Listas Trakt', 'show_tmdb_manager': 'Listas TMDb', 'show_personallists_manager': 'Listas Personales',
+				'show_favorites_manager': 'Listas de Favoritos', 'playback_choice': 'Opciones de Reproducción', 'show_plot': 'Sinopsis', 'show_keywords': 'Palabras Clave',
+				'show_in_trakt_lists': 'En Listas de Trakt', 'close_all': 'Cerrar'},
 			'tvshow':
-				{'tvshow_browse': 'Browse', 'show_trailers': 'Trailer', 'show_images': 'Images', 'show_extrainfo': 'Extra Info', 'show_genres': 'Genres',
-				'play_nextep': 'Play Next', 'show_options': 'Options', 'show_recommended': 'Recommended', 'show_related': 'Related', 'show_more_like_this': 'More Like This',
-				'show_similar': 'Similar', 'show_reviews': 'Reviews', 'show_comments': 'Comments', 'show_trivia': 'Trivia', 'show_blunders': 'Blunders',
-				'show_year': 'More Year', 'show_genre': 'More Genres', 'show_network': 'More Network',
-				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Simkl Lists', 'show_trakt_manager': 'Trakt Lists', 'show_tmdb_manager': 'TMDb Lists', 'show_personallists_manager': 'Personal Lists',
-				'show_favorites_manager': 'Favorites Lists', 'play_random_episode': 'Play Random', 'show_plot': 'Plot', 'show_keywords': 'Keywords',
-				'show_in_trakt_lists': 'In Trakt Lists', 'close_all': 'Close'}}
+				{'tvshow_browse': 'Explorar', 'show_trailers': 'Tráiler', 'show_images': 'Imágenes', 'show_extrainfo': 'Información Extra', 'show_genres': 'Géneros',
+				'play_nextep': 'Reproducir Siguiente', 'show_options': 'Opciones', 'show_recommended': 'Recomendadas', 'show_related': 'Relacionadas', 'show_more_like_this': 'Más Como Esta',
+				'show_similar': 'Similares', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
+				'show_year': 'Más del Año', 'show_genre': 'Más del Género', 'show_network': 'Más de la Cadena',
+				'show_mdblist_manager': 'Listas MDBList', 'show_simkl_manager': 'Listas Simkl', 'show_trakt_manager': 'Listas Trakt', 'show_tmdb_manager': 'Listas TMDb', 'show_personallists_manager': 'Listas Personales',
+				'show_favorites_manager': 'Listas de Favoritos', 'play_random_episode': 'Reproducir Episodio Aleatorio', 'show_plot': 'Sinopsis', 'show_keywords': 'Palabras Clave',
+				'show_in_trakt_lists': 'En Listas de Trakt', 'close_all': 'Cerrar'}}
 
 def extras_items():
-	return [{'name': 'Plot', 'value': 2050}, {'name': 'Cast', 'value': 2051}, {'name': 'Recommended', 'value': 2052}, {'name': 'Related', 'value': 2053},
-	{'name': 'More Like This', 'value': 2054}, {'name': 'Similar', 'value': 2055}, {'name': 'Reviews', 'value': 2056}, {'name': 'Comments', 'value': 2057},
-	{'name': 'Trivia', 'value': 2058}, {'name': 'Blunders', 'value': 2059}, {'name': 'Parental Guide', 'value': 2060}, {'name': 'In Trakt Lists', 'value': 2061},
-	{'name': 'Videos', 'value': 2062}, {'name': 'More from Year', 'value': 2063}, {'name': 'More from Genres', 'value': 2064}, {'name': 'More from Networks', 'value': 2065},
-	{'name': 'More from Collection', 'value': 2066}]
+	return [{'name': 'Sinopsis', 'value': 2050}, {'name': 'Reparto', 'value': 2051}, {'name': 'Recomendadas', 'value': 2052}, {'name': 'Relacionadas', 'value': 2053},
+	{'name': 'Más Como Esta', 'value': 2054}, {'name': 'Similares', 'value': 2055}, {'name': 'Reseñas', 'value': 2056}, {'name': 'Comentarios', 'value': 2057},
+	{'name': 'Curiosidades', 'value': 2058}, {'name': 'Errores', 'value': 2059}, {'name': 'Guía para Padres', 'value': 2060}, {'name': 'En Listas de Trakt', 'value': 2061},
+	{'name': 'Vídeos', 'value': 2062}, {'name': 'Más del Año', 'value': 2063}, {'name': 'Más del Género', 'value': 2064}, {'name': 'Más de la Cadena', 'value': 2065},
+	{'name': 'Más de la Colección', 'value': 2066}]
 
 def context_menu_items():
 	return [
-	{'name': 'Extras', 'value': 'extras'}, {'name': 'Options', 'value': 'options'}, {'name': 'Play Options', 'value': 'playback_options'},
-	{'name': 'External Scraper Settings', 'value': 'external_scraper_settings'},
-	{'name': 'Browse Movie Set', 'value': 'browse_movie_set'}, {'name': 'Browse TV Seasons', 'value': 'browse_seasons'},
-	{'name': 'Browse Season Episodes', 'value': 'browse_episodes'}, {'name': 'Browse Recommended', 'value': 'recommended'}, {'name': 'Browse Related', 'value': 'related'},
-	{'name': 'Browse More Like This', 'value': 'more_like_this'}, {'name': 'Browse Similar', 'value': 'similar'}, {'name': 'In Trakt Lists', 'value': 'in_trakt_list'},
-	{'name': 'MDBList Manager', 'value': 'mdblist_manager'}, {'name': 'Simkl Lists Manager', 'value': 'simkl_manager'}, {'name': 'Trakt Lists Manager', 'value': 'trakt_manager'}, {'name': 'TMDb Lists Manager', 'value': 'tmdb_manager'},
-	{'name': 'Personal Lists Manager', 'value': 'personal_manager'}, {'name': 'Favorites Manager', 'value': 'favorites_manager'}, {'name': 'Mark Watched/Unwatched', 'value': 'mark_watched'},
-	{'name': 'Unmark Previous Watched Episode', 'value': 'unmark_previous_episode'}, {'name': 'Exit List', 'value': 'exit'}, {'name': 'Refresh Widgets', 'value': 'refresh'},
-	{'name': 'Reload Widgets', 'value': 'reload'}]
+	{'name': 'Extras', 'value': 'extras'}, {'name': 'Opciones', 'value': 'options'}, {'name': 'Opciones de Reproducción', 'value': 'playback_options'},
+	{'name': 'Configuración de Scrapers Externos', 'value': 'external_scraper_settings'},
+	{'name': 'Explorar Colección de Películas', 'value': 'browse_movie_set'}, {'name': 'Explorar Temporadas', 'value': 'browse_seasons'},
+	{'name': 'Explorar Episodios de la Temporada', 'value': 'browse_episodes'}, {'name': 'Explorar Recomendados', 'value': 'recommended'}, {'name': 'Explorar Relacionados', 'value': 'related'},
+	{'name': 'Explorar Más Como Esto', 'value': 'more_like_this'}, {'name': 'Explorar Similares', 'value': 'similar'}, {'name': 'En Listas de Trakt', 'value': 'in_trakt_list'},
+	{'name': 'Administrador de MDBList', 'value': 'mdblist_manager'}, {'name': 'Administrador de Listas de Simkl', 'value': 'simkl_manager'}, {'name': 'Administrador de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Administrador de Listas de TMDb', 'value': 'tmdb_manager'},
+	{'name': 'Administrador de Listas Personales', 'value': 'personal_manager'}, {'name': 'Administrador de Favoritos', 'value': 'favorites_manager'}, {'name': 'Marcar Visto/No Visto', 'value': 'mark_watched'},
+	{'name': 'Desmarcar Episodio Anterior como Visto', 'value': 'unmark_previous_episode'}, {'name': 'Salir de la Lista', 'value': 'exit'}, {'name': 'Actualizar Widgets', 'value': 'refresh'},
+	{'name': 'Recargar Widgets', 'value': 'reload'}]
 
 def rescrape_items():
 	return [
-	{'name': 'Rescrape With No Cache Check', 'value': 'cache_ignored'},
-	{'name': 'Rescrape With IMDb Year Data', 'value': 'imdb_year'},
-	{'name': 'Rescrape With Disabled External Providers', 'value': 'with_all'},
-	{'name': 'Rescrape With Episode Group', 'value': 'episode_group'},
-	{'name': 'Rescrape with Filters Ignored', 'value': 'ignore_filters'},
-	{'name': 'Offer Full Search After Early Results', 'value': 'full_scrape'}]
+	{'name': 'Reexplorar Sin Comprobar Caché', 'value': 'cache_ignored'},
+	{'name': 'Reexplorar con Datos del Año de IMDb', 'value': 'imdb_year'},
+	{'name': 'Reexplorar con Todos los Proveedores Externos', 'value': 'with_all'},
+	{'name': 'Reexplorar con Grupo de Episodios', 'value': 'episode_group'},
+	{'name': 'Reexplorar Ignorando los Filtros', 'value': 'ignore_filters'},
+	{'name': 'Ofrecer Búsqueda Completa Tras los Primeros Resultados', 'value': 'full_scrape'}]
 
 def video_extensions():
 	return ('m4v', '3g2', '3gp', 'nsv', 'tp', 'ts', 'ty', 'pls', 'rm', 'rmvb', 'mpd', 'ifo', 'mov', 'qt', 'divx', 'xvid', 'bivx', 'vob', 'nrg', 'img', 'iso', 'udf', 'pva',
@@ -118,7 +118,7 @@ def _folder_has_entries(path):
 		return False
 
 def safe_browse_defaultt(path):
-	# Kodi on Android can block parent navigation when browse opens inside a non-empty folder.
+	# Kodi en Android puede bloquear la navegación al directorio superior cuando la exploración se inicia dentro de una carpeta que no está vacía.
 	if not is_android() or not path or path in ('None', ''):
 		return path
 	if _folder_has_entries(path):
@@ -151,7 +151,7 @@ def _browse_paths_equal(a, b):
 		return a == b
 
 def browse_directory(defaultt='', heading='Choose folder', use_defaultt=False, confirm_unchanged=False, force_defaultt=False):
-	# Kodi returns defaultt unchanged when the user cancels (same as pressing OK without moving).
+	# Kodi devuelve el valor predeterminado sin cambios cuando el usuario cancela (lo mismo que pulsar Aceptar sin moverse).
 	start = browse_start_path(defaultt, force_defaultt=force_defaultt) if use_defaultt else None
 	result = kodi_dialog().browse(0, heading, '', defaultt=start)
 	if not result or not str(result).strip():
@@ -161,9 +161,9 @@ def browse_directory(defaultt='', heading='Choose folder', use_defaultt=False, c
 			display = result if len(result) <= 120 else '%s...' % result[:117]
 			if not confirm_dialog(
 				heading=heading,
-				text='Use this folder?[CR][CR][B]%s[/B]' % display,
-				ok_label='Continue',
-				cancel_label='Cancel',
+				text='Usar esta carpeta?[CR][CR][B]%s[/B]' % display,
+				ok_label='Continuar',
+				cancel_label='Cancelar',
 				default_control=10,
 			):
 				return None
@@ -209,10 +209,10 @@ def addon_fanart():
 		or 'special://home/addons/plugin.video.playtvban/resources/media/fanart.jpg'
 	)
 
-MEDIA_GITHUB_USER = 'tvbandroid '
+MEDIA_GITHUB_USER = 'tvbandroid'
 MEDIA_GITHUB_REPO = 'tvbandroid.github.io'
-MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/%s/%s/main/packages/media' % (MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO)
-LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/tvbandroid/tvbandroid.github.io/main/packages/media'
+MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/%s/%s/master/tvband/packages/media' % (MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO)
+LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/tvbandroid/tvbandroid.github.io/master/tvband/packages/media'
 
 def media_github_credentials():
 	return MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO
@@ -460,6 +460,20 @@ def set_property(prop, value):
 def clear_property(prop):
 	return kodi_window().clearProperty(prop)
 
+def sync_scrape_progress_ui(percent=0, results_sd=0, results_720p=0, results_1080p=0, results_4k=0, results_total=0):
+	set_property('playtvban.scrape.percent', str(int(percent)))
+	set_property('playtvban.scrape.results_sd', str(results_sd))
+	set_property('playtvban.scrape.results_720p', str(results_720p))
+	set_property('playtvban.scrape.results_1080p', str(results_1080p))
+	set_property('playtvban.scrape.results_4k', str(results_4k))
+	set_property('playtvban.scrape.results_total', str(results_total))
+
+def clear_scrape_progress_ui():
+	for prop in ('playtvban.scrape.percent', 'playtvban.scrape.results_sd', 'playtvban.scrape.results_720p',
+			'playtvban.scrape.results_1080p', 'playtvban.scrape.results_4k', 'playtvban.scrape.results_total',
+			'playtvban.scrape.ready'):
+		clear_property(prop)
+
 def clear_all_properties():
 	return kodi_window().clearProperties()
 
@@ -610,9 +624,9 @@ def service_shutting_down(monitor=None):
 	return get_property(SHUTTING_DOWN_PROP) == 'true'
 
 def cancel_widget_refresh_alarms():
-	try: execute_builtin('CancelAlarm(redlight_widget_refresh,silent)')
+	try: execute_builtin('CancelAlarm(playtvban_widget_refresh,silent)')
 	except: pass
-	try: execute_builtin('CancelAlarm(redlight_widget_skin,silent)')
+	try: execute_builtin('CancelAlarm(playtvban_widget_skin,silent)')
 	except: pass
 
 def prepare_service_shutdown():
@@ -622,7 +636,7 @@ def prepare_service_shutdown():
 def schedule_widget_refresh(silent=True, reload_skin=False):
 	if service_shutting_down(): return
 	url = 'plugin://plugin.video.playtvban/?mode=refresh_widgets&silent=%s&reload_skin=%s' % ('true' if silent else 'false', 'true' if reload_skin else 'false')
-	execute_builtin('AlarmClock(redlight_widget_refresh,RunPlugin(%s),00:00:02,silent)' % url)
+	execute_builtin('AlarmClock(playtvban_widget_refresh,RunPlugin(%s),00:00:02,silent)' % url)
 
 PLAYBACK_WIDGET_REFRESH_PROP = 'playtvban.widgets_refresh_playback'
 PLAYBACK_WIDGET_REFRESH_SUPPRESS_SEC = 120
@@ -653,7 +667,7 @@ def refresh_widgets(silent=False, reload_skin=False):
 		if home(): container_refresh()
 	except: pass
 	if reload_skin:
-		try: execute_builtin('AlarmClock(redlight_widget_skin,ReloadSkin(),00:00:01,silent)')
+		try: execute_builtin('AlarmClock(playtvban_widget_skin,ReloadSkin(),00:00:01,silent)')
 		except: pass
 	if not silent and get_setting('playtvban.widget_refresh_notification', 'true') == 'true': notification('Widgets Refreshed', 2500)
 
@@ -793,7 +807,7 @@ def finish_addon_xml_sync():
 
 def restart_addon_for_addon_xml_change(notify=True):
 	if notify:
-		notification('Refreshing addon.xml. Restarting Play TVBan.', 8000)
+		notification('Actualizando addon.xml. Reiniciando Play TVBan.', 8000)
 	execute_builtin('ActivateWindow(Home)', True)
 	update_local_addons()
 	disable_enable_addon()
@@ -809,9 +823,9 @@ def reuse_language_invoker_check(force=False):
 			return False
 		changed, _invoker_changed = sync_addon_xml_from_settings()
 		if not changed:
-			logger('Play TVBan', 'AddonXMLCheck - addon.xml sync failed')
+			logger('Play TVBan', 'AddonXMLCheck - Error al sincronizar addon.xml')
 			return False
-		logger('Play TVBan', 'AddonXMLCheck - Change Detected. Restarting Play TVBan')
+		logger('Play TVBan', 'AddonXMLCheck - Cambio Detectado. Reiniciando Play TVBan')
 		finish_addon_xml_sync()
 		restart_addon_for_addon_xml_change(notify=not force)
 		return True
@@ -950,7 +964,7 @@ def _dialog_needs_scroll(text):
 	wrapped = sum(max(1, (len(line) + _DIALOG_CONFIRM_CHARS_PER_LINE - 1) // _DIALOG_CONFIRM_CHARS_PER_LINE) for line in lines)
 	return wrapped > _DIALOG_CONFIRM_VISIBLE_LINES
 
-def confirm_dialog(heading='', text='Are you sure?', ok_label='OK', cancel_label='Cancel', default_control=11, scroll=False, third_label=None):
+def confirm_dialog(heading='', text='Estas seguro?', ok_label='OK', cancel_label='Cancelar', default_control=11, scroll=False, third_label=None):
 	from windows.base_window import open_window
 	needs_scroll = scroll and _dialog_needs_scroll(text)
 	kwargs = {'heading': heading, 'text': text, 'ok_label': ok_label, 'cancel_label': cancel_label, 'default_control': default_control,
@@ -975,7 +989,7 @@ def show_text(heading, text=None, file=None, font_size='small', kodi_log=False):
 	if file:
 		with open(file, encoding='utf-8') as r: text = r.readlines()
 	if kodi_log:
-		confirm = confirm_dialog(text='Show Log Errors Only?', ok_label='Yes', cancel_label='No')
+		confirm = confirm_dialog(text='Mostrar Solo Errores del Registro?', ok_label='Si', cancel_label='No')
 		if confirm == None: return
 		if confirm: text = [i for i in text if any(x in i.lower() for x in ('exception', 'error', '[test]'))]
 	text = ''.join(text)
@@ -984,7 +998,7 @@ def show_text(heading, text=None, file=None, font_size='small', kodi_log=False):
 LIST_ITEM_NOT_IN_LIST = 'Item not in list'
 
 def notification(line1, time=5000, icon=None, settle_ms=0):
-	# Brief delay helps Kodi show the toast after select/confirm dialogs close (rapid calls can drop it otherwise).
+	# Un breve retraso ayuda a Kodi a mostrar la notificación después de cerrar los diálogos de selección/confirmación (las llamadas rápidas pueden impedir que aparezca).
 	if settle_ms: sleep(settle_ms)
 	kodi_dialog().notification('Play TVBan', line1, icon or addon_icon(), time)
 
@@ -994,8 +1008,8 @@ def player_check(mode, params):
 		from modules.sources import Sources
 		Sources().playback_prep(params)
 	elif mode == 'playback.video':
-		from modules.player import RedLightPlayer
-		RedLightPlayer().run(params.get('url', None), params.get('obj', None))
+		from modules.player import PlayTVBanPlayer
+		PlayTVBanPlayer().run(params.get('url', None), params.get('obj', None))
 	else: ok_dialog('External Playback Detected', 'Playback through external addons is not supported')
 
 def external_playback_check(params):
@@ -1054,9 +1068,9 @@ def upload_logfile(params):
 	import json
 	import requests
 	from modules.utils import copy2clip, make_qrcode
-	log_files = [('Current Kodi Log', 'kodi.log'), ('Previous Kodi Log', 'kodi.old.log')]
+	log_files = [('Registro Actual de Kodi', 'kodi.log'), ('Registro Anterior de Kodi', 'kodi.old.log')]
 	list_items = [{'line1': i[0]} for i in log_files]
-	kwargs = {'items': json.dumps(list_items), 'heading': 'Choose Which Log File to Upload', 'narrow_window': 'true'}
+	kwargs = {'items': json.dumps(list_items), 'heading': 'Elegir Qué Archivo de Registro Subir', 'narrow_window': 'true'}
 	log_file = select_dialog(log_files, **kwargs)
 	if log_file == None: return
 	log_name, log_file = log_file
@@ -1064,7 +1078,7 @@ def upload_logfile(params):
 	progressDialog = None
 	url = 'https://paste.kodi.tv/'
 	log_file = translate_path('special://logpath/%s' % log_file)
-	if not path_exists(log_file): return ok_dialog(text='Error. Log Upload Failed')
+	if not path_exists(log_file): return ok_dialog(text='Error. Error al Subir el Registro')
 	try:
 		show_busy_dialog()
 		try:
@@ -1074,24 +1088,24 @@ def upload_logfile(params):
 		finally:
 			hide_busy_dialog()
 		if 'key' not in response:
-			return ok_dialog(text='Error. Log Upload Failed')
+			return ok_dialog(text='Error. Error al Subir el Registro')
 		user_code = response['key']
 		url = '%s%s' % (url, user_code)
 		copy2clip(url)
 		qr_code = make_qrcode(url) or ''
-		progressDialog = progress_dialog(heading='Kodi Log Uploader', icon=qr_code)
+		progressDialog = progress_dialog(heading='Subidor de Registros de Kodi', icon=qr_code)
 		countdown_secs = 120
 		remaining = countdown_secs
 		while not progressDialog.iscanceled() and remaining > 0:
 			progressDialog.update(
-				'Share or Access with this url: [B]%s[/B][CR]Or scan the QR code on another device.[CR][CR]Auto-closes in [B]%d[/B] seconds (Back to dismiss now).' % (url, remaining),
+				'Comparte o Accede con esta URL: [B]%s[/B][CR]O escanea el código QR desde otro dispositivo.[CR][CR]Se cerrará automáticamente en [B]%d[/B] segundos (Atrás para cerrarlo ahora).' % (url, remaining),
 				int(100 * remaining / countdown_secs))
 			for _ in range(10):
 				if progressDialog.iscanceled(): break
 				sleep(100)
 			remaining -= 1
 	except:
-		ok_dialog(text='Error. Log Upload Failed')
+		ok_dialog(text='Error. Error al Subir el Registro')
 	finally:
 		hide_busy_dialog()
 		if progressDialog:

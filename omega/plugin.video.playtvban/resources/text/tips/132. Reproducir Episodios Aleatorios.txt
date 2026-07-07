@@ -1,0 +1,4 @@
+
+Play TVBan te permite reproducir automáticamente un episodio aleatorio de una Serie o reproducir episodios aleatorios de forma continua. Para acceder a esta función, abre el menú contextual de la Serie y selecciona "Opciones..." -> "Reproducción Aleatoria".
+
+Luego podrás elegir entre "Reproducción Aleatoria Unica" o "Reproducción Aleatoria Continua". La reproducción aleatoria única reproducirá un episodio al azar, mientras que la Reproducción Aleatoria Continua reproducirá episodios de forma continua hasta que se detenga.

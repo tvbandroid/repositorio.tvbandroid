@@ -1,0 +1,4 @@
+
+En Play TVBan -> Herramientas, encontrarás la función "Administrador de progreso de series" que te permitirá ocultar o mostrar series en las pantallas de progreso y próximos episodios.
+Si usas Trakt como proveedor de estado de visualización, esto es más sencillo que acceder al sitio web de Trakt para ocultar o mostrar series.
+Si usas Play TVBan como proveedor de estado de visualización, podrás ocultar las series cuyo progreso no deseas incluir.

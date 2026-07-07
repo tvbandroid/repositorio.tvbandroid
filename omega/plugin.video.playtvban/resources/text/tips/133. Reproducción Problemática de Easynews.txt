@@ -1,0 +1,14 @@
+
+EasyNews es una excelente fuente, pero siempre ha habido problemas con la reproducción de las fuentes encontradas. A menudo, la reproducción falla al primer intento y es necesario volver a intentar con la misma fuente para que el archivo se reproduzca.
+
+Play TVBan incluye una configuración para solucionar este problema, y ​​puedes elegir el método que mejor se adapte a ti.
+
+La configuración se encuentra en Reproducción -> Utilidades de reproducción. El nombre de la configuración es "Método de reproducción de EasyNews".
+
+A continuación, se explica brevemente las opciones disponibles:
+
+NINGUNO: No se utiliza ningún método especial. Play TVBan intentará resolver el enlace de EasyNews como cualquier otro.
+
+REINTENTAR: Play TVBan vuelve a intentar con el enlace de EasyNews si falla la primera vez. Este método es lento y no funciona en algunos dispositivos.
+
+SIN BÚSQUEDA: Play TVBan le indica a Kodi que el archivo no permite la búsqueda, lo que hace que la resolución de enlaces de EasyNews sea mucho más rápida y fiable. El archivo generalmente se reproducirá al primer intento y rápidamente. La desventaja es que no podrás avanzar ni retroceder fuera de los datos almacenados en caché. AMBOS: La luz roja no utilizará la función de búsqueda y permitirá reintentar. Probablemente esto no sea necesario en la mayoría de las configuraciones.

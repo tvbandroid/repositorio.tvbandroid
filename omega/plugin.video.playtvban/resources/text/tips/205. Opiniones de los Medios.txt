@@ -1,0 +1,2 @@
+
+En Herramientas->Configurar vistas, puede establecer las vistas deseadas para Películas, Series, etc., de modo que se respeten al navegar por Play TVBan.

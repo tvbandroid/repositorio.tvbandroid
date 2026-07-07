@@ -7,7 +7,7 @@
             <top>0</top>
             <width>1920</width>
             <height>1080</height>
-            <texture colordiffuse="FF000000">redlight_common/white.png</texture>
+            <texture colordiffuse="FF000000">playtvban_common/white.png</texture>
         </control>
         <control type="image">
             <left>0</left>
@@ -27,14 +27,14 @@
                     <width>60</width>
                     <height>60</height>
                     <aspectratio aligny="top">keep</aspectratio>
-                    <texture>$INFO[Window(10000).Property(redlight.addon_icon_mini)]</texture>
+                    <texture>$INFO[Window(10000).Property(playtvban.addon_icon_mini)]</texture>
                 </control>
                 <control type="label">
                     <top>20</top>
                     <left>1590</left>
                     <width max="300">auto</width>
                     <height>20</height>
-                    <font>font_medium</font> <!-- REDLIGHT_38 -->
+                    <font>font_medium</font> <!-- PLAYTVBAN_38 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
@@ -45,7 +45,7 @@
                     <left>1540</left>
                     <width max="350">auto</width>
                     <height>20</height>
-                    <font>font10</font> <!-- REDLIGHT_21 -->
+                    <font>font10</font> <!-- PLAYTVBAN_21 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>right</align>
                     <aligny>center</aligny>
@@ -56,7 +56,7 @@
                     <top>25</top>
                     <width>1520</width>
                     <height>20</height>
-                    <font>font10</font> <!-- REDLIGHT_21 -->
+                    <font>font10</font> <!-- PLAYTVBAN_21 -->
                     <textcolor>FFFFFFFF</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -78,7 +78,7 @@
                         <top>0</top>
                         <width>320</width>
                         <height>320</height>
-                        <texture colordiffuse="$INFO[Window(10000).Property(redlight.window_theme)]" border="12">redlight_common/panel-256-box.png</texture>
+                        <texture colordiffuse="$INFO[Window(10000).Property(playtvban.window_theme)]" border="12">playtvban_common/panel-256-box.png</texture>
                     </control>
                     <control type="image">
                         <left>10</left>
@@ -101,7 +101,7 @@
                             <top>0</top>
                             <width>320</width>
                             <height>320</height>
-                            <texture colordiffuse="FFCCCCCC" border="12">redlight_common/panel-256-box.png</texture>
+                            <texture colordiffuse="FFCCCCCC" border="12">playtvban_common/panel-256-box.png</texture>
                         </control>
                         <control type="image">
                             <left>10</left>
@@ -121,9 +121,9 @@
                 <height>940</height>
                 <onleft>2000</onleft>
                 <onright>2000</onright>
-                <texturesliderbackground colordiffuse="FF1F2020">redlight_common/white.png</texturesliderbackground>
-                <texturesliderbar colordiffuse="FF555556">redlight_common/white.png</texturesliderbar>
-                <texturesliderbarfocus colordiffuse="FFCCCCCC">redlight_common/white.png</texturesliderbarfocus>
+                <texturesliderbackground colordiffuse="FF1F2020">playtvban_common/white.png</texturesliderbackground>
+                <texturesliderbar colordiffuse="FF555556">playtvban_common/white.png</texturesliderbar>
+                <texturesliderbarfocus colordiffuse="FFCCCCCC">playtvban_common/white.png</texturesliderbarfocus>
                 <showonepage>false</showonepage>
                 <orientation>vertical</orientation>
                 <visible>Control.IsVisible(2000)</visible>

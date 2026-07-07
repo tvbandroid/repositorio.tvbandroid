@@ -2,7 +2,7 @@
 <settings>
 	<!-- General -->
 	<category label="General">
-		<setting label="Play TVBan uses it's own settings window." type="text" enable="false" />
-		<setting label="Open Play TVBan Settings..." type="action" option="close" action="RunPlugin(plugin://plugin.video.playtvban/?mode=open_settings)" />
+		<setting label="Play TVBan utiliza su propia ventana de configuración.." type="text" enable="false" />
+		<setting label="Abrir Configuración Play TVBan..." type="action" option="close" action="RunPlugin(plugin://plugin.video.playtvban/?mode=open_settings)" />
 	</category>
 </settings>

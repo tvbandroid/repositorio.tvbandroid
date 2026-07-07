@@ -1,0 +1,14 @@
+
+Play TVBan te permite aleatorizar el contenido de tus carpetas de accesos directos.
+
+Primero, sigue el consejo para crear y llenar una carpeta de accesos directos. Después, al abrir el menú contextual de la carpeta, puedes seleccionar "Aleatorio". Esto cambiará el nombre de la carpeta para incluir "[ALEATORIO]" en rojo, indicando que ahora es una carpeta aleatoria.
+
+Las carpetas aleatorias tomarán su contenido y seleccionarán aleatoriamente una película, serie, temporada o episodio para mostrar.
+
+Esto significa que si usas una carpeta de accesos directos aleatoria como widget, verás contenido aleatorio en ese widget cada vez que se actualice.
+
+Si también deseas que el widget muestre la etiqueta correcta para el contenido que se muestra actualmente, simplemente nombra el widget $INFO[Window.Property(redlight.[NOMBRE DE LA CARPETA DE ACCESO DIRECTO])], reemplazando [NOMBRE DE LA CARPETA DE ACCESO DIRECTO] por el nombre de la carpeta de acceso directo que estás usando como widget. Ahora tendrás un widget aleatorio basado en el contenido de la carpeta de accesos directos que hayas utilizado.
+
+Cuantas más listas de películas y series incluyas en la carpeta de accesos directos aleatorios, más aleatorio será el widget.
+
+Si necesitas modificar el contenido de la carpeta de accesos directos aleatorios, simplemente abre el menú contextual y selecciona "Eliminar aleatorio". A continuación, podrás acceder a las listas y realizar los cambios necesarios. Una vez realizados los cambios, vuelve a seleccionar "Crear aleatorio" en el menú contextual.

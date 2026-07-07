@@ -1,6 +1,6 @@
 
-Movie and TV Show context menus have an 'Extras...' listing.
+Los menús contextuales de películas y series de televisión incluyen la opción "Extras...".
 
-This will open a fullscreen window with information about the movie/tv show including cast, ratings, similar media, reviews, etc.
+Al hacer clic en ella, se abrirá una ventana a pantalla completa con información sobre la película o serie, como el reparto, las calificaciones, contenido similar, reseñas, etc.
 
-Set preferences for the Extras window under Settings->Features->Extras.
+Puedes configurar las preferencias de la ventana de Extras en Configuración > Funciones > Extras.

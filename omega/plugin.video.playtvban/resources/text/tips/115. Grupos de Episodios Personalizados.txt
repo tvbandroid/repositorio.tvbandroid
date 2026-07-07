@@ -1,0 +1,5 @@
+Play TVBan te permite asignar grupos de episodios personalizados a tus series de televisión. Estos grupos pueden estar relacionados con un orden diferente de los episodios (emitidos frente a DVD, etc.), un orden distinto debido a la fuente de metadatos (TMDb frente a TVDB, etc.) o simplemente con la nomenclatura de los archivos de los episodios publicados (el anime es conocido por esto).
+
+Para asignar un grupo de episodios personalizado a una serie, simplemente abre el menú contextual de la serie, selecciona > Opciones > Asignar un grupo de episodios a... . A continuación, si está disponible, elige un grupo de episodios de las opciones que se muestran.
+
+Estos grupos de episodios personalizados no modificarán la forma en que se organizan los episodios en Play TVBan; la información que contienen se utilizará para buscar resultados de reproducción. Esta función puede ser especialmente útil al trabajar con contenido de anime, pero se puede configurar para cualquier Serie.

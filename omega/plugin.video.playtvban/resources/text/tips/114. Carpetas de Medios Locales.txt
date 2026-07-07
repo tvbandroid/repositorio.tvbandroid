@@ -1,0 +1,31 @@
+
+Play TVBan incluye 5 herramientas para buscar archivos en carpetas de medios locales.
+
+Elige una carpeta de películas y series para cualquiera de estas herramientas, y Play TVBan escaneará esas carpetas en busca de resultados. Existe cierta flexibilidad en la estructura de las carpetas, pero para asegurar la mejor probabilidad de encontrar un archivo relevante, se recomienda la siguiente estructura:
+
+- Carpeta Películas <----Introduce esto en la configuración de la herramienta.
+
+- Carpeta Película 1
+- movie1.file
+
+- Carpeta Película 2
+
+- movie2.file
+
+- Carpeta Series <----Introduce esto en la configuración de la herramienta.
+
+- Carpeta Serie 1
+
+- Carpeta Temporada 1
+
+- s01e01.file
+
+- Carpeta Serie 2
+
+- Carpeta Temporada 1
+
+- s01e01.file
+Para usar:
+Ve a Configuración -> Cuentas -> Carpetas de medios locales. Activa la opción "Habilitar". Configura también cualquier ajuste adicional que necesites. Seleccione "Configurar rastreadores de carpetas" y asigne carpetas de red/locales, asígneles una etiqueta y especifique su ubicación.
+
+NOTA: No es necesario configurar una carpeta de películas y otra de series para cada rastreador de carpetas; simplemente deje en blanco la que no desee utilizar.

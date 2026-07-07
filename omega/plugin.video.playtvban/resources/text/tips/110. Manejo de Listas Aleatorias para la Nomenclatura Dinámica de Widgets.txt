@@ -1,0 +1,20 @@
+En Play TVBan, existen varios métodos para generar contenido aleatorio en los widgets.
+
+El método más sencillo consiste en vincular los widgets a cualquiera de las listas incluidas en la sección "Listas aleatorias" de Play TVBan. Esta sección ofrece tres opciones: Listas de películas, Listas de series o Listas de Trakt. Veamos las tres a continuación...
+
+LISTAS DE PELÍCULAS/SERIES:
+En este menú encontrarás todas las listas genéricas de películas y series incluidas en Play TVBan, como "Tendencias" y "Populares". Simplemente vincula tu widget a una de estas listas y se generará una lista aleatoria de 20 películas o series basada en las tres primeras páginas de dicha lista.
+Puedes nombrar el widget como quieras para estas listas, con algunas excepciones...
+
+Si seleccionas una lista de películas o series que normalmente incluye opciones adicionales (géneros, proveedores, idiomas, años, décadas, certificaciones o cadenas), puedes mostrar en la etiqueta del widget el género, proveedor, etc., que se haya seleccionado aleatoriamente. Para ello, deberás establecer un valor especial para la etiqueta del widget al crearlo.
+
+La etiqueta del widget se configurará de la siguiente manera: `$INFO[Window.Property(playtvban.[NOMBRE DE LA LISTA])]`, donde `[NOMBRE DE LA LISTA]` será el nombre de la lista aleatoria que quieras usar. Este será el valor predeterminado para la etiqueta. Por ejemplo, si quieres crear un widget que muestre géneros de películas aleatorios, `[NOMBRE DE LA LISTA]` será `Películas Géneros Aleatorios`. Por lo tanto, el valor que se debe ingresar como etiqueta del widget será `$INFO[Window.Property(playtvban.Movies Random Genres)]`.
+
+LISTAS DE TRAKT:
+Las opciones de listas aleatorias de Trakt se comportarán igual que las opciones de películas/series mencionadas anteriormente. Las listas que requerirán una etiqueta especial para el widget en esta categoría serán "Mis listas de Trakt" y "Listas favoritas de Trakt". Si selecciona alguna de estas como origen para un widget, la etiqueta del widget deberá ser `$INFO[Window.Property(playtvban.Trakt My Lists)]` o `$INFO[Window.Property(playtvban.Trakt Liked Lists)]`, respectivamente. Como puede ver, se utiliza el mismo método que con las listas aleatorias especiales de películas/series.
+
+La segunda opción para utilizar listas aleatorias en Play TVBan es asignar como "Aleatoria" una carpeta de acceso directo que haya creado (consulte "Consejos sobre carpetas de Acceso Directo" para obtener más información sobre cómo crear una carpeta de acceso directo). Esto se convierte esencialmente en una lista de listas, donde se elige una de ellas al azar para mostrarla.
+
+La etiqueta del widget deberá configurarse de forma similar a las etiquetas especiales descritas anteriormente, pero en este caso se utilizará el nombre de la carpeta de Accesos Directos como valor dentro de la etiqueta especial.
+
+Por ejemplo, si ha creado una carpeta de accesos directos llamada "Mis accesos directos 01" y ha añadido algunas listas de Play TVBan a ella, asignándole la etiqueta "Aleatorio", puede crear un elemento aleatorio en el widget apuntando el widget a esa carpeta. La etiqueta del widget, si desea que se muestre el nombre de la lista aleatoria seleccionada actualmente, sería `$INFO[Window.Property(playtvban.My Shortcuts 01)]`. Como puede ver, sigue el mismo principio que las demás etiquetas dinámicas de widgets descritas anteriormente. En este caso, se introduce el nombre de la carpeta de Accesos Directos a la que apunta el widget.

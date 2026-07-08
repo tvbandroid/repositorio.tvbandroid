@@ -2,7 +2,9 @@
 
 **Repositorio oficial de TVBandroid para Kodi.**
 
-TVBandroid es un repositorio para Kodi que ofrece complementos, actualizaciones y recursos compatibles con las versiones Matrix (Kodi 19), Nexus (Kodi 20) y Omega (Kodi 21).
+TVBandroid es el repositorio oficial para Kodi que ofrece complementos, actualizaciones y recursos compatibles con las versiones Matrix (Kodi 19), Nexus (Kodi 20), Omega (Kodi 21) y Piers (Kodi 22).
+
+Con TVBandroid podrás instalar y mantener tu repositorio de Kodi de forma sencilla, rápida y siempre actualizado.
 
 ## Compatibilidad
 
@@ -13,7 +15,7 @@ TVBandroid es un repositorio para Kodi que ofrece complementos, actualizaciones 
 
 ## Instalación
 
-Fuente oficial:
+**Fuente oficial**
 
 https://tvbandroid.github.io/tvband
 
@@ -25,35 +27,49 @@ https://tvbandroid.github.io
 
 <p align="left">
 <img src="https://img.shields.io/badge/REPOSITORIO%20TVBANDROID-Matrix-yellogreen">
-<!--<img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-yellogreen"> -->
 <img src="https://img.shields.io/badge/Nexus-indigo">
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
 </p>
- 
-# $\mathbb{El\ Repositorio\ Oficial\ {\color{dodgerblue}tvbandroid\ {\color{white}para\ {\color{teal}Kodi.}}}}$
 
+# $\mathbb{El\ Repositorio\ Oficial\ {\color{dodgerblue}TVBandroid\ {\color{white}para\ {\color{teal}Kodi.}}}}$
 
+<!-- ![img](https://) -->
 
-<!--![img](https://) -->
-# `Kodi 19` $\textbf{\color{green}Matrix\ {\color{white}\ {\color{indigo}}}}$
+# `Kodi 19` $\textbf{\color{green}Matrix}$
+
 <p align="left">
-<img src="https://img.shields.io/badge/ANDTV-Matrix-yellogreen">
+<img src="https://img.shields.io/badge/ANDTV-Matrix-yellowgreen">
+</p>
+
 <p align="center">
 <img src="https://i.imgur.com/FmHatKc.png">
 </p>
 
 # `Kodi 20` $\textbf{\color{indigo}Nexus}$
+
 <p align="left">
-<img src="https://img.shields.io/badge/TVBAN-LA%20ORIGINAL-8A2BE2">  
-<p align="center">
-<img src="https://i.imgur.com/19lQWCN.png">  
+<img src="https://img.shields.io/badge/TVBAN-LA%20ORIGINAL-8A2BE2">
 </p>
 
-<h1 align="left"> Kodi 21 $\textbf{\color{dodgerblue} Omega}$ </h1>
+<p align="center">
+<img src="https://i.imgur.com/19lQWCN.png">
+</p>
+
+<h1 align="left">Kodi 21 $\textbf{\color{dodgerblue}Omega}$</h1>
+
 <p align="left">
 <img src="https://img.shields.io/badge/TVBAN-MATNEXOM-yellowgreen">
 <img src="https://img.shields.io/badge/FUNCIONANDO-dodgerblue">
-<p align="center">
-<img src="https://i.imgur.com/fbPNcPZ.jpg"> 
 </p>
 
+<p align="center">
+<img src="https://i.imgur.com/fbPNcPZ.jpg">
+</p>
+
+---
+
+## 📄 Licencia
+
+Este proyecto está distribuido bajo la **Licencia MIT**.
+
+Consulta el archivo `LICENSE` para obtener más información.

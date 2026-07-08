@@ -34,7 +34,7 @@ https://tvbandroid.github.io
 </p>
 
 # $\mathbb{El\ Repositorio\ Oficial\ {\color{dodgerblue}TVBandroid\ {\color{white}para\ {\color{teal}Kodi.}}}}$
-
+<img src="https://img.icons8.com/?size=48&id=59258&format=png">
 <!-- ![img](https://) -->
 
 # `Kodi 19` $\textbf{\color{green}Matrix}$

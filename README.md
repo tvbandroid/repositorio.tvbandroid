@@ -29,7 +29,7 @@ https://tvbandroid.github.io
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
 </p>
  
-# $\mathbb{Tu\ Repo\ {\color{dodgerblue}andtvban\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi.}}}}$
+# $\mathbb{Tu\ Repo\ {\color{dodgerblue}tvbandroid\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi.}}}}$
 
 
 

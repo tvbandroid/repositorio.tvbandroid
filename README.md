@@ -30,7 +30,7 @@ https://tvbandroid.github.io
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
 </p>
  
-# $\mathbb{El\ Repositorio\ Oficial\ {\color{dodgerblue}TVBandroid\ {\color{white}para\ {\color{teal}Kodi.}}}}$
+# $\mathbb{El\ Repositorio\ Oficial\ {\color{dodgerblue}tvbandroid\ {\color{white}para\ {\color{teal}Kodi.}}}}$
 
 
 

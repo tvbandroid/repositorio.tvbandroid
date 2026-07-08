@@ -38,7 +38,7 @@ https://tvbandroid.github.io
 # `Kodi 19` $\textbf{\color{green}Matrix}$
 
 <p align="left">
-<img src="https://img.shields.io/badge/ANDTV-Matrix-yellowgreen">
+<img src="https://img.shields.io/badge/ANDTV-Matrix-yellogreen">
 </p>
 
 <p align="center">

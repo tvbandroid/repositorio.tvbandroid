@@ -31,7 +31,7 @@ https://tvbandroid.github.io
 </p>
  
 # $\mathbb{El\ Repositorio\ Oficial\ {\color{dodgerblue}TVBandroid\ {\color{white}para\ {\color{teal}Kodi.}}}}$
-
+# $\mathbb{Tu\ Repo\ {\color{dodgerblue}tvbandroid\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi.}}}}$
 
 
 <!--![img](https://) -->

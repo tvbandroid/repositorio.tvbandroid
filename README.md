@@ -24,12 +24,13 @@ https://tvbandroid.github.io
 ---
 
 <p align="left">
+<img src="https://img.shields.io/badge/REPOSITORIO%20TVBANDROID-Matrix-yellowgreen">
 <img src="https://img.shields.io/badge/REPOSITORIO_ANDTVBAN%20-Matrix-yellogreen"> 
 <img src="https://img.shields.io/badge/Nexus-indigo">
 <img src="https://img.shields.io/badge/Omega-dodgerblue">
 </p>
  
-# $\mathbb{Tu\ Repo\ {\color{dodgerblue}tvbandroid\ {\color{white}que\ no\ puede\ faltar\ para\ tu\ {\color{teal}Kodi.}}}}$
+# $\mathbb{El\ Repositorio\ Oficial\ {\color{dodgerblue}TVBandroid\ {\color{white}para\ {\color{teal}Kodi.}}}}$
 
 
 

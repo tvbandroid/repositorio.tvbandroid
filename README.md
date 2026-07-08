@@ -26,7 +26,7 @@ https://tvbandroid.github.io
 ---
 
 <p align="left">
-<img src="https://img.shields.io/badge/REPOSITORIO%20TVBANDROID-Matrix-yellogreen">
+<img src="https://img.shields.io/badge/REPOSITORIO%20TVBANDROID-Lo%20Mejor%20de-yellowgreen">
 <img src="https://img.shields.io/badge/Matrix-yellogreen">
 <img src="https://img.shields.io/badge/Nexus-indigo">
 <img src="https://img.shields.io/badge/Omega-dodgerblue">

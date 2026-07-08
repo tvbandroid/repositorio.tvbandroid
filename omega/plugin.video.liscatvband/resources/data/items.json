@@ -16,7 +16,7 @@
 	{
         "type": "m3u",
         "name": "[B][COLOR red]RAKUTEN [COLOR white]TV[/B][/COLOR]",
-        "url": "https://raw.githubusercontent.com/HelmerLuzo/RakutenTV_HL/main/tv/m3u/RakutenTV_tv.m3u",
+        "url": "https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/refs/heads/master/tvlist/streams/rakutentv.m3u",
         "logo": "https://i.imgur.com/eVyf80j.png",
         "fanart": "https://i.imgur.com/2BMnt0s.jpg"
     },
@@ -30,7 +30,7 @@
     {
         "type": "m3u",
         "name": "[B][COLOR white]SAMSUNG TV PLUS[/COLOR][/B]",
-        "url": "https://raw.githubusercontent.com/HelmerLuzo/SamsungTVPlus_HL/refs/heads/main/tv/m3u/SamsungTVPlus_tv_ES.m3u",
+        "url": "https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/refs/heads/master/tvlist/streams/samsungtvplus.m3u",
         "logo": "https://i.imgur.com/q0dHtq3.png",
         "fanart": "https://i.imgur.com/gfG9yg0.jpg"
     },

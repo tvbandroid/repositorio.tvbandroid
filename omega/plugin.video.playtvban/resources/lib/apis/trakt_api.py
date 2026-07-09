@@ -17,11 +17,11 @@ from modules.utils import sort_list, sort_for_article, get_datetime, timedelta, 
 TRAKT_PAGE_LIMIT = 250
 
 def no_client_key():
-	kodi_utils.notification('Please set a valid Trakt Client ID Key')
+	kodi_utils.notification('Por favor, introduce una clave válida del ID de Cliente de Trakt')
 	return None
 
 def no_secret_key():
-	kodi_utils.notification('Please set a valid Trakt Client Secret Key')
+	kodi_utils.notification('Por favor, introduce una clave válida del Secreto de Cliente de Trakt')
 	return None
 
 def get_trakt(params):
@@ -165,10 +165,10 @@ def trakt_get_device_token(device_codes):
 		qr_code = make_qrcode(auth_url) or ''
 		short_url = make_tinyurl(auth_url)
 		copy2clip(auth_url)
-		if short_url: p_dialog_insert = '[CR]OR....[CR]visit [B]%s[/B]' % short_url
+				if short_url: p_dialog_insert = '[CR]O BIEN...[CR]visita [B]%s[/B]' % short_url
 		else: p_dialog_insert = ''
-		content = 'Enter [B]%s[/B] at [B]%s[/B][CR]OR....[CR]Scan the [B]QR Code[/B]%s' % (user_code, device_codes['verification_url'], p_dialog_insert)
-		progressDialog = kodi_utils.progress_dialog('Trakt Authorise', qr_code)
+		content = 'Introduce [B]%s[/B] en [B]%s[/B][CR]O BIEN...[CR]Escanea el [B]código QR[/B]%s' % (user_code, device_codes['verification_url'], p_dialog_insert)
+		progressDialog = kodi_utils.progress_dialog('Autorizar Trakt', qr_code)
 		progressDialog.update(content, 0)
 		try:
 			time_passed = 0
@@ -242,7 +242,7 @@ def trakt_revoke_authentication(dummy=''):
 	set_setting('trakt.next_daily_clear', '0')
 	settings.fallback_watched_provider_on_revoke(1)
 	trakt_cache.clear_all_trakt_cache_data(silent=True, refresh=False)
-	kodi_utils.notification('Trakt Account Authorisation Reset', 3000)
+	kodi_utils.notification('Restablecer Autorización de la Cuenta de Trakt', 3000)
 	CLIENT_ID = settings.trakt_client()
 	if CLIENT_ID in (None, 'empty_setting', ''): return no_client_key()
 	CLIENT_SECRET = settings.trakt_secret()

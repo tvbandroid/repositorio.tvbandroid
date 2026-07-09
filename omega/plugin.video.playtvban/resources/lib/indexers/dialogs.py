@@ -41,7 +41,7 @@ def navigate_to_page_choice(params):
 	def _builder():
 		for item in start_list:
 			if item == current_page: line1 = '[COLOR blue][B]Página %s   |   Página Actual[/B][/COLOR]' % item
-			else: line1 = 'Página %s' % item
+			else: line1 = 'Page %s' % item
 			yield {'line1': line1}
 	try:
 		current_page, total_pages = int(params.get('current_page')), int(params.get('total_pages'))
@@ -415,7 +415,7 @@ def preferred_filters_choice(params):
 		filters_choice = [i for i in filters_choice if not i[1] in disabled_filters]
 		unused_filters = [i for i in filters_choice if not i[1] in auto_settings]
 		param_list_items = [{'line1': i[0], 'line2': i[1]} for i in unused_filters]
-		param_kwargs = {'items': json.dumps(param_list_items), 'multi_line': 'true', 'heading': 'Elegir los criterios de clasificación prioritarios para la reproducción automática', 'narrow_window': 'true'}
+		param_kwargs = {'items': json.dumps(param_list_items), 'multi_line': 'true', 'heading': 'Seleccionar Parámetros de Ordenación a la Parte Superior', 'narrow_window': 'true'}
 		param_choice = kodi_utils.select_dialog(unused_filters, **param_kwargs)
 		if param_choice == None: return ''
 		choice['value'] = param_choice[1]
@@ -427,7 +427,7 @@ def preferred_filters_choice(params):
 	auto_settings = settings.preferred_filters()
 	choices = params.get('choices') or _beginning_choices()
 	list_items = [{'line1': i['name'], 'line2': i['value']} for i in choices]
-	kwargs = {'items': json.dumps(list_items), 'multi_line': 'true', 'heading': 'Elegir los criterios de clasificación prioritarios para la reproducción automática', 'narrow_window': 'true'}
+	kwargs = {'items': json.dumps(list_items), 'multi_line': 'true', 'heading': 'Seleccionar Parámetros de Ordenación a la Parte Superior', 'narrow_window': 'true'}
 	choice = kodi_utils.select_dialog(choices, **kwargs)
 	if choice == None: return _make_settings()
 	choice, ask_params = _rechoose_checker(choice)
@@ -474,9 +474,9 @@ def clear_sources_folder_choice(params):
 
 def widget_refresh_timer_choice(params):
 	choices = [{'name': 'DESACTIVADO', 'value': '0'}]
-	choices.extend([{'name': 'Cada %s minutos' % i, 'value': str(i)} for i in range(5,25,5)])
-	choices.extend([{'name': 'Cada %s minutos' % i, 'value': str(i)} for i in range(30,65,10)])
-	choices.extend([{'name': 'Cada %s horas' % (float(i)/60), 'value': str(i)} for i in range(90,720,30)])
+	choices.extend([{'name': 'Cada %s Minutos' % i, 'value': str(i)} for i in range(5,25,5)])
+	choices.extend([{'name': 'Cada %s Minutos' % i, 'value': str(i)} for i in range(30,65,10)])
+	choices.extend([{'name': 'Cada %s Horas' % (float(i)/60), 'value': str(i)} for i in range(90,720,30)])
 	list_items = [{'line1': i['name']} for i in choices]
 	kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true'}
 	choice = kodi_utils.select_dialog(choices, **kwargs)
@@ -660,7 +660,7 @@ def trakt_manager_choice(params):
 	if not settings.trakt_user_active(): return kodi_utils.notification('No Hay Una Cuenta Trakt Activa', 3500)
 	tmdb_id, tvdb_id, imdb_id, media_type = params['tmdb_id'], params['tvdb_id'], params['imdb_id'], params['media_type']
 	icon = params.get('icon', None) or kodi_utils.get_icon('trakt')
-	choices = [('Añadir A [B]Watchlist[/B]', 'add_watchlist'), ('Eliminar De [B]Watchlist[/B]', 'remove_watchlist'),
+	choices = [('Añadir A [B]Watchlist[/B]', 'add_watchlist'), ('Eliminar De [B]Lista de Seguimiento[/B]', 'remove_watchlist'),
 				('Añadir A [B]Colección[/B]', 'add_collection'), ('Eliminar De [B]Colección[/B]', 'remove_collection'),
 				('Añadir A [B]Lista Personal[/B]...', 'add'), ('Eliminar De [B]Lista Personal[/B]...', 'remove')]
 	list_items = [{'line1': item[0], 'icon': icon} for item in choices]
@@ -965,7 +965,7 @@ def enable_scrapers_choice(params={}):
 	icon = params.get('icon', None) or kodi_utils.get_icon('playtvban')
 	scrapers = ['external', 'easynews', 'rd_cloud', 'pm_cloud', 'ad_cloud', 'tb_cloud', 'folders']
 	cloud_scrapers = {'rd_cloud': 'rd.enabled', 'pm_cloud': 'pm.enabled', 'ad_cloud': 'ad.enabled', 'tb_cloud': 'tb.enabled'}
-	scraper_names = ['SCRAPERS EXTERNOS', 'EASYNEWS', 'RD CLOUD', 'PM CLOUD', 'AD CLOUD', 'TB CLOUD', 'CARPETAS 1-5']
+	scraper_names = ['PROVEEDORES EXTERNOS', 'EASYNEWS', 'NUBE RD', 'NUBE PM', 'NUBE AD', 'NUBE TB', 'CARPETAS 1-5']
 	set_scrapers = settings.active_internal_scrapers()
 	preselect = [scrapers.index(i) for i in set_scrapers]
 	list_items = [{'line1': item, 'icon': icon} for item in scraper_names]
@@ -1089,28 +1089,21 @@ def options_menu_choice(params, meta=None):
 	listing = []
 	listing_append = listing.append
 	if from_extras:
-		if menu_type in ('movie', 'episode'):
-			listing_append(('Opciones De Reproducción', 'Opciones De Scrapers', 'playback_choice'))
+		if menu_type in ('movie', 'episode'): listing_append(('Playback Options', 'Scrapers Options', 'playback_choice'))
 	if menu_type in ('movie', 'tvshow'):
-		if settings.mdblist_user_active():
-			listing_append(('Administrador De Listas MDBList', '', 'mdblist_manager'))
-		if settings.simkl_user_active():
-			listing_append(('Administrador De Listas Simkl', '', 'simkl_manager'))
-		if settings.trakt_user_active():
-			listing_append(('Administrador De Listas Trakt', '', 'trakt_manager'))
-		listing_append(('Administrador De Listas TMDb', '', 'tmdblists_manager_choice'))
-		listing_append(('Administrador De Listas Personales', '', 'personallists_manager_choice'))
-		listing_append(('Administrador De Favoritos', '', 'favorites_manager_choice'))
-	if menu_type == 'tvshow':
-		listing_append(('Reproducción Aleatoria', 'Basado En %s' % rootname, 'random'))
+		if settings.mdblist_user_active(): listing_append(('Administrador de MDBList', '', 'mdblist_manager'))
+		if settings.simkl_user_active(): listing_append(('Administrador de Listas de Simkl', '', 'simkl_manager'))
+		if settings.trakt_user_active(): listing_append(('Administrador de Listas de Trakt', '', 'trakt_manager'))
+		listing_append(('Administrador de Listas de TMDb', '', 'tmdblists_manager_choice'))
+		listing_append(('Administrador de Listas Personales', '', 'personallists_manager_choice'))
+		listing_append(('Administrador de Favoritos', '', 'favorites_manager_choice'))
+	if menu_type == 'tvshow': listing_append(('Reproducir Aleatoriamente', 'Basado en %s' % rootname, 'random'))
 	if menu_type in ('tvshow', 'season'):
-		listing_append(('Asignar Un Grupo De Episodios A %s' % rootname, 'Actual: %s' % episode_groups_cache.get(tmdb_id).get('name', 'Ninguno'), 'episode_group'))
+		listing_append(('Asignar un Grupo de Episodios a %s' % rootname, 'Actual: %s' % episode_groups_cache.get(tmdb_id).get('name', 'Ninguno'), 'episode_group'))
 	if menu_type in ('movie', 'episode') or menu_type in single_ep_list:
 		base_str1, base_str2, on_str, off_str = '%s%s', 'Actual: [B]%s[/B]', 'Activado', 'Desactivado'
-		if settings.auto_play(content):
-			autoplay_status, autoplay_toggle, quality_setting = on_str, 'false', 'autoplay_quality_%s' % content
-		else:
-			autoplay_status, autoplay_toggle, quality_setting = off_str, 'true', 'results_quality_%s' % content
+		if settings.auto_play(content): autoplay_status, autoplay_toggle, quality_setting = on_str, 'false', 'autoplay_quality_%s' % content
+		else: autoplay_status, autoplay_toggle, quality_setting = off_str, 'true', 'results_quality_%s' % content
 		set_active = settings.active_internal_scrapers()
 		active_int_scrapers = [i.replace('_', '') for i in set_active]
 		current_scrapers_status = ', '.join([i for i in active_int_scrapers]) if len(active_int_scrapers) > 0 else 'N/D'
@@ -1120,28 +1113,26 @@ def options_menu_choice(params, meta=None):
 		if menu_type == 'episode' or menu_type in single_ep_list:
 			if autoplay_status == on_str:
 				autoplay_next_status, autoplay_next_toggle = (on_str, 'false') if settings.autoplay_next_episode() else (off_str, 'true')
-				listing_append((base_str1 % ('Reproducir Automáticamente El Siguiente Episodio', ''), base_str2 % autoplay_next_status, 'toggle_autoplay_next'))
+				listing_append((base_str1 % ('Reproducción Automática del Siguiente Episodio', ''), base_str2 % autoplay_next_status, 'toggle_autoplay_next'))
 			else:
 				autoscrape_next_status, autoscrape_next_toggle = (on_str, 'false') if settings.autoscrape_next_episode() else (off_str, 'true')
-				listing_append((base_str1 % ('Auto Scrape Del Siguiente Episodio', ''), base_str2 % autoscrape_next_status, 'toggle_autoscrape_next'))
-		listing_append((base_str1 % ('Límite De Calidad', ' (%s)' % content), base_str2 % current_quality_status, 'set_quality'))
+				listing_append((base_str1 % ('Búsqueda Automática del Siguiente Episodio', ''), base_str2 % autoscrape_next_status, 'toggle_autoscrape_next'))
+		listing_append((base_str1 % ('Límite de Calidad', ' (%s)' % content), base_str2 % current_quality_status, 'set_quality'))
 		listing_append((base_str1 % ('', 'Activar Scrapers'), base_str2 % current_scrapers_status, 'enable_scrapers'))
 		if menu_type == 'episode' or menu_type in single_ep_list:
-			listing_append(('Asignar Un Grupo De Episodios A %s' % rootname, base_str2 % episode_groups_cache.get(tmdb_id).get('name', 'Ninguno'), 'episode_group'))
+			listing_append(('Asignar un Grupo de Episodios a %s' % rootname, base_str2 % episode_groups_cache.get(tmdb_id).get('name', 'Ninguno'), 'episode_group'))
 	if not from_extras:
 		if menu_type in ('movie', 'tvshow'):
-			listing_append(('Actualizar Información En Caché De %s' % ('Películas' if menu_type == 'movie' else 'Series'), 'Borrar Caché De %s' % rootname, 'clear_media_cache'))
-		if menu_type in ('movie', 'episode') or menu_type in single_ep_list:
-			listing_append(('Borrar Caché De Scrapers', '', 'clear_scrapers_cache'))
-		if menu_type in ('tvshow', 'season', 'episode'):
-			listing_append(('Administrador Del Progreso De Series', '', 'nextep_manager'))
-		listing_append(('Abrir Administrador De Descargas', '', 'open_download_manager'))
+			listing_append(('Volver a Crear la Caché de %s' % ('Películas' if menu_type == 'movie' else 'Series'), 'Borrar la Caché de %s' % rootname, 'clear_media_cache'))
+		if menu_type in ('movie', 'episode') or menu_type in single_ep_list: listing_append(('Borrar Caché de Scrapers', '', 'clear_scrapers_cache'))
+		if menu_type in ('tvshow', 'season', 'episode'): listing_append(('Administrador del Progreso de Series', '', 'nextep_manager'))
+		listing_append(('Abrir Administrador de Descargas', '', 'open_download_manager'))
 		listing_append(('Abrir Herramientas', '', 'open_tools'))
 		if menu_type in ('movie', 'episode', 'tvshow', 'season') or menu_type in single_ep_list:
 			configured_scrapers = settings.configured_external_scraper_slots()
 			if configured_scrapers:
 				listing_append((settings.external_scraper_settings_options_label(), '', 'open_external_scraper_settings'))
-		listing_append(('Abrir Configuración', '', 'open_settings'))
+		listing_append(('Abrir Ajustes', '', 'open_settings'))
 	list_items = [{'line1': item[0], 'line2': item[1] or item[0], 'icon': poster} for item in listing]
 	heading = rootname or 'Opciones...'
 	kwargs = {'items': json.dumps(list_items), 'heading': heading, 'multi_line': 'true'}
@@ -1236,7 +1227,7 @@ def media_extra_info_choice(params):
 			append('[B]Estado:[/B] %s' % extra_info['status'])
 			append('[B]Estreno:[/B] %s' % meta['premiered'])
 			append('[B]Valoración:[/B] %s (%s Votos)' % (str(round(meta['rating'], 1)), meta['votes']))
-			append('[B]Duración:[/B] %s Minutos' % int(float(meta['duration'])/60))
+			append('[B]Duración:[/B] %s min' % int(float(meta['duration'])/60))
 			append('[B]Género/s:[/B] %s' % ', '.join(meta['genre']))
 			append('[B]Presupuesto:[/B] %s' % extra_info['budget'])
 			append('[B]Recaudación:[/B] %s' % extra_info['revenue'])
@@ -1253,20 +1244,20 @@ def media_extra_info_choice(params):
 			append('[B]Estado:[/B] %s' % extra_info['status'])
 			append('[B]Estreno:[/B] %s' % meta['premiered'])
 			append('[B]Valoración:[/B] %s (%s Votos)' % (str(round(meta['rating'], 1)), meta['votes']))
-			append('[B]Duración:[/B] %d Minutos' % int(float(meta['duration'])/60))
+			append('[B]Duración:[/B] %d min' % int(float(meta['duration'])/60))
 			append('[B]Clasificación:[/B] %s' % meta['mpaa'])
 			append('[B]Género/s:[/B] %s' % ', '.join(meta['genre']))
 			append('[B]Cadenas:[/B] %s' % ', '.join(meta['studio']))
-			append('[B]Creado Por:[/B] %s' % extra_info['created_by'])
+			append('[B]Creada Por:[/B] %s' % extra_info['created_by'])
 			try:
 				last_ep = extra_info['last_episode_to_air']
-				append('[B]Última Emisión:[/B] %s - [B]T%.2dE%.2d[/B] - %s' \
+				append('[B]Última Emisión:[/B] %s - [B]S%.2dE%.2d[/B] - %s' \
 					% (adjust_premiered_date(last_ep['air_date'], settings.date_offset())[0].strftime('%d %B %Y'),
 						last_ep['season_number'], last_ep['episode_number'], last_ep['name']))
 			except: pass
 			try:
 				next_ep = extra_info['next_episode_to_air']
-				append('[B]Próxima Emisión:[/B] %s - [B]T%.2dE%.2d[/B] - %s' \
+				append('[B]Próxima Emisión:[/B] %s - [B]S%.2dE%.2d[/B] - %s' \
 					% (adjust_premiered_date(next_ep['air_date'], settings.date_offset())[0].strftime('%d %B %Y'),
 						next_ep['season_number'], next_ep['episode_number'], next_ep['name']))
 			except: pass
@@ -1278,4 +1269,4 @@ def media_extra_info_choice(params):
 
 def discover_choice(params):
 	from windows.base_window import open_window
-	open_window(('windows.discover', 'Discover'), 'discover.xml', media_type=params['media_type'])
+	open_window(('windows.discover', 'Descubrir'), 'discover.xml', media_type=params['media_type'])

@@ -132,7 +132,7 @@ class Discover(BaseDialog):
 		choice = kodi_dialog().input('Range [B]%s - %s[/B].' % (min_value, max_value), type=1)
 		if choice in ('', '0', None): return
 		if int(choice) < min_value or int(choice) > max_value:
-			ok_dialog(text='Please Choose Between the Range [B]%s - %s[/B].' % (min_value, max_value))
+			ok_dialog(text='Por favor, Elija una Opción Dentro del Rango. [B]%s - %s[/B].' % (min_value, max_value))
 			return self.votes()
 		self.set_key_values(self.chosen_item['url_insert'] % choice, choice)
 

@@ -122,14 +122,14 @@ def encode_sequence(content, error=None, version=None, mode=None, mask=None,
         return int(math.ceil(bit_length / capacity))
 
     version = normalize_version(version)
-    if version is not None:
+       if version is not None:
         if version < 1:
-            raise ValueError('This function does not accept Micro QR Code versions. '
-                             f'Provided: "{get_version_name(version)}"')
+            raise ValueError('Esta función no admite versiones de códigos QR Micro. '
+                             f'Proporcionada: "{get_version_name(version)}"')
     elif symbol_count is None:
-        raise ValueError('Please provide either a QR Code version or the symbol count')
+        raise ValueError('Por favor, proporciona una versión del código QR o el número de símbolos')
     if symbol_count is not None and not 1 <= symbol_count <= 16:
-        raise ValueError('The symbol count must be in range 1 .. 16')
+        raise ValueError('El número de símbolos debe estar en el rango de 1 a 16')
     error = normalize_errorlevel(error, accept_none=True)
     if error is None:
         error = consts.ERROR_LEVEL_L
@@ -150,19 +150,19 @@ def encode_sequence(content, error=None, version=None, mode=None, mask=None,
             return [_encode(segments, error=error, version=(version or guessed_version),
                             mask=mask, eci=eci, boost_error=boost_error)]
     if len(segments.modes) > 1:
-        raise ValueError('This function cannot handle more than one mode (yet). Sorry.')
+           raise ValueError('Esta función no puede manejar más de un modo (todavía). Lo sentimos.')
     mode = segments.modes[0]  # CHANGE iff more than one mode is supported!
     # Creating one QR code failed or max_no is not None
     if mode == consts.MODE_NUMERIC:
         content = str(content)
     if symbol_count is not None and len(content) < symbol_count:
-        raise ValueError(f'The content is not long enough to be divided into {symbol_count} symbols')
+        raise ValueError(f'El contenido no es lo suficientemente largo para dividirse en {symbol_count} símbolos')
     sa_parity_data = calc_structured_append_parity(content)
     num_symbols = symbol_count or 16
     if version is not None:
         num_symbols = number_of_symbols_by_version(content, version, error, mode)
-    if num_symbols > 16:
-        raise DataOverflowError(f'The data does not fit into Structured Append version {version}')
+        if num_symbols > 16:
+        raise DataOverflowError(f'Los datos no caben en la versión {version} de Anexo Estructurado')
     chunks = divide_into_chunks(content, num_symbols)
     if symbol_count is not None:
         segments = one_item_segments(max(chunks, key=len), mode)

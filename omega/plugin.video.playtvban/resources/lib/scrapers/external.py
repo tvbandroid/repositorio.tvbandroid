@@ -61,40 +61,11 @@ class source:
 			return self._get_sources_orchestrated()
 		return self._get_sources_flat()
 
-	def _counts_from_sources_list(self, sources):
-		if not sources:
-			return 0, 0, 0, 0, 0
-		return (
-			self._quality_length_sd(sources, None),
-			self._quality_length(sources, '720p'),
-			self._quality_length(sources, '1080p'),
-			self._quality_length(sources, '4K'),
-			len(sources),
-		)
-
-	def _ui_scrape_counts(self):
-		live = self._counts_from_sources_list(self.sources)
-		if live[4] >= self.sources_total:
-			return live
-		return (self.sources_sd, self.sources_720p, self.sources_1080p, self.sources_4k, self.sources_total)
-
-	def _push_scrape_progress(self, line1, percent):
-		try:
-			counts = self._ui_scrape_counts()
-			self.progress_dialog.update_scraper(counts[0], counts[1], counts[2], counts[3], counts[4], line1, percent)
-		except:
-			pass
-
-	def _push_debrid_progress(self, line1, percent):
-		# Keep scrape totals on screen during cache check; final_* only counts cached
-		# subsets and uses a different basis (deduped hashes), which made totals drop.
-		self._push_scrape_progress(line1, percent)
-
 	def _get_sources_flat(self):
 		def _scraperDialog():
 			kodi_utils.hide_busy_dialog()
+			kodi_utils.sleep(200)
 			start_time = time.time()
-			self._push_scrape_progress('', 0)
 			while not self.progress_dialog.iscanceled() and not self.monitor.abortRequested():
 				try:
 					alive_threads = [x.getName() for x in self.threads if x.is_alive()]
@@ -102,7 +73,7 @@ class source:
 					self.poll_cloud_scrapers()
 					line1 =  ', '.join(alive_threads).upper()
 					percent = min(100, int((max((time.time() - start_time), 0) / float(self.timeout)) * 100))
-					self._push_scrape_progress(line1, percent)
+					self.progress_dialog.update_scraper(self.sources_sd, self.sources_720p, self.sources_1080p, self.sources_4k, self.sources_total, line1, percent)
 					if self.threads_completed:
 						len_alive_threads = len(alive_threads)
 						if len_alive_threads == 0: break
@@ -148,13 +119,13 @@ class source:
 
 	def _log_scrape_external_wave(self, wave_idx, wave_labels, wave_new, wave_total, skip_threshold, mode, stop_reason):
 		try:
-			kodi_utils.logger('ScrapeExternalWave', 'wave=%d modules=%s wave_new=%d total=%d threshold=%d mode=%s stop=%s' % (
+			kodi_utils.logger('ScrapeExternalWave', 'fase=%d módulos=%s nuevos_en_fase=%d total=%d umbral=%d modo=%s parada=%s' % (
 				wave_idx, ','.join(wave_labels), wave_new, wave_total, skip_threshold, mode, stop_reason))
 		except: pass
 
 	def _finish_orchestrated_scrape(self, stop_reason):
 		try:
-			kodi_utils.logger('ScrapeExternalWave', 'finished total=%d reason=%s' % (len(self.sources), stop_reason))
+			kodi_utils.logger('ScrapeExternalWave', 'finalizado total=%d motivo=%s' % (len(self.sources), stop_reason))
 		except: pass
 		current_results = list(self.sources)
 		if current_results: return self.process_results(current_results)
@@ -164,7 +135,7 @@ class source:
 		groups = orch['groups']
 		skip_threshold = int(orch.get('skip_threshold', 0))
 		mode = orch.get('mode', 'primary_parallel')
-		stop_reason = 'exhausted'
+		stop_reason = 'agotado'
 		wave_idx = 0
 		primary = groups[0]
 		wave_idx += 1
@@ -172,7 +143,7 @@ class source:
 		self._run_provider_batch(list(primary['entries']), float(self.timeout), [primary['display_name']])
 		wave_total = len(self.sources)
 		wave_new = wave_total - baseline
-		self._log_scrape_external_wave(wave_idx, [primary['display_name']], wave_new, wave_total, skip_threshold, mode, 'primary_done')
+		self._log_scrape_external_wave(wave_idx, [primary['display_name']], wave_new, wave_total, skip_threshold, mode, 'primario_finalizado')
 		fallback_groups = groups[1:]
 		if fallback_groups:
 			wave_idx += 1
@@ -184,7 +155,7 @@ class source:
 			self._run_provider_batch(batch_entries, float(self.timeout), wave_labels)
 			wave_total = len(self.sources)
 			wave_new = wave_total - baseline
-			self._log_scrape_external_wave(wave_idx, wave_labels, wave_new, wave_total, skip_threshold, '%s_fallback' % mode, 'exhausted')
+			self._log_scrape_external_wave(wave_idx, wave_labels, wave_new, wave_total, skip_threshold, '%s_fallback' % mode, 'agotado')
 		return self._finish_orchestrated_scrape(stop_reason)
 
 	def _get_sources_orchestrated(self):
@@ -200,11 +171,11 @@ class source:
 		wave_step = 1 if series_mode else max_parallel
 		phase_deadline = time.time() + self.timeout
 		wave_idx = 0
-		stop_reason = 'exhausted'
+		stop_reason = 'agotado'
 		for wave_start in range(0, len(groups), wave_step):
 			remaining = phase_deadline - time.time()
 			if remaining <= 0:
-				stop_reason = 'timeout'
+				stop_reason = 'tiempo_agotado'
 				break
 			wave = groups[wave_start:wave_start + wave_step]
 			wave_idx += 1
@@ -228,9 +199,9 @@ class source:
 	def _run_provider_batch(self, batch_entries, batch_timeout, wave_labels):
 		def _scraperDialog():
 			kodi_utils.hide_busy_dialog()
+			kodi_utils.sleep(200)
 			batch_start = time.time()
 			line1_prefix = ' | '.join(wave_labels).upper()
-			self._push_scrape_progress(line1_prefix, 0)
 			while not self.progress_dialog.iscanceled() and not self.monitor.abortRequested():
 				try:
 					alive_threads = [x.getName() for x in self.threads if x.is_alive()]
@@ -240,7 +211,7 @@ class source:
 					if alive_threads: line1 = '%s: %s' % (line1_prefix, ', '.join(alive_threads).upper())
 					elapsed = max((time.time() - batch_start), 0)
 					percent = min(100, (elapsed / float(batch_timeout)) * 100)
-					self._push_scrape_progress(line1, percent)
+					self.progress_dialog.update_scraper(self.sources_sd, self.sources_720p, self.sources_1080p, self.sources_4k, self.sources_total, line1, percent)
 					if self.threads_completed:
 						if len(alive_threads) == 0: break
 					if time.time() >= batch_start + batch_timeout:
@@ -388,11 +359,11 @@ class source:
 			if api_blocked:
 				if not self.background:
 					self.process_quality_count_final(results)
-					kodi_utils.notification('AllDebrid cache check unavailable (%s). Showing unchecked sources.' % api_blocked, 6000)
+					kodi_utils.notification('Comprobación de caché de AllDebrid no disponible (%s). Se mostrarán fuentes sin comprobar.' % api_blocked, 6000)
 					kodi_utils.clear_property('playtvban.debrid_cache_api_error')
 				batch = [dict(i, **{'cache_provider': provider, 'debrid': provider}) for i in results]
 				try:
-					kodi_utils.logger('DebridCacheCheck', 'fallback=unchecked provider=%s reason=%s total=%d' % (provider, api_blocked, len(batch)))
+					kodi_utils.logger('DebridCacheCheck', 'alternativa=sin_comprobar proveedor=%s motivo=%s total=%d' % (provider, api_blocked, len(batch)))
 				except: pass
 			else:
 				cached_set = set(str(i).lower() for i in cached)
@@ -402,7 +373,6 @@ class source:
 				final_results.extend(batch)
 		def _debrid_check_dialog(debrid_deadline):
 			self.progress_dialog.reset_is_cancelled()
-			self._push_scrape_progress('Checking cache...', 0)
 			start_time = time.time()
 			debrid_timeout = max(1.0, debrid_deadline - start_time)
 			while not self.progress_dialog.iscanceled() and not self.monitor.abortRequested():
@@ -411,7 +381,7 @@ class source:
 					current_progress = max((time.time() - start_time), 0)
 					line1 = ', '.join(remaining_debrids).upper()
 					percent = min(100, int((current_progress / float(debrid_timeout)) * 100))
-					self._push_debrid_progress(line1, percent)
+					self.progress_dialog.update_scraper(self.final_sd, self.final_720p, self.final_1080p, self.final_4k, self.final_total, line1, percent)
 					kodi_utils.sleep(100)
 					if len(remaining_debrids) == 0: break
 					if time.time() >= debrid_deadline: break
@@ -467,7 +437,7 @@ class source:
 						self.process_quality_count_final(results)
 					final_results.extend([dict(i, **{'cache_provider': 'Uncached %s' % provider, 'debrid': provider}) for i in results])
 				try:
-					kodi_utils.logger('DebridCacheCheck', 'warning=incomplete_check fallback=uncached providers=%s hashes=%d' % (
+					kodi_utils.logger('DebridCacheCheck', 'aviso=comprobación_incompleta alternativa=sin_cache proveedores=%s hashes=%d' % (
 						','.join(providers_needing_api), len(hash_list)))
 				except: pass
 			_log_debrid_cache_summary(final_results, providers_needing_api)
@@ -509,7 +479,7 @@ class source:
 		for item in self.count_tuple_final: setattr(self, item[0], getattr(self, item[0]) + item[2](sources, item[1]))
 
 	def _join_scraper_threads_grace(self, grace_seconds=8):
-		"""After the scrape timeout, allow slow host threads a short window to finish."""
+		"""Tras agotarse el tiempo del scrape, permite unos segundos para que finalicen los scrapers más lentos."""
 		deadline = time.time() + grace_seconds
 		while time.time() < deadline:
 			if not any(x.is_alive() for x in self.threads):

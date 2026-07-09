@@ -21,14 +21,14 @@ def _kodi_favorites_path():
 
 
 def _pick_import_file():
-	path = kodi_utils.browse_file(BACKUP_MASK, settings.import_export_directory_setting(), heading='Choose Kodi favorites backup', force_defaultt=True)
+	path = kodi_utils.browse_file(BACKUP_MASK, settings.import_export_directory_setting(), heading='Elegir Copia de Seguridad de Favoritos de Kodi', force_defaultt=True)
 	if not path:
 		return None
 	tpath = kodi_utils.translate_path(path)
 	if not os.path.isfile(tpath):
 		return None
 	if not tpath.lower().endswith('.xml'):
-		kodi_utils.ok_dialog(heading='Import Kodi favorites', text='Please choose a Kodi favorites backup (.xml).')
+		kodi_utils.ok_dialog(heading='Importar favoritos de Kodi', text='Por Favor, elige una copia de seguridad de favoritos de Kodi (.xml).')
 		return None
 	return tpath
 
@@ -37,10 +37,10 @@ def _parse_favorites_file(path):
 	try:
 		tree = ET.parse(path)
 	except Exception as e:
-		raise ValueError('Invalid XML (%s)' % e)
+		raise ValueError('XML no válido (%s)' % e)
 	root = tree.getroot()
 	if root.tag.lower() != 'favourites':
-		raise ValueError('This file is not a Kodi favorites backup (expected a favourites root element).')
+		raise ValueError('Este archivo no es una copia de seguridad de favoritos de Kodi (se esperaba un elemento raíz "favourites").')
 	items = []
 	for node in root.findall('favourite'):
 		action = (node.text or '').strip()

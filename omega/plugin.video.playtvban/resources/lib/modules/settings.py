@@ -226,9 +226,9 @@ def subs_alert_fetch_configured():
 	return submaker_manifest_configured() or opensubs_configured()
 
 def alert_timing_options(next_episode=False):
-	options = {'0': 'Playback Percentage', '1': 'Chapter Info', '2': 'Subtitles Info'}
+	options = {'0': 'Porcentaje de Reproducción', '1': 'Información del Capítulo', '2': 'Información de los Subtítulos'}
 	if next_episode:
-		options['3'] = 'IntroDB Info'
+		options['3'] = 'Información de IntroDB'
 	if not subs_alert_fetch_configured():
 		options.pop('2', None)
 	return options
@@ -284,10 +284,10 @@ def kodi_subtitle_language():
 def subs_language_preferences():
 	if subs_language_is_forced_local(): return []
 	prefs = []
-	red_light = subs_language()
-	if red_light: prefs.append(red_light)
+	play_tvban = subs_language()
+	if play_tvban: prefs.append(play_tvban)
 	kodi_lang = kodi_subtitle_language()
-	if kodi_lang and (not red_light or kodi_lang.lower() != red_light.lower()):
+	if kodi_lang and (not play_tvban or kodi_lang.lower() != play_tvban.lower()):
 		prefs.append(kodi_lang)
 	return prefs
 
@@ -510,6 +510,9 @@ def aiostreams_active():
 	if not ENABLED: return False
 	if get_setting('playtvban.provider.aiostreams', 'false') == 'true': return aiostreams_authorized()
 	return False
+
+def aiostreams_preserve_order():
+	return get_setting('playtvban.aiostreams.preserve_order', 'true') == 'true'
 
 def extras_enable_extra_ratings():
 	return get_setting('playtvban.extras.enable_extra_ratings', 'true') == 'true'

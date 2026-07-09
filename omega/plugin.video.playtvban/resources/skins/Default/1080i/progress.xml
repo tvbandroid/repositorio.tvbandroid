@@ -39,7 +39,7 @@
                     <align>left</align>
                     <aligny>bottom</aligny>
                     <textcolor>B3CCCCCC</textcolor>
-                    <label>[UPPERCASE]Press [B]BACK[/B] to Cancel[/UPPERCASE]</label>
+                    <label>[UPPERCASE]Pulsa [B]ATRÁS[/B] para Cancelar[/UPPERCASE]</label>
                 </control>
                 <control type="image" id="200">
                     <left>610</left>

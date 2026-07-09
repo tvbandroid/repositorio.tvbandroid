@@ -171,7 +171,7 @@ def browse_directory(defaultt='', heading='Choose folder', use_defaultt=False, c
 			return None
 	return result
 
-def browse_file(mask='', defaultt='', heading='Choose file', force_defaultt=False):
+def browse_file(mask='', defaultt='', heading='Elegir Archivo', force_defaultt=False):
 	# File browse: cancel with a folder defaultt returns that path, not an empty string.
 	start = browse_start_path(defaultt, force_defaultt=force_defaultt)
 	result = kodi_dialog().browse(1, heading, '', mask, defaultt=start)
@@ -877,7 +877,7 @@ def jsonrpc_set_system_setting(setting_id, value):
 	try: return get_jsonrpc(command)
 	except: return None
 
-def open_settings():
+def open_settings(section=None):
 	try:
 		from caches.settings_cache import refresh_settings_manager_properties
 		refresh_settings_manager_properties()
@@ -887,8 +887,17 @@ def open_settings():
 		from apis.aiostreams_api import refresh_settings_properties
 		refresh_settings_properties()
 	except: pass
+	section_indexes = {'torrent': 5, 'direct': 6, '61': 5, '62': 6, 'torrent_sources': 5, 'direct_sources': 6}
+	focus_key = str(section or '').strip().lower()
+	if focus_key in section_indexes:
+		set_property('playtvban.settings_manager.focus_index', str(section_indexes[focus_key]))
+	else:
+		clear_property('playtvban.settings_manager.focus_index')
 	from windows.base_window import open_window
-	open_window(('windows.settings_manager', 'SettingsManager'), 'settings_manager.xml')
+	try:
+		open_window(('windows.settings_manager', 'SettingsManager'), 'settings_manager.xml')
+	finally:
+		clear_property('playtvban.settings_manager.focus_index')
 
 def external_scraper_settings(params=None):
 	try:
@@ -999,8 +1008,9 @@ LIST_ITEM_NOT_IN_LIST = 'Item not in list'
 
 def notification(line1, time=5000, icon=None, settle_ms=0):
 	# Un breve retraso ayuda a Kodi a mostrar la notificación después de cerrar los diálogos de selección/confirmación (las llamadas rápidas pueden impedir que aparezca).
+	# sound=False: silent toast — especially during playback (Next Episode Ready, Next Up).
 	if settle_ms: sleep(settle_ms)
-	kodi_dialog().notification('Play TVBan', line1, icon or addon_icon(), time)
+	kodi_dialog().notification('Play TVBan', line1, icon or addon_icon(), time, False)
 
 def player_check(mode, params):
 	from modules.settings import playback_key
@@ -1010,7 +1020,7 @@ def player_check(mode, params):
 	elif mode == 'playback.video':
 		from modules.player import PlayTVBanPlayer
 		PlayTVBanPlayer().run(params.get('url', None), params.get('obj', None))
-	else: ok_dialog('External Playback Detected', 'Playback through external addons is not supported')
+	else: ok_dialog('Reproducción Externa Detectada', 'La Reproducción mediante Addons Externos no es Compatible')
 
 def external_playback_check(params):
 	return True

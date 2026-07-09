@@ -41,10 +41,10 @@ def ad_cloud(folder_id=None):
 				cm = []
 				folder_name, folder_id = item['filename'], item['id']
 				clean_folder_name = clean_file_name(normalize(folder_name)).upper()
-				display = '%02d | [B]FOLDER[/B] | [I]%s [/I]' % (count, clean_folder_name)
+				display = '%02d | [B]CARPETA[/B] | [I]%s [/I]' % (count, clean_folder_name)
 				url_params = {'mode': 'alldebrid.browse_ad_cloud', 'id': folder_id}
 				delete_params = {'mode': 'alldebrid.delete', 'id': folder_id}
-				cm.append(('[B]Delete Folder[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
+				cm.append(('[B]Eliminar carpeta[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
@@ -66,9 +66,9 @@ def ad_cloud(folder_id=None):
 		kodi_utils.hide_busy_dialog()
 	handle = int(sys.argv[1])
 	kodi_utils.add_items(handle, list(_builder()))
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.end_directory(handle, cacheToDisc=False)
-	kodi_utils.set_view_mode('view.premium')
+	kodi_utils.set_view_mode('view.premium', kodi_utils.MENU_FOLDER_CONTENT)
 
 
 def ad_downloads():
@@ -85,7 +85,7 @@ def ad_downloads():
 					finished = item.get('statusCode') == 4
 					display = '%02d | %d%% | [B]%s[/B] | [I]%s [/I]' % (count, progress, type_label, name)
 					delete_params = {'mode': 'alldebrid.delete', 'id': item['id']}
-					cm_append(('[B]Delete[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
+					cm_append(('[B]Eliminar[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
 					if finished:
 						url_params = {'mode': 'alldebrid.browse_ad_cloud', 'id': item['id']}
 						is_folder = True
@@ -100,7 +100,7 @@ def ad_downloads():
 					url_link = item.get('link_dl') or item.get('link')
 					url_params = {'mode': 'playback.video', 'url': url_link, 'obj': 'video'}
 					down_file_params = {'mode': 'downloader.runner', 'name': name, 'url': url_link, 'action': 'cloud.alldebrid_direct', 'image': icon}
-					cm_append(('[B]Download File[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
+					cm_append(('[B]Descargar Archivo[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
 					is_folder = False
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
@@ -153,12 +153,12 @@ def ad_downloads():
 		if errors:
 			kodi_utils.notification('All Debrid: %s' % errors[0], 4000)
 		else:
-			kodi_utils.notification('All Debrid: No transfers in history', 2500)
+			kodi_utils.notification('All Debrid: Sin transferencias en el historial', 2500)
 	handle = int(sys.argv[1])
 	kodi_utils.add_items(handle, list(_builder()))
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.end_directory(handle, cacheToDisc=False)
-	kodi_utils.set_view_mode('view.premium')
+	kodi_utils.set_view_mode('view.premium', kodi_utils.MENU_FOLDER_CONTENT)
 
 
 def ad_saved_links():
@@ -173,7 +173,7 @@ def ad_saved_links():
 				url_link = item['link']
 				url_params = {'mode': 'alldebrid.resolve_ad', 'url': url_link, 'play': 'true'}
 				down_file_params = {'mode': 'downloader.runner', 'name': name, 'url': url_link, 'action': 'cloud.alldebrid', 'image': icon}
-				cm_append(('[B]Download File[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
+				cm_append(('[B]Descargar archivo[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
@@ -195,9 +195,9 @@ def ad_saved_links():
 		kodi_utils.hide_busy_dialog()
 	handle = int(sys.argv[1])
 	kodi_utils.add_items(handle, list(_builder()))
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.end_directory(handle, cacheToDisc=False)
-	kodi_utils.set_view_mode('view.premium')
+	kodi_utils.set_view_mode('view.premium', kodi_utils.MENU_FOLDER_CONTENT)
 
 
 def browse_ad_cloud(folder_id):
@@ -211,11 +211,11 @@ def browse_ad_cloud(folder_id):
 				name = clean_file_name(item['n']).upper()
 				size = item['s']
 				display_size = float(int(size))/1073741824
-				display = '%02d | [B]FILE[/B] | %.2f GB | [I]%s [/I]' % (count, display_size, name)
+				display = '%02d | [B]ARCHIVO[/B] | %.2f GB | [I]%s [/I]' % (count, display_size, name)
 				url_params = {'mode': 'alldebrid.resolve_ad', 'url': url_link, 'play': 'true'}
 				down_file_params = {'mode': 'downloader.runner', 'name': name, 'url': url_link, 'action': 'cloud.alldebrid', 'image': icon}
 				url = kodi_utils.build_url(url_params)
-				cm.append(('[B]Download File[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
+				cm.append(('[B]Descargar archivo[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
 				listitem.addContextMenuItems(cm)
@@ -232,9 +232,9 @@ def browse_ad_cloud(folder_id):
 	handle = int(sys.argv[1])
 	icon, fanart = kodi_utils.get_icon('alldebrid'), kodi_utils.get_addon_fanart()
 	kodi_utils.add_items(handle, list(_builder()))
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.end_directory(handle, cacheToDisc=False)
-	kodi_utils.set_view_mode('view.premium')
+	kodi_utils.set_view_mode('view.premium', kodi_utils.MENU_FOLDER_CONTENT)
 
 
 def resolve_ad(params):
@@ -267,11 +267,11 @@ def ad_account_info():
 		days_remaining = (expires - datetime.today()).days
 		body = []
 		append = body.append
-		append('[B]Username:[/B] %s' % username)
+		append('[B]Nombre de Usuario:[/B] %s' % username)
 		append('[B]Email:[/B] %s' % email)
-		append('[B]Status:[/B] %s' % status)
-		append('[B]Expires:[/B] %s' % expires)
-		append('[B]Days Remaining:[/B] %s' % days_remaining)
+		append('[B]Estado:[/B] %s' % status)
+		append('[B]Caduca:[/B] %s' % expires)
+		append('[B]Días Restantes:[/B] %s' % days_remaining)
 		kodi_utils.hide_busy_dialog()
 		return kodi_utils.show_text('ALL DEBRID', '\n\n'.join(body), font_size='large')
 	except:

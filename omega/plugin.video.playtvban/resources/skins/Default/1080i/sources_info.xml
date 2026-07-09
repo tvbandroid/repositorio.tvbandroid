@@ -59,7 +59,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Provider: [/B][/COLOR]$INFO[Window.Property(provider)][/UPPERCASE]</label>
+                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Proveedor: [/B][/COLOR]$INFO[Window.Property(provider)][/UPPERCASE]</label>
                 </control>
                 <control type="label">
                     <top>50</top>
@@ -69,7 +69,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Provider: [/B][/COLOR]$INFO[Window.Property(source_type)][/UPPERCASE]</label>
+                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Proveedor: [/B][/COLOR]$INFO[Window.Property(source_type)][/UPPERCASE]</label>
                 </control>
                 <control type="label">
                     <top>100</top>
@@ -79,7 +79,18 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Site: [/B][/COLOR]$INFO[Window.Property(source_site)][/UPPERCASE]</label>
+                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Sitio: [/B][/COLOR]$INFO[Window.Property(source_site)][/UPPERCASE]</label>
+                </control>
+                                <control type="label">
+                    <visible>!String.IsEmpty(Window.Property(scraper_module))</visible>
+                    <top>125</top>
+                    <width max="1275">auto</width>
+                    <height>20</height>
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
+                    <textcolor>FFCCCCCC</textcolor>
+                    <align>left</align>
+                    <aligny>center</aligny>
+                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]$INFO[Window.Property(scraper_module_label)]: [/B][/COLOR]$INFO[Window.Property(scraper_module)][/UPPERCASE]</label>
                 </control>
                 <control type="label">
                     <top>150</top>
@@ -89,7 +100,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Quality: [/B][/COLOR]$INFO[Window.Property(quality)][/UPPERCASE]</label>
+                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Calidad: [/B][/COLOR]$INFO[Window.Property(quality)][/UPPERCASE]</label>
                 </control>
                 <control type="label">
                     <top>200</top>
@@ -99,7 +110,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Size: [/B][/COLOR]$INFO[Window.Property(size_label)][/UPPERCASE]</label>
+                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Tamaño: [/B][/COLOR]$INFO[Window.Property(size_label)][/UPPERCASE]</label>
                 </control>
                 <control type="label">
                     <top>250</top>
@@ -130,7 +141,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <align>left</align>
                     <aligny>top</aligny>
-                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Title: [/B][/COLOR]$INFO[Window.Property(name)][/UPPERCASE]</label>
+                    <label>[UPPERCASE][COLOR $INFO[Window.Property(highlight)]][B]Título: [/B][/COLOR]$INFO[Window.Property(name)][/UPPERCASE]</label>
                 </control>
             </control>
         </control>

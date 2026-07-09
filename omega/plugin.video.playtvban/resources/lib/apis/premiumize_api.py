@@ -26,7 +26,7 @@ class PremiumizeAPI:
 		auth_url = response.get('verification_uri')
 		qr_code = make_qrcode(auth_url) or ''
 		copy2clip(auth_url)
-		content = 'Please Scan the QR Code[CR]Full link copied to clipboard[CR]OR visit: [B]%s[/B][CR]AND Enter this Code: [B]%s[/B]' % (auth_url, user_code)
+	    content = 'Por favor, escanea el código QR[CR]Enlace completo copiado al portapapeles[CR]O visita: [B]%s[/B][CR]E introduce este código: [B]%s[/B]' % (auth_url, user_code)
 		progressDialog = progress_dialog('Premiumize Authorise', qr_code)
 		progressDialog.update(content, 0)
 		device_code = response['device_code']
@@ -48,7 +48,7 @@ class PremiumizeAPI:
 				self.token = str(response['access_token'])
 				set_setting('pm.token', self.token)
 			except:
-				 ok_dialog(heading='Premiumize', text='Authorisation failed.')
+				 ok_dialog(heading='Premiumize', text='La autorización ha fallado.')
 				 break
 		try: progressDialog.close()
 		except: pass

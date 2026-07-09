@@ -159,7 +159,7 @@ class TMDbListAPI:
 		account_session_id = get_setting('tmdb.account_session_id')
 		session_id = get_setting('tmdb.session_id')
 		if 'empty_setting' in [account_session_id, session_id]:
-			notification('Please Re-Authenticate you TMDB account')
+			notification('Por Favor, Vuelve a Autenticar tu Cuenta de TMDB.')
 			return {'success': False}
 		url = '%s/account/%s/%s' % (self.base_url_v3, account_session_id, list_type)
 		return self.request_data(url, params={'session_id': session_id}, data={'media_type': media_type, 'media_id': str(media_id), list_type: status}, method='post')

@@ -68,14 +68,14 @@ def _addon_version():
 
 
 def _pick_import_zip(default_dir):
-	path = kodi_utils.browse_file(SETTINGS_BACKUP_MASK, default_dir, heading='Choose settings backup', force_defaultt=True)
+	path = kodi_utils.browse_file(SETTINGS_BACKUP_MASK, default_dir, heading='Elegir copia de seguridad de la configuración', force_defaultt=True)
 	if not path:
 		return None
 	tpath = kodi_utils.translate_path(path)
 	if not os.path.isfile(tpath):
 		return None
 	if not tpath.lower().endswith('.zip'):
-		kodi_utils.ok_dialog(heading='Import settings', text='Please choose a Play TVBan settings backup (.zip).')
+		kodi_utils.ok_dialog(heading='Importar configuración', text='Por favor, elige una copia de seguridad de la configuración de Play TVBan (.zip).')
 		return None
 	return tpath
 

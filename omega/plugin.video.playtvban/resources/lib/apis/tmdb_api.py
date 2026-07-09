@@ -13,7 +13,7 @@ def tmdb_dict_removals():
 
 def no_api_key():
 	from modules.kodi_utils import notification
-	notification('Please set a valid TMDb API Key')
+	notification('Por Favor, Introduce una Clave Válida de la API de TMDb')
 	return []
 
 def movie_details(tmdb_id, api_key):

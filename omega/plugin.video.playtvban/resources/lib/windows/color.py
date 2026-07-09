@@ -56,6 +56,6 @@ class SelectColor(BaseDialog):
 		if not color_value: return None
 		color_value = color_value.upper()
 		if not color_value.isalnum() or not color_value.startswith('FF') or not len(color_value) == 8:
-			ok_dialog(text='Value must begin with [B]FF[/B], be [B]8[/B] characters in length and be [B]Alphanumeric[/B].[CR][CR]Please try again..')
+			ok_dialog(text='El Valor Debe Comenzar por [B]FF[/B], Tener [B]8[/B] Caracteres y Ser [B]Alfanumérico[/B].[CR][CR]Por Favor, Inténtalo de Nuevo.')
 			return self.color_input()
 		return color_value

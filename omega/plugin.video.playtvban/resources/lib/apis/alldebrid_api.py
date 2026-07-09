@@ -34,7 +34,7 @@ class AllDebridAPI:
 		if short_url: p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visita: [B][COLOR gold]%s[/COLOR][/B][CR]O introduce este código: [B][COLOR gold]%s[/COLOR][/B]' % (short_url, user_code)
 		else: p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O introduce este código: [B]%s[/B]' % user_code
 		sleep_interval = 5
-		content = 'Please Scan the QR Code%s[CR]' % p_dialog_insert
+		content = 'Por favor, Escanea el Código QR%s[CR]'' % p_dialog_insert
 		progressDialog = progress_dialog('Autorizar [COLOR gold]AllDebrid[/COLOR]', qr_code)
 		progressDialog.update(content, 0)
 		start, time_passed = time.time(), 0

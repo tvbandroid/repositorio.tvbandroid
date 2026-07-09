@@ -739,20 +739,20 @@ class TorBoxAPI:
 		app_name = 'Play TVBan'
 		try:
 			response = requests.get(base_url + 'user/auth/device/start', params={'app': app_name}, timeout=20).json()
-		except Exception:
-			return ok_dialog(text='Unable to start TorBox authorisation')
+				except Exception:
+			return ok_dialog(text='No se pudo iniciar la autorización de TorBox')
 		if not response.get('success'):
-			return ok_dialog(text=response.get('detail') or 'Unable to start TorBox authorisation')
+			return ok_dialog(text=response.get('detail') or 'No se pudo iniciar la autorización de TorBox')
 		data = response.get('data') or {}
 		device_code = data.get('device_code')
 		user_code = data.get('code')
 		if not device_code or not user_code:
-			return ok_dialog(text='Invalid TorBox authorisation response')
+					return ok_dialog(text='Respuesta de autorización de TorBox no válida')
 		auth_url = _device_auth_url(app_name, user_code)
 		qr_code = make_qrcode(auth_url) or ''
 		copy2clip(auth_url)
-		p_dialog_insert = '[CR]Full link copied to clipboard[CR]OR visit: [B]torbox.app/oauth/device[/B][CR]AND Enter this Code: [B]%s[/B]' % user_code
-		content = 'Please Scan the QR Code%s[CR]' % p_dialog_insert
+		p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visita: [B]torbox.app/oauth/device[/B][CR]E Introduce este Código: [B]%s[/B]' % user_code
+		content = 'Por Favor, escanea el código QR%s[CR]' % p_dialog_insert
 		progressDialog = progress_dialog('TorBox Authorise', qr_code)
 		progressDialog.update(content, 0)
 		sleep_interval = int(data.get('interval') or 5)
@@ -796,13 +796,13 @@ class TorBoxAPI:
 		except Exception:
 			set_setting('tb.token', 'empty_setting')
 			set_setting('tb.enabled', 'false')
-			ok_dialog(heading='TorBox', text='Authorisation failed.')
+			ok_dialog(heading='TorBox', text='La autorización ha fallado.')
 
 	def revoke(self):
 		if not confirm_dialog(): return
 		set_setting('tb.token', 'empty_setting')
 		set_setting('tb.enabled', 'false')
-		notification('TorBox Authorisation Reset', 3000)
+		notification('Autorización de TorBox restablecida', 3000)
 
 	def clear_cache(self, clear_hashes=True):
 		try:

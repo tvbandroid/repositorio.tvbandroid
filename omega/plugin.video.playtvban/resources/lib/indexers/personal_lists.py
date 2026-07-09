@@ -328,7 +328,7 @@ def personal_image_downloader(list_name, author, image_type, url, sort_order, se
 	return final_image
 
 def personal_list_name(list_name=''):
-	new_name = kodi_utils.kodi_dialog().input('Please Choose a Name for the New List', defaultt=list_name)
+	new_name = kodi_utils.kodi_dialog().input('Por Favor, Elija un Nombre para la Nueva Lista.', defaultt=list_name)
 	if not new_name: return None
 	new_name = unquote(new_name)
 	return new_name
@@ -365,7 +365,7 @@ def import_trakt_list(params):
 	new_contents = process_trakt_list(chosen_list)
 	result = personal_lists_cache.add_many_list_items(list_name, author, new_contents)
 	if result == 'Exitoso':
-		if kodi_utils.confirm_dialog(heading='Listas Personales', text='¿Renombrar la lista para que coincida con el nombre de la lista de Trakt?', ok_label='Sí', cancel_label='No'):
+		if kodi_utils.confirm_dialog(heading='Listas Personales', text='Renombrar la lista para que coincida con el nombre de la lista de Trakt?', ok_label='Sí', cancel_label='No'):
 			personal_lists_cache.update_single_detail('name', trakt_list_name, list_name, author)
 	kodi_utils.notification(result, 3000)
 

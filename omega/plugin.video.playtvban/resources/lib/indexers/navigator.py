@@ -27,9 +27,9 @@ class Navigator:
 					url = k.build_folder_url(folder_params)
 					cm_items = []
 					if can_move:
-						cm_items.append(('[B]Move[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.move', 'active_list': self.list_name, 'position': count})))
+						cm_items.append(('[B]Mover[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.move', 'active_list': self.list_name, 'position': count})))
 					cm_items.extend([
-										('[B]Eliminar[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.remove', 'active_list': self.list_name, 'position': count})),
+					('[B]Eliminar[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.remove', 'active_list': self.list_name, 'position': count})),
 					('[B]Añadir Contenido[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.add', 'active_list': self.list_name, 'position': count})),
 					('[B]Restaurar Menú[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.restore', 'active_list': self.list_name, 'position': count})),
 					('[B]Buscar Nuevos Elementos del Menú[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.update', 'active_list': self.list_name, 'position': count})),

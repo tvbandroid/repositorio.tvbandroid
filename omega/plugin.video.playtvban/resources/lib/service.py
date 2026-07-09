@@ -9,16 +9,16 @@ from modules import kodi_utils
 
 pause_services_prop = 'playtvban.pause_services'
 current_skin_prop = 'playtvban.current_skin'
-trakt_service_string = 'Actualización del Servicio TraktMonitor %s - %s'
-trakt_success_line_dict = {'success': 'Actualización de Trakt Realizada', 'no account': '(No Autorizado) Actualización de Trakt Realizada'}
-update_string = 'Próxima Actualización en %s minutos...'
+trakt_service_string = 'TraktMonitor Service Update %s - %s'
+trakt_success_line_dict = {'success': 'Trakt Update Performed', 'no account': '(Unauthorised) Trakt Update Performed'}
+update_string = 'Next Update in %s minutes...'
 
 def _start_daemon(target):
 	Thread(target=target, daemon=True).start()
 
 class SetAddonConstants:
 	def run(self):
-		kodi_utils.logger('Play TVBan', 'Servicio SetAddonConstants Iniciado')
+		kodi_utils.logger('Play TVBan', 'SetAddonConstants Service Starting')
 		import random
 		new_version = kodi_utils.addon_info('version')
 		prev_version = kodi_utils.get_property('playtvban.addon_version')
@@ -28,7 +28,7 @@ class SetAddonConstants:
 				clear_settings_boot_state(clear_deferred=True)
 			except: pass
 			kodi_utils.clear_addon_xml_sync_version()
-			kodi_utils.logger('Play TVBan', 'SetAddonConstants - versión %s -> %s' % (prev_version, new_version))
+			kodi_utils.logger('Play TVBan', 'SetAddonConstants - version %s -> %s' % (prev_version, new_version))
 		icon_choice = get_setting('addon_icon_choice', 'resources/media/addon_icons/icon.png')
 		addon_path = kodi_utils.addon_info('path')
 		icon_path = kodi_utils.translate_path(os.path.join(addon_path, icon_choice))
@@ -51,23 +51,23 @@ class SetAddonConstants:
 			from modules.utils import _prune_qr_cache
 			_prune_qr_cache(kodi_utils.translate_path(kodi_utils.addon_info('profile')))
 		except: pass
-		return kodi_utils.logger('Play TVBan', 'Servicio SetAddonConstants Finalizado')
+		return kodi_utils.logger('Play TVBan', 'SetAddonConstants Service Finished')
 
 class DatabaseMaintenance:
 	def run(self):
-		kodi_utils.logger('Play TVBan', 'Servicio DatabaseMaintenance Iniciado')
+		kodi_utils.logger('Play TVBan', 'DatabaseMaintenance Service Starting')
 		from caches.base_cache import check_databases_integrity
 		check_databases_integrity(silent=True)
-		return kodi_utils.logger('Play TVBan', 'Servicio DatabaseMaintenance Finalizado')
+		return kodi_utils.logger('Play TVBan', 'DatabaseMaintenance Service Finished')
 
 class SyncSettings:
 	def run(self):
-		kodi_utils.logger('Play TVBan', 'Servicio SyncSettings Iniciado')
+		kodi_utils.logger('Play TVBan', 'SyncSettings Service Starting')
 		from caches.settings_cache import sync_settings, settings_sync_needed
 		if not settings_sync_needed():
-			return kodi_utils.logger('Play TVBan', 'Servicio SyncSettings Omitido')
+			return kodi_utils.logger('Play TVBan', 'SyncSettings Service Skipped')
 		sync_settings({'load_properties': False})
-		return kodi_utils.logger('Play TVBan', 'Servicio SyncSettings Finalizado')
+		return kodi_utils.logger('Play TVBan', 'SyncSettings Service Finished')
 
 class BootstrapSettings:
 	def run(self, monitor):
@@ -78,7 +78,7 @@ class BootstrapSettings:
 		)
 		if not service_bootstrap_needed():
 			return
-		kodi_utils.logger('Play TVBan', 'Servicio BootstrapSettings Iniciado')
+		kodi_utils.logger('Play TVBan', 'BootstrapSettings Service Starting')
 		try:
 			from modules.sources import clear_orphan_nextep_play_stash
 			clear_orphan_nextep_play_stash()
@@ -95,7 +95,7 @@ class BootstrapSettings:
 			run_deferred_setup_background_if_needed()
 		except Exception as e:
 			kodi_utils.logger('BootstrapSettings', str(e))
-		return kodi_utils.logger('Play TVBan', 'Servicio BootstrapSettings Finalizado')
+		return kodi_utils.logger('Play TVBan', 'BootstrapSettings Service Finished')
 
 _custom_windows_thread_started = False
 
@@ -107,16 +107,16 @@ def start_custom_windows_prepare(monitor):
 
 def run_deferred_service_setup():
 	global _custom_windows_thread_started
-	kodi_utils.logger('Play TVBan', 'Configuración Diferida del Servicio Iniciada')
+	kodi_utils.logger('Play TVBan', 'Deferred Service Setup Starting')
 	try:
 		from windows.base_window import ExtrasUtils
 		ExtrasUtils().run()
 	except Exception as e: kodi_utils.logger('DeferredServiceSetup', 'ExtrasUtils: %s' % e)
-	return kodi_utils.logger('Play TVBan', 'Configuración Diferida del Servicio Finalizada')
+	return kodi_utils.logger('Play TVBan', 'Deferred Service Setup Finished')
 
 class CustomWindowsPrepare:
 	def run(self, monitor):
-		kodi_utils.logger('Play TVBan', 'Servicio CustomWindowsPrepare Iniciado')
+		kodi_utils.logger('Play TVBan', 'CustomWindowsPrepare Service Starting')
 		from windows.base_window import FontUtils
 		player = kodi_utils.kodi_player()
 		wait_for_abort, is_playing = monitor.waitForAbort, player.isPlayingVideo
@@ -127,11 +127,11 @@ class CustomWindowsPrepare:
 			wait_for_abort(20)
 		try: del player
 		except: pass
-		return kodi_utils.logger('Play TVBan', 'Servicio CustomWindowsPrepare Finalizado')
+		return kodi_utils.logger('Play TVBan', 'CustomWindowsPrepare Service Finished')
 
 class TraktMonitor:
 	def run(self, monitor):
-		kodi_utils.logger('Play TVBan', 'Servicio TraktMonitor Iniciado')
+		kodi_utils.logger('Play TVBan', 'TraktMonitor Service Starting')
 		from apis.trakt_api import trakt_sync_activities
 		from modules.settings import trakt_user_active, trakt_sync_interval
 		player = kodi_utils.kodi_player()
@@ -147,28 +147,29 @@ class TraktMonitor:
 				next_update_string = update_string % sync_interval
 				if trakt_user_active(): status = trakt_sync_activities()
 				else: status = 'no_auth'
-				if status == 'failed':
-					kodi_utils.logger('Play TVBan', trakt_service_string % ('Falló. Error de Trakt', next_update_string))
-				elif status == 'no_auth':
-					kodi_utils.logger('Play TVBan', trakt_service_string % ('No Ejecutado. No Hay una Cuenta Trakt Activa', next_update_string))
+				if status == 'failed': kodi_utils.logger('Play TVBan', trakt_service_string % ('Failed. Error from Trakt', next_update_string))
+				elif status == 'no_auth': kodi_utils.logger('Play TVBan', trakt_service_string % ('Not Run. No Current Trakt Account', next_update_string))
 				else:
 					if status in ('success', 'no account'):
-						kodi_utils.logger('Play TVBan', trakt_service_string % ('Correcto. %s' % trakt_success_line_dict[status], next_update_string))
+						kodi_utils.logger('Play TVBan', trakt_service_string % ('Success. %s' % trakt_success_line_dict[status], next_update_string))
 					else:
-						kodi_utils.logger('Play TVBan', trakt_service_string % ('Correcto. No Se Requieren Cambios', next_update_string))
-					if status == 'success' and get_setting('playtvban.trakt.refresh_widgets', 'false') == 'true' and not kodi_utils.service_shutting_down(monitor):
-						if not kodi_utils.playback_widget_refresh_recent():
-							kodi_utils.run_plugin({'mode': 'kodi_refresh'})
-			except Exception as e:
-				kodi_utils.logger('Play TVBan', trakt_service_string % ('Falló', 'Ocurrió el siguiente Error: %s' % str(e)))
+						kodi_utils.logger('Play TVBan', trakt_service_string % ('Success. No Changes Needed', next_update_string))# 'not needed'
+					if status == 'success' and not kodi_utils.service_shutting_down(monitor):
+						from modules.settings import provider_sync_refresh_widgets
+						if provider_sync_refresh_widgets(1):
+							try:
+								if not kodi_utils.playback_widget_refresh_recent(): kodi_utils.run_plugin({'mode': 'kodi_refresh'})
+							except Exception as exc:
+								kodi_utils.logger('Play TVBan', 'Trakt widget refresh skipped: %s' % exc)
+			except Exception as e: kodi_utils.logger('Play TVBan', trakt_service_string % ('Failed', 'The following Error Occured: %s' % str(e)))
 			wait_for_abort(wait_time)
 		try: del player
 		except: pass
-		return kodi_utils.logger('Play TVBan', 'Servicio TraktMonitor Finalizado')
+		return kodi_utils.logger('Play TVBan', 'TraktMonitor Service Finished')
 
 class SimklMonitor:
 	def run(self, monitor):
-		kodi_utils.logger('Play TVBan', 'Servicio SimklMonitor Iniciado')
+		kodi_utils.logger('Play TVBan', 'SimklMonitor Service Starting')
 		from apis.simkl_api import simkl_sync_activities
 		from modules.settings import simkl_user_active, simkl_sync_interval
 		player = kodi_utils.kodi_player()
@@ -181,30 +182,28 @@ class SimklMonitor:
 				from caches.settings_cache import sync_kodi_profile_context
 				sync_kodi_profile_context()
 				sync_interval, wait_time = simkl_sync_interval()
-				next_update_string = 'Sincronización de Simkl finalizada - Próxima sincronización en %s minutos' % sync_interval
-				if simkl_user_active():
-					status = simkl_sync_activities()
-				else:
-					status = 'no_auth'
-				if status == 'failed':
-					kodi_utils.logger('Play TVBan', 'Falló la Sincronización de Simkl')
-				elif status == 'no_auth':
-					kodi_utils.logger('Play TVBan', 'La Sincronización de Simkl No Se Ejecutó - No Hay Cuenta')
-				else:
-					kodi_utils.logger('Play TVBan', 'Sincronización de Simkl %s - %s' % ('CORRECTA' if status == 'success' else 'Sin Cambios', next_update_string))
-				if status == 'success' and get_setting('playtvban.simkl.refresh_widgets', 'false') == 'true' and not kodi_utils.service_shutting_down(monitor):
-					if not kodi_utils.playback_widget_refresh_recent():
-						kodi_utils.run_plugin({'mode': 'kodi_refresh'})
-			except Exception as e:
-				kodi_utils.logger('Play TVBan', 'Falló la Sincronización de Simkl: %s' % str(e))
+				next_update_string = 'Simkl Sync finished - Next Sync in %s minutes' % sync_interval
+				if simkl_user_active(): status = simkl_sync_activities()
+				else: status = 'no_auth'
+				if status == 'failed': kodi_utils.logger('Play TVBan', 'Simkl Sync Failed')
+				elif status == 'no_auth': kodi_utils.logger('Play TVBan', 'Simkl Sync Not Run - No Account')
+				else: kodi_utils.logger('Play TVBan', 'Simkl Sync %s - %s' % ('OK' if status == 'success' else 'No Changes', next_update_string))
+				if status == 'success' and not kodi_utils.service_shutting_down(monitor):
+					from modules.settings import provider_sync_refresh_widgets
+					if provider_sync_refresh_widgets(2):
+						try:
+							if not kodi_utils.playback_widget_refresh_recent(): kodi_utils.run_plugin({'mode': 'kodi_refresh'})
+						except Exception as exc:
+							kodi_utils.logger('Play TVBan', 'Simkl widget refresh skipped: %s' % exc)
+			except Exception as e: kodi_utils.logger('Play TVBan', 'Simkl Sync Failed: %s' % str(e))
 			wait_for_abort(wait_time)
 		try: del player
 		except: pass
-		return kodi_utils.logger('Play TVBan', 'Servicio SimklMonitor Finalizado')
+		return kodi_utils.logger('Play TVBan', 'SimklMonitor Service Finished')
 
 class MdblistMonitor:
 	def run(self, monitor):
-		kodi_utils.logger('Play TVBan', 'Servicio MDBListMonitor Iniciado')
+		kodi_utils.logger('Play TVBan', 'MDBListMonitor Service Starting')
 		from apis.mdblist_api import mdblist_sync_activities
 		from modules.settings import mdblist_user_active, mdblist_sync_interval
 		player = kodi_utils.kodi_player()
@@ -217,23 +216,28 @@ class MdblistMonitor:
 				from caches.settings_cache import sync_kodi_profile_context
 				sync_kodi_profile_context()
 				sync_interval, wait_time = mdblist_sync_interval()
-				next_update_string = 'Sincronización de MDBList finalizada - Próxima sincronización en %s minutos' % sync_interval
+				next_update_string = 'MDBList Sync finished - Next Sync in %s minutes' % sync_interval
 				if mdblist_user_active(): status = mdblist_sync_activities()
 				else: status = 'no_auth'
-				if status == 'failed': kodi_utils.logger('Play TVBan', 'Falló la sincronización de MDBList')
-				elif status == 'no_auth': kodi_utils.logger('Play TVBan', 'La sincronización de MDBList no se ejecutó - No hay cuenta')
-				else: kodi_utils.logger('Play TVBan', 'Sincronización de MDBList %s - %s' % ('CORRECTA' if status == 'success' else 'Sin cambios', next_update_string))
-				if status == 'success' and get_setting('playtvban.mdblist.refresh_widgets', 'false') == 'true' and not kodi_utils.service_shutting_down(monitor):
-					if not kodi_utils.playback_widget_refresh_recent(): kodi_utils.run_plugin({'mode': 'kodi_refresh'})
-			except Exception as e: kodi_utils.logger('Play TVBan', 'Falló la sincronización de MDBList: %s' % str(e))
+				if status == 'failed': kodi_utils.logger('Play TVBan', 'MDBList Sync Failed')
+				elif status == 'no_auth': kodi_utils.logger('Play TVBan', 'MDBList Sync Not Run - No Account')
+				else: kodi_utils.logger('Play TVBan', 'MDBList Sync %s - %s' % ('OK' if status == 'success' else 'No Changes', next_update_string))
+				if status == 'success' and not kodi_utils.service_shutting_down(monitor):
+					from modules.settings import provider_sync_refresh_widgets
+					if provider_sync_refresh_widgets(3):
+						try:
+							if not kodi_utils.playback_widget_refresh_recent(): kodi_utils.run_plugin({'mode': 'kodi_refresh'})
+						except Exception as exc:
+							kodi_utils.logger('Play TVBan', 'MDBList widget refresh skipped: %s' % exc)
+			except Exception as e: kodi_utils.logger('Play TVBan', 'MDBList Sync Failed: %s' % str(e))
 			wait_for_abort(wait_time)
 		try: del player
 		except: pass
-		return kodi_utils.logger('Play TVBan', 'Servicio MDBListMonitor Finalizado')
+		return kodi_utils.logger('Play TVBan', 'MDBListMonitor Service Finished')
 
 class WidgetRefresher:
 	def run(self, monitor):
-		kodi_utils.logger('Play TVBan', 'Servicio WidgetRefresher Iniciado')
+		kodi_utils.logger('Play TVBan', 'WidgetRefresher Service Starting')
 		from time import time
 		player = kodi_utils.kodi_player()
 		wait_for_abort, self.is_playing = monitor.waitForAbort, player.isPlayingVideo
@@ -249,13 +253,13 @@ class WidgetRefresher:
 					continue
 				if self.condition_check(): continue
 				if self.next_refresh < time():
-					kodi_utils.logger('Play TVBan', 'Servicio WidgetRefresher - Widgets Actualizados')
+					kodi_utils.logger('Play TVBan', 'WidgetRefresher Service - Widgets Refreshed')
 					kodi_utils.refresh_widgets()
 					self.set_next_refresh(time())
 			except: pass
 		try: del player
 		except: pass
-		return kodi_utils.logger('Play TVBan', 'Servicio WidgetRefresher Finalizado')
+		return kodi_utils.logger('Play TVBan', 'WidgetRefresher Service Finished')
 
 	def condition_check(self):
 		if not self.external(): return True
@@ -278,7 +282,7 @@ class WidgetRefresher:
 
 class AutoStart:
 	def run(self, monitor):
-		kodi_utils.logger('Play TVBan', 'Servicio AutoStart Iniciado')
+		kodi_utils.logger('Play TVBan', 'AutoStart Service Starting')
 		from modules.settings import auto_start_playtvban
 		if auto_start_playtvban() and not kodi_utils.service_shutting_down(monitor):
 			try:
@@ -287,16 +291,16 @@ class AutoStart:
 			except Exception as e:
 				kodi_utils.logger('AutoStart', 'bootstrap: %s' % e)
 			kodi_utils.run_addon()
-		return kodi_utils.logger('Play TVBan', 'Servicio AutoStart Finalizado')
+		return kodi_utils.logger('Play TVBan', 'AutoStart Service Finished')
 
 class AddonXMLCheck:
 	def run(self):
-		kodi_utils.logger('Play TVBan', 'Servicio AddonXMLCheck Iniciado')
+		kodi_utils.logger('Play TVBan', 'AddonXMLCheck Service Starting')
 		try: kodi_utils.reuse_language_invoker_check()
 		except Exception as e: kodi_utils.logger('AddonXMLCheck', str(e))
-		return kodi_utils.logger('Play TVBan', 'Servicio AddonXMLCheck Finalizado')
+		return kodi_utils.logger('Play TVBan', 'AddonXMLCheck Service Finished')
 
-class RedLightMonitor(Monitor):
+class PlayTVBanMonitor(Monitor):
 	def __init__ (self):
 		Monitor.__init__(self)
 		self.startServices()
@@ -326,20 +330,20 @@ class RedLightMonitor(Monitor):
 	def onNotification(self, sender, method, data):
 		if method in ('GUI.OnScreensaverActivated', 'System.OnSleep'):
 			kodi_utils.set_property(pause_services_prop, 'true')
-			kodi_utils.logger('OnNotificationActions', 'PAUSANDO los servicios de Play TVBan debido a que el dispositivo entró en suspensión')
+			kodi_utils.logger('OnNotificationActions', 'PAUSING Play TVBan Services Due to Device Sleep')
 		elif method in ('GUI.OnScreensaverDeactivated', 'System.OnWake'):
 			kodi_utils.clear_property(pause_services_prop)
-			kodi_utils.logger('OnNotificationActions', 'REANUDANDO los servicios de Play TVBan debido a que el dispositivo salió de suspensión')
+			kodi_utils.logger('OnNotificationActions', 'UNPAUSING Play TVBan Services Due to Device Awake')
 		elif method in ('Addon.OnDisabled', 'Addon.OnUninstalled'):
 			try:
 				info = json.loads(data)
 				if info.get('id') == 'plugin.video.playtvban':
 					kodi_utils.prepare_service_shutdown()
-					kodi_utils.logger('Play TVBan', 'Apagado del servicio - complemento deshabilitado para actualización o desinstalación')
+					kodi_utils.logger('Play TVBan', 'Service shutdown - addon disabled for update or uninstall')
 			except: pass
 
 if __name__ == '__main__':
-	# ----- Inicio del parche de sincronización de inicio de AM Lite Trakt -----
+	# ----- AM Lite Trakt startup sync patch BEGIN -----
 	def wait_for_am_trakt(timeout=120, max_age=180):
 		import time
 		import xbmc
@@ -371,7 +375,7 @@ if __name__ == '__main__':
 			pass
 
 	Thread(target=_am_trakt_startup, daemon=True).start()
-	# ----- Fin del parche de sincronización de inicio de AM Lite Trakt -----
-	kodi_utils.logger('Play TVBan', 'Servicio Principal del Monitor Iniciado')
-	RedLightMonitor().waitForAbort()
-	kodi_utils.logger('Play TVBan', 'Servicio Principal del Monitor Finalizado')
+	# ----- AM Lite Trakt startup sync patch END -----
+	kodi_utils.logger('Play TVBan', 'Main Monitor Service Starting')
+	PlayTVBanMonitor().waitForAbort()
+	kodi_utils.logger('Play TVBan', 'Main Monitor Service Finished')

@@ -122,10 +122,10 @@ def encode_sequence(content, error=None, version=None, mode=None, mask=None,
         return int(math.ceil(bit_length / capacity))
 
     version = normalize_version(version)
-       if version is not None:
+    if version is not None:
         if version < 1:
-            raise ValueError('Esta función no admite versiones de códigos QR Micro. '
-                             f'Proporcionada: "{get_version_name(version)}"')
+            raise ValueError('This function does not accept Micro QR Code versions. '
+                             f'Provided: "{get_version_name(version)}"')
     elif symbol_count is None:
         raise ValueError('Por favor, proporciona una versión del código QR o el número de símbolos')
     if symbol_count is not None and not 1 <= symbol_count <= 16:
@@ -161,7 +161,7 @@ def encode_sequence(content, error=None, version=None, mode=None, mask=None,
     num_symbols = symbol_count or 16
     if version is not None:
         num_symbols = number_of_symbols_by_version(content, version, error, mode)
-        if num_symbols > 16:
+    if num_symbols > 16:
         raise DataOverflowError(f'Los datos no caben en la versión {version} de Anexo Estructurado')
     chunks = divide_into_chunks(content, num_symbols)
     if symbol_count is not None:

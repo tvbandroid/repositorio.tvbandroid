@@ -2139,7 +2139,7 @@
                       <item>
                           <visible>Container(2000).HasFocus(61)</visible>
                           <visible>String.IsEqual(Window(10000).Property(playtvban.ad.token),empty_setting)</visible>
-                          <property name="setting_label">Autorizar</property>
+                          <property name="setting_label">Autorizar [COLOR gold]AllDebrid[/COLOR]</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
                           <property name="setting_description">Autoriza tu cuenta de All Debrid para utilizarla en Play TVBan.</property>
@@ -2671,7 +2671,7 @@
                       <item>
                           <visible>Container(2000).HasFocus(61)</visible>
                           <visible>String.IsEqual(Window(10000).Property(playtvban.rd.token),empty_setting)</visible>
-                          <property name="setting_label">Autorizar</property>
+                          <property name="setting_label">Autorizar [COLOR darkseagreen]Real[COLOR lightblue]Debrid[/COLOR]</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
                           <property name="setting_description">Autoriza tu cuenta de Real Debrid y úsala en Play TVBan</property>

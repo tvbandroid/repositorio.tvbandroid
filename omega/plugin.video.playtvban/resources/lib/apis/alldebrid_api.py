@@ -34,7 +34,7 @@ class AllDebridAPI:
 		if short_url: p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visita: [B][COLOR gold]%s[/COLOR][/B][CR]O introduce este código: [B][COLOR gold]%s[/COLOR][/B]' % (short_url, user_code)
 		else: p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O introduce este código: [B]%s[/B]' % user_code
 		sleep_interval = 5
-		content = 'Por favor, Escanea el Código QR%s[CR]'' % p_dialog_insert
+		content = 'Escanea el código QR%s[CR]' % p_dialog_insert
 		progressDialog = progress_dialog('Autorizar [COLOR gold]AllDebrid[/COLOR]', qr_code)
 		progressDialog.update(content, 0)
 		start, time_passed = time.time(), 0
@@ -54,7 +54,7 @@ class AllDebridAPI:
 				self.token = str(response['apikey'])
 				set_setting('ad.token', self.token)
 			except:
-				ok_dialog(heading='All Debrid', text='La autorización ha fallado.')
+				ok_dialog(heading='All Debrid', text='La Autorización ha Fallado.')
 				break
 		try: progressDialog.close()
 		except: pass
@@ -63,13 +63,13 @@ class AllDebridAPI:
 			account_info = self._get('user')
 			set_setting('ad.account_id', str(account_info['user']['username']))
 			set_setting('ad.enabled', 'true')
-			ok_dialog(heading='All Debrid', text='Cuenta autorizada.')
+			ok_dialog(heading='All Debrid', text='Cuenta Autorizada.')
 
 	def revoke(self):
 		set_setting('ad.token', 'empty_setting')
 		set_setting('ad.account_id', 'empty_setting')
 		set_setting('ad.enabled', 'false')
-		notification('Restablecimiento de la autorización de All Debrid', 3000)
+		notification('Restablecimiento de la Autorización de All Debrid', 3000)
 
 	def account_info(self):
 		response = self._get('user')

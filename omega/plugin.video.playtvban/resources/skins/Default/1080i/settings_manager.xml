@@ -2132,7 +2132,7 @@
         <!-- All Debrid -->
                       <item>
                          <visible>Container(2000).HasFocus(61)</visible>
-                         <property name="setting_label">All Debrid</property>
+                         <property name="setting_label">[COLOR gold]All Debrid[/COLOR]</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>
@@ -2664,7 +2664,7 @@
         <!-- Real Debrid -->
                       <item>
                           <visible>Container(2000).HasFocus(61)</visible>
-                          <property name="setting_label">Real Debrid</property>
+                          <property name="setting_label">[COLOR darkseagreen]Real [COLOR lightblue]Debrid[/COLOR]</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>

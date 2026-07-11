@@ -13,7 +13,7 @@ from modules.utils import copy2clip, make_qrcode
 
 BASE_URL = 'https://api.simkl.com'
 OAUTH_PIN_URL = 'https://api.simkl.com/oauth/pin'
-SIMKL_APP_NAME = 'plugin.video.redlight'
+SIMKL_APP_NAME = 'plugin.video.playtvban'
 SIMKL_CLIENT_ID = '6cacc8db22e67b2cd423ef73a9fd3a4f45146ba7fbf30fb2ae28f2fa9d0c2583'
 _request_lock = Lock()
 _last_request_time = 0.0
@@ -32,7 +32,7 @@ def _simkl_token():
 	from caches.settings_cache import settings_cache
 	token = settings_cache.read_db_value('simkl.token')
 	if token in (None, '0', '', 'empty_setting'):
-		token = get_setting('redlight.simkl.token', '0')
+		token = get_setting('playtvban.simkl.token', '0')
 	return token
 
 def _headers():

@@ -68,4 +68,4 @@ def model_present(model_id):
 	return model_id in models()
 
 def get_api():
-	return get_setting('redlight.google_api')
+	return get_setting('playtvban.google_api')

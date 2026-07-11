@@ -14,14 +14,14 @@ _rd_magnet_semaphore = Semaphore(3)
 
 class RealDebridAPI:
 	def __init__(self):
-		self.client_ID = get_setting('redlight.rd.client_id', 'empty_setting')
+		self.client_ID = get_setting('playtvban.rd.client_id', 'empty_setting')
 		if self.client_ID in ('empty_setting', ''): self.client_ID = 'X245A4XAIBGVM'
-		url = {'true': 'app.real-debrid.com', 'false': 'api.real-debrid.com'}[get_setting('redlight.rd.alternate_base_url', 'false')]
+		url = {'true': 'app.real-debrid.com', 'false': 'api.real-debrid.com'}[get_setting('playtvban.rd.alternate_base_url', 'false')]
 		self.base_url = 'https://%s/rest/1.0/' % url
 		self.auth_url = 'https://%s/oauth/v2/' % url
-		self.token = get_setting('redlight.rd.token', 'empty_setting')
-		self.secret = get_setting('redlight.rd.secret', 'empty_setting')
-		self.refresh = get_setting('redlight.rd.refresh', 'empty_setting')
+		self.token = get_setting('playtvban.rd.token', 'empty_setting')
+		self.secret = get_setting('playtvban.rd.secret', 'empty_setting')
+		self.refresh = get_setting('playtvban.rd.refresh', 'empty_setting')
 		self.device_code = ''
 		self.refresh_retries = 0
 		self.break_auth_loop = False
@@ -172,7 +172,7 @@ class RealDebridAPI:
 		except: return None
 
 	def rd_free_active_slot(self):
-		if get_setting('redlight.rd.free_active_slot', 'false') != 'true':
+		if get_setting('playtvban.rd.free_active_slot', 'false') != 'true':
 			return
 		try:
 			active_count = self.torrents_activeCount()

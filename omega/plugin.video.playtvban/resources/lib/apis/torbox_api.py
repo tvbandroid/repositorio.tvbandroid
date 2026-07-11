@@ -51,7 +51,7 @@ def _device_auth_poll_pending(response):
 
 class TorBoxAPI:
 	def __init__(self):
-		self.token = get_setting('redlight.tb.token')
+		self.token = get_setting('playtvban.tb.token')
 
 	def _safe_json(self, response):
 		try: return response.json()
@@ -736,7 +736,7 @@ class TorBoxAPI:
 	# ----------- AUTH -----------
 	def auth(self):
 		self.token = ''
-		app_name = 'Red Light'
+		app_name = 'Play TVBan'
 		try:
 			response = requests.get(base_url + 'user/auth/device/start', params={'app': app_name}, timeout=20).json()
 		except Exception:

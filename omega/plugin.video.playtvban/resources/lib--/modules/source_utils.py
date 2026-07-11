@@ -37,14 +37,14 @@ def audio_filter_choices():
 def source_filters():
 	return (
 ('PACK', 'PACK'), ('DOLBY VISION', '[B]D/VISION[/B]'), ('HIGH DYNAMIC RANGE (HDR)', '[B]HDR[/B]'), ('IMAX', 'IMAX'), ('HYBRID', '[B]HYBRID[/B]'), ('AV1', '[B]AV1[/B]'),
-('HEVC (X265)', '[B]HEVC[/B]'), ('REMUX', 'REMUX'), ('BLURAY', 'BLURAY'), ('IA ENHANCED/UPSCALED', '[B]IA ENHANCED/UPSCALED[/B]'), ('SDR', 'SDR'), ('3D', '[B]3D[/B]'),
+('HEVC (X265)', '[B]HEVC[/B]'), ('REMUX', 'REMUX'), ('BLURAY', 'BLURAY'), ('AI ENHANCED/UPSCALED', '[B]AI ENHANCED/UPSCALED[/B]'), ('SDR', 'SDR'), ('3D', '[B]3D[/B]'),
 ('DOLBY ATMOS', 'ATMOS'), ('DOLBY TRUEHD', 'TRUEHD'), ('DOLBY DIGITAL EX', 'DD-EX'), ('DOLBY DIGITAL PLUS', 'DD+'), ('DOLBY DIGITAL', 'DD'),
 ('DTS-HD MASTER AUDIO', 'DTS-HD MA'), ('DTS-X', 'DTS-X'), ('DTS-HD', 'DTS-HD'), ('DTS', 'DTS'), ('AAC', 'AAC'), ('OPUS', 'OPUS'), ('MP3', 'MP3'), ('8CH AUDIO', '8CH'),
-('7CH AUDIO', '7CH'), ('6CH AUDIO', '6CH'), ('2CH AUDIO', '2CH'), ('DVD SOURCE', 'DVD'), ('FUENTE WEB', 'WEB'), ('MULTIPLE IDIOMAS', 'MULTI-LENG'),
-('SUBTITULOS', 'SUBS'))
+('7CH AUDIO', '7CH'), ('6CH AUDIO', '6CH'), ('2CH AUDIO', '2CH'), ('DVD SOURCE', 'DVD'), ('WEB SOURCE', 'WEB'), ('MULTIPLE LANGUAGES', 'MULTI-LANG'),
+('SUBTITLES', 'SUBS'))
 
 def include_exclude_filters():
-	return {'hevc': 'HEVC', '3d': '3D', 'hdr': 'HDR', 'dv': 'D/VISION', 'av1': 'AV1', 'enhanced_upscaled': 'IA ENHANCED/UPSCALED', 'hybrid': 'HYBRID'}
+	return {'hevc': 'HEVC', '3d': '3D', 'hdr': 'HDR', 'dv': 'D/VISION', 'av1': 'AV1', 'enhanced_upscaled': 'AI ENHANCED/UPSCALED', 'hybrid': 'HYBRID'}
 
 def get_aliases_titles(aliases):
 	try: result = [i['title'] for i in aliases]

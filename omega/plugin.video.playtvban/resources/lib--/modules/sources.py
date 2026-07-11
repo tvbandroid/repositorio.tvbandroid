@@ -1317,7 +1317,7 @@ class Sources():
 	def _no_results(self):
 		self._close_progress_before_modal()
 		heading = self.meta.get('rootname', '') or self.meta.get('title', '') or 'Play TVBan'
-		return self._show_modal_message(heading, 'No results found.', '[B]Next Up:[/B] No Results')
+		return self._show_modal_message(heading, 'No se encontraron resultados.', '[B]Siguiente:[/B] No hay resultados')
 
 	def get_search_title(self):
 		search_title = self.meta.get('custom_title', None) or self.meta.get('english_title') or self.meta.get('title')

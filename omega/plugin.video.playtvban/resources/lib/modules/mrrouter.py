@@ -8,7 +8,7 @@ from modules.kodi_utils import external, get_property
 
 def sys_exit_check(mode='navigator.main'):
 	from caches.settings_cache import get_setting, is_directory_listing_mode
-	if get_setting('redlight.reuse_language_invoker', 'true') == 'false': return False
+	if get_setting('playtvban.reuse_language_invoker', 'true') == 'false': return False
 	# First open still has external() true before Container.PluginName updates; never discard a built list.
 	if is_directory_listing_mode(mode): return False
 	if mode == 'open_settings': return False
@@ -22,7 +22,7 @@ def prepare_directory_listing(mode):
 		from caches.base_cache import ensure_listing_databases_ready
 		ensure_listing_databases_ready()
 	except Exception as e:
-		kodi_utils.logger('routing', 'prepare listing: %s' % e)
+		kodi_utils.logger('routing', 'preparar listado: %s' % e)
 
 def routing(sys):
 	params = dict(parse_qsl(sys.argv[2][1:], keep_blank_values=True))
@@ -31,7 +31,7 @@ def routing(sys):
 		from caches.settings_cache import sync_kodi_profile_context
 		sync_kodi_profile_context()
 	except Exception as e:
-		kodi_utils.logger('routing', 'profile context: %s' % e)
+		kodi_utils.logger('routing', 'contexto del perfil: %s' % e)
 	prepare_directory_listing(mode)
 	from caches.settings_cache import ensure_settings_properties_loaded, should_block_bootstrap_on_entry
 	if should_block_bootstrap_on_entry(mode):

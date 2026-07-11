@@ -14,7 +14,7 @@ from modules.kodi_utils import sleep, ok_dialog, progress_dialog, notification
 
 class PremiumizeAPI:
 	def __init__(self):
-		self.token = get_setting('playtvban.pm.token', 'empty_setting')
+		self.token = get_setting('redlight.pm.token', 'empty_setting')
 
 	def auth(self):
 		self.token = ''
@@ -26,7 +26,7 @@ class PremiumizeAPI:
 		auth_url = response.get('verification_uri')
 		qr_code = make_qrcode(auth_url) or ''
 		copy2clip(auth_url)
-	    content = 'Por favor, escanea el código QR[CR]Enlace completo copiado al portapapeles[CR]O visita: [B]%s[/B][CR]E introduce este código: [B]%s[/B]' % (auth_url, user_code)
+		content = 'Please Scan the QR Code[CR]Full link copied to clipboard[CR]OR visit: [B]%s[/B][CR]AND Enter this Code: [B]%s[/B]' % (auth_url, user_code)
 		progressDialog = progress_dialog('Premiumize Authorise', qr_code)
 		progressDialog.update(content, 0)
 		device_code = response['device_code']
@@ -48,7 +48,7 @@ class PremiumizeAPI:
 				self.token = str(response['access_token'])
 				set_setting('pm.token', self.token)
 			except:
-				 ok_dialog(heading='Premiumize', text='La autorización ha fallado.')
+				 ok_dialog(heading='Premiumize', text='Authorisation failed.')
 				 break
 		try: progressDialog.close()
 		except: pass
@@ -56,7 +56,7 @@ class PremiumizeAPI:
 			account_info = self.account_info()
 			set_setting('pm.account_id', str(account_info['customer_id']))
 			set_setting('pm.enabled', 'true')
-			ok_dialog(heading='Premiumize', text='Cuenta autorizada.')
+			ok_dialog(heading='Premiumize', text='Account authorised.')
 
 	def revoke(self):
 		set_setting('pm.token', 'empty_setting')
@@ -214,7 +214,7 @@ class PremiumizeAPI:
 		return url + '|' + urlencode(self.headers())
 
 	def headers(self):
-		return {'User-Agent': 'Play TVBan', 'Authorization': 'Bearer %s' % self.token}
+		return {'User-Agent': 'Red Light', 'Authorization': 'Bearer %s' % self.token}
 
 	def _get(self, url, data={}):
 		if self.token in ('empty_setting', ''): return None

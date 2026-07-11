@@ -14,14 +14,14 @@ _rd_magnet_semaphore = Semaphore(3)
 
 class RealDebridAPI:
 	def __init__(self):
-		self.client_ID = get_setting('playtvban.rd.client_id', 'empty_setting')
+		self.client_ID = get_setting('redlight.rd.client_id', 'empty_setting')
 		if self.client_ID in ('empty_setting', ''): self.client_ID = 'X245A4XAIBGVM'
-		url = {'true': 'app.real-debrid.com', 'false': 'api.real-debrid.com'}[get_setting('playtvban.rd.alternate_base_url', 'false')]
+		url = {'true': 'app.real-debrid.com', 'false': 'api.real-debrid.com'}[get_setting('redlight.rd.alternate_base_url', 'false')]
 		self.base_url = 'https://%s/rest/1.0/' % url
 		self.auth_url = 'https://%s/oauth/v2/' % url
-		self.token = get_setting('playtvban.rd.token', 'empty_setting')
-		self.secret = get_setting('playtvban.rd.secret', 'empty_setting')
-		self.refresh = get_setting('playtvban.rd.refresh', 'empty_setting')
+		self.token = get_setting('redlight.rd.token', 'empty_setting')
+		self.secret = get_setting('redlight.rd.secret', 'empty_setting')
+		self.refresh = get_setting('redlight.rd.refresh', 'empty_setting')
 		self.device_code = ''
 		self.refresh_retries = 0
 		self.break_auth_loop = False
@@ -37,11 +37,11 @@ class RealDebridAPI:
 		short_url = make_tinyurl(auth_url)
 		copy2clip(auth_url)
 		if short_url:
-			p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visita: [B][COLOR aquamarine]%s[/COLOR][/B][CR]O Introduce este Código: [B][COLOR skyblue]%s[/COLOR][/B]' % (short_url, user_code)
+			p_dialog_insert = '[CR]Full link copied to clipboard[CR]OR visit: [B]%s[/B][CR]OR Enter this Code: [B]%s[/B]' % (short_url, user_code)
 		else:
-			p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O introduce este código: [B]%s[/B]' % user_code
-		content = 'Escanea el código QR%s[CR]' % p_dialog_insert
-		progressDialog = progress_dialog('Autorizar [COLOR aquamarine]Real[COLOR skyblue]Debrid[/COLOR]', qr_code)
+			p_dialog_insert = '[CR]Full link copied to clipboard[CR]OR Enter this Code: [B]%s[/B]' % user_code
+		content = 'Please Scan the QR Code%s[CR]' % p_dialog_insert
+		progressDialog = progress_dialog('Real Debrid Authorise', qr_code)
 		progressDialog.update(content, 0)
 		expires_in = int(response['expires_in'])
 		sleep_interval = int(response['interval'])
@@ -64,7 +64,7 @@ class RealDebridAPI:
 				self.client_ID = response['client_id']
 				progressDialog.close()
 			except:
-				ok_dialog(heading='Real Debrid', text='La autorización ha fallado.')
+				ok_dialog(heading='Real Debrid', text='Authorisation failed.')
 				break
 		try: progressDialog.close()
 		except: pass
@@ -79,7 +79,7 @@ class RealDebridAPI:
 			set_setting('rd.refresh', self.refresh)
 			set_setting('rd.account_id', username)
 			set_setting('rd.enabled', 'true')
-			ok_dialog(heading='Real Debrid', text='Cuenta autorizada.')
+			ok_dialog(heading='Real Debrid', text='Account authorised.')
 
 	def refresh_token(self):
 		try:
@@ -100,7 +100,7 @@ class RealDebridAPI:
 		set_setting('rd.token', 'empty_setting')
 		set_setting('rd.account_id', 'empty_setting')
 		set_setting('rd.enabled', 'false')
-		notification('Autorización de Real Debrid Restablecida', 3000)
+		notification('Real Debrid Authorisation Reset', 3000)
 
 	def account_info(self):
 		url = 'user'
@@ -172,7 +172,7 @@ class RealDebridAPI:
 		except: return None
 
 	def rd_free_active_slot(self):
-		if get_setting('playtvban.rd.free_active_slot', 'false') != 'true':
+		if get_setting('redlight.rd.free_active_slot', 'false') != 'true':
 			return
 		try:
 			active_count = self.torrents_activeCount()

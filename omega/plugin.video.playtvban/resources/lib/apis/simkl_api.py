@@ -13,7 +13,7 @@ from modules.utils import copy2clip, make_qrcode
 
 BASE_URL = 'https://api.simkl.com'
 OAUTH_PIN_URL = 'https://api.simkl.com/oauth/pin'
-SIMKL_APP_NAME = 'plugin.video.playtvban'
+SIMKL_APP_NAME = 'plugin.video.redlight'
 SIMKL_CLIENT_ID = '6cacc8db22e67b2cd423ef73a9fd3a4f45146ba7fbf30fb2ae28f2fa9d0c2583'
 _request_lock = Lock()
 _last_request_time = 0.0
@@ -32,7 +32,7 @@ def _simkl_token():
 	from caches.settings_cache import settings_cache
 	token = settings_cache.read_db_value('simkl.token')
 	if token in (None, '0', '', 'empty_setting'):
-		token = get_setting('playtvban.simkl.token', '0')
+		token = get_setting('redlight.simkl.token', '0')
 	return token
 
 def _headers():
@@ -125,7 +125,7 @@ def simkl_authenticate(dummy=''):
 		set_setting('simkl.user', str(info['user'].get('name') or info['user'].get('login') or 'Simkl User'))
 	else: set_setting('simkl.user', 'Simkl User')
 	switched = settings.offer_watched_provider(2, 'Simkl')
-	kodi_utils.notification('Cuenta Simkl Autorizada', 3000)
+	kodi_utils.notification('Simkl Account Authorised', 3000)
 	import_ran = switched and settings.trakt_user_active() and settings.offer_trakt_import_to_simkl()
 	if not import_ran: simkl_sync_activities(force_update=True)
 	try: kodi_utils.container_refresh()
@@ -568,7 +568,7 @@ def simkl_reset_scrobble(params):
 				simkl_progress('clear_progress', 'episode', tmdb_id, 0, season, episode, resume_id=row[0])
 			erase_bookmark('episode', tmdb_id, season, episode, 'true')
 		else: return kodi_utils.notification('Reset Scrobble is only available for movies and episodes', 3500)
-		kodi_utils.notification('Exitoso', 3000)
+		kodi_utils.notification('Success', 3000)
 	except: kodi_utils.notification('Error', 3000)
 
 def simkl_add_to_list(listname, tmdb_id, media_type, imdb_id=None, tvdb_id=None):
@@ -580,7 +580,7 @@ def simkl_add_to_list(listname, tmdb_id, media_type, imdb_id=None, tvdb_id=None)
 	success = _simkl_list_add_ok(result, media_type)
 	if success:
 		_simkl_refresh_after_list_change(listname, media_type)
-		kodi_utils.notification('Exitoso', 3000)
+		kodi_utils.notification('Success', 3000)
 	else: kodi_utils.notification('Error', 3000)
 	return success
 
@@ -593,7 +593,7 @@ def simkl_remove_from_list(listname, tmdb_id, media_type, imdb_id=None, tvdb_id=
 	success = _simkl_list_remove_ok(result, media_type)
 	if success:
 		_simkl_refresh_after_list_change(listname, media_type)
-		kodi_utils.notification('Exitoso', 3000)
+		kodi_utils.notification('Success', 3000)
 	else: kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
 	return success
 

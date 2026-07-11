@@ -51,7 +51,7 @@ def _device_auth_poll_pending(response):
 
 class TorBoxAPI:
 	def __init__(self):
-		self.token = get_setting('playtvban.tb.token')
+		self.token = get_setting('redlight.tb.token')
 
 	def _safe_json(self, response):
 		try: return response.json()
@@ -736,23 +736,23 @@ class TorBoxAPI:
 	# ----------- AUTH -----------
 	def auth(self):
 		self.token = ''
-		app_name = 'Play TVBan'
+		app_name = 'Red Light'
 		try:
 			response = requests.get(base_url + 'user/auth/device/start', params={'app': app_name}, timeout=20).json()
-				except Exception:
-			return ok_dialog(text='No se pudo iniciar la autorización de TorBox')
+		except Exception:
+			return ok_dialog(text='Unable to start TorBox authorisation')
 		if not response.get('success'):
-			return ok_dialog(text=response.get('detail') or 'No se pudo iniciar la autorización de TorBox')
+			return ok_dialog(text=response.get('detail') or 'Unable to start TorBox authorisation')
 		data = response.get('data') or {}
 		device_code = data.get('device_code')
 		user_code = data.get('code')
 		if not device_code or not user_code:
-					return ok_dialog(text='Respuesta de autorización de TorBox no válida')
+			return ok_dialog(text='Invalid TorBox authorisation response')
 		auth_url = _device_auth_url(app_name, user_code)
 		qr_code = make_qrcode(auth_url) or ''
 		copy2clip(auth_url)
-		p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visita: [B]torbox.app/oauth/device[/B][CR]E Introduce este Código: [B]%s[/B]' % user_code
-		content = 'Por Favor, escanea el código QR%s[CR]' % p_dialog_insert
+		p_dialog_insert = '[CR]Full link copied to clipboard[CR]OR visit: [B]torbox.app/oauth/device[/B][CR]AND Enter this Code: [B]%s[/B]' % user_code
+		content = 'Please Scan the QR Code%s[CR]' % p_dialog_insert
 		progressDialog = progress_dialog('TorBox Authorise', qr_code)
 		progressDialog.update(content, 0)
 		sleep_interval = int(data.get('interval') or 5)
@@ -792,17 +792,17 @@ class TorBoxAPI:
 			r = self.account_info()
 			if not r or not r.get('success'): raise Exception('invalid account')
 			set_setting('tb.enabled', 'true')
-			ok_dialog(heading='TorBox', text='Cuenta autorizada.')
+			ok_dialog(heading='TorBox', text='Account authorised.')
 		except Exception:
 			set_setting('tb.token', 'empty_setting')
 			set_setting('tb.enabled', 'false')
-			ok_dialog(heading='TorBox', text='La autorización ha fallado.')
+			ok_dialog(heading='TorBox', text='Authorisation failed.')
 
 	def revoke(self):
 		if not confirm_dialog(): return
 		set_setting('tb.token', 'empty_setting')
 		set_setting('tb.enabled', 'false')
-		notification('Autorización de TorBox restablecida', 3000)
+		notification('TorBox Authorisation Reset', 3000)
 
 	def clear_cache(self, clear_hashes=True):
 		try:

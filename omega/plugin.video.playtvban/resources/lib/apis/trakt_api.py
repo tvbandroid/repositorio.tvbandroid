@@ -4,7 +4,12 @@ import time
 import requests
 from urllib.parse import unquote, quote_plus
 from caches import trakt_cache
-from caches.settings_cache import get_setting, set_setting
+from caches.settings_cache import get_setting, set_setting, settings_cache
+
+def _trakt_setting(setting_id, fallback=''):
+	val = settings_cache.read_db_value(setting_id)
+	if val in (None, '', '0', 'empty_setting'): return fallback
+	return val
 from caches.main_cache import cache_object
 from caches.lists_cache import lists_cache_object
 from modules import kodi_utils, settings
@@ -15,13 +20,20 @@ from modules.utils import sort_list, sort_for_article, get_datetime, timedelta, 
 
 # Trakt API max per-page limit (reducing to 250; see https://github.com/trakt/trakt-api/discussions/681 / #775)
 TRAKT_PAGE_LIMIT = 250
+# extended=progress on watched/shows is capped at 100 per page (discussion #775)
+TRAKT_WATCHED_PROGRESS_PAGE_LIMIT = 100
+
+def _trakt_fetch_page_limit(base_params):
+	ext = str((base_params or {}).get('extended') or '').lower()
+	if 'progress' in ext: return TRAKT_WATCHED_PROGRESS_PAGE_LIMIT
+	return TRAKT_PAGE_LIMIT
 
 def no_client_key():
-	kodi_utils.notification('Por favor, introduce una clave válida del ID de Cliente de Trakt')
+	kodi_utils.notification('Por favor, introduce una Clave de Cliente Trakt válida')
 	return None
 
 def no_secret_key():
-	kodi_utils.notification('Por favor, introduce una clave válida del Secreto de Cliente de Trakt')
+	kodi_utils.notification('Por favor, introduce una Clave Secreta de Cliente Trakt válida')
 	return None
 
 def get_trakt(params):
@@ -35,18 +47,21 @@ def get_trakt_all(params):
 	path = params['path'] % params.get('path_insert', '')
 	base_params = dict(params.get('params') or {})
 	method = params.get('method')
+	page_limit = _trakt_fetch_page_limit(base_params)
 	sort_by, sort_how = 'rank', 'asc'
 	all_items = []
 	page_no, page_count = 1, 1
 	while page_no <= page_count:
 		query = dict(base_params)
-		query['limit'] = TRAKT_PAGE_LIMIT
+		query['limit'] = page_limit
 		page_method = method if page_no == 1 else (None if method == 'sort_by_headers' else method)
 		result, page_count = call_trakt(path, params=query, data=params.get('data'), is_delete=params.get('is_delete', False),
 						with_auth=params.get('with_auth', False), method=page_method, pagination=True, page_no=page_no)
 		try: page_count = max(int(page_count), page_no)
 		except: page_count = page_no
-		if result is None: break
+		if result is None:
+			if page_no == 1: return None
+			break
 		if isinstance(result, dict) and 'data' in result:
 			sort_by, sort_how = result.get('sort_by', sort_by), result.get('sort_how', sort_how)
 			chunk = result.get('data') or []
@@ -54,7 +69,6 @@ def get_trakt_all(params):
 		else: break
 		if not chunk: break
 		all_items.extend(chunk)
-		if len(chunk) < TRAKT_PAGE_LIMIT: break
 		page_no += 1
 		if page_no > 1: kodi_utils.sleep(100)
 	if method == 'sort_by_headers':
@@ -68,10 +82,10 @@ def call_trakt(path, params={}, data=None, is_delete=False, with_auth=True, meth
 			while kodi_utils.get_property('playtvban.trakt_refreshing_token') == 'true':
 				kodi_utils.logger('refreshing trakt token', '')
 				kodi_utils.sleep(250)
-			try: expires_at = float(get_setting('playtvban.trakt.expires'))
+			try: expires_at = float(_trakt_setting('trakt.expires', '0'))
 			except: expires_at = 0.0
 			if time.time() > expires_at: trakt_refresh_token()
-			token = get_setting('playtvban.trakt.token')
+			token = _trakt_setting('trakt.token')
 			if token: headers['Authorization'] = 'Bearer ' + token
 		try:
 			if method:
@@ -122,7 +136,7 @@ def trakt_get_device_code():
 	result = call_trakt('oauth/device/code', data=data, with_auth=False)
 	if result: return result
 	_, message = trakt_test_credentials()
-	kodi_utils.ok_dialog(heading='Trakt Authorise', text=message)
+	kodi_utils.ok_dialog(heading='Autorizar Trakt', text=message)
 	return None
 
 def trakt_test_credentials():
@@ -165,10 +179,10 @@ def trakt_get_device_token(device_codes):
 		qr_code = make_qrcode(auth_url) or ''
 		short_url = make_tinyurl(auth_url)
 		copy2clip(auth_url)
-				if short_url: p_dialog_insert = '[CR]O BIEN...[CR]visita [B]%s[/B]' % short_url
+		if short_url: p_dialog_insert = '[CR]O BIEN....[CR]visita [B]%s[/B]' % short_url
 		else: p_dialog_insert = ''
-		content = 'Introduce [B]%s[/B] en [B]%s[/B][CR]O BIEN...[CR]Escanea el [B]código QR[/B]%s' % (user_code, device_codes['verification_url'], p_dialog_insert)
-		progressDialog = kodi_utils.progress_dialog('Autorizar Trakt', qr_code)
+		content = 'Introduce [B]%s[/B] en [B]%s[/B][CR]O BIEN....[CR]Escanea el [B]Código QR[/B]%s' % (user_code, device_codes['verification_url'], p_dialog_insert)
+		progressDialog = kodi_utils.progress_dialog('Aurorizar Trakt', qr_code)
 		progressDialog.update(content, 0)
 		try:
 			time_passed = 0
@@ -202,7 +216,7 @@ def trakt_refresh_token():
 		kodi_utils.set_property('playtvban.trakt_refreshing_token', 'true')
 		data = {        
 			'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET, 'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob',
-			'grant_type': 'refresh_token', 'refresh_token': get_setting('playtvban.trakt.refresh')}
+			'grant_type': 'refresh_token', 'refresh_token': _trakt_setting('trakt.refresh')}
 		response = call_trakt("oauth/token", data=data, with_auth=False)
 		if response:
 			set_setting('trakt.token', response['access_token'])
@@ -226,12 +240,16 @@ def trakt_authenticate(dummy=''):
 			user = call_trakt('/users/me')
 			set_setting('trakt.user', str(user['username']))
 		except: set_setting('trakt.user', 'Trakt User')
+		try:
+			from caches.settings_cache import sync_kodi_profile_context
+			sync_kodi_profile_context()
+		except: pass
 		settings.offer_watched_provider(1, 'Trakt')
 		kodi_utils.sleep(1000)
 		kodi_utils.notification('Cuenta Trakt Autorizada', 3000)
 		trakt_sync_activities(force_update=True)
 		return True
-	kodi_utils.notification('Error de Autorización de Trakt', 3000)
+	kodi_utils.notification('Error Autorización Trakt', 3000)
 	return False
 
 def trakt_revoke_authentication(dummy=''):
@@ -242,12 +260,12 @@ def trakt_revoke_authentication(dummy=''):
 	set_setting('trakt.next_daily_clear', '0')
 	settings.fallback_watched_provider_on_revoke(1)
 	trakt_cache.clear_all_trakt_cache_data(silent=True, refresh=False)
-	kodi_utils.notification('Restablecer Autorización de la Cuenta de Trakt', 3000)
+	kodi_utils.notification('Restablecimiento Autorización de la Cuenta Trakt', 3000)
 	CLIENT_ID = settings.trakt_client()
 	if CLIENT_ID in (None, 'empty_setting', ''): return no_client_key()
 	CLIENT_SECRET = settings.trakt_secret()
 	if CLIENT_SECRET in (None, 'empty_setting', ''): return no_secret_key()
-	data = {'token': get_setting('playtvban.trakt.token'), 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET}
+	data = {'token': _trakt_setting('trakt.token'), 'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET}
 	response = call_trakt("oauth/revoke", data=data, with_auth=False)
 
 def trakt_movies_related(imdb_id):
@@ -448,9 +466,9 @@ def trakt_fetch_collection_watchlist(list_type, media_type):
 
 def add_to_list(user, slug, data):
 	result = call_trakt('/users/%s/lists/%s/items' % (user, slug), data=data)
-	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya está En La Lista', 3000)
+	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
 	return result
 
@@ -458,16 +476,16 @@ def remove_from_list(user, slug, data):
 	result = call_trakt('/users/%s/lists/%s/items/remove' % (user, slug), data=data)
 	if not result or result.get('deleted', {}).get('movies', 0) + result.get('deleted', {}).get('shows', 0) == 0:
 		return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
 	if kodi_utils.path_check('my_lists') or kodi_utils.external(): kodi_utils.kodi_refresh()
 	return result
 
 def add_to_watchlist(data):
 	result = call_trakt('/sync/watchlist', data=data)
-	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya está En La Lista', 3000)
+	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
 	return result
 
@@ -475,16 +493,16 @@ def remove_from_watchlist(data):
 	result = call_trakt('/sync/watchlist/remove', data=data)
 	if not result or result.get('deleted', {}).get('movies', 0) + result.get('deleted', {}).get('shows', 0) == 0:
 		return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
 	if kodi_utils.path_check('trakt_watchlist') or kodi_utils.external(): kodi_utils.kodi_refresh()
 	return result
 
 def add_to_collection(data):
 	result = call_trakt('/sync/collection', data=data)
-	if result['existing']['movies'] + result['existing']['episodes'] > 0: return kodi_utils.notification('Ya está En La Lista', 3000)
+	if result['existing']['movies'] + result['existing']['episodes'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['episodes'] == 0: return kodi_utils.notification('Error', 3000)
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
 	return result
 
@@ -492,7 +510,7 @@ def remove_from_collection(data):
 	result = call_trakt('/sync/collection/remove', data=data)
 	if not result or result.get('deleted', {}).get('movies', 0) + result.get('deleted', {}).get('episodes', 0) == 0:
 		return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
 	if kodi_utils.path_check('trakt_collection') or kodi_utils.external(): kodi_utils.kodi_refresh()
 	return result
@@ -595,10 +613,10 @@ def trakt_get_lists(list_type, page_no='1'):
 def get_trakt_list_selection(included_lists):
 	def default_lists():
 		return [
-		{'name': 'Movies Collection', 'display': '[B][I]MOVIES COLLECTION [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'movie'},
-		{'name': 'TV Show Collection', 'display': '[B][I]TV SHOW COLLECTION [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'show'},
-		{'name': 'Movies Watchlist', 'display': '[B][I]MOVIES WATCHLIST [/I][/B]',  'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'movie'},
-		{'name': 'TV Show Watchlist', 'display': '[B][I]TV SHOW WATCHLIST [/I][/B]',  'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'show'}
+		{'name': 'Colección de películas', 'display': '[B][I]COLECCIÓN DE PELÍCULAS [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'movie'},
+		{'name': 'Colección de series', 'display': '[B][I]COLECCIÓN DE SERIES [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'show'},
+		{'name': 'Lista de seguimiento de películas', 'display': '[B][I]LISTA DE SEGUIMIENTO DE PELÍCULAS [/I][/B]', 'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'movie'},
+		{'name': 'Lista de seguimiento de series', 'display': '[B][I]LISTA DE SEGUIMIENTO DE SERIES [/I][/B]', 'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'show'}
 		]
 	def personal_lists():
 		trakt_my_lists = trakt_get_lists('my_lists')
@@ -629,7 +647,7 @@ def make_new_trakt_list(params):
 	data = {'name': list_name, 'privacy': 'private', 'allow_comments': False}
 	call_trakt('users/me/lists', data=data)
 	trakt_sync_activities()
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	kodi_utils.kodi_refresh()
 
 def delete_trakt_list(params):
@@ -639,7 +657,7 @@ def delete_trakt_list(params):
 	url = 'users/%s/lists/%s' % (user, list_slug)
 	call_trakt(url, is_delete=True)
 	trakt_sync_activities()
-	kodi_utils.notification('Exitoso', 3000)
+	kodi_utils.notification('Éxito', 3000)
 	kodi_utils.kodi_refresh()
 
 def trakt_like_a_list(params):
@@ -648,7 +666,7 @@ def trakt_like_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='post')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='post')
-		kodi_utils.notification('Exitoso - Trakt List Liked', 3000)
+		kodi_utils.notification('Éxito - Lista de Trakt Marcada con Me gusta', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True
@@ -662,7 +680,7 @@ def trakt_unlike_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='delete')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='delete')
-		kodi_utils.notification('Exitoso - Trakt List Unliked', 3000)
+		kodi_utils.notification('Éxito - Me gusta Eliminado de la Lista de Trakt', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True
@@ -710,7 +728,8 @@ def trakt_indicators_movies():
 		insert_list = []
 		insert_append = insert_list.append
 		params = {'path': 'sync/watched/movies%s', 'with_auth': True, 'fetch_all': True}
-		result = get_trakt(params) or []
+		result = get_trakt(params)
+		if result is None: return
 		threads = TaskPool().tasks(_process, result, min(len(result), settings.max_threads()))
 		[i.join() for i in threads]
 		trakt_cache.trakt_watched_cache.set_bulk_movie_watched(insert_list)
@@ -736,8 +755,9 @@ def trakt_indicators_tv():
 	try:
 		insert_list = []
 		insert_append = insert_list.append
-		params = {'path': 'users/me/watched/shows?extended=full%s', 'with_auth': True, 'fetch_all': True}
-		result = get_trakt(params) or []
+		params = {'path': 'sync/watched/shows%s', 'params': {'extended': 'progress'}, 'with_auth': True, 'fetch_all': True}
+		result = get_trakt(params)
+		if result is None: return
 		threads = TaskPool().tasks(_process, result, min(len(result), settings.max_threads()))
 		[i.join() for i in threads]
 		trakt_cache.trakt_watched_cache.set_bulk_tvshow_watched(insert_list)
@@ -887,6 +907,7 @@ def trakt_sync_activities(params=None, force_update=False):
 	if not settings.trakt_user_active() and not force_update: return 'no account'
 	try: latest = trakt_get_activity()
 	except: return 'failed'
+	if not trakt_cache.valid_trakt_activities(latest): return 'failed'
 	cached = trakt_cache.reset_activity(latest)
 	fallback_date = '2020-01-01T00:00:01.000Z'
 	if not force_update and not _compare(latest['all'], cached['all']): return 'not needed'
@@ -931,13 +952,18 @@ def trakt_sync_activities(params=None, force_update=False):
 	return 'success'
 
 def trakt_force_sync(params=None):
-	if not settings.trakt_user_active(): return kodi_utils.notification('Trakt account not authorised', 3000)
-	progress = kodi_utils.progress_dialog('Trakt Sync')
-	progress.update('Syncing with Trakt...', 0)
-	status = trakt_sync_activities(force_update=True)
-	progress.close()
-	if status == 'failed': kodi_utils.notification('Trakt Sync Failed', 3000)
+	if not settings.trakt_user_active(): return kodi_utils.notification('Cuenta de Trakt no Autorizada', 3000)
+	progress = kodi_utils.progress_dialog('Sincronización de Trakt')
+	status = 'failed'
+	try:
+		progress.update('Sincronizando con Trakt...', 0)
+		status = trakt_sync_activities(force_update=True)
+	except Exception as e:
+		kodi_utils.logger('Trakt', 'Error en la sincronización forzada: %s' % e)
+	finally:
+		kodi_utils.close_progress_dialog(progress)
+	if status == 'failed': kodi_utils.notification('Error en la Sincronización con Trakt', 3000)
 	else:
-		kodi_utils.notification('Trakt Sync Complete', 3000)
+		kodi_utils.notification('Sincronización con Trakt Completada', 3000)
 		kodi_utils.kodi_refresh()
 	return status

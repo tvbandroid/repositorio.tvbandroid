@@ -73,8 +73,8 @@ def _subtitle_cache_release_tag(release_context):
 	return primary.lower() if primary else ''
 
 def _subtitle_base_filename(imdb_id, season, episode):
-	if season: return 'PayTVBanSubs_%s_%s_%s' % (imdb_id, season, episode)
-	return 'PayTVBanSubs_%s' % imdb_id
+	if season: return 'PlayTVBanSubs_%s_%s_%s' % (imdb_id, season, episode)
+	return 'PlayTVBanSubs_%s' % imdb_id
 
 def _subtitle_search_filename(imdb_id, season, episode, release_context=None):
 	filename_lang = st.subs_language_for_download().replace(' ', '_')
@@ -404,13 +404,13 @@ def _prepare_subtitle_file_content(content, log_reject=False, reject_label='SubM
 	text = _subtitle_text(content)
 	if not text or _is_submaker_error_content(text):
 		if log_reject and text:
-			ku.logger('Play TVBan', '%s: carga rechazada por el proveedor' % reject_label)
+			ku.logger('Play TVBan', '%s: rejected provider error payload' % reject_label)
 		return None
 	if text.lstrip().startswith('WEBVTT'):
 		text = _vtt_to_srt(text)
 	if not text or _count_subtitle_cues(text) < 2:
 		if log_reject:
-			ku.logger('Play TVBan', '%s: descarga vacía o con un único subtítulo rechazada' % reject_label)
+			ku.logger('Play TVBan', '%s: rejected empty or single-cue download' % reject_label)
 		return None
 	if not _looks_like_subtitle_content(text): return None
 	return text
@@ -429,9 +429,9 @@ def _download_submaker_content(download_fn, subs, language, release_context=None
 		if not quiet:
 			raw_count, _, _ = _submaker_filter_stats(subs)
 			if raw_count and not usable:
-				ku.logger('Play TVBan', 'SubMaker: solo se devolvieron resultados de marcador de posición filtrados (configura los proveedores de SubMaker)')
+				ku.logger('Play TVBan', 'SubMaker: only filtered placeholder results returned (configure SubMaker providers)')
 			else:
-				ku.logger('Play TVBan', 'SubMaker: no se encontraron subtítulos en %s en la respuesta (%d otros idiomas ignorados)' % (language, len(other)))
+				ku.logger('Play TVBan', 'SubMaker: no %s subs in response (%d other languages ignored)' % (language, len(other)))
 		return None
 	ranked = _submaker_ranked_subs(subs, language, release_context=release_context, preferred_only=True)
 	for item in ranked:
@@ -446,9 +446,9 @@ def _download_submaker_content(download_fn, subs, language, release_context=None
 				try:
 					label = _subtitle_display_name(item)
 					if len(label) > 120: label = label[:117] + '...'
-					play_tag = _subtitle_cache_release_tag(release_context) or 'desconocido'
+					play_tag = _subtitle_cache_release_tag(release_context) or 'unknown'
 					lang = (item.get('lang') or '?') if isinstance(item, dict) else '?'
-					ku.logger('Play TVBan', 'SubMaker seleccionado (%s) [%s]: %s' % (play_tag, lang, label))
+					ku.logger('Play TVBan', 'SubMaker pick (%s) [%s]: %s' % (play_tag, lang, label))
 				except: pass
 			return prepared
 	return None
@@ -457,7 +457,7 @@ def _get(url, stream=False, retry=False, quiet=False):
 	response = requests.get(url, stream=stream, timeout=timeout)
 	if retry and response.status_code in (403, 429):
 		if not quiet:
-			ku.notification('SubMaker limitado por tasa de peticiones. Reintentando en 10 segundos...', 3500)
+			ku.notification('SubMaker rate limited. Retrying in 10 secs...', 3500)
 		ku.sleep(10000)
 		return _get(url, stream=stream, quiet=quiet)
 	return response
@@ -496,10 +496,30 @@ def subtitle_notify_poster(meta, media_type='movie'):
 		return meta.get('ep_thumb') or meta.get('fanart') or meta.get('poster') or ku.get_icon('box_office')
 	return meta.get('poster') or ku.get_icon('box_office')
 
-def _notify_subtitles_ready(poster=None, local=False, is_episode=False):
+def _subtitle_playback_active(player=None):
+	try:
+		if player is not None:
+			return player.isPlayingVideo() or player.isPlaying()
+	except:
+		pass
+	try:
+		return ku.get_visibility('Window.IsActive(fullscreenvideo)')
+	except:
+		return False
+
+def _subtitle_user_notify(message, poster=None, settle_ms=150, player=None):
+	if player is not None and not _subtitle_playback_active(player):
+		return
+	ku.notification(message, icon=poster, settle_ms=settle_ms)
+
+def _notify_subtitles_ready(poster=None, local=False, is_episode=False, player=None):
+	if player is not None and not _subtitle_playback_active(player):
+		return
 	for _ in range(40):
 		if ku.get_visibility('Window.IsActive(fullscreenvideo)'): break
 		ku.sleep(100)
+	if player is not None and not _subtitle_playback_active(player):
+		return
 	settle_ms = 500 if is_episode else 200
 	message = 'Local subtitles found' if local else 'Downloaded subtitles found'
 	ku.notification(message, icon=poster, settle_ms=settle_ms)
@@ -510,7 +530,7 @@ def _enable_forced_local_subtitles(player, poster=None, notify=True, is_episode=
 	try: player.setSubtitleStream(stream_index)
 	except: return False
 	if st.auto_enable_subs(): player.showSubtitles(True)
-	if notify: _notify_subtitles_ready(poster=poster, local=True, is_episode=is_episode)
+	if notify: _notify_subtitles_ready(poster=poster, local=True, is_episode=is_episode, player=player)
 	return True
 
 def enable_local_subtitles(player, poster=None, notify=True, is_episode=False):
@@ -523,14 +543,14 @@ def enable_local_subtitles(player, poster=None, notify=True, is_episode=False):
 		for pref in preferred_languages:
 			if _submaker_language_matches(current, pref):
 				if st.auto_enable_subs(): player.showSubtitles(True)
-				if notify: _notify_subtitles_ready(poster=poster, local=True, is_episode=is_episode)
+				if notify: _notify_subtitles_ready(poster=poster, local=True, is_episode=is_episode, player=player)
 				return True
 	stream_index = _find_subtitle_stream_index(player, preferred_languages)
 	if stream_index is not None:
 		try: player.setSubtitleStream(stream_index)
 		except: pass
 		if st.auto_enable_subs(): player.showSubtitles(True)
-		if notify: _notify_subtitles_ready(poster=poster, local=True, is_episode=is_episode)
+		if notify: _notify_subtitles_ready(poster=poster, local=True, is_episode=is_episode, player=player)
 		return True
 	return False
 
@@ -538,8 +558,8 @@ def _alert_sub_filename(imdb_id, season, episode, release_context=None):
 	return _subtitle_search_filename(imdb_id, season, episode, release_context)
 
 def _opensubs_base_filename(imdb_id, season, episode):
-	if season: return 'PayTVBanOpenSubs_%s_%s_%s' % (imdb_id, season, episode)
-	return 'PayTVBanOpenSubs_%s' % imdb_id
+	if season: return 'PlayTVBanOpenSubs_%s_%s_%s' % (imdb_id, season, episode)
+	return 'PlayTVBanOpenSubs_%s' % imdb_id
 
 def _opensubs_alert_filename(imdb_id, season, episode, release_context=None):
 	filename_lang = st.subs_language_for_download().replace(' ', '_')
@@ -914,7 +934,7 @@ def subtitle_seconds_remaining_before_end(total_time, imdb_id, season=None, epis
 			if not quiet:
 				try: label = os.path.basename(ku.translate_path(sub_path) if sub_path.startswith('special://') else sub_path)
 				except: label = sub_path or 'unknown'
-				ku.logger('Play TVBan', '%s (local): %s restante=%ss' % (log_label, label, remaining))
+				ku.logger('Play TVBan', '%s (local): %s remaining=%ss' % (log_label, label, remaining))
 			return remaining
 	if not fetch or not imdb_id or not st.subs_alert_fetch_configured(): return None
 	fetched = fetch_subtitle_for_alert_timing(imdb_id, season, episode, year, playing_filename, playing_item)
@@ -922,8 +942,8 @@ def subtitle_seconds_remaining_before_end(total_time, imdb_id, season=None, epis
 	remaining = _seconds_remaining_before_end(fetched, total_time, for_alert=for_alert, credits_entry=credits_entry)
 	if remaining is not None and not quiet:
 		try: label = os.path.basename(ku.translate_path(fetched) if fetched.startswith('special://') else fetched)
-		except: label = fetched or 'desconocido'
-		ku.logger('Play TVBan', '%s (descargado): %s restante=%ss' % (log_label, label, remaining))
+		except: label = fetched or 'unknown'
+		ku.logger('Play TVBan', '%s (fetched): %s remaining=%ss' % (log_label, label, remaining))
 	return remaining
 
 def remember_active_subtitle_path(path):
@@ -937,7 +957,7 @@ def clear_subtitles_cache():
 	removed = 0
 	if os.path.isdir(temp_path):
 		for name in os.listdir(temp_path):
-			if name.startswith('PayTVBanSubs_') or name.startswith('PayTVBanOpenSubs_'):
+			if name.startswith('PlayTVBanSubs_') or name.startswith('PlayTVBanOpenSubs_'):
 				try:
 					os.remove(os.path.join(temp_path, name))
 					removed += 1
@@ -947,12 +967,14 @@ def clear_subtitles_cache():
 
 def _apply_external_subtitle(player, path, poster=None, notify=True, is_episode=False):
 	if not path: return False
+	if not _subtitle_playback_active(player):
+		return False
 	try: player.setSubtitles(path)
 	except: return False
 	if st.auto_enable_subs():
 		try: player.showSubtitles(True)
 		except: pass
-	if notify: _notify_subtitles_ready(poster=poster, local=False, is_episode=is_episode)
+	if notify: _notify_subtitles_ready(poster=poster, local=False, is_episode=is_episode, player=player)
 	return True
 
 class Subtitles(xbmc.Player):
@@ -992,9 +1014,9 @@ class Subtitles(xbmc.Player):
 	def _searched_subs(self):
 		subs = self.subtitles_search()
 		if isinstance(subs, str):
-			return ku.notification('Error de SubMaker: %s' % subs, settle_ms=150)
+			return _subtitle_user_notify('SubMaker error: %s' % subs, player=self._player)
 		if not subs:
-			return ku.notification('No se encontraron subtítulos', icon=self.poster, settle_ms=150)
+			return _subtitle_user_notify('No subtitles found', poster=self.poster, player=self._player)
 		release_context = playback_release_context(self.playing_filename, self.playing_item, self.season, self.episode)
 		search_params = getattr(self, '_last_search_params', '') or _submaker_search_params(
 			self.imdb_id, self.season, self.episode, self.playing_filename, self.playing_item)
@@ -1007,7 +1029,7 @@ class Subtitles(xbmc.Player):
 				if path: return path
 			except: pass
 		if not content:
-			return ku.notification('No se encontraron subtítulos', icon=self.poster, settle_ms=150)
+			return _subtitle_user_notify('No subtitles found', poster=self.poster, player=self._player)
 		final_path = '%s%s' % (self.subtitle_path, self.search_filename)
 		with ku.open_file(final_path, 'w') as file: file.write(content)
 		ku.sleep(1000)
@@ -1050,12 +1072,12 @@ class OpenSubtitlesSubs(xbmc.Player):
 		if st.submaker_prefer_local():
 			if self._video_file_subs(): return
 		if not st.opensubs_configured():
-			return ku.notification('Se requiere el nombre de usuario y la contraseña de OpenSubtitles', icon=poster, settle_ms=500 if self.is_episode else 200)
+			return _subtitle_user_notify('OpenSubtitles username and password required', poster=poster, settle_ms=500 if self.is_episode else 200, player=self._player)
 		try:
 			from apis.opensubs_api import fetch_alert_subtitle
 			path = fetch_alert_subtitle(imdb_id, season, episode, year, playing_filename, playing_item, log_pick=True)
 		except: path = None
 		if not path:
-			return ku.notification('No se encontraron subtítulos', icon=poster, settle_ms=500 if self.is_episode else 200)
+			return _subtitle_user_notify('No subtitles found', poster=poster, settle_ms=500 if self.is_episode else 200, player=self._player)
 		remember_active_subtitle_path(path)
 		return _apply_external_subtitle(self._player, path, poster=poster, is_episode=self.is_episode)

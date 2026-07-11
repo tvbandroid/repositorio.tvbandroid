@@ -8,7 +8,6 @@ from modules.utils import TaskPool
 from modules.source_utils import source_filters
 from modules.settings import provider_sort_ranks, avoid_episode_spoilers, max_threads
 from modules.kodi_utils import get_icon, kodi_dialog, hide_busy_dialog, show_busy_dialog, addon_fanart, select_dialog, ok_dialog, notification
-# from modules.kodi_utils import logger
 
 def _highlight_with_alpha(color, alpha):
 	if not color: return color or 'FFCCCCCC'
@@ -31,6 +30,7 @@ class SourcesResults(BaseDialog):
 		self.meta = kwargs.get('meta')
 		self.sources_ref = kwargs.get('sources_ref')
 		self.filters_ignored = kwargs.get('filters_ignored', False)
+		self.selected = (None, '')
 		self.meta_get = self.meta.get
 		self.make_poster = self.window_format in ('list', 'medialist')
 		self.empty_poster = get_icon('box_office')
@@ -265,9 +265,9 @@ class SourcesResults(BaseDialog):
 				elif scrape_provider == 'aiostreams':
 					scraper_module = get('aio_release_group') or ''
 					if scraper_module:
-						scraper_module_label = 'Group'
-						scraper_suffix = '     [COLOR %s][B]Group: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
-						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Group: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
+						scraper_module_label = 'Grupo'
+						scraper_suffix = '     [COLOR %s][B]Grupo: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
+						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Grupo: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
 				set_properties({'name': name.upper(), 'source_site': source_site, 'provider_icon': provider_icon, 'quality_icon': quality_icon, 'count': '%02d.' % count,
 						'size_label': get('size_label', 'N/A'), 'extraInfo': extraInfo, 'quality': quality.upper(), 'hash': get('hash', 'N/A'), 'source': json.dumps(item),
 						'highlight': item_highlight, 'highlight_bg': highlight_bg, 'scraper_module': scraper_module.upper() if scraper_module else '', 'scraper_module_label': scraper_module_label,
@@ -332,14 +332,14 @@ class SourcesResults(BaseDialog):
 				return (1, key)
 			return (2, key)
 		providers.sort(key=_provider_filter_sort_key)
-		qualities = [('Show [B]%s[/B] Only | [B]%d[/B] Results' % (i, quality_totals[i]), 'quality', i) for i in qualities]
-		providers = [('Show [B]%s[/B] Only | [B]%d[/B] Results' % (i, provider_totals[i]), 'provider', i) for i in providers]
+		qualities = [('Mostrar solo [B][COLOR khaki]%s[/COLOR][/B] | Resultados [B]%d[/B]' % (i, quality_totals[i]), 'quality', i) for i in qualities]
+		providers = [('Mostrar solo [B][COLOR khaki]%s[/COLOR] | Resultados [B]%d[/B]' % (i, provider_totals[i]), 'provider', i) for i in providers]
 		data = []
-		if cache_functions_debrid: data.append(('Rescrape with External Cache Check [B]%s[/B]' % ('OFF' if self._any_cache_check_active() else 'ON'), 'special', 'cache_check_rescrape'))
-		if self.uncached_results: data.append(('Show [B]Uncached[/B] Only | [B]%d[/B] Results' % len(self.uncached_results), 'special', 'showuncached'))
+		if cache_functions_debrid: data.append(('Volver a Buscar con Comprobación de Caché Externa [B]%s[/B]' % ('DESACTIVADO' if self._any_cache_check_active() else 'ACTIVADO'), 'special', 'cache_check_rescrape'))
+		if self.uncached_results: data.append(('Mostrar solo [B]sin caché[/B] | [B]%d[/B] Resultados' % len(self.uncached_results), 'special', 'showuncached'))
 		data.extend(qualities)
 		data.extend(providers)
-		data.extend([('Filter by [B]Title[/B]...', 'special', 'title'), ('Filter by [B]Info[/B]...', 'special', 'extraInfo')])
+		data.extend([('Filtrar por [B]Título[/B]...', 'special', 'title'), ('Filtrar por [B]Información[/B]...', 'special', 'extraInfo')])
 		self.filter_list = []
 		threads = TaskPool().tasks_enumerate(builder, data, min(len(data), max_threads()))
 		[i.join() for i in threads]
@@ -386,16 +386,16 @@ class SourcesResults(BaseDialog):
 				'magnet_url': magnet_url,
 				'display_name': item_get('display_name', ''),
 			}
-		choices_append(('Info', 'results_info'))
-		if add_magnet_to_cloud_params: choices_append(('Add to Cloud', add_magnet_to_cloud_params))
-		if browse_pack_params: choices_append(('Browse', browse_pack_params))
-		if down_pack_params: choices_append(('Download Pack', down_pack_params))
-		if down_file_params: choices_append(('Download File', down_file_params))
-		if provider_source == 'rd_cloud': choices_append(('Delete from RD Cloud', 'rd_cloud_delete'))
-		list_items = [{'line1': i[0], 'icon': self.poster} for i in choices]
-		kwargs = {'items': json.dumps(list_items)}
-		choice = select_dialog([i[1] for i in choices], **kwargs)
-		return choice
+		choices_append(('Información', 'results_info'))
+if add_magnet_to_cloud_params: choices_append(('Añadir a la nube', add_magnet_to_cloud_params))
+if browse_pack_params: choices_append(('Explorar Pack', browse_pack_params))
+if down_pack_params: choices_append(('Descargar Pack', down_pack_params))
+if down_file_params: choices_append(('Descargar Archivo', down_file_params))
+if provider_source == 'rd_cloud': choices_append(('Eliminar de Real-Debrid Cloud', 'rd_cloud_delete'))
+list_items = [{'line1': i[0], 'icon': self.poster} for i in choices]
+kwargs = {'items': json.dumps(list_items)}
+choice = select_dialog([i[1] for i in choices], **kwargs)
+return choice
 
 	def set_filter(self, filtered_list):
 		self.filter_applied = True

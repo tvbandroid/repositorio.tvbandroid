@@ -16,6 +16,9 @@ PROP_NEXTEP_PREP_SCHEDULED = 'playtvban.nextep_prep_scheduled'
 PROP_NEXTEP_PREP_DECLINED = 'playtvban.nextep_prep_declined'
 PROP_AUTOSCRAPE_NEXTEP_READY = 'playtvban.autoscrape_nextep_ready'
 PROP_NEXTEP_AUTOPLAY_CANCELLED = 'playtvban.nextep_autoplay_cancelled'
+PROP_NEXTEP_NATURAL_END = 'playtvban.nextep_natural_end'
+PROP_ACTIVE_PLAYBACK_KEY = 'playtvban.active_playback_key'
+_NEXTEP_NATURAL_END_SEC = 15
 # Movies-only: fire stingers alert ~3 min before other alert sources would (typical 90% vs 95% gap on ~1 hr).
 _STINGER_EARLY_OFFSET_SEC = 180
 _NEXTEP_SUB_FETCH_DEFER_SEC = 45
@@ -46,7 +49,7 @@ class PlayTVBanPlayer(xbmc.Player):
 		self.clear_playback_properties(clear_navigation=False)
 		if not url:
 			self.is_generic = obj == 'video'
-			return self.run_error('No se devolvió ningún enlace reproducible.')
+			return self.run_error('No playable link was returned.')
 		try: return self.play_video(url, obj)
 		except:
 			self.is_generic = obj == 'video'
@@ -79,8 +82,10 @@ class PlayTVBanPlayer(xbmc.Player):
 				try:
 					if self.sources_object:
 						self.sources_object._release_resolve_busy()
+						self.sources_object._release_sources_busy()
 				except:
 					pass
+				self._register_active_playback()
 				self.monitor()
 			else:
 				self.sources_object.playback_successful = self.playback_successful
@@ -94,7 +99,7 @@ class PlayTVBanPlayer(xbmc.Player):
 					if not self.sources_object._resolve_user_cancelled:
 						self.kill_dialog()
 				else:
-					# Mantener la interfaz de progreso del resolvedor para que play_file pueda probar la siguiente fuente en cola.
+					# Keep the resolver progress UI so play_file can try the next queued source.
 					self.run_error()
 				self.safe_stop()
 		try: del self.kodi_monitor
@@ -192,19 +197,20 @@ class PlayTVBanPlayer(xbmc.Player):
 		ku.close_all_dialog()
 
 	def monitor(self):
+		playback_superseded = False
 		try:
 			ensure_dialog_dead, total_check_time = False, 0
 			if self.media_type == 'episode':
 				play_random_continual = self.sources_object.random_continual
 				play_random = self.sources_object.random
 				disable_autoplay_next_episode = self.sources_object.disable_autoplay_next_episode
-				if disable_autoplay_next_episode: ku.notification('Búsqueda con Valores Personalizados - Reproducción Automática del Siguiente Episodio Cancelada', 4500)
-				if any((play_random_continual, play_random, disable_autoplay_next_episode)): self.autoplay_nextep, self.autoscrape_nextep = False, False, False
+				if disable_autoplay_next_episode: ku.notification('Scrape with Custom Values - Autoplay Next Episode Cancelled', 4500)
+				if any((play_random_continual, play_random, disable_autoplay_next_episode)): self.autoplay_nextep, self.autoscrape_nextep = False, False
 				else: self.autoplay_nextep, self.autoscrape_nextep = self.sources_object.autoplay_nextep, self.sources_object.autoscrape_nextep
 				if self.autoplay_nextep or self.autoscrape_nextep:
-					self._log_nextep('Monitor del siguiente episodio activo: reproducción_automática=%s búsqueda_automática=%s' % (self.autoplay_nextep, self.autoscrape_nextep))
+					self._log_nextep('Next episode monitor active: autoplay=%s autoscrape=%s' % (self.autoplay_nextep, self.autoscrape_nextep))
 				elif st.autoscrape_next_episode() or st.autoplay_next_episode():
-					self._log_nextep('Siguiente episodio deshabilitado en esta reproducción (aleatorio=%s aleatorio_continuo=%s valores_personalizados=%s)' % (play_random, play_random_continual, disable_autoplay_next_episode))
+					self._log_nextep('Next episode disabled this play (random=%s random_continual=%s custom_values=%s)' % (play_random, play_random_continual, disable_autoplay_next_episode))
 			else:
 				show_stinger, stinger_alert_timing, stingers_percentage_fallback = st.stingers_show(), st.stingers_alert_timing(), st.stingers_percentage()
 				play_random_continual, self.autoplay_nextep, self.autoscrape_nextep = False, False, False
@@ -225,6 +231,9 @@ class PlayTVBanPlayer(xbmc.Player):
 				except:
 					self.showSubtitles(True)
 			while self.isPlayingVideo():
+				if not self._owns_active_playback():
+					playback_superseded = True
+					break
 				try:
 					if not ensure_dialog_dead:
 						ensure_dialog_dead = True
@@ -277,29 +286,50 @@ class PlayTVBanPlayer(xbmc.Player):
 						if self.current_point >= final_chapter: self.run_movie_stingers()
 				except: pass
 				if not self.subs_searched: self.run_subtitles()
+			try:
+				_remaining = None
+				if getattr(self, 'total_time', None) not in (None, '', 0, 0.0) and getattr(self, 'curr_time', None) not in (None, ''):
+					_remaining = round(float(self.total_time) - float(self.curr_time))
+				natural_end = (not playback_superseded and _remaining is not None and _remaining <= _NEXTEP_NATURAL_END_SEC)
+				if self.autoscrape_nextep and not playback_superseded:
+					if natural_end:
+						ku.set_property(PROP_NEXTEP_NATURAL_END, 'true')
+					else:
+						ku.set_property(PROP_NEXTEP_NATURAL_END, 'false')
+						try:
+							from modules.sources import mark_nextep_autoplay_cancelled
+							mark_nextep_autoplay_cancelled()
+							self._log_nextep('Autoscrape next episode: cancelled (playback stopped early)')
+						except:
+							pass
+				elif natural_end:
+					ku.set_property(PROP_NEXTEP_NATURAL_END, 'true')
+			except:
+				pass
 			autoplay_stash_scheduled = False
-			if self.autoplay_nextep:
+			if not playback_superseded and self.autoplay_nextep:
 				try:
-					from modules.sources import clear_nextep_autoplay_stash, clear_orphan_nextep_play_stash, nextep_autoplay_cancelled, peek_nextep_autoplay_stash, schedule_nextep_stashed_play, take_nextep_autoplay_stash
-					if nextep_autoplay_cancelled():
+					from modules.sources import clear_nextep_autoplay_stash, clear_orphan_nextep_play_stash, nextep_autoplay_cancelled, nextep_end_play_superseded, peek_nextep_autoplay_stash, schedule_nextep_stashed_play, take_nextep_autoplay_stash
+					if nextep_autoplay_cancelled() or nextep_end_play_superseded():
 						clear_nextep_autoplay_stash()
 						clear_orphan_nextep_play_stash()
-						self._log_nextep('Reproducción Automática del Siguiente Episodio: omitida al finalizar el episodio (cancelada por el usuario)')
+						self._log_nextep('Autoplay next episode: skipped at episode end (superseded by user playback)')
 					elif getattr(self, '_nextep_stash_play_scheduled', False):
 						autoplay_stash_scheduled = True
 					elif getattr(self, '_nextep_alert_shown', False):
 						if peek_nextep_autoplay_stash():
 							stash = take_nextep_autoplay_stash()
 							if stash:
-								self._log_nextep('Reproducción Automática del Siguiente Episodio: reproduciendo resolución almacenada al finalizar el episodio')
+								self._log_nextep('Autoplay next episode: playing stashed resolve at episode end')
 								autoplay_stash_scheduled = schedule_nextep_stashed_play(stash)
 					else:
 						clear_nextep_autoplay_stash()
 				except: pass
 			if not autoplay_stash_scheduled:
 				ku.hide_busy_dialog()
-			if not self.media_marked: self.media_watched_marker()
+			if not playback_superseded and not self.media_marked: self.media_watched_marker()
 			self.clear_playback_properties(clear_navigation=False)
+			self._release_active_playback()
 		except:
 			ku.hide_busy_dialog()
 			self.sources_object.playback_successful = False
@@ -346,6 +376,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			director, writer, country = self.meta_get('director', ''), self.meta_get('writer', ''), self.meta_get('country', '')
 			cast = self.meta_get('short_cast', []) or self.meta_get('cast', []) or []
 			listitem.setLabel(self.title)
+			fresh_start = False
 			if self.media_type == 'movie':
 				plot = self.meta_get('plot')
 				listitem.setArt({'poster': poster, 'fanart': fanart, 'icon': poster, 'clearlogo': clearlogo})
@@ -368,10 +399,19 @@ class PlayTVBanPlayer(xbmc.Player):
 				info_tag.setStudios(studio), info_tag.setIMDBNumber(self.imdb_id), info_tag.setGenres(genre), info_tag.setWriters(writer)
 				info_tag.setDirectors(director), info_tag.setUniqueIDs({'imdb': self.imdb_id, 'tmdb': str(self.tmdb_id), 'tvdb': str(self.tvdb_id)})
 				info_tag.setCast([ku.kodi_actor()(name=item['name'], role=item['role'], thumbnail=item['thumbnail']) for item in cast])
-				info_tag.setFilenameAndPath(self.url)
+				fresh_start = self._nextep_aio_en_fresh_start()
+				if fresh_start:
+					self.playback_percent = 0.0
+					try:
+						info_tag.setFilenameAndPath('%s S%02dE%02d %s' % (
+							self.title or '', int(self.season), int(self.episode), (self.playing_filename or '')[:120]))
+					except:
+						info_tag.setFilenameAndPath(self.url)
+				else:
+					info_tag.setFilenameAndPath(self.url)
 			self.set_resume_point(listitem)
 			if self.url and str(self.url).startswith('http'):
-				self._disable_kodi_url_resume(listitem, keep_start_percent=True)
+				self._disable_kodi_url_resume(listitem, keep_start_percent=not fresh_start)
 			self.set_playback_properties()
 		return listitem
 
@@ -480,8 +520,44 @@ class PlayTVBanPlayer(xbmc.Player):
 		if reason:
 			self._log_nextep('Next episode prep declined: %s' % reason)
 
+	def _playback_meta_key(self):
+		if getattr(self, 'is_generic', False):
+			return None
+		try:
+			return '%s_%s_%s' % (self.tmdb_id, int(self.season), int(self.episode))
+		except:
+			return None
+
+	def _owns_active_playback(self):
+		try:
+			if not self.isPlayingVideo():
+				return False
+			active = ku.get_property(PROP_ACTIVE_PLAYBACK_KEY)
+			mine = self._playback_meta_key()
+			if not active or not mine:
+				return True
+			return active == mine
+		except:
+			return False
+
+	def _register_active_playback(self):
+		key = self._playback_meta_key()
+		if key:
+			ku.set_property(PROP_ACTIVE_PLAYBACK_KEY, key)
+
+	def _release_active_playback(self):
+		key = self._playback_meta_key()
+		if key and ku.get_property(PROP_ACTIVE_PLAYBACK_KEY) == key:
+			ku.clear_property(PROP_ACTIVE_PLAYBACK_KEY)
+
 	def _should_prep_next_ep(self):
+		if not self._owns_active_playback():
+			return False
+		if getattr(self, '_nextep_stash_play_scheduled', False):
+			return False
 		if ku.get_property(PROP_NEXTEP_PREP_DECLINED) == 'true':
+			return False
+		if getattr(self, '_nextep_prep_attempted', False):
 			return False
 		if ku.get_property(PROP_NEXTEP_AUTOPLAY_CANCELLED) == 'true':
 			return False
@@ -569,6 +645,7 @@ class PlayTVBanPlayer(xbmc.Player):
 		self._log_nextep('Next episode prep scheduled: %s S%02dE%02d play_type=%s remaining=%ss start_prep=%ss' % (
 			self.meta_get('title', ''), self.meta_get('season', 0), self.meta_get('episode', 0),
 			self.nextep_settings.get('play_type', ''), remaining, getattr(self, 'start_prep', '')))
+		self._nextep_prep_attempted = True
 		ku.set_property(PROP_NEXTEP_PREP_SCHEDULED, 'true')
 		ku.set_property(PROP_NEXTEP_PENDING, 'true')
 		meta = dict(self.meta) if getattr(self, 'meta', None) else {}
@@ -589,6 +666,7 @@ class PlayTVBanPlayer(xbmc.Player):
 
 	def _maybe_log_nextep_alert_pending(self):
 		if not self.autoplay_nextep or getattr(self, '_nextep_alert_shown', False): return
+		if not self._owns_active_playback(): return
 		if getattr(self, '_nextep_alert_pending_logged', False): return
 		if ku.get_property('playtvban.nextep_scrape_ready') != 'true': return
 		try:
@@ -608,9 +686,15 @@ class PlayTVBanPlayer(xbmc.Player):
 	def _should_show_autoplay_nextep_alert(self):
 		if not self.autoplay_nextep or not getattr(self, 'nextep_settings', None): return False
 		if getattr(self, '_nextep_alert_shown', False): return False
+		if not self._owns_active_playback():
+			return False
 		try:
-			from modules.sources import nextep_autoplay_cancelled
+			from modules.sources import nextep_autoplay_cancelled, peek_nextep_autoplay_stash, nextep_alert_handled, PROP_NEXTEP_SCRAPE_KEY
 			if nextep_autoplay_cancelled(): return False
+			key = ku.get_property(PROP_NEXTEP_SCRAPE_KEY)
+			if nextep_alert_handled(key):
+				self._nextep_alert_shown = True
+				return False
 		except:
 			pass
 		if ku.get_property('playtvban.nextep_scrape_ready') != 'true': return False
@@ -628,6 +712,7 @@ class PlayTVBanPlayer(xbmc.Player):
 
 	def _try_autoscrape_nextep_ready_notify(self):
 		if not self.autoscrape_nextep or getattr(self, '_autoscrape_ready_notified', False): return
+		if not self._owns_active_playback(): return
 		if not ku.get_property(PROP_AUTOSCRAPE_NEXTEP_READY): return
 		if not getattr(self, 'nextep_settings', None): return
 		try:
@@ -645,21 +730,24 @@ class PlayTVBanPlayer(xbmc.Player):
 		except:
 			pass
 		ku.clear_property(PROP_AUTOSCRAPE_NEXTEP_READY)
+		ku.set_property(ku.PROP_AUTOSCRAPE_TOAST_SHOWN, 'true')
 		title = meta.get('title') or self.meta_get('title', '')
 		season = meta.get('season', self.season)
 		episode = meta.get('episode', self.episode)
 		poster = meta.get('poster') or self.meta_get('poster')
-		ku.notification('[B]Siguiente Episodio Preparado:[/B] %s S%02dE%02d' % (title, season, episode), 6500, poster)
-		self._log_nextep('Búsqueda Automática del Siguiente Episodio preparada: restante=%ss ventana=%ss' % (remaining, window))
+		ku.notification('[B]Next Episode Ready:[/B] %s S%02dE%02d' % (title, season, episode), 6500, poster)
+		self._log_nextep('Autoscrape next episode ready notify: remaining=%ss window=%ss' % (remaining, window))
 
 	def _try_autoplay_early_stash_play(self):
 		if not self.autoplay_nextep or not getattr(self, '_nextep_close_wait', False):
 			return
+		if not self._owns_active_playback():
+			return
 		if getattr(self, '_nextep_stash_play_scheduled', False) or not getattr(self, '_nextep_alert_shown', False):
 			return
 		try:
-			from modules.sources import nextep_autoplay_cancelled, peek_nextep_autoplay_stash, schedule_nextep_stashed_play, take_nextep_autoplay_stash
-			if nextep_autoplay_cancelled() or not peek_nextep_autoplay_stash():
+			from modules.sources import nextep_autoplay_cancelled, nextep_end_play_superseded, peek_nextep_autoplay_stash, schedule_nextep_stashed_play, take_nextep_autoplay_stash
+			if nextep_autoplay_cancelled() or nextep_end_play_superseded() or not peek_nextep_autoplay_stash():
 				return
 		except:
 			return
@@ -674,15 +762,19 @@ class PlayTVBanPlayer(xbmc.Player):
 			return
 		if schedule_nextep_stashed_play(stash, show_busy=False):
 			self._nextep_stash_play_scheduled = True
-			self._log_nextep('Reproducción Automática del Siguiente Episodio: resolución almacenada iniciada anticipadamente con %ss restantes' % remaining)
+			self._log_nextep('Autoplay next episode: early stash resolve at remaining=%ss' % remaining)
 
 	def _try_autoplay_nextep_alert(self):
 		if not self._should_show_autoplay_nextep_alert(): return
-		self._nextep_alert_shown = True
 		try:
-			from modules.sources import peek_nextep_autoplay_stash, take_nextep_autoplay_stash
+			from modules.sources import peek_nextep_autoplay_stash, take_nextep_autoplay_stash, claim_nextep_alert_handled, PROP_NEXTEP_SCRAPE_KEY
 		except:
 			return
+		stash_key = ku.get_property(PROP_NEXTEP_SCRAPE_KEY)
+		if not claim_nextep_alert_handled(stash_key):
+			self._nextep_alert_shown = True
+			return
+		self._nextep_alert_shown = True
 		stash = peek_nextep_autoplay_stash()
 		if not stash: return
 		settings = self.nextep_settings
@@ -693,7 +785,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			remaining = round(float(self.total_time) - float(self.curr_time))
 		except:
 			remaining = settings.get('window_time')
-		self._log_nextep('Alerta de Reproducción Automática del Siguiente Episodio: restante=%ss ventana=%ss método=%s' % (
+		self._log_nextep('Autoplay next episode alert: remaining=%ss window=%ss method=%s' % (
 			remaining, settings.get('window_time'), 'window' if use_window else 'notification'))
 		action = None
 		if use_window:
@@ -703,7 +795,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			except:
 				action = 'cancel'
 		else:
-			ku.notification('[B]A Continuación:[/B] %s S%02dE%02d' % (dialog_meta.get('title'), dialog_meta.get('season'), dialog_meta.get('episode')), 6500, dialog_meta.get('poster'))
+			ku.notification('[B]Next Up:[/B] %s S%02dE%02d' % (dialog_meta.get('title'), dialog_meta.get('season'), dialog_meta.get('episode')), 6500, dialog_meta.get('poster'))
 		if not action:
 			action = default_action if use_window else 'close'
 		if not action:
@@ -715,27 +807,29 @@ class PlayTVBanPlayer(xbmc.Player):
 			except:
 				pass
 			ku.clear_property(PROP_NEXTEP_PREP_SCHEDULED)
-			self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: cancelar')
+			self._log_nextep('Autoplay next episode alert action: cancel')
 			return
 		if action == 'pause':
 			self._nextep_close_wait = True
-			self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: pausar (esperando al usuario)')
+			self._log_nextep('Autoplay next episode alert action: pause (waiting for user)')
 			return
 		if action == 'close':
 			self._nextep_close_wait = True
-			self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: cerrar (esperando al final del episodio)')
+			self._log_nextep('Autoplay next episode alert action: close (waiting for episode end)')
 			return
 		if action != 'play':
 			return
-		self._log_nextep('Acción de la Reproducción Automática del Siguiente Episodio: reproducir')
+		self._log_nextep('Autoplay next episode alert action: play')
 		stash = take_nextep_autoplay_stash()
 		if not stash: return
 		try:
 			from modules.sources import schedule_nextep_stashed_play
-			if not schedule_nextep_stashed_play(stash):
-				ku.logger('Play TVBan', 'Error en la Reproducción Automática del Siguiente Episodio: no se pudo programar la resolución')
+			if schedule_nextep_stashed_play(stash):
+				self._nextep_stash_play_scheduled = True
+			else:
+				ku.logger('Play TVBan', 'Autoplay next episode play failed: could not schedule resolve')
 		except Exception as exc:
-			ku.logger('Play TVBan', 'Error en la Reproducción Automática del Siguiente Episodio: %s' % exc)
+			ku.logger('Play TVBan', 'Autoplay next episode play failed: %s' % exc)
 		return
 
 	def run_next_ep(self):
@@ -764,8 +858,17 @@ class PlayTVBanPlayer(xbmc.Player):
 	def set_resume_point(self, listitem):
 		if self.playback_percent > 0.0: listitem.setProperty('StartPercent', str(self.playback_percent))
 
+	def _nextep_aio_en_fresh_start(self):
+		try:
+			sources = self.sources_object
+			if not sources or not getattr(sources, '_nextep_aio_en_fresh_start', None):
+				return False
+			return sources._nextep_aio_en_fresh_start(getattr(self, 'playing_item', None))
+		except:
+			return False
+
 	def _disable_kodi_url_resume(self, listitem, keep_start_percent=False):
-		# Kodi guarda el punto de reanudación según la URL del flujo o el nombre del archivo; los enlaces debrid reutilizan el mismo nombre y pueden reabrirse cerca del final del archivo (EOF).
+		# Kodi stores resume by stream URL/filename; debrid links reuse the same name and can reopen near EOF.
 		if not keep_start_percent or float(listitem.getProperty('StartPercent') or 0) <= 0:
 			listitem.setProperty('StartPercent', '0')
 		listitem.setProperty('StartOffset', '0')
@@ -936,7 +1039,7 @@ class PlayTVBanPlayer(xbmc.Player):
 		self.start_prep = start_prep
 		self.nextep_settings['window_time'] = pop_at
 		self.nextep_settings['pipeline_headroom'] = pipeline
-		self._log_nextep('Tiempo del siguiente episodio actualizado (capítulos): pop_at=%ss start_prep=%ss' % (pop_at, start_prep))
+		self._log_nextep('Next episode timing refreshed (chapters): pop_at=%ss start_prep=%ss' % (pop_at, start_prep))
 
 	def _outro_credits_start(self, fetch=False):
 		if getattr(self, 'is_generic', False) or self.media_type != 'episode':
@@ -982,7 +1085,7 @@ class PlayTVBanPlayer(xbmc.Player):
 		self.nextep_settings['pipeline_headroom'] = pipeline
 		self.nextep_settings['outro_start'] = outro_start
 		outro_log = ' outro_start=%.1fs' % outro_start if outro_start is not None else ''
-		self._log_nextep('Temporización del siguiente episodio actualizada (IntroDB): mostrar_en=%ss iniciar_preparación=%ss%s' % (pop_at, start_prep, outro_log))
+		self._log_nextep('Next episode timing refreshed (introdb): pop_at=%ss start_prep=%ss%s' % (pop_at, start_prep, outro_log))
 
 	def _stinger_early_percentage(self, trigger_pct):
 		try:
@@ -1031,11 +1134,14 @@ class PlayTVBanPlayer(xbmc.Player):
 			self._subtitle_alert_fetch_started = False
 			self._subtitle_alert_fetch_done = False
 			self._playback_started_at = time.time()
+			self._nextep_prep_attempted = False
 			ku.clear_property(PROP_NEXTEP_PENDING)
 			ku.clear_property(PROP_NEXTEP_PREP_SCHEDULED)
 			ku.clear_property(PROP_NEXTEP_PREP_DECLINED)
+			ku.clear_property(PROP_NEXTEP_NATURAL_END)
 			ku.clear_property(PROP_AUTOSCRAPE_NEXTEP_READY)
 			ku.clear_property(PROP_NEXTEP_AUTOPLAY_CANCELLED)
+			ku.clear_property(ku.PROP_AUTOSCRAPE_TOAST_SHOWN)
 			self._autoscrape_ready_notified = False
 			self._nextep_alert_pending_logged = False
 			self._nextep_close_wait = False
@@ -1223,7 +1329,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			return
 		if self._intro_skip_past_segment(segment):
 			if getattr(self, '_intro_skip_approved', False):
-				self._log_intro_skip('Saltar introducción omitido: se superó el margen de tiempo')
+				self._log_intro_skip('Intro skip missed: past grace window')
 			self._intro_skip_done = True
 			return
 		try:
@@ -1256,20 +1362,20 @@ class PlayTVBanPlayer(xbmc.Player):
 		if not getattr(self, '_intro_skip_approved', False):
 			return
 		if self._intro_skip_past_segment(segment):
-			self._log_intro_skip('Saltar introducción omitido: se superó el margen de tiempo')
+			self._log_intro_skip('Intro skip missed: past grace window')
 			self._intro_skip_done = True
 			return
 		if curr < start_sec:
 			return
 		if curr >= end_sec:
 			self._intro_skip_done = True
-			self._log_intro_skip('Saltar introducción: ya se ha superado la introducción (%.1fs >= %.1fs)' % (curr, end_sec))
+			self._log_intro_skip('Intro skip: already past intro (%.1fs >= %.1fs)' % (curr, end_sec))
 			return
 		try:
 			if self._execute_intro_skip_seek(start_sec, end_sec, segment.get('source', '?')):
 				self._intro_skip_done = True
 		except Exception as exc:
-			self._log_intro_skip('Error al saltar la introducción: %s' % exc)
+			self._log_intro_skip('Intro skip failed: %s' % exc)
 			self._intro_skip_done = True
 
 	def run_subtitles(self):
@@ -1348,17 +1454,17 @@ class PlayTVBanPlayer(xbmc.Player):
 			pass
 		self.clear_playback_properties(clear_navigation=not self.is_generic)
 		if self.is_generic and ku.get_property('playtvban.browse_playback') == 'true':
-			return ku.notification('Reproducción fallida', 4000, settle_ms=400)
+			return ku.notification('Playback Failed', 4000, settle_ms=400)
 		# play_file walks the resolve queue and calls playback_failed_action after the last attempt.
 		if not self.is_generic and getattr(self, 'sources_object', None):
 			return
-		text = message or 'No se pudo reproducir este enlace. Puede que haya caducado, haya sido eliminado o no sea compatible con este dispositivo.'
+		text = message or 'This link could not be played. It may be expired, removed, or unsupported on this device.'
 		ku.hide_busy_dialog()
 		ku.sleep(400)
 		try:
-			return ku.kodi_dialog().ok('Reproducción fallida', text)
+			return ku.kodi_dialog().ok('Playback failed', text)
 		except Exception:
 			try:
-				return ku.ok_dialog(heading='Reproducción fallida', text=text)
+				return ku.ok_dialog(heading='Playback failed', text=text)
 			except Exception:
-				return ku.notification('Reproducción fallida', 4000, settle_ms=400)
+				return ku.notification('Playback Failed', 4000, settle_ms=400)

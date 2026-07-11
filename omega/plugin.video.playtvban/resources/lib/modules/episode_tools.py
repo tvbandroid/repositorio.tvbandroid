@@ -13,7 +13,7 @@ from modules import kodi_utils
 
 def _log_nextep_skip(title, season, episode, reason):
 	try:
-		kodi_utils.logger('Play TVBan', 'Preparación del siguiente episodio omitida: %s T%02dE%02d (%s)' % (title, int(season), int(episode), reason))
+		kodi_utils.logger('Play TVBan', 'Next episode prep skipped: %s S%02dE%02d (%s)' % (title, int(season), int(episode), reason))
 	except:
 		pass
 
@@ -34,22 +34,22 @@ class EpisodeTools:
 			watched_info = watched_info_episode(self.meta_get('tmdb_id'))
 			season, episode = get_next(current_season, current_episode, watched_info, season_data, 0)
 			if season is None or episode is None:
-				_log_nextep_skip(title, current_season, current_episode, 'no hay siguiente episodio')
+				_log_nextep_skip(title, current_season, current_episode, 'no next episode')
 				return 'no_next_episode'
-			kodi_utils.logger('Play TVBan', 'Preparando siguiente episodio: %s T%02dE%02d (siguiente literal)' % (title, season, episode))
+			kodi_utils.logger('Play TVBan', 'Next episode prep target: %s S%02dE%02d (literal next)' % (title, season, episode))
 			playcount = get_watched_status_episode(watched_info, (season, episode))
 			ep_data = episodes_meta(season, self.meta)
 			if not ep_data:
-				_log_nextep_skip(title, season, episode, 'lista de episodios no disponible')
+				_log_nextep_skip(title, season, episode, 'episode list unavailable')
 				return 'no_next_episode'
 			ep_data = next((i for i in ep_data if i['episode'] == episode), None)
 			if not ep_data:
-				_log_nextep_skip(title, season, episode, 'episodio no encontrado en los metadatos')
+				_log_nextep_skip(title, season, episode, 'episode not in metadata')
 				return 'no_next_episode'
 			adjust_hours, current_date = date_offset(), get_datetime()
 			episode_date, premiered = adjust_premiered_date(ep_data['premiered'], adjust_hours)
 			if not episode_date or current_date < episode_date:
-				_log_nextep_skip(title, season, episode, 'el episodio aún no se ha emitido')
+				_log_nextep_skip(title, season, episode, 'episode not aired yet')
 				return 'no_next_episode'
 			custom_title = self.meta_get('custom_title', None)
 			title = custom_title or self.meta_get('title')
@@ -58,11 +58,10 @@ class EpisodeTools:
 							'episode': episode, 'premiered': premiered, 'plot': ep_data['plot']})
 			url_params = {'media_type': 'episode', 'tmdb_id': self.meta_get('tmdb_id'), 'tvshowtitle': self.meta_get('rootname'), 'season': season, 'playcount': playcount,
 						'episode': episode, 'background': 'true', 'nextep_settings': self.nextep_settings, 'play_type': play_type, 'watch_count': watch_count}
-			if play_type == 'autoscrape_nextep': url_params['prescrape'] = 'false'
 			if custom_title: url_params['custom_title'] = custom_title
 			if 'custom_year' in self.meta: url_params['custom_year'] = self.meta_get('custom_year')
 		except Exception as exc:
-			kodi_utils.logger('Play TVBan', 'Error al preparar el siguiente episodio: %s T%02dE%02d (%s)' % (title, current_season, current_episode, exc))
+			kodi_utils.logger('Play TVBan', 'Next episode prep error: %s S%02dE%02d (%s)' % (title, current_season, current_episode, exc))
 			url_params = 'error'
 		return self.add_playback_key(url_params)
 
@@ -125,7 +124,9 @@ class EpisodeTools:
 	def auto_nextep(self):
 		url_params = self.next_episode_info()
 		if url_params == 'error': return kodi_utils.notification('Next Episode Error', 3000)
-		elif url_params == 'no_next_episode': return
+		elif url_params == 'no_next_episode':
+			kodi_utils.set_property('playtvban.nextep_prep_declined', 'true')
+			return
 		return Sources().playback_prep(url_params)
 
 	def add_playback_key(self, url_params):
@@ -138,8 +139,8 @@ def build_next_episode_manager():
 		try:
 			listitem = make_listitem()
 			tmdb_id, title = item['media_ids']['tmdb'], item['title']
-			if int(tmdb_id) in hidden_list: display, action = 'Restaurar [B]%s[/B] [COLOR=red][DESCARTADA][/COLOR]' % title, 'undrop'
-			else: display, action = 'Descartar [B]%s[/B]' % title, 'drop'
+			if int(tmdb_id) in hidden_list: display, action = 'Undrop [B]%s[/B] [COLOR=red][DROPPED][/COLOR]' % title, 'undrop'
+			else: display, action = 'Drop [B]%s[/B]' % title, 'drop'
 			url_params = {'mode': mode, 'action': action, 'media_type': 'shows', 'media_id': tmdb_id, 'section': 'dropped'}
 			url = build_url(url_params)
 			listitem.setLabel(display)
@@ -164,9 +165,9 @@ def build_next_episode_manager():
 	item_list = sorted(list_items, key=lambda k: (title_key(k['sort_title'], ignore_articles())), reverse=False)
 	item_list = [i['listitem'] for i in item_list]
 	kodi_utils.add_items(handle, item_list)
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.end_directory(handle, cacheToDisc=False)
-	kodi_utils.set_view_mode('view.main', 'files', False)
+	kodi_utils.set_view_mode('view.main', kodi_utils.MENU_FOLDER_CONTENT, False)
 
 def single_last_watched_episodes(data):
 	seen = set()

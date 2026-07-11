@@ -697,13 +697,13 @@ def configured_external_scraper_slots():
 
 def external_scraper_settings_tools_label():
 	if len(configured_external_scraper_slots()) != 1:
-		return 'External Scrapers Settings'
-	return 'External Scraper Settings'
+		return 'Configuración del Raspador Externo'
+	return 'Configuración del Raspador Externo'
 
 def external_scraper_settings_options_label():
 	if len(configured_external_scraper_slots()) != 1:
-		return 'Open External Scrapers Settings'
-	return 'Open External Scraper Settings'
+		return 'Abrir Configuración de Raspadores Externos'
+	return 'Abrir Configuración de Raspadores Externos'
 
 def append_external_scraper_settings_cm(cm_append, build_url_fn):
 	if not configured_external_scraper_slots(): return

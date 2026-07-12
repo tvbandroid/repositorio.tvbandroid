@@ -282,6 +282,11 @@ def _download_subtitle_content(file_id):
 def fetch_alert_subtitle(imdb_id, season=None, episode=None, year=None, playing_filename=None, playing_item=None, log_pick=False):
 	if not st.opensubs_configured(): return None
 	from indexers.subtitles import _looks_like_subtitle_content, _opensubs_alert_path, playback_release_context, _subtitle_cache_release_tag
+	from indexers.subtitles import _existing_release_tagged_subtitle_cache, remember_active_subtitle_path
+	cached = _existing_release_tagged_subtitle_cache(imdb_id, season, episode, playing_filename, playing_item)
+	if cached:
+		remember_active_subtitle_path(cached)
+		return cached
 	release_context = playback_release_context(playing_filename, playing_item, season, episode)
 	results = _search_subtitles(imdb_id, year, season, episode, _subtitle_language_code(), playing_filename, playing_item)
 	match = _pick_best_subtitle(results, playing_filename, playing_item, season, episode)
@@ -322,11 +327,11 @@ def _fetch_user_quota(token=None):
 
 def check_account():
 	if not st.opensubs_configured():
-		return ku.ok_dialog(heading='OpenSubtitles', text='Enter your OpenSubtitles username and password first.')
+		return ku.ok_dialog(heading='OpenSubtitles', text='Introduce primero tu usuario y contraseña de OpenSubtitles.')
 	try:
 		response = requests.post('%s/login' % BASE_URL, headers=_headers(), json={'username': _username(), 'password': _password()}, timeout=TIMEOUT)
 		if response.status_code != 200:
-			return ku.ok_dialog(heading='OpenSubtitles', text='Login failed. Check your OpenSubtitles username and password.')
+			return ku.ok_dialog(heading='OpenSubtitles', text='Error de inicio de sesión. Comprueba tu usuario y contraseña de OpenSubtitles.')
 		data = response.json()
 		token = data.get('token')
 		if token: _save_token(token)
@@ -337,14 +342,14 @@ def check_account():
 		if info_remaining is not None: remaining = info_remaining
 		if info_allowed is not None: allowed = info_allowed
 		if remaining is not None and allowed is not None:
-			text = 'Account: %s[CR][CR]Downloads remaining (24h): %s of %s' % (_username(), remaining, allowed)
+			text = 'Cuenta: %s[CR][CR]Descargas restantes (24h): %s de %s' % (_username(), remaining, allowed)
 		elif allowed is not None:
-			text = 'Account: %s[CR][CR]Daily download limit (24h): %s' % (_username(), allowed)
+			text = 'Cuenta: %s[CR][CR]Límite diario de descargas (24h): %s' % (_username(), allowed)
 		else:
-			text = 'Account: %s[CR][CR]Download quota: unknown' % _username()
+			text = 'Cuenta: %s[CR][CR]Cuota de descarga: desconocida' % _username()
 		return ku.ok_dialog(heading='OpenSubtitles', text=text)
 	except:
-		return ku.ok_dialog(heading='OpenSubtitles', text='Error checking OpenSubtitles account. Check your username and password.')
+		return ku.ok_dialog(heading='OpenSubtitles', text='Error al comprobar la cuenta de OpenSubtitles. Comprueba tu usuario y contraseña.')
 
 
 def revoke_access():
@@ -363,7 +368,7 @@ def revoke_access():
 		refresh_playback_subs_source()
 		refresh_alert_timing_settings()
 	except: pass
-	return ku.ok_dialog(heading='OpenSubtitles', text='OpenSubtitles username, password, and saved login cleared.')
+	return ku.ok_dialog(heading='OpenSubtitles', text='Usuario, contraseña e inicio de sesión guardado de OpenSubtitles eliminados.')
 
 
 def test_login():

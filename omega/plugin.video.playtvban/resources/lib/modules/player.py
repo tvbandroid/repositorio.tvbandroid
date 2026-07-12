@@ -101,9 +101,18 @@ class PlayTVBanPlayer(xbmc.Player):
 				else:
 					# Keep the resolver progress UI so play_file can try the next queued source.
 					self.run_error()
+					self._dismiss_kodi_playback_error_dialog()
 				self.safe_stop()
 		try: del self.kodi_monitor
 		except: pass
+
+	def _dismiss_kodi_playback_error_dialog(self):
+		# Kodi shows DialogConfirm (okdialog) when demux/open fails. Force-close so
+		# mid-queue resolve retries do not flash a brief confirm over the resolver UI.
+		if ku.get_visibility('Window.IsVisible(okdialog)'):
+			ku.close_dialog('okdialog')
+			return True
+		return False
 
 	def check_playback_start_generic(self):
 		resolve_percent = 0
@@ -115,8 +124,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			elif resolve_percent >= 100:
 				self.playback_successful = False
 				break
-			elif ku.get_visibility('Window.IsTopMost(okdialog)'):
-				ku.execute_builtin('SendClick(okdialog, 11)')
+			elif self._dismiss_kodi_playback_error_dialog():
 				self.playback_successful = False
 			elif self.isPlayingVideo():
 				try:
@@ -170,8 +178,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			elif resolve_percent >= 100:
 				self.playback_successful = False
 				break
-			elif ku.get_visibility('Window.IsTopMost(okdialog)'):
-				ku.execute_builtin('SendClick(okdialog, 11)')
+			elif self._dismiss_kodi_playback_error_dialog():
 				self.playback_successful = False
 			elif self.isPlayingVideo():
 				if self._resolve_cancelled():
@@ -204,7 +211,7 @@ class PlayTVBanPlayer(xbmc.Player):
 				play_random_continual = self.sources_object.random_continual
 				play_random = self.sources_object.random
 				disable_autoplay_next_episode = self.sources_object.disable_autoplay_next_episode
-				if disable_autoplay_next_episode: ku.notification('Scrape with Custom Values - Autoplay Next Episode Cancelled', 4500)
+				if disable_autoplay_next_episode: ku.notification('Buscar con Valores Personalizados - Reproducción Automática del Siguiente Episodio Cancelada', 4500)
 				if any((play_random_continual, play_random, disable_autoplay_next_episode)): self.autoplay_nextep, self.autoscrape_nextep = False, False
 				else: self.autoplay_nextep, self.autoscrape_nextep = self.sources_object.autoplay_nextep, self.sources_object.autoscrape_nextep
 				if self.autoplay_nextep or self.autoscrape_nextep:
@@ -735,7 +742,7 @@ class PlayTVBanPlayer(xbmc.Player):
 		season = meta.get('season', self.season)
 		episode = meta.get('episode', self.episode)
 		poster = meta.get('poster') or self.meta_get('poster')
-		ku.notification('[B]Next Episode Ready:[/B] %s S%02dE%02d' % (title, season, episode), 6500, poster)
+		ku.notification('[B]Siguiente Episodio Listo:[/B] %s T%02dE%02d' % (title, season, episode), 6500, poster)
 		self._log_nextep('Autoscrape next episode ready notify: remaining=%ss window=%ss' % (remaining, window))
 
 	def _try_autoplay_early_stash_play(self):
@@ -795,7 +802,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			except:
 				action = 'cancel'
 		else:
-			ku.notification('[B]Next Up:[/B] %s S%02dE%02d' % (dialog_meta.get('title'), dialog_meta.get('season'), dialog_meta.get('episode')), 6500, dialog_meta.get('poster'))
+			ku.notification('[B]Próximo:[/B] %s T%02dE%02d' % (dialog_meta.get('title'), dialog_meta.get('season'), dialog_meta.get('episode')), 6500, dialog_meta.get('poster'))
 		if not action:
 			action = default_action if use_window else 'close'
 		if not action:
@@ -1454,17 +1461,17 @@ class PlayTVBanPlayer(xbmc.Player):
 			pass
 		self.clear_playback_properties(clear_navigation=not self.is_generic)
 		if self.is_generic and ku.get_property('playtvban.browse_playback') == 'true':
-			return ku.notification('Playback Failed', 4000, settle_ms=400)
+			return ku.notification('Reproducción Fallida', 4000, settle_ms=400)
 		# play_file walks the resolve queue and calls playback_failed_action after the last attempt.
 		if not self.is_generic and getattr(self, 'sources_object', None):
 			return
-		text = message or 'This link could not be played. It may be expired, removed, or unsupported on this device.'
+		text = message or 'Este enlace no se pudo reproducir. Puede que haya expirado, haya sido eliminado, o no sea compatible con este dispositivo.'
 		ku.hide_busy_dialog()
 		ku.sleep(400)
 		try:
-			return ku.kodi_dialog().ok('Playback failed', text)
+			return ku.kodi_dialog().ok('Reproducción fallida', text)
 		except Exception:
 			try:
-				return ku.ok_dialog(heading='Playback failed', text=text)
+				return ku.ok_dialog(heading='Reproducción fallida', text=text)
 			except Exception:
-				return ku.notification('Playback Failed', 4000, settle_ms=400)
+				return ku.notification('Reproducción Fallida', 4000, settle_ms=400)

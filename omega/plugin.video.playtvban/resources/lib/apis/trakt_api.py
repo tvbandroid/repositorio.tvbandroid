@@ -29,11 +29,11 @@ def _trakt_fetch_page_limit(base_params):
 	return TRAKT_PAGE_LIMIT
 
 def no_client_key():
-	kodi_utils.notification('Por favor, introduce una Clave de Cliente Trakt válida')
+	kodi_utils.notification('Por favor, establece una Clave de ID de Cliente de Trakt válida')
 	return None
 
 def no_secret_key():
-	kodi_utils.notification('Por favor, introduce una Clave Secreta de Cliente Trakt válida')
+	kodi_utils.notification('Por favor, establece una Clave Secreta de Cliente de Trakt válida')
 	return None
 
 def get_trakt(params):
@@ -142,23 +142,23 @@ def trakt_get_device_code():
 def trakt_test_credentials():
 	CLIENT_ID = settings.trakt_client()
 	if CLIENT_ID in (None, 'empty_setting', ''):
-		return False, 'Trakt Client ID Key is not set.'
+		return False, 'La Clave de ID de Cliente de Trakt no está establecida.'
 	CLIENT_SECRET = settings.trakt_secret()
 	if CLIENT_SECRET in (None, 'empty_setting', ''):
-		return False, 'Trakt Client Secret Key is not set.'
+		return False, 'La Clave Secreta de Cliente de Trakt no está establecida.'
 	try:
 		headers = {'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': CLIENT_ID}
 		response = requests.post('https://api.trakt.tv/oauth/device/code', json={'client_id': CLIENT_ID}, headers=headers, timeout=15)
 		if response.status_code == 200:
-			return True, 'Trakt client keys are valid.'
+			return True, 'Las claves de cliente de Trakt son válidas.'
 		try:
 			payload = response.json()
 			detail = payload.get('error_description') or payload.get('error') or ''
 		except: detail = ''
-		if not detail: detail = (response.text or '').strip() or 'No details returned.'
-		return False, 'Trakt client keys failed.[CR]Trakt rejected the client ID (HTTP %s).[CR]%s' % (response.status_code, detail)
+		if not detail: detail = (response.text or '').strip() or 'No se devolvieron detalles.'
+		return False, 'Las claves de cliente de Trakt fallaron.[CR]Trakt rechazó el ID de cliente (HTTP %s).[CR]%s' % (response.status_code, detail)
 	except Exception as e:
-		return False, 'Trakt client keys failed.[CR]Could not reach Trakt: %s' % str(e)
+		return False, 'Las claves de cliente de Trakt fallaron.[CR]No se pudo conectar con Trakt: %s' % str(e)
 
 def trakt_get_device_token(device_codes):
 	API_ENDPOINT = 'https://api.trakt.tv/%s'
@@ -179,10 +179,10 @@ def trakt_get_device_token(device_codes):
 		qr_code = make_qrcode(auth_url) or ''
 		short_url = make_tinyurl(auth_url)
 		copy2clip(auth_url)
-		if short_url: p_dialog_insert = '[CR]O BIEN....[CR]visita [B]%s[/B]' % short_url
+		if short_url: p_dialog_insert = '[CR]OR....[CR]visit [B]%s[/B]' % short_url
 		else: p_dialog_insert = ''
-		content = 'Introduce [B]%s[/B] en [B]%s[/B][CR]O BIEN....[CR]Escanea el [B]Código QR[/B]%s' % (user_code, device_codes['verification_url'], p_dialog_insert)
-		progressDialog = kodi_utils.progress_dialog('Aurorizar Trakt', qr_code)
+		content = 'Enter [B]%s[/B] at [B]%s[/B][CR]OR....[CR]Scan the [B]QR Code[/B]%s' % (user_code, device_codes['verification_url'], p_dialog_insert)
+		progressDialog = kodi_utils.progress_dialog('Trakt Authorise', qr_code)
 		progressDialog.update(content, 0)
 		try:
 			time_passed = 0
@@ -239,17 +239,17 @@ def trakt_authenticate(dummy=''):
 		try:
 			user = call_trakt('/users/me')
 			set_setting('trakt.user', str(user['username']))
-		except: set_setting('trakt.user', 'Trakt User')
+		except: set_setting('trakt.user', 'Usuario de Trakt')
 		try:
 			from caches.settings_cache import sync_kodi_profile_context
 			sync_kodi_profile_context()
 		except: pass
 		settings.offer_watched_provider(1, 'Trakt')
 		kodi_utils.sleep(1000)
-		kodi_utils.notification('Cuenta Trakt Autorizada', 3000)
+		kodi_utils.notification('Cuenta de Trakt Autorizada', 3000)
 		trakt_sync_activities(force_update=True)
 		return True
-	kodi_utils.notification('Error Autorización Trakt', 3000)
+	kodi_utils.notification('Error al Autorizar Trakt', 3000)
 	return False
 
 def trakt_revoke_authentication(dummy=''):
@@ -260,7 +260,7 @@ def trakt_revoke_authentication(dummy=''):
 	set_setting('trakt.next_daily_clear', '0')
 	settings.fallback_watched_provider_on_revoke(1)
 	trakt_cache.clear_all_trakt_cache_data(silent=True, refresh=False)
-	kodi_utils.notification('Restablecimiento Autorización de la Cuenta Trakt', 3000)
+	kodi_utils.notification('Autorización de la Cuenta de Trakt Restablecida', 3000)
 	CLIENT_ID = settings.trakt_client()
 	if CLIENT_ID in (None, 'empty_setting', ''): return no_client_key()
 	CLIENT_SECRET = settings.trakt_secret()
@@ -466,7 +466,7 @@ def trakt_fetch_collection_watchlist(list_type, media_type):
 
 def add_to_list(user, slug, data):
 	result = call_trakt('/users/%s/lists/%s/items' % (user, slug), data=data)
-	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
+	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
 	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
@@ -483,7 +483,7 @@ def remove_from_list(user, slug, data):
 
 def add_to_watchlist(data):
 	result = call_trakt('/sync/watchlist', data=data)
-	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
+	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
 	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
@@ -500,7 +500,7 @@ def remove_from_watchlist(data):
 
 def add_to_collection(data):
 	result = call_trakt('/sync/collection', data=data)
-	if result['existing']['movies'] + result['existing']['episodes'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
+	if result['existing']['movies'] + result['existing']['episodes'] > 0: return kodi_utils.notification('Ya está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['episodes'] == 0: return kodi_utils.notification('Error', 3000)
 	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
@@ -613,10 +613,10 @@ def trakt_get_lists(list_type, page_no='1'):
 def get_trakt_list_selection(included_lists):
 	def default_lists():
 		return [
-		{'name': 'Colección de películas', 'display': '[B][I]COLECCIÓN DE PELÍCULAS [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'movie'},
-		{'name': 'Colección de series', 'display': '[B][I]COLECCIÓN DE SERIES [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'show'},
-		{'name': 'Lista de seguimiento de películas', 'display': '[B][I]LISTA DE SEGUIMIENTO DE PELÍCULAS [/I][/B]', 'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'movie'},
-		{'name': 'Lista de seguimiento de series', 'display': '[B][I]LISTA DE SEGUIMIENTO DE SERIES [/I][/B]', 'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'show'}
+		{'name': 'Movies Collection', 'display': '[B][I]MOVIES COLLECTION [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'movie'},
+		{'name': 'TV Show Collection', 'display': '[B][I]TV SHOW COLLECTION [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'show'},
+		{'name': 'Movies Watchlist', 'display': '[B][I]MOVIES WATCHLIST [/I][/B]',  'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'movie'},
+		{'name': 'TV Show Watchlist', 'display': '[B][I]TV SHOW WATCHLIST [/I][/B]',  'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'show'}
 		]
 	def personal_lists():
 		trakt_my_lists = trakt_get_lists('my_lists')
@@ -666,7 +666,7 @@ def trakt_like_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='post')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='post')
-		kodi_utils.notification('Éxito - Lista de Trakt Marcada con Me gusta', 3000)
+		kodi_utils.notification('Éxito - Lista de Trakt Marcada como Favorita', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True
@@ -680,7 +680,7 @@ def trakt_unlike_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='delete')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='delete')
-		kodi_utils.notification('Éxito - Me gusta Eliminado de la Lista de Trakt', 3000)
+		kodi_utils.notification('Éxito - Lista de Trakt Ya No es Favorita', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True
@@ -952,18 +952,19 @@ def trakt_sync_activities(params=None, force_update=False):
 	return 'success'
 
 def trakt_force_sync(params=None):
-	if not settings.trakt_user_active(): return kodi_utils.notification('Cuenta de Trakt no Autorizada', 3000)
-	progress = kodi_utils.progress_dialog('Sincronización de Trakt')
+	if not settings.trakt_user_active(): return kodi_utils.notification('Cuenta de Trakt no autorizada', 3000)
+	progress = kodi_utils.progress_dialog('Trakt Sync')
 	status = 'failed'
 	try:
-		progress.update('Sincronizando con Trakt...', 0)
+		progress.update('Syncing with Trakt...', 0)
 		status = trakt_sync_activities(force_update=True)
 	except Exception as e:
-		kodi_utils.logger('Trakt', 'Error en la sincronización forzada: %s' % e)
+		kodi_utils.logger('Trakt', 'Force sync failed: %s' % e)
 	finally:
 		kodi_utils.close_progress_dialog(progress)
-	if status == 'failed': kodi_utils.notification('Error en la Sincronización con Trakt', 3000)
+	if status == 'failed': kodi_utils.notification('Sincronización de Trakt Fallida', 3000)
 	else:
-		kodi_utils.notification('Sincronización con Trakt Completada', 3000)
+		kodi_utils.mark_boot_trakt_sync_ready()
+		kodi_utils.notification('Sincronización de Trakt Completa', 3000)
 		kodi_utils.kodi_refresh()
 	return status

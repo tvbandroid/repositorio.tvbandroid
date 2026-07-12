@@ -350,7 +350,7 @@ def mark_tvshow(params):
 	except: tvdb_id = 0
 	watched_indicators = settings.watched_indicators()
 	progress_backround = kodi_progress_background()
-	progress_backround.create('[B]Espere por favor..[/B]', '')
+	progress_backround.create('[B]Please Wait..[/B]', '')
 	if watched_indicators == 1:
 		if not trakt_watched_status_mark(action, 'shows', tmdb_id, tvdb_id): return notification('Error')
 		clear_trakt_collection_watchlist_data('watchlist', 'tvshow')
@@ -373,7 +373,7 @@ def mark_tvshow(params):
 			season_number = ep['season']
 			ep_number = ep['episode']
 			display = '%s - S%.2dE%.2d' % (title, int(season_number), int(ep_number))
-			progress_backround.update(int(float(count)/float(total)*100), '[B]Espere por favor....[/B]', display)
+			progress_backround.update(int(float(count)/float(total)*100), '[B]Please Wait..[/B]', display)
 			episode_date, premiered = adjust_premiered_date(ep['premiered'], settings.date_offset())
 			if episode_date and current_date < episode_date: continue
 			insert_append(make_batch_insert(action, 'episode', tmdb_id, season_number, ep_number, last_played, title))
@@ -383,7 +383,7 @@ def mark_tvshow(params):
 
 def mark_season(params):
 	season = int(params.get('season'))
-	if season == 0: return notification('Failed')
+	if season == 0: return notification('Fallido')
 	insert_list = []
 	insert_append = insert_list.append
 	action, title, tmdb_id = params.get('action'), params.get('title'), params.get('tmdb_id')
@@ -410,7 +410,7 @@ def mark_season(params):
 		display = '%s - S%.2dE%.2d' % (title, season_number, ep_number)
 		episode_date, premiered = adjust_premiered_date(item['premiered'], settings.date_offset())
 		if episode_date and current_date < episode_date: continue
-		progress_backround.update(int(float(count) / float(len(ep_data)) * 100), '[B]Espere por favor..[/B]', display)
+		progress_backround.update(int(float(count) / float(len(ep_data)) * 100), '[B]Please Wait..[/B]', display)
 		insert_append(make_batch_insert(action, 'episode', tmdb_id, season_number, ep_number, last_played, title))
 	batch_watched_status_mark(watched_indicators, insert_list, action)
 	progress_backround.close()
@@ -418,7 +418,7 @@ def mark_season(params):
 
 def mark_episode(params):
 	season, episode, title = int(params.get('season')), int(params.get('episode')), params.get('title')
-	if season == 0: return notification('Failed')
+	if season == 0: return notification('Fallido')
 	action, media_type = params.get('action'), 'episode'
 	refresh, from_playback = params.get('refresh', 'true') == 'true', params.get('from_playback', 'false') == 'true'
 	if from_playback: refresh = False
@@ -525,6 +525,8 @@ def _movie_progress_list(dbcon):
 def _refresh_trakt_movie_progress():
 	try:
 		if settings.watched_indicators() != 1 or not settings.trakt_user_active(): return
+		from modules.kodi_utils import boot_trakt_list_refresh_allowed
+		if not boot_trakt_list_refresh_allowed(): return
 		from apis.trakt_api import trakt_playback_progress, trakt_progress_movies
 		trakt_progress_movies(trakt_playback_progress())
 	except: pass
@@ -565,6 +567,8 @@ def _refresh_mdblist_episode_progress():
 def _refresh_trakt_episode_progress():
 	try:
 		if settings.watched_indicators() != 1 or not settings.trakt_user_active(): return
+		from modules.kodi_utils import boot_trakt_list_refresh_allowed
+		if not boot_trakt_list_refresh_allowed(): return
 		from apis.trakt_api import trakt_playback_progress, trakt_progress_tv
 		trakt_progress_tv(trakt_playback_progress())
 	except: pass
@@ -572,6 +576,8 @@ def _refresh_trakt_episode_progress():
 def _refresh_trakt_tvshow_watched():
 	try:
 		if settings.watched_indicators() != 1 or not settings.trakt_user_active(): return
+		from modules.kodi_utils import boot_trakt_list_refresh_allowed
+		if not boot_trakt_list_refresh_allowed(): return
 		from apis.trakt_api import trakt_indicators_tv
 		trakt_indicators_tv()
 	except: pass

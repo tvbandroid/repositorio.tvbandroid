@@ -172,7 +172,7 @@ def subtitles_source():
 	return get_setting('playtvban.playback.subs_source', '0')
 
 def subtitles_source_options():
-	options = {'0': 'Local Subtitles'}
+	options = {'0': 'Subtítulos Locales'}
 	if submaker_manifest_configured(): options['1'] = 'SubMaker'
 	if opensubs_configured(): options['2'] = 'OpenSubtitles'
 	return options
@@ -226,7 +226,7 @@ def subs_alert_fetch_configured():
 	return submaker_manifest_configured() or opensubs_configured()
 
 def alert_timing_options(next_episode=False):
-	options = {'0': 'Porcentaje de Reproducción', '1': 'Información del Capítulo', '2': 'Información de los Subtítulos'}
+	options = {'0': 'Porcentaje de Reproducción', '1': 'Información de Capítulo', '2': 'Información de Subtítulos'}
 	if next_episode:
 		options['3'] = 'Información de IntroDB'
 	if not subs_alert_fetch_configured():
@@ -284,15 +284,18 @@ def kodi_subtitle_language():
 def subs_language_preferences():
 	if subs_language_is_forced_local(): return []
 	prefs = []
-	play_tvban = subs_language()
-	if play_tvban: prefs.append(play_tvban)
+	red_light = subs_language()
+	if red_light: prefs.append(red_light)
 	kodi_lang = kodi_subtitle_language()
-	if kodi_lang and (not play_tvban or kodi_lang.lower() != play_tvban.lower()):
+	if kodi_lang and (not red_light or kodi_lang.lower() != red_light.lower()):
 		prefs.append(kodi_lang)
 	return prefs
 
 def submaker_prefer_local():
 	return get_setting('playtvban.playback.submaker_prefer_local', 'true') == 'true'
+
+def subs_show_notifications():
+	return get_setting('playtvban.playback.subs_show_notifications', 'true') == 'true'
 
 def stingers_show():
 	return get_setting('playtvban.stinger_alert.show', 'false') == 'true'
@@ -697,13 +700,13 @@ def configured_external_scraper_slots():
 
 def external_scraper_settings_tools_label():
 	if len(configured_external_scraper_slots()) != 1:
-		return 'External Scrapers Settings'
-	return 'External Scraper Settings'
+		return 'Ajustes de Scrapers Externos'
+	return 'Ajustes de Scraper Externo'
 
 def external_scraper_settings_options_label():
 	if len(configured_external_scraper_slots()) != 1:
-		return 'Open External Scrapers Settings'
-	return 'Open External Scraper Settings'
+		return 'Abrir Ajustes de Scrapers Externos'
+	return 'Abrir Ajustes de Scraper Externo'
 
 def append_external_scraper_settings_cm(cm_append, build_url_fn):
 	if not configured_external_scraper_slots(): return
@@ -929,8 +932,8 @@ def watched_provider_options():
 
 def offer_watched_provider(provider_index, name):
 	from modules.kodi_utils import confirm_dialog
-	if confirm_dialog(heading='Proveedor de Estado de Visualización', text='Deseas establecer %s como tu Proveedor de Estado de Visualización?' % name,
-						ok_label='Si', cancel_label='No', default_control=10):
+	if confirm_dialog(heading='Proveedor de Estado de Visto', text='¿Quieres establecer %s como tu Proveedor de Estado de Visto?' % name,
+						ok_label='Sí', cancel_label='No', default_control=10):
 		set_setting('watched_indicators', str(provider_index))
 		return True
 	return False
@@ -938,9 +941,9 @@ def offer_watched_provider(provider_index, name):
 def offer_trakt_import_to_simkl():
 	if not trakt_user_active() or not simkl_user_active(): return False
 	from modules.kodi_utils import confirm_dialog
-	if not confirm_dialog(heading='Import Trakt to Simkl',
-		text='Import your Trakt watch history into Simkl?',
-		ok_label='Yes', cancel_label='No', default_control=10): return False
+	if not confirm_dialog(heading='Importar Trakt a Simkl',
+		text='¿Importar tu historial de visualización de Trakt a Simkl?',
+		ok_label='Sí', cancel_label='No', default_control=10): return False
 	from apis.simkl_api import simkl_import_trakt
 	simkl_import_trakt()
 	return True
@@ -957,6 +960,16 @@ def fallback_watched_provider_on_revoke(revoked_index):
 
 def watched_indicators():
 	return _resolve_watched_provider()
+
+def provider_sync_refresh_widgets(provider_index):
+	"""Refresh home widgets after a provider sync only when that provider owns watched/progress indicators."""
+	if watched_indicators() != provider_index:
+		return False
+	keys = {1: 'trakt.refresh_widgets', 2: 'simkl.refresh_widgets', 3: 'mdblist.refresh_widgets'}
+	key = keys.get(provider_index)
+	if not key:
+		return False
+	return get_setting('playtvban.%s' % key, 'false') == 'true'
 
 def most_watched_provider():
 	return 'simkl' if watched_indicators() == 2 else 'trakt'
@@ -1131,5 +1144,4 @@ def rpdb_info(media_type):
 
 def use_season_name():
 	return get_setting('playtvban.use_season_name', 'false') == 'true'
-
 

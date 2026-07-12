@@ -5,7 +5,7 @@ import os
 from urllib.parse import urlencode, unquote
 
 def addon_themes():
-	return [{'name': 'Claro', 'value': ('FF434343', 'FF2E2E2E'), 'icon': 'light'}, {'name': 'Medium', 'value': ('FF373737', 'FF4a4347'), 'icon': 'medium'},
+	return [{'name': 'Claro', 'value': ('FF434343', 'FF2E2E2E'), 'icon': 'light'}, {'name': 'Medio', 'value': ('FF373737', 'FF4a4347'), 'icon': 'medium'},
 			{'name': 'Oscuro', 'value': ('FF1F2020', 'FF4F4F4F'), 'icon': 'dark'}]
 
 def addon_themes_opacity():
@@ -27,48 +27,48 @@ def random_episodes_check():
 def extras_button_label_values():
 	return {'movie':
 				{'movies_play': 'Reproducir', 'show_trailers': 'Tráiler', 'show_images': 'Imágenes',  'show_extrainfo': 'Información Extra', 'show_genres': 'Géneros',
-				'show_director': 'Director', 'show_options': 'Opciones', 'show_recommended': 'Recomendadas', 'show_related': 'Relacionadas', 'show_more_like_this': 'Más Como Esta',
-				'show_similar': 'Similares', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
-				'show_year': 'Más del Año', 'show_genre': 'Más del Género', 'show_network': 'Más de la Cadena',
-				'show_mdblist_manager': 'Listas MDBList', 'show_simkl_manager': 'Listas Simkl', 'show_trakt_manager': 'Listas Trakt', 'show_tmdb_manager': 'Listas TMDb', 'show_personallists_manager': 'Listas Personales',
+				'show_director': 'Director', 'show_options': 'Opciones', 'show_recommended': 'Recomendado', 'show_related': 'Relacionado', 'show_more_like_this': 'Más Como Esto',
+				'show_similar': 'Similar', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
+				'show_year': 'Más Año', 'show_genre': 'Más Géneros', 'show_network': 'Más Cadena',
+				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Listas de Simkl', 'show_trakt_manager': 'Listas de Trakt', 'show_tmdb_manager': 'Listas de TMDb', 'show_personallists_manager': 'Listas Personales',
 				'show_favorites_manager': 'Listas de Favoritos', 'playback_choice': 'Opciones de Reproducción', 'show_plot': 'Sinopsis', 'show_keywords': 'Palabras Clave',
 				'show_in_trakt_lists': 'En Listas de Trakt', 'close_all': 'Cerrar'},
 			'tvshow':
 				{'tvshow_browse': 'Explorar', 'show_trailers': 'Tráiler', 'show_images': 'Imágenes', 'show_extrainfo': 'Información Extra', 'show_genres': 'Géneros',
-				'play_nextep': 'Reproducir Siguiente', 'show_options': 'Opciones', 'show_recommended': 'Recomendadas', 'show_related': 'Relacionadas', 'show_more_like_this': 'Más Como Esta',
-				'show_similar': 'Similares', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
-				'show_year': 'Más del Año', 'show_genre': 'Más del Género', 'show_network': 'Más de la Cadena',
-				'show_mdblist_manager': 'Listas MDBList', 'show_simkl_manager': 'Listas Simkl', 'show_trakt_manager': 'Listas Trakt', 'show_tmdb_manager': 'Listas TMDb', 'show_personallists_manager': 'Listas Personales',
-				'show_favorites_manager': 'Listas de Favoritos', 'play_random_episode': 'Reproducir Episodio Aleatorio', 'show_plot': 'Sinopsis', 'show_keywords': 'Palabras Clave',
+				'play_nextep': 'Reproducir Siguiente', 'show_options': 'Opciones', 'show_recommended': 'Recomendado', 'show_related': 'Relacionado', 'show_more_like_this': 'Más Como Esto',
+				'show_similar': 'Similar', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
+				'show_year': 'Más Año', 'show_genre': 'Más Géneros', 'show_network': 'Más Cadena',
+				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Listas de Simkl', 'show_trakt_manager': 'Listas de Trakt', 'show_tmdb_manager': 'Listas de TMDb', 'show_personallists_manager': 'Listas Personales',
+				'show_favorites_manager': 'Listas de Favoritos', 'play_random_episode': 'Reproducir Aleatorio', 'show_plot': 'Sinopsis', 'show_keywords': 'Palabras Clave',
 				'show_in_trakt_lists': 'En Listas de Trakt', 'close_all': 'Cerrar'}}
 
 def extras_items():
-	return [{'name': 'Sinopsis', 'value': 2050}, {'name': 'Reparto', 'value': 2051}, {'name': 'Recomendadas', 'value': 2052}, {'name': 'Relacionadas', 'value': 2053},
-	{'name': 'Más Como Esta', 'value': 2054}, {'name': 'Similares', 'value': 2055}, {'name': 'Reseñas', 'value': 2056}, {'name': 'Comentarios', 'value': 2057},
-	{'name': 'Curiosidades', 'value': 2058}, {'name': 'Errores', 'value': 2059}, {'name': 'Guía para Padres', 'value': 2060}, {'name': 'En Listas de Trakt', 'value': 2061},
-	{'name': 'Vídeos', 'value': 2062}, {'name': 'Más del Año', 'value': 2063}, {'name': 'Más del Género', 'value': 2064}, {'name': 'Más de la Cadena', 'value': 2065},
+	return [{'name': 'Sinopsis', 'value': 2050}, {'name': 'Reparto', 'value': 2051}, {'name': 'Recomendado', 'value': 2052}, {'name': 'Relacionado', 'value': 2053},
+	{'name': 'Más Como Esto', 'value': 2054}, {'name': 'Similar', 'value': 2055}, {'name': 'Reseñas', 'value': 2056}, {'name': 'Comentarios', 'value': 2057},
+	{'name': 'Curiosidades', 'value': 2058}, {'name': 'Errores', 'value': 2059}, {'name': 'Guía Parental', 'value': 2060}, {'name': 'En Listas de Trakt', 'value': 2061},
+	{'name': 'Vídeos', 'value': 2062}, {'name': 'Más de Este Año', 'value': 2063}, {'name': 'Más de Estos Géneros', 'value': 2064}, {'name': 'Más de Estas Cadenas', 'value': 2065},
 	{'name': 'Más de la Colección', 'value': 2066}]
 
 def context_menu_items():
 	return [
 	{'name': 'Extras', 'value': 'extras'}, {'name': 'Opciones', 'value': 'options'}, {'name': 'Opciones de Reproducción', 'value': 'playback_options'},
-	{'name': 'Configuración de Scrapers Externos', 'value': 'external_scraper_settings'},
-	{'name': 'Explorar Colección de Películas', 'value': 'browse_movie_set'}, {'name': 'Explorar Temporadas', 'value': 'browse_seasons'},
+	{'name': 'Ajustes de Scraper Externo', 'value': 'external_scraper_settings'},
+	{'name': 'Explorar Colección de Películas', 'value': 'browse_movie_set'}, {'name': 'Explorar Temporadas de la Serie', 'value': 'browse_seasons'},
 	{'name': 'Explorar Episodios de la Temporada', 'value': 'browse_episodes'}, {'name': 'Explorar Recomendados', 'value': 'recommended'}, {'name': 'Explorar Relacionados', 'value': 'related'},
 	{'name': 'Explorar Más Como Esto', 'value': 'more_like_this'}, {'name': 'Explorar Similares', 'value': 'similar'}, {'name': 'En Listas de Trakt', 'value': 'in_trakt_list'},
-	{'name': 'Administrador de MDBList', 'value': 'mdblist_manager'}, {'name': 'Administrador de Listas de Simkl', 'value': 'simkl_manager'}, {'name': 'Administrador de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Administrador de Listas de TMDb', 'value': 'tmdb_manager'},
-	{'name': 'Administrador de Listas Personales', 'value': 'personal_manager'}, {'name': 'Administrador de Favoritos', 'value': 'favorites_manager'}, {'name': 'Marcar Visto/No Visto', 'value': 'mark_watched'},
-	{'name': 'Desmarcar Episodio Anterior como Visto', 'value': 'unmark_previous_episode'}, {'name': 'Salir de la Lista', 'value': 'exit'}, {'name': 'Actualizar Widgets', 'value': 'refresh'},
+	{'name': 'Gestor de MDBList', 'value': 'mdblist_manager'}, {'name': 'Gestor de Listas de Simkl', 'value': 'simkl_manager'}, {'name': 'Gestor de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Gestor de Listas de TMDb', 'value': 'tmdb_manager'},
+	{'name': 'Gestor de Listas Personales', 'value': 'personal_manager'}, {'name': 'Gestor de Favoritos', 'value': 'favorites_manager'}, {'name': 'Marcar Visto/No Visto', 'value': 'mark_watched'},
+	{'name': 'Desmarcar Episodio Visto Anterior', 'value': 'unmark_previous_episode'}, {'name': 'Salir de la Lista', 'value': 'exit'}, {'name': 'Actualizar Widgets', 'value': 'refresh'},
 	{'name': 'Recargar Widgets', 'value': 'reload'}]
 
 def rescrape_items():
 	return [
-	{'name': 'Reexplorar Sin Comprobar Caché', 'value': 'cache_ignored'},
-	{'name': 'Reexplorar con Datos del Año de IMDb', 'value': 'imdb_year'},
-	{'name': 'Reexplorar con Todos los Proveedores Externos', 'value': 'with_all'},
-	{'name': 'Reexplorar con Grupo de Episodios', 'value': 'episode_group'},
-	{'name': 'Reexplorar Ignorando los Filtros', 'value': 'ignore_filters'},
-	{'name': 'Ofrecer Búsqueda Completa Tras los Primeros Resultados', 'value': 'full_scrape'}]
+	{'name': 'Rebuscar Sin Comprobar Caché', 'value': 'cache_ignored'},
+	{'name': 'Rebuscar Con Datos de Año de IMDb', 'value': 'imdb_year'},
+	{'name': 'Rebuscar Con Proveedores Externos Desactivados', 'value': 'with_all'},
+	{'name': 'Rebuscar Con Grupo de Episodios', 'value': 'episode_group'},
+	{'name': 'Rebuscar Ignorando Filtros', 'value': 'ignore_filters'},
+	{'name': 'Ofrecer Búsqueda Completa Tras Resultados Iniciales', 'value': 'full_scrape'}]
 
 def video_extensions():
 	return ('m4v', '3g2', '3gp', 'nsv', 'tp', 'ts', 'ty', 'pls', 'rm', 'rmvb', 'mpd', 'ifo', 'mov', 'qt', 'divx', 'xvid', 'bivx', 'vob', 'nrg', 'img', 'iso', 'udf', 'pva',
@@ -135,7 +135,7 @@ def _folder_has_entries(path):
 		return False
 
 def safe_browse_defaultt(path):
-	# Kodi en Android puede bloquear la navegación al directorio superior cuando la exploración se inicia dentro de una carpeta que no está vacía.
+	# Kodi on Android can block parent navigation when browse opens inside a non-empty folder.
 	if not is_android() or not path or path in ('None', ''):
 		return path
 	if _folder_has_entries(path):
@@ -167,8 +167,8 @@ def _browse_paths_equal(a, b):
 	except:
 		return a == b
 
-def browse_directory(defaultt='', heading='Choose folder', use_defaultt=False, confirm_unchanged=False, force_defaultt=False):
-	# Kodi devuelve el valor predeterminado sin cambios cuando el usuario cancela (lo mismo que pulsar Aceptar sin moverse).
+def browse_directory(defaultt='', heading='Elegir carpeta', use_defaultt=False, confirm_unchanged=False, force_defaultt=False):
+	# Kodi returns defaultt unchanged when the user cancels (same as pressing OK without moving).
 	start = browse_start_path(defaultt, force_defaultt=force_defaultt) if use_defaultt else None
 	result = kodi_dialog().browse(0, heading, '', defaultt=start)
 	if not result or not str(result).strip():
@@ -178,7 +178,7 @@ def browse_directory(defaultt='', heading='Choose folder', use_defaultt=False, c
 			display = result if len(result) <= 120 else '%s...' % result[:117]
 			if not confirm_dialog(
 				heading=heading,
-				text='Usar esta carpeta?[CR][CR][B]%s[/B]' % display,
+				text='¿Usar esta carpeta?[CR][CR][B]%s[/B]' % display,
 				ok_label='Continuar',
 				cancel_label='Cancelar',
 				default_control=10,
@@ -188,7 +188,7 @@ def browse_directory(defaultt='', heading='Choose folder', use_defaultt=False, c
 			return None
 	return result
 
-def browse_file(mask='', defaultt='', heading='Elegir Archivo', force_defaultt=False):
+def browse_file(mask='', defaultt='', heading='Elegir archivo', force_defaultt=False):
 	# File browse: cancel with a folder defaultt returns that path, not an empty string.
 	start = browse_start_path(defaultt, force_defaultt=force_defaultt)
 	result = kodi_dialog().browse(1, heading, '', mask, defaultt=start)
@@ -229,7 +229,7 @@ def addon_fanart():
 MEDIA_GITHUB_USER = 'tvbandroid'
 MEDIA_GITHUB_REPO = 'tvbandroid.github.io'
 MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/%s/%s/master/tvband/packages/media' % (MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO)
-LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/tvbandroid/tvbandroid.github.io/master/tvband/packages/media'
+LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/tvbandroid/tvbandroid.github.io/tree/master/tvband/packages/media'
 # Estuary WideList row icons use ListItem.Icon only for Container.Content() — not files.
 MENU_FOLDER_CONTENT = ''
 
@@ -258,13 +258,13 @@ def resolve_list_icon(icon, default_name='folder'):
 				return get_icon(name, folder, ext)
 		return get_icon(os.path.splitext(os.path.basename(icon_norm))[0])
 	return get_icon(icon)
-    
+
 def set_list_item_art(listitem, icon, fanart=None, banner=None, landscape=None):
 	art = {'icon': icon, 'poster': icon, 'thumb': icon, 'banner': banner or icon, 'landscape': landscape or icon}
 	if fanart: art['fanart'] = fanart
 	listitem.setArt(art)
 	try: listitem.setIconImage(icon) # Estuary WideList reads ListItem.Icon, not Art(thumb).
-	except: pass    
+	except: pass
 
 def get_addon_fanart():
 	return get_property('playtvban.default_addon_fanart') or addon_fanart()
@@ -343,8 +343,8 @@ _browse_action_exit_params = {
 	'trakt_collection_lists': {'mode': 'navigator.trakt_collections'},
 	'trakt_watchlist': {'mode': 'navigator.trakt_watchlists'},
 	'trakt_watchlist_lists': {'mode': 'navigator.trakt_watchlists'},
-	'trakt_favorites': {'mode': 'navigator.trakt_favorites', 'category_name': 'Favorites'},
-	'trakt_recommendations': {'mode': 'navigator.trakt_recommendations', 'category_name': 'Recommended'},
+	'trakt_favorites': {'mode': 'navigator.trakt_favorites', 'category_name': 'Favoritos'},
+	'trakt_recommendations': {'mode': 'navigator.trakt_recommendations', 'category_name': 'Recomendado'},
 	'simkl_plantowatch': {'mode': 'navigator.simkl_lists'},
 	'simkl_completed': {'mode': 'navigator.simkl_lists'},
 	'simkl_watching': {'mode': 'navigator.simkl_lists'},
@@ -647,6 +647,33 @@ SHUTTING_DOWN_PROP = 'playtvban.shutting_down'
 PROP_AUTOSCRAPE_TOAST_SHOWN = 'playtvban.autoscrape_nextep_toast_shown'
 PLAYBACK_WIDGET_REFRESH_PROP = 'playtvban.playback_widget_refresh_at'
 PLAYBACK_WIDGET_REFRESH_COOLDOWN_SEC = 120
+BOOT_SYNC_STARTED_PROP = 'playtvban.boot_sync_started_at'
+BOOT_TRAKT_SYNC_READY_PROP = 'playtvban.boot_trakt_sync_ready'
+BOOT_SYNC_GATE_TIMEOUT_SEC = 180
+
+def reset_boot_sync_gate():
+	try:
+		from time import time
+		set_property(BOOT_SYNC_STARTED_PROP, str(time()))
+	except:
+		pass
+	clear_property(BOOT_TRAKT_SYNC_READY_PROP)
+
+def mark_boot_trakt_sync_ready():
+	set_property(BOOT_TRAKT_SYNC_READY_PROP, 'true')
+
+def boot_trakt_list_refresh_allowed():
+	if get_property(BOOT_TRAKT_SYNC_READY_PROP) == 'true':
+		return True
+	try:
+		from time import time
+		started = float(get_property(BOOT_SYNC_STARTED_PROP) or 0)
+		if started and (time() - started) >= BOOT_SYNC_GATE_TIMEOUT_SEC:
+			return True
+	except:
+		pass
+	return False
+
 def service_shutting_down(monitor=None):
 	if monitor and monitor.abortRequested(): return True
 	return get_property(SHUTTING_DOWN_PROP) == 'true'
@@ -698,9 +725,9 @@ def refresh_widgets(silent=False, reload_skin=False):
 		if home(): container_refresh()
 	except: pass
 	if reload_skin:
-		try: execute_builtin('AlarmClock(redlight_widget_skin,ReloadSkin(),00:00:01,silent)')
+		try: execute_builtin('AlarmClock(playtvban_widget_skin,ReloadSkin(),00:00:01,silent)')
 		except: pass
-	if not silent and get_setting('redlight.widget_refresh_notification', 'true') == 'true': notification('Widgets Refreshed', 2500)
+	if not silent and get_setting('playtvban.widget_refresh_notification', 'true') == 'true': notification('Widgets Actualizados', 2500)
 
 def run_plugin(params, block=False):
 	if isinstance(params, dict): params = build_url(params)
@@ -854,9 +881,9 @@ def reuse_language_invoker_check(force=False):
 			return False
 		changed, _invoker_changed = sync_addon_xml_from_settings()
 		if not changed:
-			logger('Play TVBan', 'AddonXMLCheck - Error al sincronizar addon.xml')
+			logger('Play TVBan', 'AddonXMLCheck - addon.xml sync failed')
 			return False
-		logger('Play TVBan', 'AddonXMLCheck - Cambio Detectado. Reiniciando Play TVBan')
+		logger('Play TVBan', 'AddonXMLCheck - Change Detected. Restarting Play TVBan')
 		finish_addon_xml_sync()
 		restart_addon_for_addon_xml_change(notify=not force)
 		return True
@@ -954,7 +981,7 @@ def external_scraper_settings(params=None):
 					line2 = 'Slot %d' % entry['slot']
 					if not entry['enabled']: line2 = '%s (disabled)' % line2
 					list_items.append({'line1': entry['display_name'], 'line2': line2})
-				kwargs = {'items': json.dumps(list_items), 'heading': 'Configuración del Raspador Externo', 'multi_line': 'true'}
+				kwargs = {'items': json.dumps(list_items), 'heading': 'Ajustes de Scraper Externo', 'multi_line': 'true'}
 				choice = select_dialog(slots, **kwargs)
 				if choice is None: return
 				execute_builtin('Addon.OpenSettings(%s)' % choice['module_id'])
@@ -1004,7 +1031,7 @@ def _dialog_needs_scroll(text):
 	wrapped = sum(max(1, (len(line) + _DIALOG_CONFIRM_CHARS_PER_LINE - 1) // _DIALOG_CONFIRM_CHARS_PER_LINE) for line in lines)
 	return wrapped > _DIALOG_CONFIRM_VISIBLE_LINES
 
-def confirm_dialog(heading='', text='Estas seguro?', ok_label='OK', cancel_label='Cancelar', default_control=11, scroll=False, third_label=None):
+def confirm_dialog(heading='', text='¿Estás seguro?', ok_label='OK', cancel_label='Cancelar', default_control=11, scroll=False, third_label=None):
 	from windows.base_window import open_window
 	needs_scroll = scroll and _dialog_needs_scroll(text)
 	kwargs = {'heading': heading, 'text': text, 'ok_label': ok_label, 'cancel_label': cancel_label, 'default_control': default_control,
@@ -1016,7 +1043,7 @@ def confirm_dialog(heading='', text='Estas seguro?', ok_label='OK', cancel_label
 		return raw
 	return None
 
-def ok_dialog(heading='', text='No Results', ok_label='OK', scroll=False):
+def ok_dialog(heading='', text='Sin Resultados', ok_label='OK', scroll=False):
 	from windows.base_window import open_window
 	needs_scroll = scroll and _dialog_needs_scroll(text)
 	kwargs = {'heading': heading, 'text': text, 'ok_label': ok_label,
@@ -1029,16 +1056,16 @@ def show_text(heading, text=None, file=None, font_size='small', kodi_log=False):
 	if file:
 		with open(file, encoding='utf-8') as r: text = r.readlines()
 	if kodi_log:
-		confirm = confirm_dialog(text='Mostrar Solo Errores del Registro?', ok_label='Si', cancel_label='No')
+		confirm = confirm_dialog(text='¿Mostrar Solo Errores del Registro?', ok_label='Sí', cancel_label='No')
 		if confirm == None: return
 		if confirm: text = [i for i in text if any(x in i.lower() for x in ('exception', 'error', '[test]'))]
 	text = ''.join(text)
 	return open_window(('windows.textviewer', 'TextViewer'), 'textviewer.xml', heading=heading, text=text, font_size=font_size)
 
-LIST_ITEM_NOT_IN_LIST = 'Item not in list'
+LIST_ITEM_NOT_IN_LIST = 'Elemento no está en la lista'
 
 def notification(line1, time=5000, icon=None, settle_ms=0):
-	# Un breve retraso ayuda a Kodi a mostrar la notificación después de cerrar los diálogos de selección/confirmación (las llamadas rápidas pueden impedir que aparezca).
+	# Brief delay helps Kodi show the toast after select/confirm dialogs close (rapid calls can drop it otherwise).
 	# sound=False: silent toast — especially during playback (Next Episode Ready, Next Up).
 	if settle_ms: sleep(settle_ms)
 	kodi_dialog().notification('Play TVBan', line1, icon or addon_icon(), time, False)
@@ -1049,9 +1076,9 @@ def player_check(mode, params):
 		from modules.sources import Sources
 		Sources().playback_prep(params)
 	elif mode == 'playback.video':
-		from modules.player import PlayTVBanPlayer
-		PlayTVBanPlayer().run(params.get('url', None), params.get('obj', None))
-	else: ok_dialog('Reproducción Externa Detectada', 'La Reproducción mediante Addons Externos no es Compatible')
+		from modules.player import RedLightPlayer
+		RedLightPlayer().run(params.get('url', None), params.get('obj', None))
+	else: ok_dialog('Reproducción Externa Detectada', 'Playback through external addons is not supported')
 
 def external_playback_check(params):
 	return True
@@ -1119,7 +1146,7 @@ def upload_logfile(params):
 	progressDialog = None
 	url = 'https://paste.kodi.tv/'
 	log_file = translate_path('special://logpath/%s' % log_file)
-	if not path_exists(log_file): return ok_dialog(text='Error. Error al Subir el Registro')
+	if not path_exists(log_file): return ok_dialog(text='Error. Fallo al Subir el Registro')
 	try:
 		show_busy_dialog()
 		try:
@@ -1129,7 +1156,7 @@ def upload_logfile(params):
 		finally:
 			hide_busy_dialog()
 		if 'key' not in response:
-			return ok_dialog(text='Error. Error al Subir el Registro')
+			return ok_dialog(text='Error. Fallo al Subir el Registro')
 		user_code = response['key']
 		url = '%s%s' % (url, user_code)
 		copy2clip(url)
@@ -1139,14 +1166,14 @@ def upload_logfile(params):
 		remaining = countdown_secs
 		while not progressDialog.iscanceled() and remaining > 0:
 			progressDialog.update(
-				'Comparte o Accede con esta URL: [B]%s[/B][CR]O escanea el código QR desde otro dispositivo.[CR][CR]Se cerrará automáticamente en [B]%d[/B] segundos (Atrás para cerrarlo ahora).' % (url, remaining),
+				'Share or Access with this url: [B]%s[/B][CR]Or scan the QR code on another device.[CR][CR]Auto-closes in [B]%d[/B] seconds (Back to dismiss now).' % (url, remaining),
 				int(100 * remaining / countdown_secs))
 			for _ in range(10):
 				if progressDialog.iscanceled(): break
 				sleep(100)
 			remaining -= 1
 	except:
-		ok_dialog(text='Error. Error al Subir el Registro')
+		ok_dialog(text='Error. Fallo al Subir el Registro')
 	finally:
 		hide_busy_dialog()
 		if progressDialog:

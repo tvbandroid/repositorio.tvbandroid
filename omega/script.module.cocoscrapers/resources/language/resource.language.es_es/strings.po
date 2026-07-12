@@ -1,0 +1,532 @@
+# Kodi Media Center language file
+# Addon Name: PlayTVBan Scrapers
+# Addon id: script.module.cocoscrapers
+# Addon Provider: Mr-Kodi
+# Traductor español: TVBandroid
+
+msgid ""
+msgstr ""
+
+msgctxt "#32001"
+msgid "[COLOR FFA0C12C]-- Help --[/COLOR]"
+msgstr "[COLOR FFA0C12C]-- Ayuda --[/COLOR]"
+
+msgctxt "#32002"
+msgid "[COLOR FFA0C12C]-- pack scraper Help --[/COLOR]"
+msgstr "[COLOR FFA0C12C]-- Ayuda del buscador de packs --[/COLOR]"
+
+msgctxt "#32003"
+msgid "[COLOR FFA0C12C]-- undesirables filter Help --[/COLOR]"
+msgstr "[COLOR FFA0C12C]-- Ayuda del filtro de resultados no deseados --[/COLOR]"
+
+msgctxt "#32004"
+msgid "[COLOR FFA0C12C]-- my accounts Help --[/COLOR]"
+msgstr "[COLOR FFA0C12C]-- Ayuda de mis cuentas --[/COLOR]"
+
+msgctxt "#32005"
+msgid "Choose Module Scraper"
+msgstr "Elegir módulo de scrapers"
+
+msgctxt "#32006"
+msgid "CocoScrapers Default Providers"
+msgstr "Proveedores Predeterminados de PlayTVBan"
+
+msgctxt "#32007"
+msgid "Disable All Providers"
+msgstr "Desactivar Todos los Proveedores"
+
+msgctxt "#32008"
+msgid "Enable All Providers"
+msgstr "Activar todos los proveedores"
+
+msgctxt "#32009"
+msgid "Show Changelog"
+msgstr "Mostrar Registro de Cambios"
+
+msgctxt "#32010"
+msgid "Notify Me About Available Updates"
+msgstr "Notificarme cuando haya actualizaciones disponibles"
+
+msgctxt "#32011"
+msgid "Disable All Hoster Providers"
+msgstr "Desactivar todos los proveedores de alojamiento"
+
+msgctxt "#32012"
+msgid "Enable All Hoster Providers"
+msgstr "Activar todos los proveedores de alojamiento"
+
+msgctxt "#32013"
+msgid "Disable All Torrent Providers"
+msgstr "Desactivar todos los proveedores Torrent"
+
+msgctxt "#32014"
+msgid "Enable All Torrent Providers"
+msgstr "Activar todos los proveedores Torrent"
+
+msgctxt "#32015"
+msgid "Enable Only Pack Capable Torrent Providers"
+msgstr "Activar solo proveedores Torrent compatibles con packs"
+
+msgctxt "#32016"
+msgid "Remove Undesirables"
+msgstr "Eliminar resultados no deseados"
+
+msgctxt "#32017"
+msgid "Remove identified Foreign single audio sources"
+msgstr "Eliminar fuentes identificadas con audio en idioma extranjero"
+
+msgctxt "#32018"
+msgid "Username"
+msgstr "Nombre de usuario"
+
+msgctxt "#32019"
+msgid "Password"
+msgstr "Contraseña"
+
+msgctxt "#32022"
+msgid "Furk API Key (Optional)"
+msgstr "Clave API de Furk (opcional)"
+
+msgctxt "#32033"
+msgid "Enable Debug"
+msgstr "Activar modo de depuración"
+
+msgctxt "#32034"
+msgid "Logging Location"
+msgstr "Ubicación del registro"
+
+msgctxt "#32035"
+msgid "Kodi Log"
+msgstr "Registro de Kodi"
+
+msgctxt "#32036"
+msgid "Addon Log"
+msgstr "Registro del addon"
+
+msgctxt "#32037"
+msgid "A new verison of CocoScrapers is available from the repository. Please consider updating to v%s"
+msgstr "Hay una nueva versión de PlayTVBan disponible en el repositorio. Se recomienda actualizar a la versión v%s."
+
+msgctxt "#32038"
+msgid "My Accounts sync complete"
+msgstr "Sincronización de Mis cuentas completada"
+
+msgctxt "#32039"
+msgid "GDrive Worker URL"
+msgstr "URL del Worker de Google Drive"
+
+msgctxt "#32040"
+msgid "[COLOR FFA0C12C]-- Torrent scraper Info --[/COLOR]"
+msgstr "[COLOR FFA0C12C]-- Información de los scrapers Torrent --[/COLOR]"
+
+msgctxt "#32041"
+msgid "Clean Settings file"
+msgstr "Limpiar archivo de configuración"
+
+msgctxt "#32042"
+msgid "{} Obsolete Settings Entries Removed"
+msgstr "Se eliminaron {} entradas de configuración obsoletas"
+
+msgctxt "#32043"
+msgid "Error Cleaning Settings.xml. Old settings.xml files Restored."
+msgstr "Error al limpiar Settings.xml. Se restauró el archivo Settings.xml anterior."
+
+msgctxt "#32044"
+msgid "Account Required Scrapers"
+msgstr "Scrapers que requieren cuenta"
+
+msgctxt "#32045"
+msgid "Local Scrapers"
+msgstr "Scrapers locales"
+
+msgctxt "#32046"
+msgid "Manage Default Undesirables"
+msgstr "Administrar resultados no deseados predeterminados"
+
+msgctxt "#32047"
+msgid "[B]Browse[/B]"
+msgstr "[B]Examinar[/B]"
+
+msgctxt "#32048"
+msgid "Define Extra Undesirables (Comma Separated)"
+msgstr "Definir resultados no deseados adicionales (separados por comas)"
+
+msgctxt "#32049"
+msgid "Remove Extra Undesirables"
+msgstr "Eliminar resultados no deseados adicionales"
+
+msgctxt "#32050"
+msgid "General"
+msgstr "General"
+
+msgctxt "#32051"
+msgid "Hosters"
+msgstr "Alojamientos"
+
+msgctxt "#32052"
+msgid "Torrents"
+msgstr "Torrents"
+
+msgctxt "#32053"
+msgid "Filepursuit API Key"
+msgstr "Clave API de FilePursuit"
+
+msgctxt "#32054"
+msgid "Debug"
+msgstr "Depuración"
+
+msgctxt "#32055"
+msgid "Write CocoScrapers log in reverse order"
+msgstr "Escribir el registro de PlayTVBan en orden inverso"
+
+msgctxt "#32056"
+msgid "Clear CocoScrapers log file"
+msgstr "Borrar el registro de PlayTVBan"
+
+msgctxt "#32057"
+msgid "View CocoScrapers log file"
+msgstr "Ver el registro de PlayTVBan"
+
+msgctxt "#32058"
+msgid "Upload CocoScrapers log file to pastebin"
+msgstr "Subir el registro de PlayTVBan a Pastebin"
+
+msgctxt "#32059"
+msgid "CocoScrapers log file uploaded to:"
+msgstr "Registro de PlayTVBan subido a:"
+
+msgctxt "#32060"
+msgid "Are you sure?"
+msgstr "¿Estás seguro?"
+
+msgctxt "#32061"
+msgid "$NUMBER[2]DDL"
+msgstr "$NUMBER[2]DDL"
+
+msgctxt "#32062"
+msgid "$NUMBER[300]MBFILMS"
+msgstr "$NUMBER[300]MBFILMS"
+
+msgctxt "#32063"
+msgid "$NUMBER[5]MOVIES"
+msgstr "$NUMBER[5]MOVIES"
+
+msgctxt "#32064"
+msgid "CARTOONHD"
+msgstr "CARTOONHD"
+
+msgctxt "#32065"
+msgid "EASYNEWS"
+msgstr "EASYNEWS"
+
+msgctxt "#32066"
+msgid "FILEPURSUIT"
+msgstr "FILEPURSUIT"
+
+msgctxt "#32067"
+msgid "FILMXY"
+msgstr "FILMXY"
+
+msgctxt "#32068"
+msgid "FURK"
+msgstr "FURK"
+
+msgctxt "#32069"
+msgid "GANOOL (Movies only)"
+msgstr "GANOOL (solo películas)"
+
+msgctxt "#32070"
+msgid "LIBRARY"
+msgstr "BIBLIOTECA"
+
+msgctxt "#32071"
+msgid "MAXRLS"
+msgstr "MAXRLS"
+
+msgctxt "#32072"
+msgid "MYVIDEOLINK"
+msgstr "MYVIDEOLINK"
+
+msgctxt "#32073"
+msgid "ONLINESERIES"
+msgstr "ONLINESERIES"
+
+msgctxt "#32074"
+msgid "ORORO"
+msgstr "ORORO"
+
+msgctxt "#32075"
+msgid "RLSBB"
+msgstr "RLSBB"
+
+msgctxt "#32076"
+msgid "SCENERLS"
+msgstr "SCENERLS"
+
+msgctxt "#32077"
+msgid "WATCHEPISODES (shows only)"
+msgstr "WATCHEPISODES (solo series)"
+
+msgctxt "#32078"
+msgid "WATCHSERIES (shows only)"
+msgstr "WATCHSERIES (solo series)"
+
+msgctxt "#32079"
+msgid "WATCHSERIESHD (shows only)"
+msgstr "WATCHSERIESHD (solo series)"
+
+msgctxt "#32080"
+msgid "WATCHSERIESTV (shows only)"
+msgstr "WATCHSERIESTV (solo series)"
+
+msgctxt "#32081"
+msgid "GDRIVE"
+msgstr "GDRIVE"
+
+msgctxt "#32082"
+msgid "RAPIDMOVIEZ"
+msgstr "RAPIDMOVIEZ"
+
+msgctxt "#32083"
+msgid "Title Check Results"
+msgstr "Resultados de la comprobación del título"
+
+msgctxt "#32084"
+msgid "No User Undesirables Set"
+msgstr "No hay resultados no deseados definidos por el usuario"
+
+msgctxt "#32085"
+msgid "Select to Enable/Disable"
+msgstr "Seleccionar para activar/Desactivar"
+
+msgctxt "#32086"
+msgid "Select to Remove From List"
+msgstr "Seleccionar para Eliminar de la Lista"
+
+msgctxt "#32087"
+msgid "Success"
+msgstr "Correcto"
+
+msgctxt "#32088"
+msgid ""
+msgstr ""
+
+msgctxt "#32089"
+msgid ""
+msgstr ""
+
+msgctxt "#32090"
+msgid ""
+msgstr ""
+
+msgctxt "#32091"
+msgid ""
+msgstr ""
+
+msgctxt "#32092"
+msgid ""
+msgstr ""
+
+msgctxt "#32093"
+msgid ""
+msgstr ""
+
+msgctxt "#32094"
+msgid ""
+msgstr ""
+
+msgctxt "#32095"
+msgid ""
+msgstr ""
+
+msgctxt "#32096"
+msgid ""
+msgstr ""
+
+msgctxt "#32097"
+msgid ""
+msgstr ""
+
+msgctxt "#32098"
+msgid ""
+msgstr ""
+
+msgctxt "#32099"
+msgid ""
+msgstr ""
+
+msgctxt "#32100"
+msgid ""
+msgstr ""
+
+msgctxt "#32101"
+msgid "$NUMBER[1337]X"
+msgstr "$NUMBER[1337]X"
+
+msgctxt "#32102"
+msgid "$NUMBER[7]TORRENTS (Pack capable)"
+msgstr "$NUMBER[7]TORRENTS (compatible con Packs)"
+
+msgctxt "#32103"
+msgid "BITLORD (Pack capable)"
+msgstr "BITLORD (compatible con Packs)"
+
+msgctxt "#32104"
+msgid "BTSCENE (Pack capable)"
+msgstr "BTSCENE (compatible con Packs)"
+
+msgctxt "#32105"
+msgid "ETTV"
+msgstr "ETTV"
+
+msgctxt "#32106"
+msgid "EXTRATORRENT (Pack capable)"
+msgstr "EXTRATORRENT (compatible con Packs)"
+
+msgctxt "#32107"
+msgid "EZTV (shows only-Pack capable)"
+msgstr "EZTV (solo series - compatible con
+
+msgctxt "#32111"
+msgid "KICKASS2 (Pack Capable)"
+msgstr "KICKASS2 (compatible con Packs)"
+
+msgctxt "#32113"
+msgid "MAGNET$NUMBER[4]YOU"
+msgstr "MAGNET$NUMBER[4]YOU"
+
+msgctxt "#32114"
+msgid "TORRENTQUEST (Pack capable)"
+msgstr "TORRENTQUEST (compatible con Packs)"
+
+msgctxt "#32115"
+msgid "MOVIEMAGNET"
+msgstr "MOVIEMAGNET"
+
+msgctxt "#32116"
+msgid "NYAA"
+msgstr "NYAA"
+
+msgctxt "#32117"
+msgid "PIRATEBAY (Pack capable)"
+msgstr "PIRATEBAY (compatible con Packs)"
+
+msgctxt "#32118"
+msgid "SKYTORRENTS (Pack capable)"
+msgstr "SKYTORRENTS (compatible con Packs)"
+
+msgctxt "#32119"
+msgid "SOLIDTORRENTS (Pack capable)"
+msgstr "SOLIDTORRENTS (compatible con Packs)"
+
+msgctxt "#32120"
+msgid "TOPNOW"
+msgstr "TOPNOW"
+
+msgctxt "#32122"
+msgid "TORRENTAPI (Pack capable)"
+msgstr "TORRENTAPI (compatible con Packs)"
+
+msgctxt "#32123"
+msgid "TORRENTDOWNLOAD (Pack capable)"
+msgstr "TORRENTDOWNLOAD (compatible con Packs)"
+
+msgctxt "#32124"
+msgid "TORRENTFUNK (Pack capable)"
+msgstr "TORRENTFUNK (compatible con Packs)"
+
+msgctxt "#32125"
+msgid "TORRENTGALAXY (Pack capable)"
+msgstr "TORRENTGALAXY (compatible con Packs)"
+
+msgctxt "#32126"
+msgid "YOURBITTORRENT (Pack capable)"
+msgstr "YOURBITTORRENT (compatible con Packs)"
+
+msgctxt "#32127"
+msgid "YTSMX (Movies only)"
+msgstr "YTSMX (solo películas)"
+
+msgctxt "#32128"
+msgid "ZOOQLE (Pack capable)"
+msgstr "ZOOQLE (compatible con Packs)"
+
+msgctxt "#32129"
+msgid "BTDB (Pack capable)"
+msgstr "BTDB (compatible con Packs)"
+
+msgctxt "#32131"
+msgid "EXT.TO (Pack capable)"
+msgstr "EXT.TO (compatible con Packs)"
+
+msgctxt "#32132"
+msgid "BT4G (Pack capable)"
+msgstr "BT4G (compatible con Packs)"
+
+msgctxt "#32133"
+msgid "BTDIG"
+msgstr "BTDIG"
+
+msgctxt "#32134"
+msgid "TORRENTTM (Pack capable)"
+msgstr "TORRENTTM (compatible con Packs)"
+
+msgctxt "#32135"
+msgid "TORRENTPARADISE (Pack capable)"
+msgstr "TORRENTPARADISE (compatible con Packs)"
+
+msgctxt "#32136"
+msgid "TORRENTPROJECT2 (Pack capable)"
+msgstr "TORRENTPROJECT2 (compatible con Packs)"
+
+msgctxt "#32137"
+msgid "BITCQ (Pack capable)"
+msgstr "BITCQ Ccompatible con Packs)"
+
+msgctxt "#32138"
+msgid "BITSEARCH (Pack capable)"
+msgstr "BITSEARCH (compatible con Packs)"
+
+msgctxt "#32139"
+msgid "TORRENTIO (Pack capable)"
+msgstr "TORRENTIO (compatible con Packs)"
+
+msgctxt "#32569"
+msgid "View CocoScrapers torrent stats"
+msgstr "VER ESTADÍSTICAS TORRENT DE PLAYTVBAN"
+
+msgctxt "#32570"
+msgid "Setup Using Device Code"
+msgstr "CONFIGURAR MEDIANTE CÓDIGO DE DISPOSITIVO"
+
+msgctxt "#32571"
+msgid "Mediafusion URL"
+msgstr "URL DE MEDIAFUSION"
+
+msgctxt "#32572"
+msgid "Use Custom Mediafusion URL"
+msgstr "USAR URL PERSONALIZADA DE MEDIAFUSION"
+
+msgctxt "#32573"
+msgid "Secret String"
+msgstr "CADENA SECRETA"
+
+msgctxt "#32574"
+msgid "Reset Secret"
+msgstr "RESTABLECER CADENA SECRETA"
+
+msgctxt "#32575"
+msgid "LIMETORRENTS (Pack Capable)"
+msgstr "LIMETORRENTS (COMPATIBLE CON PACKS)"
+
+msgctxt "#32576"
+msgid "PROWLARR (PACK CAPABLE)"
+msgstr "PROWLARR (COMPATIBLE CON PACKS)"
+
+msgctxt "#32577"
+msgid "PROWLARR apikey"
+msgstr "CLAVE API DE PROWLARR"
+
+msgctxt "#32578"
+msgid "PROWLARR url"
+msgstr "URL DE PROWLARR"

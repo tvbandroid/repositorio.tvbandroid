@@ -29,9 +29,9 @@ def search_trakt_lists(params):
 				display = '%s | [I]%s (x%s)[/I]' % (list_name, user, str(item_count))
 				url = build_url({'mode': 'trakt.list.build_trakt_list', 'list_id': list_id, 'list_type': 'user_lists', 'list_name': list_name, 'user': user,
 				'iconImage': 'trakt', 'name': list_name})
-				cm = [('[B]Like List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_like_a_list', 'list_id': list_id})),
-				('[B]Unlike List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_unlike_a_list', 'list_id': list_id})),
-				('[B]Add to Shortcut Folder[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
+				cm = [('[B]Me gusta la Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_like_a_list', 'list_id': list_id})),
+				('[B]Quitar Me gusta de la Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_unlike_a_list', 'list_id': list_id})),
+				('[B]Añadir a la Carpeta de Accesos Directos[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
 				listitem = make_listitem()
 				listitem.setLabel(display)
 				listitem.setArt({'icon': trakt_icon, 'poster': trakt_icon, 'thumb': trakt_icon, 'fanart': fanart, 'banner': fanart})
@@ -50,7 +50,7 @@ def search_trakt_lists(params):
 		kodi_utils.add_items(handle, list(_builder()))
 		if pages > page:
 			new_page = str(int(page) + 1)
-			kodi_utils.add_dir(handle, {'mode': mode, 'key_id': search_title, 'new_page': new_page}, 'Next Page (%s) >>' % new_page,
+			kodi_utils.add_dir(handle, {'mode': mode, 'key_id': search_title, 'new_page': new_page}, 'Página Siguiente (%s) >>' % new_page,
 								'nextpage', kodi_utils.get_icon('nextpage_landscape'))
 	except: pass
 	kodi_utils.set_content(handle, 'files')
@@ -85,10 +85,10 @@ def search_trakt_my_lists(params):
 					'list_name': list_name, 'iconImage': 'trakt', 'name': list_name, 'sort_by': sort_by, 'sort_how': sort_how}
 				url = kodi_utils.build_folder_url(url_params)
 				display = '%s [I](x%s)[/I]' % (list_name, str(item_count))
-				cm_append(('[B]Make New List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.make_new_trakt_list'})))
-				cm_append(('[B]Delete List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.delete_trakt_list', 'user': user, 'list_slug': slug})))
-				cm_append(('[B]Add to Shortcut Folder[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url})))
-				cm_append(('[B]Set Custom Sort[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.set_list_custom_sort', 'list_id': list_id,
+				cm_append(('[B]Crear Nueva Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.make_new_trakt_list'})))
+				cm_append(('[B]Eliminar Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.delete_trakt_list', 'user': user, 'list_slug': slug})))
+				cm_append(('[B]Añadir a la Carpeta de Accesos Directos[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url})))
+				cm_append(('[B]Establecer Orden Personalizado[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.set_list_custom_sort', 'list_id': list_id,
 					'sort_by': sort_by, 'sort_how': sort_how})))
 				listitem = make_listitem()
 				listitem.setLabel(display)
@@ -154,20 +154,20 @@ def get_trakt_lists(params):
 				url = kodi_utils.build_folder_url(url_params)
 				if list_type == 'liked_lists':
 					display = '%s | [I]%s (x%s)[/I]' % (list_name, user, str(item_count))
-					cm_append(('[B]Unlike List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_unlike_a_list', 'user': user, 'list_slug': slug})))
-				else:
+					cm_append(('[B]Quitar Me Gusta de la Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_unlike_a_list', 'user': user, 'list_slug': slug})))
+								else:
 					display = '%s [I](x%s)[/I]' % (list_name, str(item_count))
-					cm_append(('[B]Make New List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.make_new_trakt_list'})))
-					cm_append(('[B]Delete List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.delete_trakt_list', 'user': user, 'list_slug': slug})))
-				cm_append(('[B]Add to Shortcut Folder[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url})))
-				cm_append(('[B]Set Custom Sort[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.set_list_custom_sort', 'list_id': list_id,
+					cm_append(('[B]Crear Nueva Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.make_new_trakt_list'})))
+					cm_append(('[B]Eliminar Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.delete_trakt_list', 'user': user, 'list_slug': slug})))
+				cm_append(('[B]Añadir a la Carpeta de Accesos Directos[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url})))
+				cm_append(('[B]Establecer Orden Personalizado[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.set_list_custom_sort', 'list_id': list_id,
 					'sort_by': sort_by, 'sort_how': sort_how})))
-				cm_append(('[B]Make Custom Poster[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.make_custom_artwork', 'action': 'make_poster',
+				cm_append(('[B]Crear Póster Personalizado[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.make_custom_artwork', 'action': 'make_poster',
 					'custom_image': custom_poster, 'list_name': list_name, 'list_type': list_type, 'list_id': list_id, 'user': user, 'list_slug': slug})))
-				cm_append(('[B]Make Custom Fanart[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.make_custom_artwork', 'action': 'make_fanart',
+				cm_append(('[B]Crear Fanart Personalizado[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.make_custom_artwork', 'action': 'make_fanart',
 					'custom_image': custom_fanart, 'list_name': list_name, 'list_type': list_type, 'list_id': list_id, 'user': user, 'list_slug': slug})))
-				if custom_poster: cm_append(('[B]Delete Custom Poster[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.delete_current_image', 'custom_image': custom_poster})))
-				if custom_fanart: cm_append(('[B]Delete Custom Fanart[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.delete_current_image', 'custom_image': custom_fanart})))
+				if custom_poster: cm_append(('[B]Eliminar Póster Personalizado[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.delete_current_image', 'custom_image': custom_poster})))
+				if custom_fanart: cm_append(('[B]Eliminar Fanart Personalizado[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.list.delete_current_image', 'custom_image': custom_fanart})))
 				listitem = make_listitem()
 				listitem.setLabel(display)
 				listitem.setArt({'icon': poster, 'poster': poster, 'thumb': poster, 'fanart': background, 'banner': background})
@@ -231,9 +231,9 @@ def get_trakt_user_lists(params):
 				url = kodi_utils.build_folder_url(url_params)
 				listitem = make_listitem()
 				if user != 'Trakt Official':
-					cm_append(('[B]Like List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_like_a_list', 'user': user, 'list_slug': slug})))
-					cm_append(('[B]Unlike List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_unlike_a_list', 'user': user, 'list_slug': slug})))
-				cm_append(('[B]Add to Shortcut Folder[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url})))
+					cm_append(('[B]Me Gusta la Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_like_a_list', 'user': user, 'list_slug': slug})))
+					cm_append(('[B]Quitar Me Gusta de la Lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'trakt.trakt_unlike_a_list', 'user': user, 'list_slug': slug})))
+				cm_append(('[B]Añadir a la Carpeta de Accesos Directos[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url})))
 				listitem.addContextMenuItems(cm)
 				listitem.setLabel(display)
 				listitem.setArt({'icon': trakt_icon, 'poster': trakt_icon, 'thumb': trakt_icon, 'fanart': fanart, 'banner': fanart})
@@ -250,10 +250,10 @@ def get_trakt_user_lists(params):
 		lists = trakt_get_lists(list_type, page)
 		kodi_utils.add_items(handle, list(_process()))
 		kodi_utils.add_dir(handle, {'mode': 'trakt.list.get_trakt_user_lists', 'list_type': list_type, 'new_page': new_page},
-				'Next Page (%s) >>' % new_page, 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
+				'Página Siguiente (%s) >>' % new_page, 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
 	except: pass
 	kodi_utils.set_content(handle, 'files')
-	kodi_utils.set_category(handle, params.get('category_name', 'Trakt Lists'))
+	kodi_utils.set_category(handle, params.get('category_name', 'Listas de Trakt'))
 	kodi_utils.end_directory(handle)
 	kodi_utils.set_view_mode('view.main')
 
@@ -269,8 +269,8 @@ def in_trakt_lists(params):
 				url = kodi_utils.build_url({'mode': 'trakt.list.build_trakt_list', 'user': user, 'slug': slug, 'list_type': 'user_lists', 'list_name': list_name})
 				listitem = kodi_utils.make_listitem()
 				if not user == 'Trakt Official':
-					cm_append(('[B]Like List[/B]', 'RunPlugin(%s)' % kodi_utils.build_url({'mode': 'trakt.trakt_like_a_list', 'user': user, 'list_slug': slug})))
-					cm_append(('[B]Unlike List[/B]', 'RunPlugin(%s)' % kodi_utils.build_url({'mode': 'trakt.trakt_unlike_a_list', 'user': user, 'list_slug': slug})))
+					cm_append(('[B]Me Gusta la Lista[/B]', 'RunPlugin(%s)' % kodi_utils.build_url({'mode': 'trakt.trakt_like_a_list', 'user': user, 'list_slug': slug})))
+					cm_append(('[B]Quitar Me Gusta de la Lista[/B]', 'RunPlugin(%s)' % kodi_utils.build_url({'mode': 'trakt.trakt_unlike_a_list', 'user': user, 'list_slug': slug})))
 				listitem.addContextMenuItems(cm)
 				listitem.setLabel(display)
 				listitem.setArt({'icon': trakt_icon, 'poster': trakt_icon, 'thumb': trakt_icon, 'fanart': fanart, 'banner': fanart})

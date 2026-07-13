@@ -257,35 +257,35 @@ class TVShows:
 				else: url_params = self.build_url({'mode': 'build_episode_list', 'tmdb_id': tmdb_id, 'season': 'all'})
 			else: url_params = self.build_url({'mode': 'build_season_list', 'tmdb_id': tmdb_id})
 			if self.open_extras:
-				cm_append(['extras', ('[B]Explorar[/B]', 'Container.Update(%s)' % url_params)])
+				cm_append(['extras', ('[B]Browse[/B]', 'Container.Update(%s)' % url_params)])
 				url_params = extras_params
-						else: cm_append(['extras', ('[B]Extras[/B]', 'RunPlugin(%s)' % extras_params)])
-			cm_append(['options', ('[B]Opciones[/B]', 'RunPlugin(%s)' % options_params)])
-			cm_append(['recommended', ('[B]Explorar Recomendaciones[/B]', self.window_command % browse_recommended_params)])
-			cm_append(['related', ('[B]Explorar Relacionados[/B]', self.window_command % browse_related_params)])
-			cm_append(['more_like_this', ('[B]Explorar Más Como Esto[/B]', self.window_command % browse_more_like_this_params)])
-			if self.ai_model_active: cm_append(['similar', ('[B]Explorar Similares[/B]', self.window_command % browse_similar_params)])
-			cm_append(['in_trakt_list', ('[B]En Listas de Trakt[/B]', self.window_command % browse_in_trakt_list_params)])
-			if mdblist_manager_params: cm_append(['mdblist_manager', ('[B]Administrador de MDBList[/B]', 'RunPlugin(%s)' % mdblist_manager_params)])
-			if simkl_manager_params: cm_append(['simkl_manager', ('[B]Administrador de Listas de Simkl[/B]', 'RunPlugin(%s)' % simkl_manager_params)])
-			cm_append(['trakt_manager', ('[B]Administrador de Listas de Trakt[/B]', 'RunPlugin(%s)' % trakt_manager_params)])
-			cm_append(['tmdb_manager', ('[B]Administrador de Listas de TMDb[/B]', 'RunPlugin(%s)' % tmdb_manager_params)])
-			cm_append(['personal_manager', ('[B]Administrador de Listas Personales[/B]', 'RunPlugin(%s)' % personal_manager_params)])
-			cm_append(['favorites_manager', ('[B]Administrador de Favoritos[/B]', 'RunPlugin(%s)' % favorites_manager_params)])
+			else: cm_append(['extras', ('[B]Extras[/B]', 'RunPlugin(%s)' % extras_params)])
+			cm_append(['options', ('[B]Options[/B]', 'RunPlugin(%s)' % options_params)])
+			cm_append(['recommended', ('[B]Browse Recommended[/B]', self.window_command % browse_recommended_params)])
+			cm_append(['related', ('[B]Browse Related[/B]', self.window_command % browse_related_params)])
+			cm_append(['more_like_this', ('[B]Browse More Like This[/B]', self.window_command % browse_more_like_this_params)])
+			if self.ai_model_active: cm_append(['similar', ('[B]Browse Similar[/B]', self.window_command % browse_similar_params)])
+			cm_append(['in_trakt_list', ('[B]In Trakt Lists[/B]', self.window_command % browse_in_trakt_list_params)])
+			if mdblist_manager_params: cm_append(['mdblist_manager', ('[B]MDBList Manager[/B]', 'RunPlugin(%s)' % mdblist_manager_params)])
+			if simkl_manager_params: cm_append(['simkl_manager', ('[B]Simkl Lists Manager[/B]', 'RunPlugin(%s)' % simkl_manager_params)])
+			cm_append(['trakt_manager', ('[B]Trakt Lists Manager[/B]', 'RunPlugin(%s)' % trakt_manager_params)])
+			cm_append(['tmdb_manager', ('[B]TMDb Lists Manager[/B]', 'RunPlugin(%s)' % tmdb_manager_params)])
+			cm_append(['personal_manager', ('[B]Personal Lists Manager[/B]', 'RunPlugin(%s)' % personal_manager_params)])
+			cm_append(['favorites_manager', ('[B]Favorites Manager[/B]', 'RunPlugin(%s)' % favorites_manager_params)])
 			if playcount:
 				if self.widget_hide_watched: return
 			elif not unaired:
-				cm_append(['mark_watched', ('[B]Marcar Como Visto[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'watched_status.mark_tvshow', 'action': 'mark_as_watched',
+				cm_append(['mark_watched', ('[B]Mark Watched[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'watched_status.mark_tvshow', 'action': 'mark_as_watched',
 																			'title': title,'tmdb_id': tmdb_id, 'tvdb_id': tvdb_id}))])
 			if progress:
-				cm_append(['mark_watched', ('[B]Marcar Como No Visto[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'watched_status.mark_tvshow', 'action': 'mark_as_unwatched',
+				cm_append(['mark_watched', ('[B]Mark Unwatched[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'watched_status.mark_tvshow', 'action': 'mark_as_unwatched',
 																			'title': title, 'tmdb_id': tmdb_id, 'tvdb_id': tvdb_id}))])
 			set_properties({'watchedepisodes': str(total_watched), 'unwatchedepisodes': str(total_unwatched)})
 			set_properties({'watchedprogress': visible_progress, 'totalepisodes': str(total_aired_eps), 'totalseasons': str(total_seasons)})
-			if not self.is_external: cm_append(['exit', ('[B]Salir de la Lista de Series[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.exit_media_menu'}))])
+			if not self.is_external: cm_append(['exit', ('[B]Exit TV Show List[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.exit_media_menu'}))])
 			if self.is_external:
-				cm.extend([['refresh', ('[B]Actualizar Widgets[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'refresh_widgets'}))],
-						['reload', ('[B]Recargar Widgets[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'kodi_refresh'}))]])
+				cm.extend([['refresh', ('[B]Refresh Widgets[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'refresh_widgets'}))],
+						['reload', ('[B]Reload Widgets[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'kodi_refresh'}))]])
 			cm = self.context_menu(cm)
 			listitem.setLabel(title)
 			listitem.addContextMenuItems(cm)

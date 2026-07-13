@@ -167,7 +167,7 @@ class Movies:
 											'Jump To...', 'item_jump', kodi_utils.get_icon('item_jump_landscape'), isFolder=False)
 			if self.new_page and not self.widget_hide_next_page:
 				self.new_page.update({'mode': 'build_movie_list', 'action': self.action, 'category_name': self.category_name})
-				kodi_utils.add_dir(handle, self.new_page, 'Next Page (%s) >>' % self.new_page['new_page'], 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
+				kodi_utils.add_dir(handle, self.new_page, 'Página Siguiente (%s) >>' % self.new_page['new_page'], 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
 		except Exception as e:
 			if self.action in self.mdblist_personal or self.action == 'mdblist_user_list':
 				kodi_utils.logger('MDBList List Error', '%s: %s' % (self.action, e))

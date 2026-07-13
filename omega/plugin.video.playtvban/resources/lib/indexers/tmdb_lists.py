@@ -143,7 +143,7 @@ def build_tmdb_list(params):
 		if total_pages > page_no and not hide_next_page:
 			new_page = str(page_no + 1)
 			new_params['new_page'] = new_page
-			kodi_utils.add_dir(handle, new_params, 'Next Page (%s) >>' % new_page, 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
+			kodi_utils.add_dir(handle, new_params, 'Página Siguiente (%s) >>' % new_page, 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
 	except: pass
 	kodi_utils.set_content(handle, content)
 	kodi_utils.set_category(handle, list_name)

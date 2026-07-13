@@ -707,12 +707,12 @@ def set_string(params):
 	current_value = get_setting('playtvban.%s' % setting_id)
 	current_value = current_value.replace('empty_setting', '')
 	new_value = kodi_utils.kodi_dialog().input('', defaultt=current_value)
-	if not new_value and not kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
+	if not new_value and not kodi_utils.confirm_dialog(text='¿Introducir un Valor en Blanco?', ok_label='Sí', cancel_label='Volver a Introducir el Valor', default_control=11):
 		return set_string(params)
 	if setting_id in _CREDENTIAL_STRING_SETTINGS:
 		new_value = normalize_credential_string(new_value)
 	if setting_id == 'tmdb_api' and new_value and looks_like_tmdb_v4_jwt(new_value):
-		kodi_utils.ok_dialog(heading='Wrong key type', text='This is a TMDb v4 Read Access Token (JWT), not the v3 API Key.[CR]Use TMDb Lists → Read Access Token for v4 tokens.')
+		kodi_utils.ok_dialog(heading='Tipo de Clave Incorrecto', text='Este es un Token de Acceso de Lectura v4 de TMDb (JWT), no la Clave API v3.[CR]Usa TMDb Lists → Token de Acceso de Lectura para los Tokens v4.')
 		return set_string(params)
 	if setting_id == 'playback.submaker_manifest' and new_value:
 		new_value = new_value.strip()
@@ -1196,7 +1196,7 @@ def default_settings():
 #===============================================================================#
 #==================== Visualización
 {'setting_id': 'results.timeout', 'setting_type': 'action', 'setting_default': '20', 'min_value': '1'},
-{'setting_id': 'results.list_format', 'setting_type': 'string', 'setting_default': 'List'},
+{'setting_id': 'results.list_format', 'setting_type': 'string', 'setting_default': 'Lista'},
 #==================== Reescaneo
 {'setting_id': 'rescrape.cache_ignored', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Desactivado', '1': 'Automático', '2': 'Preguntar'}},
 {'setting_id': 'rescrape.cache_ignored.order', 'setting_type': 'action', 'setting_default': '0', 'min_value': '1', 'max_value': '5'},

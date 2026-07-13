@@ -77,10 +77,10 @@ class ThumbImageViewer(BaseDialog):
 	def make_context_menu(self, enable_delete, enable_favorite):
 		choices = []
 		choices_append = choices.append
-		if enable_delete: choices_append(('Delete', 'delete_image'))
-		else: choices_append(('Download File', 'download_image'))
-		if enable_favorite: choices_append(('Favorites Manager', 'manage_favorite'))
-		if self.current_page > 1: choices_append(('Exit Images', 'exit_image'))
+		if enable_delete: choices_append(('Eliminar', 'delete_image'))
+		else: choices_append(('Descargar Archivo', 'download_image'))
+		if enable_favorite: choices_append(('Administrador de Favoritos', 'manage_favorite'))
+		if self.current_page > 1: choices_append(('Salir de Imágenes', 'exit_image'))
 		list_items = [{'line1': i[0]} for i in choices]
 		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true'}
 		choice = select_dialog([i[1] for i in choices], **kwargs)
@@ -108,7 +108,7 @@ class ThumbImageViewer(BaseDialog):
 	def make_next_page(self):
 		try:
 			listitem = self.make_listitem()
-			listitem.setProperties({'name': 'Next Page (%s) >>' % str(self.current_page + 1), 'thumb': get_icon('nextpage'), 'next_page_item': 'true'})
+			listitem.setProperties({'name': 'Página Siguiente (%s) >>' % str(self.current_page + 1), 'thumb': get_icon('nextpage'), 'next_page_item': 'true'})
 			self.list_items.append(listitem)
 		except: pass
 

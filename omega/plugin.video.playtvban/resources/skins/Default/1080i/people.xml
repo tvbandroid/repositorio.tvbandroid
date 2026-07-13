@@ -71,7 +71,7 @@
                         <textcolor>FFCCCCCC</textcolor>
                         <align>right</align>
                         <aligny>top</aligny>
-                        <label>Press Info Button for More Info</label>
+                        <label>Pulsa el Botón de Info para Obtener Más Info.</label>
                         <visible>Control.HasFocus(2050) | Control.HasFocus(2051) | Control.HasFocus(2053)</visible>
                     </control>
                 </control>
@@ -146,7 +146,7 @@
                             <onright>11</onright>
                             <onup>2053</onup>
                             <ondown>50</ondown>
-                            <label>Images</label>
+                            <label>Imágenes</label>
                             <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
@@ -163,7 +163,7 @@
                             <onright>12</onright>
                             <onup>2053</onup>
                             <ondown>50</ondown>
-                            <label>Tagged Images</label>
+                            <label>Imágenes Etiquetadas</label>
                             <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
@@ -180,7 +180,7 @@
                             <onright>13</onright>
                             <onup>2053</onup>
                             <ondown>50</ondown>
-                            <label>More Images</label>
+                            <label>Más Imágenes</label>
                             <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
@@ -199,7 +199,7 @@
                             <onright>10</onright>
                             <onup>2053</onup>
                             <ondown>50</ondown>
-                            <label>Favorites Manager</label>
+                            <label>Gerente de Favoritos</label>
                             <font>font13</font> <!-- PLAYTVBAN_30 -->
                             <textcolor>FFCCCCCC</textcolor>
                             <focusedcolor>FF1F2020</focusedcolor>
@@ -222,7 +222,7 @@
                             <textcolor>FFCCCCCC</textcolor>
                             <align>left</align>
                             <aligny>bottom</aligny>
-                            <label>[B]Biography[/B]</label>
+                            <label>[B]Biografía[/B]</label>
                         </control>
                         <control type="button" id="50">
                             <top>50</top>
@@ -271,7 +271,7 @@
                             <height>20</height>
                             <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
-                            <label>[B]Movies $INFO[Window.Property(more_from_movie.number)][/B]</label>
+                            <label>[B]Películas $INFO[Window.Property(more_from_movie.number)][/B]</label>
                             <visible>!Control.HasFocus(2050)</visible>
                         </control>
                         <control type="label">
@@ -279,7 +279,7 @@
                             <height>20</height>
                             <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
-                            <label>[B]Movies | [/B]$INFO[Container(2050).ListItem.Property(name)] • $INFO[Container(2050).ListItem.Property(release_date)] • $INFO[Container(2050).ListItem.Property(vote_average)]</label>
+                            <label>[B]Películas | [/B]$INFO[Container(2050).ListItem.Property(name)] • $INFO[Container(2050).ListItem.Property(release_date)] • $INFO[Container(2050).ListItem.Property(vote_average)]</label>
                             <visible>Control.HasFocus(2050)</visible>
                         </control>
                         <control type="fixedlist" id="2050">
@@ -371,7 +371,7 @@
                             <height>20</height>
                             <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
-                            <label>[B]TV Shows $INFO[Window.Property(more_from_tvshow.number)][/B]</label>
+                            <label>[B]Series $INFO[Window.Property(more_from_tvshow.number)][/B]</label>
                             <visible>!Control.HasFocus(2051)</visible>
                         </control>
                         <control type="label">
@@ -379,7 +379,7 @@
                             <height>20</height>
                             <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
-                            <label>[B]TV Shows | [/B]$INFO[Container(2051).ListItem.Property(name)] • $INFO[Container(2051).ListItem.Property(release_date)] • $INFO[Container(2051).ListItem.Property(vote_average)]</label>
+                            <label>[B]Series | [/B]$INFO[Container(2051).ListItem.Property(name)] • $INFO[Container(2051).ListItem.Property(release_date)] • $INFO[Container(2051).ListItem.Property(vote_average)]</label>
                             <visible>Control.HasFocus(2051)</visible>
                         </control>
                         <control type="fixedlist" id="2051">
@@ -564,7 +564,7 @@
                             <height>20</height>
                             <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
-                            <label>[B]Movies Directed $INFO[Window.Property(more_from_director.number)][/B]</label>
+                            <label>[B]Películas Dirigidas $INFO[Window.Property(more_from_director.number)][/B]</label>
                             <visible>!Control.HasFocus(2053)</visible>
                         </control>
                         <control type="label">
@@ -572,7 +572,7 @@
                             <height>20</height>
                             <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                             <textcolor>FFCCCCCC</textcolor>
-                            <label>[B]Movies Directed | [/B]$INFO[Container(2053).ListItem.Property(name)] • $INFO[Container(2053).ListItem.Property(release_date)] • $INFO[Container(2053).ListItem.Property(vote_average)]</label>
+                            <label>[B]Películas Dirigidas | [/B]$INFO[Container(2053).ListItem.Property(name)] • $INFO[Container(2053).ListItem.Property(release_date)] • $INFO[Container(2053).ListItem.Property(vote_average)]</label>
                             <visible>Control.HasFocus(2053)</visible>
                         </control>
                         <control type="fixedlist" id="2053">

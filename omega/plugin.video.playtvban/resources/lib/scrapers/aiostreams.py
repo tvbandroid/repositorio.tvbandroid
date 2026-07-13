@@ -77,7 +77,7 @@ class source:
 							if val and str(val) not in extra_tags: extra_tags.append(str(val))
 						for tag in merged.get('visualTags') or ():
 							if tag and str(tag) not in extra_tags: extra_tags.append(str(tag))
-												if extra_tags:
+						if extra_tags:
 							tag_line = ' | '.join(extra_tags)
 							details = '%s | %s' % (details, tag_line) if details else tag_line
 						source_item = {'name': file_name, 'display_name': display_name, 'quality': video_quality, 'size': size,

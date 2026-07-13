@@ -13,7 +13,7 @@ def tmdb_dict_removals():
 
 def no_api_key():
 	from modules.kodi_utils import notification
-	notification('Please set a valid TMDb API Key')
+	notification('Por favor, establece una Clave API de TMDb válida')
 	return []
 
 def movie_details(tmdb_id, api_key):
@@ -46,7 +46,7 @@ def episode_group_details(group_id):
 
 def movie_set_details(collection_id, api_key):
 	try:
-		url = 'https://api.themoviedb.org/3/collection/%s?api_key=%s&language=en' % (collection_id, api_key)
+		url = 'https://api.themoviedb.org/3/collection/%s?api_key=%s&language=es-ES' % (collection_id, api_key)
 		return get_tmdb(url).json()
 	except: return None
 
@@ -106,14 +106,14 @@ def tmdb_movie_keyword_results(tmdb_id, page_no):
 	api_key = tmdb_api_key()
 	if api_key in (None, 'empty_setting', ''): return no_api_key()
 	string = 'tmdb_movie_keyword_results_%s_%s' % (tmdb_id, page_no)
-	url = 'https://api.themoviedb.org/3/discover/movie?api_key=%s&language=en-US&with_keywords=%s&page=%s' % (api_key, tmdb_id, page_no)
+	url = 'https://api.themoviedb.org/3/discover/movie?api_key=%s&language=es-ES&with_keywords=%s&page=%s' % (api_key, tmdb_id, page_no)
 	return lists_cache_object(get_data, string, url, expiration=96)
 
 def tmdb_tv_keyword_results(tmdb_id, page_no):
 	api_key = tmdb_api_key()
 	if api_key in (None, 'empty_setting', ''): return no_api_key()
 	string = 'tmdb_tv_keyword_results_%s_%s' % (tmdb_id, page_no)
-	url = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&language=en-US&with_keywords=%s&page=%s' % (api_key, tmdb_id, page_no)
+	url = 'https://api.themoviedb.org/3/discover/tv?api_key=%s&language=es-ES&with_keywords=%s&page=%s' % (api_key, tmdb_id, page_no)
 	return lists_cache_object(get_data, string, url, expiration=96)
 
 def tmdb_movie_keyword_results_direct(query, page_no):
@@ -510,7 +510,7 @@ def tmdb_popular_people(page_no):
 	api_key = tmdb_api_key()
 	if api_key in (None, 'empty_setting', ''): return no_api_key()
 	string = 'tmdb_people_popular_%s' % page_no
-	url = 'https://api.themoviedb.org/3/person/popular?api_key=%s&language=en&page=%s' % (api_key, page_no)
+	url = 'https://api.themoviedb.org/3/person/popular?api_key=%s&language=es-ES&page=%s' % (api_key, page_no)
 	return cache_function(get_tmdb, string, url, expiration=48)
 
 def tmdb_trending_people_day(page_no):
@@ -531,7 +531,7 @@ def tmdb_people_full_info(actor_id):
 	api_key = tmdb_api_key()
 	if api_key in (None, 'empty_setting', ''): return no_api_key()
 	string = 'tmdb_people_full_info_%s' % actor_id
-	url = 'https://api.themoviedb.org/3/person/%s?api_key=%s&language=en&append_to_response=external_ids,combined_credits,images,tagged_images' % (actor_id, api_key)
+	url = 'https://api.themoviedb.org/3/person/%s?api_key=%s&language=es-ES&append_to_response=external_ids,combined_credits,images,tagged_images' % (actor_id, api_key)
 	return cache_function(get_tmdb, string, url, expiration=168)
 
 def tmdb_people_info(query, page_no=1):
@@ -539,14 +539,14 @@ def tmdb_people_info(query, page_no=1):
 	if api_key in (None, 'empty_setting', ''): return no_api_key()
 	meta_filter = get_meta_filter()
 	string = 'tmdb_people_info_%s_%s_%s' % (query, meta_filter, page_no)
-	url = 'https://api.themoviedb.org/3/search/person?api_key=%s&language=en&include_adult=%s&query=%s&page=%s' % (api_key, meta_filter, query, page_no)
+	url = 'https://api.themoviedb.org/3/search/person?api_key=%s&language=es-ES&include_adult=%s&query=%s&page=%s' % (api_key, meta_filter, query, page_no)
 	return cache_function(get_tmdb, string, url, expiration=4)
 
 def season_episodes_details(tmdb_id, season_no):
 	api_key = tmdb_api_key()
 	if api_key in (None, 'empty_setting', ''): return no_api_key()
 	try:
-		url = 'https://api.themoviedb.org/3/tv/%s/season/%s?api_key=%s&language=en&append_to_response=credits' % (tmdb_id, season_no, api_key)
+		url = 'https://api.themoviedb.org/3/tv/%s/season/%s?api_key=%s&language=es-ES&append_to_response=credits' % (tmdb_id, season_no, api_key)
 		return get_tmdb(url).json()
 	except: return None
 

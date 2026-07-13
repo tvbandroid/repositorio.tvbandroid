@@ -34,9 +34,9 @@ def build_episode_list(params):
 					duration = show_duration
 					item['duration'] = duration
 				if not episode_date or current_date < episode_date:
-					display, unaired = '[COLOR red][I]%s[/I][/COLOR]' % ep_name, True
+					display, unaired = '[COLOR khaki][I]%s[/I][/COLOR]' % ep_name, True
 					item['title'] = display
-							else: display, unaired = ep_name, False
+				else: display, unaired = ep_name, False
 				extras_params = build_url({'mode': 'extras_menu_choice', 'tmdb_id': tmdb_id, 'media_type': 'episode', 'is_external': is_external})
 				options_params = build_url({'mode': 'options_menu_choice', 'content': 'episode', 'tmdb_id': tmdb_id, 'poster': show_poster, 'is_external': is_external})
 				playback_options_params = build_url({'mode': 'playback_choice', 'media_type': 'episode', 'meta': tmdb_id, 'season': season, 'playcount': playcount,
@@ -216,7 +216,7 @@ def build_single_episode(list_type, params={}):
 					else: display_premiered = '[UNKNOWN] '
 				else: display_premiered = ''
 				if unwatched: highlight_start, highlight_end = '[COLOR darkgoldenrod]', '[/COLOR]'
-				elif unaired: highlight_start, highlight_end = '[COLOR red]', '[/COLOR]'
+				elif unaired: highlight_start, highlight_end = '[COLOR khaki]', '[/COLOR]'
 				else: highlight_start, highlight_end = '', ''
 				display = '%s%s%s%s%s%s' % (display_premiered, title_str, highlight_start, seas_ep, ep_name, highlight_end)
 			elif list_type_compare == 'trakt_calendar':
@@ -227,7 +227,7 @@ def build_single_episode(list_type, params={}):
 			if no_spoilers and not playcount: thumb, plot = show_landscape or show_fanart, tvshow_plot or '* Hidden to Prevent Spoilers *'
 			else: thumb, plot = item_get('thumb', None) or show_landscape or show_fanart, item_get('plot') or tvshow_plot
 			duration = item_get('duration')
-						if not duration:
+			if not duration:
 				duration = meta_get('duration')
 				item['duration'] = duration
 			bookmarks = ws.get_bookmarks_episode(tmdb_id, season, watched_db)
@@ -246,7 +246,7 @@ def build_single_episode(list_type, params={}):
 			cm_append(['browse_seasons', ('[B]Explorar Temporadas[/B]', window_command % build_url({'mode': 'build_season_list', 'tmdb_id': tmdb_id}))])
 			cm_append(['browse_episodes', ('[B]Explorar EPISODIOS[/B]', window_command % build_url({'mode': 'build_episode_list', 'tmdb_id': tmdb_id, 'season': season}))])
 			if not unaired:
-								if playcount:
+				if playcount:
 					cm_append(['mark_watched', ('[B]Marcar No Visto[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_unwatched',
 												'tmdb_id': tmdb_id, 'tvdb_id': tvdb_id, 'season': season, 'episode': episode,  'title': title}))])
 				else: cm_append(['mark_watched', ('[B]Marcar Visto[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_watched',
@@ -263,7 +263,7 @@ def build_single_episode(list_type, params={}):
 				cm_append(['unmark_previous_episode', ('[B]Desmarcar Anterior Visto[/B]', 'RunPlugin(%s)' % \
 								build_url({'mode': 'watched_status.unmark_previous_episode', 'action': 'mark_as_unwatched', 'tmdb_id': tmdb_id, 'tvdb_id': tvdb_id,
 											'season': season, 'episode': episode, 'title': title, 'refresh': 'true'}))])
-						if is_external:
+			if is_external:
 				cm.extend([['refresh', ('[B]Actualizar Widgets[/B]', 'RunPlugin(%s)' % build_url({'mode': 'refresh_widgets'}))],
 						['reload', ('[B]Recargar Widgets[/B]', 'RunPlugin(%s)' % build_url({'mode': 'kodi_refresh'}))]])
 			if custom_cm_menu:

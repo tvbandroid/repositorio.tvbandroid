@@ -50,7 +50,7 @@ class MenuEditor:
 		self._db_execute('set', self.active_list, list_items)
 
 	def restore(self):
-		if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelled', 1500)
+		if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelado', 1500)
 		self._db_execute('delete', self.active_list, list_type='edited', refresh=False)
 		self._db_execute('set', self.active_list, navigator_cache.main_menus[self.active_list], 'default')
 
@@ -59,7 +59,7 @@ class MenuEditor:
 		list_type = 'edited' if edited else 'default'
 		current_list = edited or default
 		try: new_item = [i for i in default if str(i['name']) == str(self.name)][0]
-		except: return kodi_utils.notification('No Results', 1500)
+		except: return kodi_utils.notification('Sin Resultados', 1500)
 		list_items = [i for i in current_list if str(i['name']) != str(self.name)]
 		list_items.insert(self.position, new_item)
 		self._db_execute('set', self.active_list, list_items, list_type)
@@ -69,13 +69,13 @@ class MenuEditor:
 		default, edited = navigator_cache.get_main_lists(self.active_list)
 		list_type = 'edited' if edited else'default'
 		current_list = edited or default
-		if default == new_contents: return kodi_utils.notification('No New Items', 1500)
+		if default == new_contents: return kodi_utils.notification('No Hay Elementos Nuevos', 1500)
 		new_entry = [i for i in new_contents if not i in default][0]
 		new_entry_translated_name = new_entry.get('name')
-		if not kodi_utils.confirm_dialog(text='New item [B]%s[/B] Exists[CR]Would you like to add this to the Menu?' % new_entry_translated_name):
-			return kodi_utils.notification('Cancelled', 1500)
+		if not kodi_utils.confirm_dialog(text='El Nuevo Elemento [B]%s[/B] Existe[CR]¿Deseas Añadirlo al Menú?' % new_entry_translated_name):
+			return kodi_utils.notification('Cancelado', 1500)
 		item_position = self._menu_select(current_list, new_entry_translated_name, position_list=True)
-		if item_position == None: return kodi_utils.notification('Cancelled', 1500)
+		if item_position == None: return kodi_utils.notification('Cancelado', 1500)
 		current_list.insert(item_position, new_entry)
 		self._db_execute('set', self.active_list, current_list, list_type)
 		if list_type == 'edited': self._db_execute('set', self.active_list, new_contents, 'default')
@@ -103,13 +103,13 @@ class MenuEditor:
 		icon_choice = self._icon_select(default_icon=icon)
 		menu_item.update({'name': menu_name, 'iconImage': icon_choice})
 		position = self._menu_select(list_items, list_name, multi_line='true', position_list=True)
-		if position == None: return kodi_utils.notification('Cancelled', 1500)
+		if position == None: return kodi_utils.notification('Cancelado', 1500)
 		list_items.insert(position, menu_item)
 		self._db_execute('set', self.active_list, list_items)
 
 	def shortcut_folder_edit(self):
 		if self.action == 'clear':
-			if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelled', 1500)
+			if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelado', 1500)
 			list_items = []
 		elif self.action == 'add': return self.shortcut_folder_add()
 		else:
@@ -122,11 +122,11 @@ class MenuEditor:
 				current_item['name'] = new_item_name
 				list_items[self.position] == current_item
 			elif self.action == 'remove':
-				if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelled', 1500)
+				if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelado', 1500)
 				if self.position < 0 or self.position >= len(list_items): return
 				list_items.pop(self.position)
 			elif self.action == 'move':
-				if len(list_items) == 1: return kodi_utils.notification('Cancelled', 1500)
+				if len(list_items) == 1: return kodi_utils.notification('Cancelado', 1500)
 				choice_items = [i for i in list_items if str(i['name']) != str(self.name)]
 				new_position = self._menu_select(choice_items, self.name, multi_line='true', position_list=True)
 				if new_position == None or new_position == self.position: return
@@ -141,7 +141,7 @@ class MenuEditor:
 		self._db_execute('make_new_shortcut_folder', list_name, list_type='shortcut_folder')
 
 	def shortcut_folder_delete(self):
-		if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelled', 1500)
+		if not kodi_utils.confirm_dialog(): return kodi_utils.notification('Cancelado', 1500)
 		main_menus = navigator_cache.main_menus
 		main_menu_items_list = [(i, navigator_cache.currently_used_list(i)) for i in main_menus]
 		self._db_execute('delete', self.name, list_type='shortcut_folder')
@@ -158,11 +158,11 @@ class MenuEditor:
 	def shortcut_folder_convert(self):
 		list_items = navigator_cache.get_shortcut_folder_contents(self.name)
 		valid_random_items = [i for i in list_items if i.get('mode').replace('random.', '') in kodi_utils.random_valid_type_check()]
-		make_random = '[COLOR red][RANDOM][/COLOR]' not in self.name
+		make_random = '[COLOR khaki][RANDOM][/COLOR]' not in self.name
 		if make_random:
-			if not valid_random_items: return kodi_utils.notification('No random supported items in this list', 5000)
-			new_folder_name = self.name + ' [COLOR red][RANDOM][/COLOR]'
-		else: new_folder_name = self.name.replace(' [COLOR red][RANDOM][/COLOR]', '')
+			if not valid_random_items: return kodi_utils.notification('No hay elementos compatibles con aleatorio en esta lista', 5000)
+			new_folder_name = self.name + ' [COLOR khaki][RANDOM][/COLOR]'
+		else: new_folder_name = self.name.replace(' [COLOR khaki][RANDOM][/COLOR]', '')
 		self._db_execute('delete', self.name, list_type='shortcut_folder', refresh=False)
 		self._db_execute('make_new_shortcut_folder', new_folder_name, list_items)
 
@@ -178,7 +178,7 @@ class MenuEditor:
 		menu_item.update({'name': menu_name, 'iconImage': icon_choice, 'full_list': 'false'})
 		if list_items:
 			position = self._menu_select(list_items, menu_name, multi_line='true', position_list=True)
-			if position == None: return kodi_utils.notification('Cancelled', 1500)
+			if position == None: return kodi_utils.notification('Cancelado', 1500)
 		else: position = 0
 		list_items.insert(position, menu_item)
 		self._db_execute('set', choice_name, list_items, 'shortcut_folder')
@@ -193,19 +193,19 @@ class MenuEditor:
 		folders = navigator_cache.get_shortcut_folders()
 		if folders:
 			items = [{'line1': i[0]} for i in folders]
-			kwargs = {'heading': 'Select Shortcut Folder', 'items': json.dumps(items), 'narrow_window': 'true'}
+			kwargs = {'heading': 'Seleccionar Carpeta de Accesos Directos', 'items': json.dumps(items), 'narrow_window': 'true'}
 			choice = kodi_utils.select_dialog(folders, **kwargs)
 			if choice == None: return
 			choice_name, list_items = choice
 		else:
-			kodi_utils.ok_dialog(heading='Shortcut Folders', text='Please make a Shortcut Folder first')
+			kodi_utils.ok_dialog(heading='Carpetas de Accesos Directos', text='Por favor, crea primero una Carpeta de Accesos Directos')
 			choice_name = kodi_utils.kodi_dialog().input('')
 			if not choice_name: return
 			self._db_execute('make_new_shortcut_folder', choice_name, list_type='shortcut_folder')
 			list_items = []
 		if list_items:
 			position = self._menu_select(list_items, menu_name, multi_line='true', position_list=True)
-			if position == None: return kodi_utils.notification('Cancelled', 1500)
+			if position == None: return kodi_utils.notification('Cancelado', 1500)
 		else: position = 0
 		list_items.insert(position, menu_item)
 		self._db_execute('set', choice_name, list_items, 'shortcut_folder', refresh=False)
@@ -235,7 +235,7 @@ class MenuEditor:
 			except: pass
 			list_items = [{'line1': i if i != default_icon else '%s (default)' % default_icon, 'icon': kodi_utils.get_icon(i)} for i in all_icons]
 		else: list_items = [{'line1': i, 'icon': kodi_utils.get_icon(i)} for i in all_icons]
-		kwargs = {'items': json.dumps(list_items), 'heading': 'Choose Icon'}
+		kwargs = {'items': json.dumps(list_items), 'heading': 'Elegir Icono'}
 		icon_choice = kodi_utils.select_dialog(all_icons, **kwargs) or default_icon or 'folder'
 		return icon_choice
 
@@ -269,8 +269,8 @@ class MenuEditor:
 		if db_action == 'set': navigator_cache.set_list(list_name, list_type, list_contents)
 		elif db_action == 'delete': navigator_cache.delete_list(list_name, list_type)
 		elif db_action == 'make_new_shortcut_folder': navigator_cache.set_list(list_name, 'shortcut_folder', list_contents)
-		else: return kodi_utils.notification('Failed', 1500)
-		kodi_utils.notification('Exitoso', 1500)
+		else: return kodi_utils.notification('Error', 1500)
+		kodi_utils.notification('Éxito', 1500)
 		kodi_utils.sleep(500)
 		if refresh: self._refresh_menu()
 

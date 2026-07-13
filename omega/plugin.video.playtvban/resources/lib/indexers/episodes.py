@@ -36,7 +36,7 @@ def build_episode_list(params):
 				if not episode_date or current_date < episode_date:
 					display, unaired = '[COLOR red][I]%s[/I][/COLOR]' % ep_name, True
 					item['title'] = display
-				else: display, unaired = ep_name, False
+							else: display, unaired = ep_name, False
 				extras_params = build_url({'mode': 'extras_menu_choice', 'tmdb_id': tmdb_id, 'media_type': 'episode', 'is_external': is_external})
 				options_params = build_url({'mode': 'options_menu_choice', 'content': 'episode', 'tmdb_id': tmdb_id, 'poster': show_poster, 'is_external': is_external})
 				playback_options_params = build_url({'mode': 'playback_choice', 'media_type': 'episode', 'meta': tmdb_id, 'season': season, 'playcount': playcount,
@@ -44,21 +44,21 @@ def build_episode_list(params):
 				play_params = build_url({'mode': play_mode, 'media_type': 'episode', 'tmdb_id': tmdb_id, 'season': season, 'episode': episode, 'playcount': playcount,
 										'episode_id': episode_id, playback_key: playback_key})
 				cm_append(['extras', ('[B]Extras[/B]', 'RunPlugin(%s)' % extras_params)])
-				cm_append(['options', ('[B]Options[/B]', 'RunPlugin(%s)' % options_params)])
-				cm_append(['playback_options', ('[B]Play Options[/B]', 'RunPlugin(%s)' % playback_options_params)])
+				cm_append(['options', ('[B]Opciones[/B]', 'RunPlugin(%s)' % options_params)])
+				cm_append(['playback_options', ('[B]Opciones de reproducción[/B]', 'RunPlugin(%s)' % playback_options_params)])
 				settings.append_external_scraper_settings_cm(cm_append, build_url)
 				if not unaired and not season_special:
 					if playcount:
-						cm_append(['mark_watched', ('[B]Mark Unwatched[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_unwatched',
+						cm_append(['mark_watched', ('[B]Marcar como no visto[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_unwatched',
 													'tmdb_id': tmdb_id, 'tvdb_id': tvdb_id, 'season': season, 'episode': episode,  'title': title}))])
-					else: cm_append(['mark_watched', ('[B]Mark Watched[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_watched',
+					else: cm_append(['mark_watched', ('[B]Marcar como visto[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_watched',
 													'tmdb_id': tmdb_id, 'tvdb_id': tvdb_id, 'season': season, 'episode': episode,  'title': title}))])
-					if progress: cm_append(['mark_watched', ('[B]Clear Progress[/B]', 'RunPlugin(%s)' % \
+					if progress: cm_append(['mark_watched', ('[B]Borrar progreso[/B]', 'RunPlugin(%s)' % \
 								build_url({'mode': 'watched_status.erase_bookmark', 'media_type': 'episode', 'tmdb_id': tmdb_id,
 								'season': season, 'episode': episode, 'refresh': 'true'}))])
 				if is_external:
-					cm.extend([['refresh', ('[B]Refresh Widgets[/B]', 'RunPlugin(%s)' % build_url({'mode': 'refresh_widgets'}))],
-							['reload', ('[B]Reload Widgets[/B]', 'RunPlugin(%s)' % build_url({'mode': 'kodi_refresh'}))]])
+					cm.extend([['refresh', ('[B]Actualizar widgets[/B]', 'RunPlugin(%s)' % build_url({'mode': 'refresh_widgets'}))],
+							['reload', ('[B]Recargar widgets[/B]', 'RunPlugin(%s)' % build_url({'mode': 'kodi_refresh'}))]])
 				if custom_cm_menu:
 					try: cm = sorted([i for i in cm if i[0] in cm_sort_order], key=lambda k: cm_sort_order[k[0]])
 					except: pass

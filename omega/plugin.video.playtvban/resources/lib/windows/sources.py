@@ -265,9 +265,9 @@ class SourcesResults(BaseDialog):
 				elif scrape_provider == 'aiostreams':
 					scraper_module = get('aio_release_group') or ''
 					if scraper_module:
-						scraper_module_label = 'Group'
-						scraper_suffix = '     [COLOR %s][B]Group: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
-						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Group: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
+						scraper_module_label = 'Grupo'
+						scraper_suffix = '     [COLOR %s][B]Grupo: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
+						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Grupo: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
 				set_properties({'name': name.upper(), 'source_site': source_site, 'provider_icon': provider_icon, 'quality_icon': quality_icon, 'count': '%02d.' % count,
 						'size_label': get('size_label', 'N/A'), 'extraInfo': extraInfo, 'quality': quality.upper(), 'hash': get('hash', 'N/A'), 'source': json.dumps(item),
 						'highlight': item_highlight, 'highlight_bg': highlight_bg, 'scraper_module': scraper_module.upper() if scraper_module else '', 'scraper_module_label': scraper_module_label,
@@ -354,7 +354,7 @@ class SourcesResults(BaseDialog):
 		self.setProperty('clearlogo', self.meta_get('clearlogo') or '')
 		self.setProperty('title', self.meta_get('title'))
 		self.setProperty('total_results', self.total_results)
-		self.setProperty('filters_ignored', '| Filters Ignored' if self.filters_ignored else '')
+		self.setProperty('filters_ignored', '| Filtros Ignorados' if self.filters_ignored else '')
 
 	def set_poster(self):
 		if self.window_id == 2000: self.set_image(200, self.poster)
@@ -386,12 +386,12 @@ class SourcesResults(BaseDialog):
 				'magnet_url': magnet_url,
 				'display_name': item_get('display_name', ''),
 			}
-		choices_append(('Info', 'results_info'))
-		if add_magnet_to_cloud_params: choices_append(('Add to Cloud', add_magnet_to_cloud_params))
-		if browse_pack_params: choices_append(('Browse', browse_pack_params))
-		if down_pack_params: choices_append(('Download Pack', down_pack_params))
-		if down_file_params: choices_append(('Download File', down_file_params))
-		if provider_source == 'rd_cloud': choices_append(('Delete from RD Cloud', 'rd_cloud_delete'))
+		choices_append(('Información', 'results_info'))
+		if add_magnet_to_cloud_params: choices_append(('Añadir a la Nube', add_magnet_to_cloud_params))
+		if browse_pack_params: choices_append(('Explorar', browse_pack_params))
+		if down_pack_params: choices_append(('Descargar Pack', down_pack_params))
+		if down_file_params: choices_append(('Descargar Archivo', down_file_params))
+		if provider_source == 'rd_cloud': choices_append(('Eliminar de la Nube de RD', 'rd_cloud_delete'))
 		list_items = [{'line1': i[0], 'icon': self.poster} for i in choices]
 		kwargs = {'items': json.dumps(list_items)}
 		choice = select_dialog([i[1] for i in choices], **kwargs)
@@ -404,7 +404,7 @@ class SourcesResults(BaseDialog):
 		self.setFocusId(self.window_id)
 		self.setProperty('total_results', str(len(filtered_list)))
 		self.setProperty('filter_applied', 'true')
-		self.setProperty('filter_info', '| Press [B]BACK[/B] to Cancel')
+		self.setProperty('filter_info', '| Pulsa [B]ATRÁS[/B] para Cancelar')
 
 	def clear_filter(self):
 		self.filter_applied = False
@@ -530,12 +530,12 @@ class SourcesPlayback(BaseDialog):
 		from modules.kodi_utils import sync_scrape_progress_ui
 		pct = int(percent)
 		sync_scrape_progress_ui(pct, results_sd, results_720p, results_1080p, results_4k, results_total)
-		self.setProperty('results_4k', str(results_4k))
-		self.setProperty('results_1080p', str(results_1080p))
-		self.setProperty('results_720p', str(results_720p))
-		self.setProperty('results_sd', str(results_sd))
-		self.setProperty('results_total', str(results_total))
-		self.setProperty('percent', str(pct))
+		self.setProperty('resultados_4k', str(results_4k))
+		self.setProperty('resultados_1080p', str(results_1080p))
+		self.setProperty('resultados_720p', str(results_720p))
+		self.setProperty('resultados_sd', str(results_sd))
+		self.setProperty('resultados_total', str(results_total))
+		self.setProperty('por ciento', str(pct))
 		self.set_text(2001, content)
 
 	def update_resolver(self, text='', percent=0):

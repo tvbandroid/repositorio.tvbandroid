@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from threading import Thread
 from windows.base_window import BaseDialog
 from caches.settings_cache import get_setting, set_setting
 from modules.debrid import debrid_cache_check_available
@@ -39,7 +40,7 @@ class SourcesResults(BaseDialog):
 		self.cache_check_override = kwargs.get('cache_check_override')
 		self.prerelease_values, self.prerelease_key = ('CAM', 'SCR', 'TELE'), 'CAM/SCR/TELE'
 		self.item_list, self.filter_list, self.total_results = [], [], '0'
-		self.info_icons_dict = {'easynews': get_icon('easynews'), 'aiostreams': get_icon('premiumize'), 'alldebrid': get_icon('alldebrid'), 'real-debrid': get_icon('realdebrid'),
+		self.info_icons_dict = {'easynews': get_icon('easynews'), 'aiostreams': get_icon('premiumize'), 'nzb': get_icon('torbox'), 'alldebrid': get_icon('alldebrid'), 'real-debrid': get_icon('realdebrid'),
 		'premiumize': get_icon('premiumize'), 'offcloud': get_icon('offcloud'), 'torbox': get_icon('torbox'), 'ad_cloud': get_icon('alldebrid'), 'rd_cloud': get_icon('realdebrid'),
 		'pm_cloud': get_icon('premiumize'), 'oc_cloud': get_icon('offcloud'), 'tb_cloud': get_icon('torbox')}
 		self.info_quality_dict = {'4k': get_icon('flag_4k', 'flags'), '1080p': get_icon('flag_1080p', 'flags'), '720p': get_icon('flag_720p', 'flags'),
@@ -191,6 +192,26 @@ class SourcesResults(BaseDialog):
 					if result.status_code in (401, 403, 404): return notification('Error', 1200)
 					rd_api.clear_cache()
 					self.delete_single_source(source)
+				if choice == 'tb_cloud_delete':
+					from apis.torbox_api import TorBox
+					folder_id = source.get('folder_id')
+					if folder_id is None:
+						raw = source.get('id') or source.get('url_dl') or ''
+						if isinstance(raw, str) and ',' in raw:
+							folder_id = raw.split(',', 1)[0]
+					if folder_id is None:
+						return notification('Error', 1200)
+					media_type = source.get('cloud_media_type') or 'torrent'
+					if media_type == 'webdl':
+						result = TorBox.delete_webdl(folder_id)
+					elif media_type == 'usenet':
+						result = TorBox.delete_usenet(folder_id)
+					else:
+						result = TorBox.delete_torrent(folder_id)
+					if not result or not result.get('success'):
+						return notification('Error', 1200)
+					TorBox.clear_cache()
+					self.delete_single_source(source)
 
 	def delete_single_source(self, single_source):
 		self.results.remove(single_source)
@@ -242,7 +263,12 @@ class SourcesResults(BaseDialog):
 						source_site = (get('aio_site_name') or get('aio_source_name') or aio_label.replace('AIO / ', '')).upper()
 						provider = aio_label
 						provider_icon = self.get_provider_and_path(get('aio_source_icon', 'aiostreams'))[1]
-						hoster_label = get('aio_hoster') or 'DIRECT'
+												hoster_label = get('aio_hoster') or 'DIRECT'
+					elif scrape_provider == 'nzb':
+						source_site = (get('nzb_indexer') or 'NZB').upper()
+						provider = 'NZB'
+						provider_icon = self.get_provider_and_path('nzb')[1]
+						hoster_label = '[B]CACHED[/B]' if get('nzb_cached') else 'TORBOX'
 					else:
 						source_site = source.upper()
 						provider, provider_icon = self.get_provider_and_path(source.lower())
@@ -268,6 +294,12 @@ class SourcesResults(BaseDialog):
 						scraper_module_label = 'Grupo'
 						scraper_suffix = '     [COLOR %s][B]Grupo: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
 						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Grupo: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
+				elif scrape_provider == 'nzb':
+					scraper_module = get('nzb_indexer') or ''
+					if scraper_module:
+						scraper_module_label = 'Sitio'
+						scraper_suffix = '     [COLOR %s][B]Sitio: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
+						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Sitio: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
 				set_properties({'name': name.upper(), 'source_site': source_site, 'provider_icon': provider_icon, 'quality_icon': quality_icon, 'count': '%02d.' % count,
 						'size_label': get('size_label', 'N/A'), 'extraInfo': extraInfo, 'quality': quality.upper(), 'hash': get('hash', 'N/A'), 'source': json.dumps(item),
 						'highlight': item_highlight, 'highlight_bg': highlight_bg, 'scraper_module': scraper_module.upper() if scraper_module else '', 'scraper_module_label': scraper_module_label,
@@ -386,12 +418,13 @@ class SourcesResults(BaseDialog):
 				'magnet_url': magnet_url,
 				'display_name': item_get('display_name', ''),
 			}
-		choices_append(('Información', 'results_info'))
+		choices_append(('Info', 'results_info'))
 		if add_magnet_to_cloud_params: choices_append(('Añadir a la Nube', add_magnet_to_cloud_params))
 		if browse_pack_params: choices_append(('Explorar', browse_pack_params))
 		if down_pack_params: choices_append(('Descargar Pack', down_pack_params))
 		if down_file_params: choices_append(('Descargar Archivo', down_file_params))
 		if provider_source == 'rd_cloud': choices_append(('Eliminar de la Nube de RD', 'rd_cloud_delete'))
+		if provider_source == 'tb_cloud': choices_append(('Delete from TorBox Cloud', 'tb_cloud_delete'))
 		list_items = [{'line1': i[0], 'icon': self.poster} for i in choices]
 		kwargs = {'items': json.dumps(list_items)}
 		choice = select_dialog([i[1] for i in choices], **kwargs)
@@ -443,7 +476,9 @@ class SourcesPlayback(BaseDialog):
 		self.clear_modals()
 
 	def onClick(self, controlID):
-		self.resume_choice = {10: 'resume', 11: 'start_over', 12: 'cancel'}[controlID]
+		if self.window_mode == 'resume' and self.getProperty('resume_ready') != 'true':
+			return
+		self.resume_choice = {3010: 'resume', 3011: 'start_over', 3012: 'cancel'}.get(controlID)
 
 	def onAction(self, action):
 		if action in self.closing_actions:
@@ -489,8 +524,13 @@ class SourcesPlayback(BaseDialog):
 		self.set_resolver_properties()
 
 	def enable_resume(self, percent):
+		self.is_canceled = False
+		self.skip_resolve = False
+		self.resume_choice = None
+		self.busy_spinner('false')
 		self.window_mode = 'resume'
 		self.set_resume_properties(percent)
+		Thread(target=self._resume_countdown, daemon=True).start()
 
 	def busy_spinner(self, toggle='true'):
 		self.setProperty('enable_busy_spinner', toggle)
@@ -519,12 +559,32 @@ class SourcesPlayback(BaseDialog):
 		self.setProperty('window_mode', self.window_mode)
 		self.setProperty('text', self.text)
 
-	def set_resume_properties(self, percent):
+def set_resume_properties(self, percent):
+		percent_str = str(percent)
+		self.setProperty('resume_ready', 'false')
 		self.setProperty('window_mode', self.window_mode)
-		self.setProperty('resume_percent', percent)
-		self.setProperty('percent', '0')
-		self.setFocusId(10)
-		self.update_resumer()
+		self.setProperty('resume_percent', percent_str)
+		self.setProperty('resume_btn_label', 'Reanudar %s%%' % percent_str)
+		self.setProperty('startover_btn_label', 'Empezar Desde el Principio')
+		self.setProperty('cancel_btn_label', 'Cancelar')
+		self.setProperty('resume_timeout_percent', '0')
+		self.setProperty('text', '')
+		for _ in range(4):
+			hide_busy_dialog()
+			self.sleep(80)
+		self.setProperty('resume_ready', 'true')
+		self.setFocusId(3010)
+
+	def _resume_countdown(self):
+		count = 0
+		while self.resume_choice is None:
+			timeout_percent = int((float(count) / _RESUME_CHOICE_TIMEOUT_MS) * 100)
+			if timeout_percent >= 100:
+				self.resume_choice = 'resume'
+				break
+			self.setProperty('resume_timeout_percent', str(timeout_percent))
+			count += 100
+			self.sleep(100)
 
 	def update_scraper(self, results_sd, results_720p, results_1080p, results_4k, results_total, content='', percent=0):
 		from modules.kodi_utils import sync_scrape_progress_ui
@@ -546,16 +606,6 @@ class SourcesPlayback(BaseDialog):
 			self.setProperty('percent', str(pct))
 		except: pass
 		if text: self.set_text(2002, text)
-
-	def update_resumer(self):
-		count = 0
-		while self.resume_choice is None:
-			percent = int((float(count) / _RESUME_CHOICE_TIMEOUT_MS) * 100)
-			if percent >= 100:
-				self.resume_choice = 'resume'
-			self.setProperty('percent', str(percent))
-			count += 100
-			self.sleep(100)
 
 class SourcesInfo(BaseDialog):
 	def __init__(self, *args, **kwargs):

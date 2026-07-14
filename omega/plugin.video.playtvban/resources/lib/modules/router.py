@@ -8,7 +8,7 @@ from modules.kodi_utils import external, get_property
 
 def sys_exit_check(mode='navigator.main'):
 	from caches.settings_cache import get_setting, is_directory_listing_mode
-	if get_setting('redlight.reuse_language_invoker', 'true') == 'false': return False
+	if get_setting('playtvban.reuse_language_invoker', 'true') == 'false': return False
 	# First open still has external() true before Container.PluginName updates; never discard a built list.
 	if is_directory_listing_mode(mode): return False
 	if mode == 'open_settings': return False
@@ -22,7 +22,7 @@ def prepare_directory_listing(mode):
 		from caches.base_cache import ensure_listing_databases_ready
 		ensure_listing_databases_ready()
 	except Exception as e:
-		kodi_utils.logger('routing', 'prepare listing: %s' % e)
+		kodi_utils.logger('routing', 'Preparando listado: %s' % e)
 
 def routing(sys):
 	params = dict(parse_qsl(sys.argv[2][1:], keep_blank_values=True))
@@ -52,6 +52,9 @@ def routing(sys):
 	elif 'easynews.' in mode:
 		from indexers import easynews
 		return exec('easynews.%s(params)' % mode.split('.')[1])
+	elif mode.startswith('nzb.'):
+		from indexers import nzb
+		return exec('nzb.%s(params)' % mode.split('.')[1])
 	elif 'playback.' in mode:
 		from modules.kodi_utils import player_check
 		return player_check(mode, params)

@@ -69,7 +69,7 @@
                     <top>400</top>
                     <width>1920</width>
                     <height>30</height>
-                    <font>font60</font> <!-- PLAYTVBAN_60_BOLD -->
+                    <font>lyr15b</font> <!-- PLAYTVBAN_60_BOLD -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>center</align>
                     <aligny>bottom</aligny>
@@ -80,7 +80,7 @@
                     <top>480</top>
                     <width>1920</width>
                     <height>25</height>
-                    <font>font14</font> <!-- PLAYTVBAN_33 -->
+                    <font>category_widget_title</font> <!-- PLAYTVBAN_33 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <align>center</align>
                     <aligny>bottom</aligny>

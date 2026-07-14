@@ -272,6 +272,8 @@ def get_addon_fanart():
 def build_url(url_params):
 	return 'plugin://plugin.video.playtvban/?%s' % urlencode(url_params)
 
+# Keep `random` / `shuffle` on folder URLs — stripping `random` broke Random Trakt Public (All)
+# and any other list-of-lists parent that only passed random=true (shuffle alone was the workaround).
 _FOLDER_URL_SKIP = frozenset(('iconImage', 'random_support', 'random', 'name', 'isFolder'))
 _FOLDER_URL_KEEP_NAME_MODES = frozenset(('navigator.build_shortcut_folder_contents',))
 
@@ -487,16 +489,33 @@ def clear_property(prop):
 	return kodi_window().clearProperty(prop)
 
 def sync_scrape_progress_ui(percent=0, results_sd=0, results_720p=0, results_1080p=0, results_4k=0, results_total=0):
+	from caches.settings_cache import get_setting
 	set_property('playtvban.scrape.percent', str(int(percent)))
 	set_property('playtvban.scrape.results_sd', str(results_sd))
 	set_property('playtvban.scrape.results_720p', str(results_720p))
 	set_property('playtvban.scrape.results_1080p', str(results_1080p))
 	set_property('playtvban.scrape.results_4k', str(results_4k))
 	set_property('playtvban.scrape.results_total', str(results_total))
+	if get_setting('playtvban.highlight.scrape_progress_colours', 'true') == 'true':
+		set_property('playtvban.scrape.progress_4k_color', get_setting('playtvban.scraper_4k_highlight', 'FFFF00FE'))
+		set_property('playtvban.scrape.progress_1080p_color', get_setting('playtvban.scraper_1080p_highlight', 'FFE6B800'))
+		set_property('playtvban.scrape.progress_720p_color', get_setting('playtvban.scraper_720p_highlight', 'FF3C9900'))
+		set_property('playtvban.scrape.progress_sd_color', get_setting('playtvban.scraper_SD_highlight', 'FF0166FF'))
+		set_property('playtvban.scrape.progress_total_color', get_setting('playtvban.scraper_total_highlight', 'FFFFFFFF'))
+	else:
+		white = 'FFFFFFFF'
+		set_property('playtvban.scrape.progress_4k_color', white)
+		set_property('playtvban.scrape.progress_1080p_color', white)
+		set_property('playtvban.scrape.progress_720p_color', white)
+		set_property('playtvban.scrape.progress_sd_color', white)
+		set_property('playtvban.scrape.progress_total_color', white)
 
 def clear_scrape_progress_ui():
 	for prop in ('playtvban.scrape.percent', 'playtvban.scrape.results_sd', 'playtvban.scrape.results_720p',
 			'playtvban.scrape.results_1080p', 'playtvban.scrape.results_4k', 'playtvban.scrape.results_total',
+			'playtvban.scrape.progress_4k_color', 'playtvban.scrape.progress_1080p_color',
+			'playtvban.scrape.progress_720p_color', 'playtvban.scrape.progress_sd_color',
+			'playtvban.scrape.progress_total_color',
 			'playtvban.scrape.ready'):
 		clear_property(prop)
 

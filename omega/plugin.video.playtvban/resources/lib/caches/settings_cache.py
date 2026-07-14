@@ -707,12 +707,12 @@ def set_string(params):
 	current_value = get_setting('playtvban.%s' % setting_id)
 	current_value = current_value.replace('empty_setting', '')
 	new_value = kodi_utils.kodi_dialog().input('', defaultt=current_value)
-	if not new_value and not kodi_utils.confirm_dialog(text='¿Introducir un Valor en Blanco?', ok_label='Sí', cancel_label='Volver a Introducir el Valor', default_control=11):
+	if not new_value and not kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
 		return set_string(params)
 	if setting_id in _CREDENTIAL_STRING_SETTINGS:
 		new_value = normalize_credential_string(new_value)
 	if setting_id == 'tmdb_api' and new_value and looks_like_tmdb_v4_jwt(new_value):
-		kodi_utils.ok_dialog(heading='Tipo de Clave Incorrecto', text='Este es un Token de Acceso de Lectura v4 de TMDb (JWT), no la Clave API v3.[CR]Usa TMDb Lists → Token de Acceso de Lectura para los Tokens v4.')
+		kodi_utils.ok_dialog(heading='Wrong key type', text='This is a TMDb v4 Read Access Token (JWT), not the v3 API Key.[CR]Use TMDb Lists → Read Access Token for v4 tokens.')
 		return set_string(params)
 	if setting_id == 'playback.submaker_manifest' and new_value:
 		new_value = new_value.strip()
@@ -1170,6 +1170,7 @@ def default_settings():
 	'2': 'Yeb — https://aiostreams.fortheweak.cloud',
 	'3': 'Midnight — https://aiostreamsfortheweebsstable.midnightignite.me',
 	'4': 'Personalizado — establecer URL abajo',
+	# '5' ElfHosted — hidden from picker (Search API disabled on public host); keep id reserved.
 }},
 {'setting_id': 'aiostreams.profiles', 'setting_type': 'string', 'setting_default': '{}'},
 {'setting_id': 'aiostreams.custom_url', 'setting_type': 'string', 'setting_default': ''},
@@ -1181,7 +1182,7 @@ def default_settings():
 {'setting_id': 'autoplay.aiostreams', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'aio.priority', 'setting_type': 'action', 'setting_default': '7', 'min_value': '1', 'max_value': '10'},
 {'setting_id': 'provider.aiostreams_highlight', 'setting_type': 'string', 'setting_default': 'FF00D4FF'},
-#=========+========== Carpetas
+#=========+========== Folders
 {'setting_id': 'provider.folders', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'folders.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'check.folders', 'setting_type': 'boolean', 'setting_default': 'false'},
@@ -1189,10 +1190,31 @@ def default_settings():
 {'setting_id': 'results.sort_folders_first', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'results.folders_ignore_filters', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'folders.priority', 'setting_type': 'action', 'setting_default': '6', 'min_value': '1', 'max_value': '10'},
+#==================== NZB Indexers
+{'setting_id': 'provider.nzb', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'nzb1.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'nzb1.label', 'setting_type': 'string', 'setting_default': 'NZB Indexer 1'},
+{'setting_id': 'nzb1.url', 'setting_type': 'string', 'setting_default': 'empty_setting'},
+{'setting_id': 'nzb1.key', 'setting_type': 'string', 'setting_default': 'empty_setting'},
+{'setting_id': 'nzb2.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'nzb2.label', 'setting_type': 'string', 'setting_default': 'NZB Indexer 2'},
+{'setting_id': 'nzb2.url', 'setting_type': 'string', 'setting_default': 'empty_setting'},
+{'setting_id': 'nzb2.key', 'setting_type': 'string', 'setting_default': 'empty_setting'},
+{'setting_id': 'nzb3.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'nzb3.label', 'setting_type': 'string', 'setting_default': 'NZB Indexer 3'},
+{'setting_id': 'nzb3.url', 'setting_type': 'string', 'setting_default': 'empty_setting'},
+{'setting_id': 'nzb3.key', 'setting_type': 'string', 'setting_default': 'empty_setting'},
+{'setting_id': 'nzb.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
+{'setting_id': 'nzb.fallback_search', 'setting_type': 'boolean', 'setting_default': 'true'},
+{'setting_id': 'nzb.search_width', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Focused', '1': 'Balanced', '2': 'Broad'}},
+{'setting_id': 'check.nzb', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'autoplay.nzb', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'nzb.priority', 'setting_type': 'action', 'setting_default': '7', 'min_value': '1', 'max_value': '10'},
+{'setting_id': 'provider.nzb_highlight', 'setting_type': 'string', 'setting_default': 'FFD4A017'},
 
 
 #===============================================================================#
-#===================================RESULTADOS===================================#
+#===================================RESULTADOS==================================#
 #===============================================================================#
 #==================== Visualización
 {'setting_id': 'results.timeout', 'setting_type': 'action', 'setting_default': '20', 'min_value': '1'},
@@ -1252,6 +1274,8 @@ def default_settings():
 {'setting_id': 'scraper_720p_highlight', 'setting_type': 'string', 'setting_default': 'FF3C9900'},
 {'setting_id': 'scraper_SD_highlight', 'setting_type': 'string', 'setting_default': 'FF0166FF'},
 {'setting_id': 'scraper_single_highlight', 'setting_type': 'string', 'setting_default': 'FF008EB2'},
+{'setting_id': 'scraper_total_highlight', 'setting_type': 'string', 'setting_default': 'FFFFFFFF'},
+{'setting_id': 'highlight.scrape_progress_colours', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'highlight.tint_focused_background', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'highlight.background_opacity', 'setting_type': 'string', 'setting_default': '66'},
 {'setting_id': 'highlight.background_opacity_name', 'setting_type': 'string', 'setting_default': '40%'},

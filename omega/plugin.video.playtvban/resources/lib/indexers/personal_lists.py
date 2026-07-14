@@ -28,18 +28,19 @@ def get_personal_lists(params):
 				poster = custom_poster or icon
 				custom_fanart = item.get('fanart', '')
 				fanart = custom_fanart or background
-				mode = 'random.build_personal_lists_contents' if random else 'personal_lists.build_personal_list'
-				url_params = {'mode': mode, 'list_name': list_name, 'category_name': list_name, 'sort_order': sort_order, 'seen': seen, 'author': author,
+				random_contents = random or shuffle_lists
+				mode = 'random.build_personal_lists_contents' if random_contents else 'personal_lists.build_personal_list'
+				url_params = {'mode': mode, 'list_name': list_name, 'category_name': list_name,
+				'sort_order': 'shuffle' if random_contents else sort_order, 'seen': seen, 'author': author,
 				'iconImage': poster, 'name': list_name}
-				if random: url_params['random'] = 'true'
-				if shuffle_lists: url_params['shuffle'] = 'true'
+								if random_contents: url_params['random'] = 'true'
 				url = kodi_utils.build_folder_url(url_params)
-				cm = [('[B]Make New List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'personal_lists.make_new_personal_list'})),
-				('[B]Edit Properties[/B]', 'RunPlugin(%s)' % build_url({'mode': 'personal_lists.adjust_personal_list_properties', 'description': description, 'author': author,
+				cm = [('[B]Crear nueva lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'personal_lists.make_new_personal_list'})),
+				('[B]Editar propiedades[/B]', 'RunPlugin(%s)' % build_url({'mode': 'personal_lists.adjust_personal_list_properties', 'description': description, 'author': author,
 					'list_name': list_name, 'sort_order': sort_order, 'seen': seen, 'poster': custom_poster, 'fanart': custom_fanart})),
-				('[B]Delete List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'personal_lists.delete_personal_list', 'list_name': list_name, 'author': author,
+				('[B]Eliminar lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'personal_lists.delete_personal_list', 'list_name': list_name, 'author': author,
 					'poster': custom_poster, 'fanart': custom_fanart})),
-				('[B]Add to Shortcut Folder[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
+				('[B]Añadir a la carpeta de accesos directos[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
 				listitem.setArt({'icon': poster, 'poster': poster, 'thumb': poster, 'fanart': fanart, 'banner': fanart})
@@ -62,6 +63,7 @@ def get_personal_lists(params):
 	show_author = settings.personal_lists_show_author()
 	build_url = kodi_utils.build_url
 	random, shuffle_lists = params.get('random', 'false') == 'true', params.get('shuffle', 'false') == 'true'
+	returning_to_list = False
 	handle = int(sys.argv[1])
 	try:
 		data = get_all_personal_lists(get_setting('playtvban.personal_list.list_sort', '0'))
@@ -437,7 +439,7 @@ class ExternalImport:
 		self.item_list = item_list
 		self.total_items = len(self.item_list)
 		self.list_name, self.list_type, self.media_type = params.get('list_name'), params.get('list_type', None), params.get('media_type', None)
-		self.action, self.author, self.description = params.get('action', None), params.get('author', 'Unknown') or 'Unknown', params.get('description', '')
+		self.action, self.author, self.description = params.get('action', None), params.get('author', 'Desconocido') or 'Desconocido', params.get('description', '')
 		self.import_indicator, self.poster, self.fanart = params.get('busy_indicator', 'none'), params.get('poster', ''), params.get('fanart', '')
 		self.api_key, self.mpaa, self.current_time, self.current_timestamp = settings.tmdb_api_key(), settings.mpaa_region(), get_datetime(), get_current_timestamp()
 	
@@ -456,13 +458,13 @@ class ExternalImport:
 	def run(self):
 		if self.import_indicator == 'busy': kodi_utils.show_busy_dialog()
 		elif self.import_indicator == 'progress':
-			self.progressDialog = kodi_utils.progress_dialog('Importing Media', kodi_utils.get_icon('lists'))
+			self.progressDialog = kodi_utils.progress_dialog('Importando contenido', kodi_utils.get_icon('lists'))
 			kodi_utils.sleep(1000)
 		threads = TaskPool().tasks(self.process, self.item_list, min(self.total_items, settings.max_threads()))
 		[i.join() for i in threads]
 		self.results.sort(key=lambda k: k['order'])
 		success = personal_lists_cache.make_list(self.list_name, self.author, '1', self.description, seen='true' if self.action == 'import_view' else 'false')
-		if not success: return kodi_utils.notification('Error Creating [B]%s[/B]' % self.list_name, 3000)
+		if not success: return kodi_utils.notification('Error al crear [B]%s[/B]' % self.list_name, 3000)
 		items_added = personal_lists_cache.add_many_list_items(self.list_name, self.author, self.results)
 		if items_added == 'Completado':
 			if self.poster: self.poster = personal_image_maker(self.list_name, self.author, 'poster', '1', 'false', '', True if self.poster == 'random' else False, show_busy=False)
@@ -472,10 +474,10 @@ class ExternalImport:
 				else:
 					self.fanart = personal_image_maker(self.list_name, self.author, 'fanart', '1', 'false', '', True if self.fanart == 'random' else False, show_busy=False)
 			self.close_indicator()
-			kodi_utils.notification('Items Added to New List [B]%s[/B]' % self.list_name, 3000)
+			kodi_utils.notification('Elementos añadidos a la nueva lista [B]%s[/B]' % self.list_name, 3000)
 		else:
 			self.close_indicator()
-			kodi_utils.notification('Error Adding Items to [B]%s[/B]' % self.list_name, 3000)
+			kodi_utils.notification('Error al añadir elementos a [B]%s[/B]' % self.list_name, 3000)
 	
 	def close_indicator(self):
 		if self.progressDialog:
@@ -491,9 +493,9 @@ def external(params):
 	list_name, list_type, media_type = params.get('list_name'), params.get('list_type', None), params.get('media_type_default', None)
 	params['media_type'] = media_type
 	if not action:
-		choices = [('View', 'view'), ('Import', 'import'), ('Import & View', 'import_view')]
+		choices = [('Ver', 'view'), ('Importar', 'import'), ('Importar y ver', 'import_view')]
 		list_items = [{'line1': i[0]} for i in choices]
-		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true', 'heading': 'TESTING: Choose Import Action'}
+		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true', 'heading': 'PRUEBAS: Elija la acción de importación'}
 		choice = kodi_utils.select_dialog(choices, **kwargs)
 		if choice == None: return
 		action = choice[1]
@@ -508,9 +510,9 @@ def external(params):
 				try: json_bytes = gzip.decompress(payload_bytes)
 				except: json_bytes = payload_bytes
 				item_list = json.loads(json_bytes.decode('utf-8', 'ignore'))
-			except: kodi_utils.notification('Invalid External Payload (base64_items)', 4000)
+			except: kodi_utils.notification('Carga externa no válida (base64_items)', 4000)
 	else: item_list = json.loads(params.get('list_items', '[]'))
-	if not item_list: return kodi_utils.notification('No Items in Import List. Try Again.', 3000)
+	if not item_list: return kodi_utils.notification('No hay elementos en la lista de importación. Inténtelo de nuevo.', 3000)
 	item_list = [dict(i, **{'order': c, 'mt': i.get('mt') or media_type}) for c, i in enumerate(item_list)]
 	if list_name: list_name = unquote(list_name)
 	else: list_name = personal_list_name()
@@ -521,17 +523,17 @@ def external(params):
 									'list_type': list_type, 'list_name': list_name}, True)
 	if action == 'import' and (kodi_utils.path_check('get_personal_lists') or kodi_utils.external()): kodi_utils.kodi_refresh()
 
-def unique_list_check(list_name, author='Unknown'):
+def unique_list_check(list_name, author='Desconocido'):
 	contents = personal_lists_cache.get_lists()
 	list_names = [i['name'] for i in contents]
 	list_authors = [i['author'] for i in contents]
 	if list_name in list_names and author in list_authors:
-		kodi_utils.notification('List Already Exists. Choose a different name or author')
+		kodi_utils.notification('La lista ya existe. Elija un nombre o autor diferente')
 		return False
 	return True
 
 def new_list_check(seen):
 	return seen != 'true'
 
-def list_change_warning(list_name, text='[B]CAUTION!!![/B][CR][CR]This will change the contents of [B]%s[/B]. Continue?'):
-	return kodi_utils.confirm_dialog(heading='Personal Lists', text=text % list_name, ok_label='Yes', cancel_label='No')
+def list_change_warning(list_name, text='[B]¡¡¡ATENCIÓN!!![/B][CR][CR]Esto cambiará el contenido de [B]%s[/B]. Desea continuar?'):
+	return kodi_utils.confirm_dialog(heading='Listas personales', text=text % list_name, ok_label='Sí', cancel_label='No')

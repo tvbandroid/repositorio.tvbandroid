@@ -177,89 +177,89 @@ class NavigatorCache:
 		movie_random_converts = {'navigator.genres': 'tmdb_movies_genres', 'navigator.providers': 'tmdb_movies_providers',  'navigator.languages': 'tmdb_movies_languages',
 								'navigator.years': 'tmdb_movies_year', 'navigator.decades': 'tmdb_movies_decade', 'navigator.certifications': 'tmdb_movies_certifications'}
 		return [dict(i, **{'mode': 'random.build_movie_list', 'action': i.get('action') or movie_random_converts[i['mode']],
-							'random': 'true', 'name': 'Movies Random %s' % i['name'], 'menu_type': 'movie'}) for i in m_list if 'random_support' in i]
-	
+							'random': 'true', 'name': 'Películas Aleatorias %s' % i['name'], 'menu_type': 'movie'}) for i in m_list if 'random_support' in i]
+
 	def random_tvshow_lists(self):
 		t_list = NavigatorCache.tvshow_list
 		tvshow_random_converts = {'navigator.genres': 'tmdb_tv_genres', 'navigator.providers': 'tmdb_tv_providers', 'navigator.networks': 'tmdb_tv_networks',
 								'navigator.languages': 'tmdb_tv_languages', 'navigator.years': 'tmdb_tv_year', 'navigator.decades': 'tmdb_tv_decade',
 								'navigator.certifications': 'trakt_tv_certifications'}
 		return [dict(i, **{'mode': 'random.build_tvshow_list', 'action': i.get('action') or tvshow_random_converts[i['mode']],
-							'random': 'true', 'name': 'TV Shows Random %s' % i['name'], 'menu_type': 'tvshow'}) for i in t_list if 'random_support' in i]
-	
+							'random': 'true', 'name': 'Series Aleatorias %s' % i['name'], 'menu_type': 'tvshow'}) for i in t_list if 'random_support' in i]
+
 	def random_anime_lists(self):
 		a_list = NavigatorCache.anime_list
 		anime_random_converts = {'navigator.genres': 'tmdb_anime_genres', 'navigator.providers': 'tmdb_anime_providers', 'navigator.years': 'tmdb_anime_year',
 								'navigator.decades': 'tmdb_anime_decade', 'navigator.certifications': 'trakt_anime_certifications'}
 		return [dict(i, **{'mode': 'random.build_tvshow_list', 'action': i.get('action') or anime_random_converts[i['mode']],
-							'random': 'true', 'name': i['name'].replace('Anime', 'Anime Random'), 'menu_type': 'tvshow'}) for i in a_list if 'random_support' in i]
+							'random': 'true', 'name': i['name'].replace('Anime', 'Anime Aleatorio'), 'menu_type': 'tvshow'}) for i in a_list if 'random_support' in i]
 
 	def random_because_you_watched_lists(self):
 		return [
-			{'mode': 'random.build_movie_list', 'action': 'because_you_watched', 'name': 'Random Because You Watched Movies', 'iconImage': 'movies', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'because_you_watched', 'name': 'Random Because You Watched TV Shows', 'iconImage': 'tv', 'random': 'true'},
+			{'mode': 'random.build_movie_list', 'action': 'because_you_watched', 'name': 'Películas Aleatorias Basadas en lo que Has Visto', 'iconImage': 'movies', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'because_you_watched', 'name': 'Series Aleatorias Basadas en lo que Has Visto', 'iconImage': 'tv', 'random': 'true'},
 				]
-	
+
 	def random_tmdb_lists(self):
 		return [
-			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'watchlist', 'media_type': 'movie', 'name': 'Random TMDb Movie Watchlist', 'iconImage': 'tmdb', 'random': 'true'},
-			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'watchlist', 'media_type': 'tv', 'name': 'Random TMDb TV Show Watchlist', 'iconImage': 'tmdb', 'random': 'true'},
-			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'favorites', 'media_type': 'movie', 'name': 'Random TMDb Movie Favorites', 'iconImage': 'tmdb', 'random': 'true'},
-			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'favorites', 'media_type': 'tv', 'name': 'Random TMDb TV Show Favorites', 'iconImage': 'tmdb', 'random': 'true'},
-			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'recommendations', 'media_type': 'movie', 'name': 'Random TMDb Movie Recommendations',
+			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'watchlist', 'media_type': 'movie', 'name': 'Watchlist Aleatoria de Películas de TMDb', 'iconImage': 'tmdb', 'random': 'true'},
+			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'watchlist', 'media_type': 'tv', 'name': 'Watchlist Aleatoria de Series de TMDb', 'iconImage': 'tmdb', 'random': 'true'},
+			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'favorites', 'media_type': 'movie', 'name': 'Favoritos Aleatorios de Películas de TMDb', 'iconImage': 'tmdb', 'random': 'true'},
+			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'favorites', 'media_type': 'tv', 'name': 'Favoritos Aleatorios de Series de TMDb', 'iconImage': 'tmdb', 'random': 'true'},
+			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'recommendations', 'media_type': 'movie', 'name': 'Recomendaciones Aleatorias de Películas de TMDb',
 			'iconImage': 'tmdb', 'random': 'true'},
-			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'recommendations', 'media_type': 'tv', 'name': 'Random TMDb TV Show Recommendations',
+			{'mode': 'random.build_tmdb_lists_contents', 'list_id': 'recommendations', 'media_type': 'tv', 'name': 'Recomendaciones Aleatorias de Series de TMDb',
 			'iconImage': 'tmdb', 'random': 'true'},
-			{'mode': 'tmdblist.get_tmdb_lists', 'name': 'Random Shuffled TMDb My Lists (All)', 'iconImage': 'tmdb', 'random': 'true', 'shuffle': 'true'},
-			{'mode': 'random.build_tmdb_lists', 'name': 'Random TMDb My Lists (Single)', 'iconImage': 'tmdb', 'random': 'true'}
+			{'mode': 'tmdblist.get_tmdb_lists', 'name': 'Mis Listas de TMDb Mezcladas Aleatoriamente (Todas)', 'iconImage': 'tmdb', 'random': 'true', 'shuffle': 'true'},
+			{'mode': 'random.build_tmdb_lists', 'name': 'Mi Lista Aleatoria de TMDb (Individual)', 'iconImage': 'tmdb', 'random': 'true'}
 				]
-	
+
 	def random_personal_lists(self):
 		return [
-			{'mode': 'personal_lists.get_personal_lists', 'name': 'Random Shuffled Personal Lists (All)', 'iconImage': 'lists', 'random': 'true', 'shuffle': 'true'},
-			{'mode': 'random.build_personal_lists', 'name': 'Random Personal Lists (Single)', 'iconImage': 'lists', 'random': 'true'}
+			{'mode': 'personal_lists.get_personal_lists', 'name': 'Listas Personales Mezcladas Aleatoriamente (Todas)', 'iconImage': 'lists', 'random': 'true', 'shuffle': 'true'},
+			{'mode': 'random.build_personal_lists', 'name': 'Lista Personal Aleatoria', 'iconImage': 'lists', 'random': 'true'}
 				]
 
 	def random_trakt_lists_personal(self):
 		return [
-			{'mode': 'random.build_movie_list', 'action': 'trakt_collection_lists', 'name': 'Random Trakt Movie Collection', 'iconImage': 'movies', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'trakt_collection_lists', 'name': 'Random Trakt TV Show Collection', 'iconImage': 'tv', 'random': 'true'},
-			{'mode': 'random.build_movie_list', 'action': 'trakt_watchlist_lists', 'name': 'Random Trakt Movie Watchlist', 'iconImage': 'movies', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'trakt_watchlist_lists', 'name': 'Random Trakt TV Show Watchlist', 'iconImage': 'tv', 'random': 'true'},
-			{'mode': 'random.build_movie_list', 'action': 'trakt_recommendations', 'new_page': 'movies', 'name': 'Random Trakt Recommended Movies',
+			{'mode': 'random.build_movie_list', 'action': 'trakt_collection_lists', 'name': 'Colección Aleatoria de Películas de Trakt', 'iconImage': 'movies', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'trakt_collection_lists', 'name': 'Colección Aleatoria de Series de Trakt', 'iconImage': 'tv', 'random': 'true'},
+			{'mode': 'random.build_movie_list', 'action': 'trakt_watchlist_lists', 'name': 'Watchlist Aleatoria de Películas de Trakt', 'iconImage': 'movies', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'trakt_watchlist_lists', 'name': 'Watchlist Aleatoria de Series de Trakt', 'iconImage': 'tv', 'random': 'true'},
+			{'mode': 'random.build_movie_list', 'action': 'trakt_recommendations', 'new_page': 'movies', 'name': 'Películas Recomendadas Aleatorias de Trakt',
 			'iconImage': 'movies', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'trakt_recommendations', 'new_page': 'shows', 'name': 'Random Trakt Recommended TV Shows',
+			{'mode': 'random.build_tvshow_list', 'action': 'trakt_recommendations', 'new_page': 'shows', 'name': 'Series Recomendadas Aleatorias de Trakt',
 			'iconImage': 'tv', 'random': 'true'},
-			{'mode': 'trakt.list.get_trakt_lists', 'list_type': 'my_lists', 'name': 'Random Shuffled Trakt My Lists (All)',
+			{'mode': 'trakt.list.get_trakt_lists', 'list_type': 'my_lists', 'name': 'Mis Listas de Trakt Mezcladas Aleatoriamente (Todas)',
 			'iconImage': 'trakt', 'random': 'true', 'shuffle': 'true'},
-			{'mode': 'random.build_trakt_lists', 'list_type': 'my_lists', 'name': 'Random Trakt My Lists (Single)', 'iconImage': 'trakt', 'random': 'true'},
-			{'mode': 'trakt.list.get_trakt_lists', 'list_type': 'liked_lists', 'name': 'Random Shuffled Trakt Liked Lists (All)',
+			{'mode': 'random.build_trakt_lists', 'list_type': 'my_lists', 'name': 'Mi Lista Aleatoria de Trakt', 'iconImage': 'trakt', 'random': 'true'},
+			{'mode': 'trakt.list.get_trakt_lists', 'list_type': 'liked_lists', 'name': 'Listas que me Gustan de Trakt Mezcladas Aleatoriamente (Todas)',
 			'iconImage': 'trakt', 'random': 'true', 'shuffle': 'true'},
-			{'mode': 'random.build_trakt_lists', 'list_type': 'liked_lists', 'name': 'Random Trakt Liked Lists (Single)', 'iconImage': 'trakt', 'random': 'true'},
+			{'mode': 'random.build_trakt_lists', 'list_type': 'liked_lists', 'name': 'Lista Aleatoria de Favoritos de Trakt', 'iconImage': 'trakt', 'random': 'true'},
 				]
 
 	def random_trakt_lists_public(self):
 		return [
-			{'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'category_name': 'Random Trending User Lists', 'name': 'Random Trending User Lists (All)',
+			{'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'category_name': 'Listas de Usuarios en Tendencia Aleatorias', 'name': 'Listas de Usuarios en Tendencia Aleatorias (Todas)',
+			'iconImage': 'trakt', 'random': 'true', 'shuffle': 'true'},
+			{'mode': 'random.build_trakt_lists', 'list_type': 'trending', 'category_name': 'Listas de Usuarios en Tendencia Aleatorias', 'name': 'Lista de Usuarios en Tendencia Aleatoria',
 			'iconImage': 'trakt', 'random': 'true'},
-			{'mode': 'random.build_trakt_lists', 'list_type': 'trending', 'category_name': 'Random Trending User Lists', 'name': 'Random Trending User Lists (Single)',
-			'iconImage': 'trakt', 'random': 'true'},
-			{'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'category_name': 'Random Popular User Lists', 'name': 'Random Popular User Lists (All)',
-			'iconImage': 'trakt', 'random': 'true'},
-			{'mode': 'random.build_trakt_lists', 'list_type': 'popular', 'category_name': 'Random Popular User Lists', 'name': 'Random Popular User Lists (Single)',
+			{'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'category_name': 'Listas Populares de Usuarios Aleatorias', 'name': 'Listas Populares de Usuarios Aleatorias (Todas)',
+			'iconImage': 'trakt', 'random': 'true', 'shuffle': 'true'},
+			{'mode': 'random.build_trakt_lists', 'list_type': 'popular', 'category_name': 'Listas Populares de Usuarios Aleatorias', 'name': 'Lista Popular de Usuarios Aleatoria',
 			'iconImage': 'trakt', 'random': 'true'}
 				]
 
 	def random_simkl_lists(self):
 		return [
-			{'mode': 'random.build_movie_list', 'action': 'simkl_plantowatch', 'name': 'Random Simkl Movie Plan to Watch', 'iconImage': 'simkl', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'simkl_plantowatch', 'name': 'Random Simkl TV Plan to Watch', 'iconImage': 'simkl', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'simkl_watching', 'name': 'Random Simkl TV Watching', 'iconImage': 'simkl', 'random': 'true'},
-			{'mode': 'random.build_movie_list', 'action': 'simkl_completed', 'name': 'Random Simkl Movie Completed', 'iconImage': 'simkl', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'simkl_completed', 'name': 'Random Simkl TV Completed', 'iconImage': 'simkl', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'simkl_hold', 'name': 'Random Simkl TV On Hold', 'iconImage': 'simkl', 'random': 'true'},
-			{'mode': 'random.build_movie_list', 'action': 'simkl_dropped', 'name': 'Random Simkl Movie Dropped', 'iconImage': 'simkl', 'random': 'true'},
-			{'mode': 'random.build_tvshow_list', 'action': 'simkl_dropped', 'name': 'Random Simkl TV Dropped', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_movie_list', 'action': 'simkl_plantowatch', 'name': 'Películas Aleatorias Pendientes de Ver de Simkl', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'simkl_plantowatch', 'name': 'Series Aleatorias Pendientes de Ver de Simkl', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'simkl_watching', 'name': 'Series Aleatorias en Seguimiento de Simkl', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_movie_list', 'action': 'simkl_completed', 'name': 'Películas Aleatorias Completadas de Simkl', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'simkl_completed', 'name': 'Series Aleatorias Completadas de Simkl', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'simkl_hold', 'name': 'Series Aleatorias en Pausa de Simkl', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_movie_list', 'action': 'simkl_dropped', 'name': 'Películas Aleatorias Abandonadas de Simkl', 'iconImage': 'simkl', 'random': 'true'},
+			{'mode': 'random.build_tvshow_list', 'action': 'simkl_dropped', 'name': 'Series Aleatorias Abandonadas de Simkl', 'iconImage': 'simkl', 'random': 'true'},
 				]
 
 def migrate_my_content_nav_mode():

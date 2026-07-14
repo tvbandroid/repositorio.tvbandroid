@@ -74,6 +74,7 @@ class Navigator:
 	def premium(self):
 		if s.authorized_debrid_check('ad'): self.add({'mode': 'navigator.alldebrid'}, 'All Debrid', 'alldebrid')
 		if s.easynews_authorized(): self.add({'mode': 'navigator.easynews'}, 'EasyNews', 'easynews')
+		if s.nzb_indexer_active(): self.add({'mode': 'navigator.nzb_indexers'}, 'NZB Indexers', 'search')
 		if s.authorized_debrid_check('oc'): self.add({'mode': 'navigator.offcloud'}, 'Offcloud', 'offcloud')
 		if s.authorized_debrid_check('pm'): self.add({'mode': 'navigator.premiumize'}, 'Premiumize', 'premiumize')
 		if s.authorized_debrid_check('rd'): self.add({'mode': 'navigator.real_debrid'}, 'Real Debrid', 'realdebrid')
@@ -84,6 +85,15 @@ class Navigator:
 		self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar vídeos', 'search')
 		self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar imágenes', 'search')
 		self.add({'mode': 'easynews.account_info', 'isFolder': 'false'}, 'Información de la cuenta', 'easynews')
+		self.end_directory()
+
+	def nzb_indexers(self):
+		from caches.settings_cache import get_setting
+		self.add({'mode': 'navigator.search_history', 'action': 'nzb_search'}, 'Buscar en todos los indexadores', 'search')
+		for slot in (1, 2, 3):
+			if get_setting('playtvban.nzb%d.enabled' % slot, 'false') != 'true': continue
+			label = get_setting('playtvban.nzb%d.label' % slot) or 'Indexador NZB %d' % slot
+			self.add({'mode': 'nzb.test_connection', 'slot': str(slot), 'isFolder': 'false'}, 'Probar conexión: %s' % label, 'settings')
 		self.end_directory()
 
 	def real_debrid(self):
@@ -327,6 +337,7 @@ class Navigator:
 		if s.easynews_authorized():
 			self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar Videos de EasyNews', 'easynews')
 			self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar Imágenes de EasyNews', 'easynews')
+		if s.nzb_indexer_active(): self.add({'mode': 'navigator.search_history', 'action': 'nzb_search'}, 'Buscar los indexadores NZB', 'search')
 		self.end_directory()
 
 	def downloads(self):
@@ -519,6 +530,7 @@ class Navigator:
 		'tmdb_keyword_tvshow': ('keyword_tmdb_tvshow_queries', {'mode': 'search.get_key_id', 'search_type': 'tmdb_keyword', 'media_type': 'tvshow', 'isFolder': 'false'}),
 		'easynews_video': ('easynews_video_queries', {'mode': 'search.get_key_id', 'search_type': 'easynews_video', 'isFolder': 'false'}),
 		'easynews_image': ('easynews_image_queries', {'mode': 'search.get_key_id', 'search_type': 'easynews_image', 'isFolder': 'false'}),
+		'nzb_search': ('nzb_queries', {'mode': 'search.get_key_id', 'search_type': 'nzb_search', 'isFolder': 'false'}),
 		'trakt_lists': ('trakt_list_queries', {'mode': 'search.get_key_id', 'search_type': 'trakt_lists', 'isFolder': 'false'}),
 		'trakt_my_lists': ('trakt_my_list_queries', {'mode': 'search.get_key_id', 'search_type': 'trakt_my_lists', 'isFolder': 'false'}),
 		'simkl_lists': ('simkl_list_queries', {'mode': 'search.get_key_id', 'search_type': 'simkl_lists', 'isFolder': 'false'})}
@@ -558,10 +570,13 @@ class Navigator:
 
 	def choose_view(self):
 		handle = int(sys.argv[1])
-		content = self.params.get('content', 'files')
 		view_type = self.params.get('view_type', 'view.main')
-		name = self.params.get('name') or content
-		self.add({'mode': 'navigator.set_view', 'view_type': view_type, 'name': name, 'isFolder': 'false'}, 'Establezca la vista y luego haga clic aquí', 'settings')
+		if view_type in ('view.main', 'view.premium'):
+			content = k.MENU_FOLDER_CONTENT
+		else:
+			content = self.params.get('content', 'files')
+		name = self.params.get('name') or content or 'menus'
+		self.add({'mode': 'navigator.set_view', 'view_type': view_type, 'name': name, 'isFolder': 'false'}, 'Set view and then click here', 'settings')
 		k.set_content(handle, content)
 		k.end_directory(handle)
 		k.set_view_mode(view_type, content, False)
@@ -583,7 +598,7 @@ class Navigator:
 		if folders:
 			for i in folders:
 				name = i[0]
-				convert_sr = '[B]Quitar Aleatorio[/B]' if '[COLOR red][RANDOM][/COLOR]' in name else '[B]Convertir en Aleatorio[/B]'
+				convert_sr = '[B]Quitar Aleatorio[/B]' if '[COLOR khaki][RANDOM][/COLOR]' in name else '[B]Convertir en Aleatorio[/B]'
 				cm_items = [('[B]Renombrar[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_rename'})),
 							('[B]Eliminar Carpeta[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_delete'})),
 							('[B]Crear Nueva Carpeta[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_make'})),
@@ -598,17 +613,17 @@ class Navigator:
 		if not list_name:
 			k.notification('No se encontró la carpeta de accesos directos.', 2500)
 			return self.end_directory()
-		is_random = '[COLOR red][RANDOM][/COLOR]' in list_name
+		is_random = '[COLOR khaki][RANDOM][/COLOR]' in list_name
 		contents = nc.get_shortcut_folder_contents(list_name)
 		if not contents and not is_random:
-			random_name = '%s [COLOR red][RANDOM][/COLOR]' % list_name
+			random_name = '%s [COLOR khaki][RANDOM][/COLOR]' % list_name
 			contents = nc.get_shortcut_folder_contents(random_name)
 			if contents:
 				list_name, is_random = random_name, True
 		folder_icon = self.get_icon('folder')
 		if is_random:
 			from indexers.random_lists import random_shortcut_folders
-			return random_shortcut_folders(list_name.replace(' [COLOR red][RANDOM][/COLOR]', ''), contents)
+			return random_shortcut_folders(list_name.replace(' [COLOR khaki][RANDOM][/COLOR]', ''), contents)
 		if contents:
 			can_move = len(contents) > 1
 			for count, item in enumerate(contents):
@@ -764,8 +779,8 @@ class Navigator:
 
 	def end_directory(self, cache_to_disc=True, update_listing=False, skip_view_mode=False):
 		handle = int(sys.argv[1])
-		k.set_content(handle, 'files')
+		k.set_content(handle, k.MENU_FOLDER_CONTENT)
 		k.set_category(handle, self.category_name)
 		k.end_directory(handle, updateListing=update_listing, cacheToDisc=cache_to_disc)
 		if not skip_view_mode:
-			k.set_view_mode('view.main', 'files')
+			k.set_view_mode('view.main', k.MENU_FOLDER_CONTENT)

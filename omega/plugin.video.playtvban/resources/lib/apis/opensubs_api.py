@@ -16,7 +16,7 @@ _OSUB_LONGLONG = struct.calcsize('q')
 
 
 def effective_api_key():
-	key = get_setting('redlight.playback.opensubs_api_key', 'empty_setting')
+	key = get_setting('playtvban.playback.opensubs_api_key', 'empty_setting')
 	if key not in (None, '', '0', 'empty_setting'):
 		return str(key).strip()
 	return _DEFAULT_API_KEY
@@ -27,17 +27,17 @@ def _api_key():
 
 
 def _username():
-	value = get_setting('redlight.playback.opensubs_username', 'empty_setting')
+	value = get_setting('playtvban.playback.opensubs_username', 'empty_setting')
 	return '' if value in (None, '', '0', 'empty_setting') else str(value).strip()
 
 
 def _password():
-	value = get_setting('redlight.playback.opensubs_password', 'empty_setting')
+	value = get_setting('playtvban.playback.opensubs_password', 'empty_setting')
 	return '' if value in (None, '', '0', 'empty_setting') else str(value).strip()
 
 
 def _token():
-	value = get_setting('redlight.playback.opensubs_token', '0')
+	value = get_setting('playtvban.playback.opensubs_token', '0')
 	return '' if value in (None, '', '0', 'empty_setting') else str(value).strip()
 
 
@@ -45,7 +45,7 @@ def _headers(token=None):
 	headers = {
 		'Content-Type': 'application/json',
 		'Api-Key': _api_key(),
-		'User-Agent': 'RedLight/%s' % ku.addon_version(),
+		'User-Agent': 'PlayTVBan/%s' % ku.addon_version(),
 	}
 	if token: headers['Authorization'] = token
 	return headers
@@ -297,14 +297,14 @@ def fetch_alert_subtitle(imdb_id, season=None, episode=None, year=None, playing_
 			if len(str(label)) > 120: label = str(label)[:117] + '...'
 			play_tag = _subtitle_cache_release_tag(release_context) or 'unknown'
 			sync_tag = ' sync' if match.get('moviehash_match') else ''
-			ku.logger('Red Light', 'OpenSubtitles pick (%s%s): %s' % (play_tag, sync_tag, label))
+			ku.logger('Play TVBan', 'OpenSubtitles pick (%s%s): %s' % (play_tag, sync_tag, label))
 		except: pass
 	content = _download_subtitle_content(match.get('file_id'))
 	if not _looks_like_subtitle_content(content): return None
 	final_path = _opensubs_alert_path(imdb_id, season, episode, release_context)
 	try:
 		with ku.open_file(final_path, 'w') as file: file.write(content)
-		ku.set_property('redlight.active_subtitle_path', final_path)
+		ku.set_property('playtvban.active_subtitle_path', final_path)
 	except: return None
 	return final_path
 

@@ -9,22 +9,28 @@ from caches.settings_cache import get_setting
 from modules import kodi_utils
 from modules.kodi_utils import logger
 
-# id, short label, base URL (None = Custom; Custom is last in the picker)
+# id, short label, base URL (None = Custom; Custom is last in the picker).
+# Preset ids are stable — never renumber existing entries (saved settings + per-instance profiles).
 PRESETS = (
 	('0', 'Kuu', 'https://aiostreams.stremio.ru'),
 	('1', 'Viren', 'https://aiostreams.viren070.me'),
 	('2', 'Yeb', 'https://aiostreams.fortheweak.cloud'),
 	('3', 'Midnight', 'https://aiostreamsfortheweebsstable.midnightignite.me'),
 	('4', 'Custom', None),
+	# Public host returns 403 Search API is disabled — hidden from picker until re-enabled.
+	('5', 'ElfHosted', 'https://aiostreams.elfhosted.com'),
 )
 
 INSTANCE_LABELS = {preset_id: label for preset_id, label, url in PRESETS}
 INSTANCE_IDS = tuple(preset_id for preset_id, _, _ in PRESETS)
 CUSTOM_INSTANCE_ID = '4'
+# Keep preset id + credentials; omit from dropdown only.
+PICKER_HIDDEN_IDS = frozenset({'5'})
 PROFILE_SETTING = 'aiostreams.profiles'
 
-PUBLIC_INSTANCES = tuple(url for _, _, url in PRESETS if url)
-_PUBLIC_INDEX = {'0': 0, '1': 1, '2': 2, '3': 3}
+_public_presets = [(preset_id, url) for preset_id, _, url in PRESETS if url]
+PUBLIC_INSTANCES = tuple(url for _, url in _public_presets)
+_PUBLIC_INDEX = {preset_id: index for index, (preset_id, _) in enumerate(_public_presets)}
 
 def _empty_profile():
 	return {'username': 'empty_setting', 'password': 'empty_setting', 'custom_url': ''}
@@ -112,7 +118,7 @@ def base_url():
 
 def refresh_base_url_property():
 	url = base_url()
-	kodi_utils.set_property('playtvban.aiostreams.base_url', url or '(not set — choose instance or enter Custom URL)')
+	kodi_utils.set_property('playtvban.aiostreams.base_url', url or '(no establecida — elige instancia o introduce URL personalizada)')
 
 def sync_instance_display_name():
 	label = INSTANCE_LABELS.get(instance_id(), INSTANCE_LABELS['0'])
@@ -126,12 +132,12 @@ def instance_picker_list():
 	"""Instance dropdown rows: alphabetical by preset name, Custom always last."""
 	items = []
 	for preset_id, label, url in PRESETS:
-		if preset_id == CUSTOM_INSTANCE_ID:
+		if preset_id == CUSTOM_INSTANCE_ID or preset_id in PICKER_HIDDEN_IDS:
 			continue
 		items.append((label.lower(), '%s — %s' % (label, url), preset_id))
 	items.sort(key=lambda entry: entry[0])
 	picker = [(display, preset_id) for _, display, preset_id in items]
-	picker.append(('Custom — set URL below', CUSTOM_INSTANCE_ID))
+	picker.append(('Personalizado — establecer URL abajo', CUSTOM_INSTANCE_ID))
 	return picker
 
 def refresh_settings_properties():
@@ -574,14 +580,14 @@ def search(media_type, imdb_id, season=None, episode=None, timeout=30):
 	credentials = auth()
 	if not credentials:
 		logger('aiostreams API', 'search skipped — username/password not configured')
-		return [], ['AIOStreams username/password not configured']
+		return [], ['Usuario/contraseña de AIOStreams no configurados']
 	if not imdb_id:
 		logger('aiostreams API', 'search skipped — missing IMDb id')
-		return [], ['Missing IMDb id for AIOStreams search']
+		return [], ['Falta el ID de IMDb para la búsqueda en AIOStreams']
 	base = base_url()
 	if not base:
 		logger('aiostreams API', 'search skipped — no instance URL configured')
-		return [], ['No AIOStreams instance URL configured']
+		return [], ['No hay URL de instancia de AIOStreams configurada']
 	if media_type == 'movie':
 		params = {'type': 'movie', 'id': imdb_id}
 	else:

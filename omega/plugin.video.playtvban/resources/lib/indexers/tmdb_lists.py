@@ -22,7 +22,7 @@ def get_tmdb_lists(params):
 			custom_image = [i for i in images if i.rsplit('_', 1)[0] == md5_image_name][0]
 			return os.path.join(profile_path, 'images', 'tmdb_lists_%s' % image_type, custom_image)
 		except: return ''
-	def _process():
+		def _process():
 		for item in data:
 			try:
 				list_name, list_id, item_count = item['name'], item['id'], item['number_of_items']
@@ -34,19 +34,20 @@ def get_tmdb_lists(params):
 				custom_fanart = get_custom_image(list_name, 'fanart', all_fanart)
 				if custom_fanart: fanart = custom_fanart
 				else: fanart = background
-				mode = 'random.build_tmdb_lists_contents' if random else 'tmdblist.build_tmdb_list'
-				url_params = {'mode': mode, 'list_id': list_id, 'list_name': list_name, 'sort_order': sort_order, 'updated_at': updated_at, 'iconImage': poster, 'name': list_name}
-				if random: url_params['random'] = 'true'
-				if shuffle_lists: url_params['shuffle'] = 'true'
+				random_contents = random or shuffle_lists
+				mode = 'random.build_tmdb_lists_contents' if random_contents else 'tmdblist.build_tmdb_list'
+				url_params = {'mode': mode, 'list_id': list_id, 'list_name': list_name,
+				'sort_order': 'shuffle' if random_contents else sort_order, 'updated_at': updated_at, 'iconImage': poster, 'name': list_name}
+				if random_contents: url_params['random'] = 'true'
 				url = kodi_utils.build_folder_url(url_params)
 				display = '%s [I](x%02d)[/I]' % (list_name, item_count)
-				cm = [('[B]Make New List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.make_new_tmdb_list'})),
-				('[B]Edit Properties[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.adjust_tmdb_list_properties', 'list_id': list_id, 'updated_at': updated_at,
+				cm = [('[B]Crear nueva lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.make_new_tmdb_list'})),
+				('[B]Editar propiedades[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.adjust_tmdb_list_properties', 'list_id': list_id, 'updated_at': updated_at,
 					'original_list_name': list_name, 'original_sort_order': sort_order, 'custom_poster': custom_poster, 'custom_fanart': custom_fanart})),
-				('[B]Delete List[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.delete_tmdb_list', 'list_id': list_id})),
-				('[B]Clear Contents Cache[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.cache_delete_list_tmdb', 'list_id': list_id})),
-				('[B]Clear All Lists Cache[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.cache_delete_all_tmdb'})),
-				('[B]Add to Shortcut Folder[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
+				('[B]Eliminar lista[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.delete_tmdb_list', 'list_id': list_id})),
+				('[B]Borrar caché del contenido[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.cache_delete_list_tmdb', 'list_id': list_id})),
+				('[B]Borrar la caché de todas las listas[/B]', 'RunPlugin(%s)' % build_url({'mode': 'tmdblist.cache_delete_all_tmdb'})),
+				('[B]Añadir a la carpeta de accesos directos[/B]', 'RunPlugin(%s)' % build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))]
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
 				listitem.setArt({'icon': poster, 'poster': poster, 'thumb': poster, 'fanart': fanart, 'banner': fanart})
@@ -90,11 +91,11 @@ def get_tmdb_lists(params):
 		else: result = list(_new_process())
 		kodi_utils.add_items(handle, result)
 	except: pass
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.set_category(handle, params.get('category_name', ''))
 	if shuffle_lists and not returning_to_list: kodi_utils.focus_index(0)
-	kodi_utils.end_directory(handle)
-	kodi_utils.set_view_mode('view.main')
+	kodi_utils.end_directory(handle, cacheToDisc=not (random or shuffle_lists))
+	kodi_utils.set_view_mode('view.main', kodi_utils.MENU_FOLDER_CONTENT)
 
 def build_tmdb_list(params):
 	def _process(function, _list, _type):
@@ -153,30 +154,30 @@ def build_tmdb_list(params):
 		kodi_utils.set_view_mode('view.%s' % content, content, is_external)
 
 def adjust_tmdb_list_properties(params):
-	sort_order_dict = {'0': 'Title', '1': 'Release Date (asc)', '2': 'Release Date (desc)', '3': 'Shuffle'}
+	sort_order_dict = {'0': 'Título', '1': 'Fecha de Estreno (asc)', '2': 'Fecha de Estreno (desc)', '3': 'Aleatorio'}
 	list_id, sort_order = params.get('list_id'), params.get('sort_order', '')
 	original_list_name, original_sort_order = params.get('original_list_name', ''), params.get('original_sort_order', '')
 	custom_poster, custom_fanart = params.get('custom_poster', ''), params.get('custom_fanart', '')
 	current_name, current_sort_order = params.get('list_name', '') or original_list_name, sort_order or original_sort_order
-	choices = [('Change Name', 'Currently [B]%s[/B]' % (current_name), 'list_name'),
-				('Change Sort Order', 'Currently [B]%s[/B]' % sort_order_dict.get(current_sort_order, 'None'), 'sort_order'),
-				('Make Custom Poster', '', 'make_poster'),
-				('Make Custom Fanart', '', 'make_fanart')]
-	if custom_poster: choices.append(('Delete Custom Poster', '', 'delete_poster'))
-	if custom_fanart: choices.append(('Delete Custom Fanart', '', 'delete_fanart'))
-	choices.extend([('Empty List Contents', 'Delete All Contents of %s' % current_name, 'empty_contents'),
-					('Import Trakt List', 'Import a Trakt List into %s' % current_name, 'import_trakt')])
+	choices = [('Cambiar Nombre', 'Actualmente [B]%s[/B]' % (current_name), 'list_name'),
+				('Cambiar Orden', 'Actualmente [B]%s[/B]' % sort_order_dict.get(current_sort_order, 'Ninguno'), 'sort_order'),
+				('Crear Póster Personalizado', '', 'make_poster'),
+				('Crear Fanart Personalizado', '', 'make_fanart')]
+	if custom_poster: choices.append(('Eliminar Póster Personalizado', '', 'delete_poster'))
+	if custom_fanart: choices.append(('Eliminar Fanart Personalizado', '', 'delete_fanart'))
+	choices.extend([('Vaciar Contenido de la Lista', 'Eliminar Todo el Contenido de %s' % current_name, 'empty_contents'),
+					('Importar Lista de Trakt', 'Importar una lista de Trakt a %s' % current_name, 'import_trakt')])
 	list_items = [{'line1': item[0], 'line2': item[1] or item[0]} for item in choices]
-	kwargs = {'items': json.dumps(list_items), 'heading': 'TMDb List Properties', 'multi_line': 'true', 'narrow_window': 'true'}
+	kwargs = {'items': json.dumps(list_items), 'heading': 'Propiedades de la lista TMDb', 'multi_line': 'true', 'narrow_window': 'true'}
 	action = kodi_utils.select_dialog([i[2] for i in choices], **kwargs)
 	if action == None:
 		if params.get('refresh_cache', 'false') == 'true': cache_delete_all_tmdb()
 		elif params.get('refresh', 'false') == 'true': return kodi_utils.kodi_refresh()
 		return None
 	if action in ('make_poster', 'make_fanart'):
-		art_type = 'Posters' if action == 'make_poster' else 'Fanart'
-		shuffle_sort_order = kodi_utils.confirm_dialog(heading='TMDb Lists', text='Use [B]4 Random[/B] %s from List?[CR]OR[CR]Use [B]First 4[/B] %s from List?' % (art_type, art_type),
-												ok_label='4 Random', cancel_label='First 4')
+		art_type = 'Pósteres' if action == 'make_poster' else 'Fanart'
+		shuffle_sort_order = kodi_utils.confirm_dialog(heading='Listas TMDb', text='Usar [B]4 %s aleatorios[/B] de la lista?[CR]O[CR]¿Usar los [B]4 primeros %s[/B] de la lista?' % (art_type, art_type),
+												ok_label='4 aleatorios', cancel_label='4 primeros')
 		if shuffle_sort_order == None: return adjust_tmdb_list_properties(params)
 	if action == 'list_name':
 		list_name = rename_tmdb_list(current_name, list_id)
@@ -251,14 +252,14 @@ def add_remove_watchfavs(media_type, media_id, list_type, status):
 	data = tmdb_list_api.add_remove_from_watchfavs(media_type, media_id, list_type, status)
 	if not data or not data.get('success'):
 		if not status: kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-		else: kodi_utils.notification('Error Adding to List', 3000)
+		else: kodi_utils.notification('Error al Añadir a la Lista', 3000)
 		return False
 	return True
 
 def add_to_tmdb_list(list_id, items):
 	data = tmdb_list_api.add_remove_from_list(list_id, items, 'post')
 	if not data or not data.get('success'):
-		kodi_utils.notification('Error Adding to List')
+		kodi_utils.notification('Error al Añadir a la Lista')
 		return False
 	return True
 
@@ -309,7 +310,8 @@ def check_item_status_watchfav(list_id, media_type, media_id):
 def make_new_tmdb_list(params):
 	suggested_list_name, chosen_list = '', None
 	external_creation = params.get('external_creation', 'false') == 'true'
-	if not external_creation and kodi_utils.confirm_dialog(heading='TMDb Lists', text='¿Importar una Lista de Trakt para Rellenar esta Nueva Lista?', ok_label='Sí', cancel_label='No'):
+	if not external_creation and kodi_utils.confirm_dialog(heading='TMDb Lists', text='¿Importar una Lista de Trakt para Rellenar esta Nueva Lista?',
+																				ok_label='Yes', cancel_label='No'):
 		from apis.trakt_api import get_trakt_list_selection
 		chosen_list = get_trakt_list_selection(['default', 'personal'])
 		if chosen_list == None: return
@@ -386,14 +388,10 @@ def get_tmdb_list(params):
 	contents = [dict(i, **{'title': i.get('title') or i.get('name'), 'release_date': i.get('release_date') or i.get('first_air_date')}) for i in contents]
 	if sort_order:
 		try:
-			if sort_order in ('4', 'None', '', 'original_order'):
-				contents.sort(key=lambda k: (k['original_order'] is None, k['original_order']))
-			elif sort_order in ('3', 'shuffle'):
-				shuffle(contents)
-			elif sort_order in ('1', '2'):
-				contents.sort(key=lambda k: (k['release_date'] is None, k['release_date']), reverse=sort_order != '1')
-			elif sort_order in ('', '0', 'None'):
-				contents = sort_for_article(contents, 'title', ignore_articles())
+			if sort_order in ('4', 'None', '', 'original_order'): contents.sort(key=lambda k: (k['original_order'] is None, k['original_order']))
+			elif sort_order in ('3', 'shuffle'): shuffle(contents)
+			elif sort_order in ('1', '2'): contents.sort(key=lambda k: (k['release_date'] is None, k['release_date']), reverse=sort_order != '1')
+			elif sort_order in ('', '0', 'None'): contents = sort_for_article(contents, 'title', ignore_articles())
 			else: pass
 		except: pass
 	return contents
@@ -475,4 +473,3 @@ def get_sort_orders():
 
 def list_change_warning(list_name, text='[B]CAUTION!!![/B][CR][CR]This will change the contents of [B]%s[/B]. Continue?'):
 	return kodi_utils.confirm_dialog(heading='TMDb Lists', text=text % list_name, ok_label='Yes', cancel_label='No')
-

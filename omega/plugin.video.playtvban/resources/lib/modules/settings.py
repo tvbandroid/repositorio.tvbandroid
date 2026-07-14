@@ -502,6 +502,26 @@ def easynews_authorized():
 	else: easynews_status = True
 	return easynews_status
 
+def nzb_indexer_active():
+	"""True when NZB Indexers are enabled and at least one slot is configured."""
+	if get_setting('playtvban.provider.nzb', 'false') != 'true': return False
+	for slot in (1, 2, 3):
+		if get_setting('playtvban.nzb%d.enabled' % slot, 'false') != 'true': continue
+		url = get_setting('playtvban.nzb%d.url' % slot, '')
+		key = get_setting('playtvban.nzb%d.key' % slot, '')
+		if url not in ('', 'empty_setting') and key not in ('', 'empty_setting'): return True
+	return False
+
+def nzb_scrape_active():
+	"""NZB title scrape — indexers plus TorBox Pro usenet for resolve."""
+	return nzb_indexer_active() and authorized_debrid_check('tb')
+
+def nzb_search_width():
+	return int(get_setting('playtvban.nzb.search_width', '0'))
+
+def nzb_fallback_search():
+	return get_setting('playtvban.nzb.fallback_search', 'true') == 'true'
+
 def aiostreams_authorized():
 	username = get_setting('playtvban.aiostreams.username', 'empty_setting')
 	password = get_setting('playtvban.aiostreams.password', 'empty_setting')
@@ -824,18 +844,20 @@ def active_internal_scrapers():
 		if enabled_debrids_check(item[0]): settings_append(item[1])
 	active = [i.split('.')[1] for i in settings if get_setting('playtvban.%s' % i) == 'true']
 	if aiostreams_active(): active.append('aiostreams')
+	if nzb_scrape_active(): active.append('nzb')
 	return active
 
 def provider_sort_ranks():
 	fo_priority = int(get_setting('playtvban.folders.priority', '6'))
 	aio_priority = int(get_setting('playtvban.aio.priority', '7'))
 	en_priority = int(get_setting('playtvban.en.priority', '7'))
+	nzb_priority = int(get_setting('redlight.nzb.priority', '7'))
 	rd_priority = int(get_setting('playtvban.rd.priority', '8'))
 	ad_priority = int(get_setting('playtvban.ad.priority', '9'))
 	pm_priority = int(get_setting('playtvban.pm.priority', '10'))
 	oc_priority = int(get_setting('playtvban.oc.priority', '10'))
 	tb_priority = int(get_setting('playtvban.tb.priority', '10'))
-	return {'easynews': en_priority, 'aiostreams': aio_priority, 'real-debrid': rd_priority, 'premiumize.me': pm_priority, 'alldebrid': ad_priority,
+	return {'easynews': en_priority, 'aiostreams': aio_priority, 'nzb': nzb_priority, 'real-debrid': rd_priority, 'premiumize.me': pm_priority, 'alldebrid': ad_priority,
 	'offcloud': oc_priority, 'torbox': tb_priority, 'rd_cloud': rd_priority, 'pm_cloud': pm_priority, 'ad_cloud': ad_priority, 'oc_cloud': oc_priority,
 	'tb_cloud': tb_priority, 'folders': fo_priority}
 
@@ -858,6 +880,7 @@ def scraping_settings():
 	if highlight_type == 0:
 		easynews_highlight = get_setting('playtvban.provider.easynews_highlight', 'FF00B3B2')
 		aiostreams_highlight = get_setting('playtvban.provider.aiostreams_highlight', 'FF00D4FF')
+		nzb_highlight = get_setting('redlight.provider.nzb_highlight', 'FFD4A017')
 		debrid_cloud_highlight = get_setting('playtvban.provider.debrid_cloud_highlight', 'FF7A01CC')
 		folders_highlight = get_setting('playtvban.provider.folders_highlight', 'FFB36B00')
 		rd_highlight = get_setting('playtvban.provider.rd_highlight', 'FF3C9900')
@@ -872,7 +895,7 @@ def scraping_settings():
 		highlight_SD = get_setting('playtvban.scraper_SD_highlight', 'FF0166FF')
 	return {'highlight_type': highlight_type, 'real-debrid': rd_highlight, 'premiumize': pm_highlight, 'alldebrid': ad_highlight,
 			'offcloud': oc_highlight, 'torbox': tb_highlight, 'rd_cloud': debrid_cloud_highlight, 'pm_cloud': debrid_cloud_highlight, 'ad_cloud': debrid_cloud_highlight,
-			'oc_cloud': debrid_cloud_highlight, 'tb_cloud': debrid_cloud_highlight, 'easynews': easynews_highlight, 'aiostreams': aiostreams_highlight, 'folders': folders_highlight,
+			'oc_cloud': debrid_cloud_highlight, 'tb_cloud': debrid_cloud_highlight, 'easynews': easynews_highlight, 'aiostreams': aiostreams_highlight, 'nzb': nzb_highlight, 'folders': folders_highlight,
 			'4k': highlight_4K, '1080p': highlight_1080P, '720p': highlight_720P, 'sd': highlight_SD}
 
 def external_cache_check():

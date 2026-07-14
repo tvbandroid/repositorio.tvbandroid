@@ -1,3 +1,34 @@
+2026.07.15
+- genre menu icons: rename thrash_speedmetal typo, add topworld/nordicfolk/topclassical from parent genre art, rename r&b folder to r_b to match path code; resolve genre icons with parent fallbacks
+
+2026.07.14
+- fix single-track downloads dropping the track-number prefix from filenames (thanks JMAN730)
+- fix collab and featured-artist albums downloading into nested per-artist folders instead of one flat album folder (thanks JMAN730)
+- migrate language strings from legacy strings.xml to resource.language.en_gb/strings.po (Kodi 19+) (thanks JMAN730)
+- remove deprecated start="startup" from xbmc.service declaration in addon.xml (thanks JMAN730)
+- fix addon fanart and icon paths in addon.xml (art/fanart.jpg, art/icon.png)
+- fix browse fanart and notification icon paths to match addon.xml assets (art/fanart.jpg, art/icon.png)
+- Estuary WideList icons: set ListItem.Icon, empty list content (not files), and musicmp3 Referer/UA on remote cover URLs (Red Light pattern); artist rows use art/artists.jpg when no cached photo
+
+2026.05.26
+- fix songs with "/" in titles not appearing in search or downloading
+- sanitize filenames and URL-encode context menu actions for special characters
+- decode HTML entities in download folder and file names (e.g. &amp; to &)
+- decode HTML entities when browsing, searching, and viewing favourites
+- add Settings to the main menu
+- fix custom music directory setting being ignored when unticked
+- add Default/Custom folder dropdown
+- show download started and complete notifications for songs and albums
+- fix favourites display, playback, add/remove, and grouping
+- fix favourite remove failing when artist or title contains special characters such as &
+- show confirmation notifications when favourites are added or removed
+- show notification when a search returns no results
+- return to main menu when cancelling favourite group selection or when favourites are empty
+- return to previous menu position when backing out of favourites or empty searches
+- preserve main menu scroll position when removing the last favourite
+- fix blank menu after removing favourites or other context-menu actions
+- use plain English labels for music directory settings
+
 2018.08.28
 - fix compilation artwork
 - fix next page

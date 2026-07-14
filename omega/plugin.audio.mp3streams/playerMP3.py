@@ -151,7 +151,7 @@ ADDON      =  xbmcaddon.Addon(ADDONID)
 HOME       =  xbmcvfs.translatePath(ADDON.getAddonInfo('path'))
 PROFILE    =  xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 PROFILE    =  ADDON.getAddonInfo('profile')
-ICON       =  os.path.join(HOME, 'icon.png')
+ICON       =  xbmcvfs.translatePath(ADDON.getAddonInfo('icon'))
 TEMP       =  xbmcvfs.translatePath(os.path.join(PROFILE, 'temp_dl'))
 
 MAX_DOWNLOADERS = 3
@@ -322,17 +322,8 @@ def createMD5(url):
 
 
 def clean(text):
-    text = text.replace('/',  '')
-    text = text.replace("\\", '')
-    text = text.replace(':',  '')
-    text = text.replace('*',  '')
-    text = text.replace('?',  '')
-    text = text.replace('"',  '')
-    text = text.replace('<',  '')
-    text = text.replace('>',  '')
-    text = text.replace('|',  '')
-
-    return text.strip()
+    import settings
+    return settings.sanitize_filename(text)
 
 
 def createFilename(title, artist, album, url):
@@ -343,11 +334,8 @@ def createFilename(title, artist, album, url):
     artist = clean(artist)
     album  = clean(album)
 
-    customdir = ADDON.getSetting('custom_directory')
-    folder = ADDON.getSetting('music_dir')
-
-    if customdir=='false':
-        folder = TEMP
+    import settings
+    folder = settings.music_dir()
 
     if ADDON.getSetting('folder_structure')=="0":
         filename = os.path.join(folder, artist, album)
@@ -377,7 +365,7 @@ def getListItem(title, artist, album, track, image, duration, url, fanart, isPla
     liz.setProperty('fanart_image', fanart)
     liz.setProperty('IsPlayable',   isPlayable)
 
-    if FRODO or ('.mp3' in url) or (not useDownload):
+    if FRODO or '.mp3' in url or not useDownload:
         return url, liz
     title = "%s. %s" % (track,title)
     filename = createFilename(title, artist, album, url)
@@ -484,7 +472,7 @@ def fetchFile(title, artist, album, track, url, filename):
 
     nDownloaders = getNmrDownloaders()
     log('Number of downloaders= %d' % nDownloaders)
-    if nDownloaders >= MAX_DOWNLOADERS: #-1 to allow for fetchNext
+    if nDownloaders >= MAX_DOWNLOADERS-1: #-1 to allow for fetchNext
         stopDownloaders()
 
     if xbmcvfs.exists(xbmcvfs.translatePath(filename)) and xbmcvfs.File(filename).size() > 250 * 1024:
@@ -507,7 +495,6 @@ def play(sys, params):
     duration = urllib.parse.unquote_plus(params['duration'])
     filename = urllib.parse.unquote_plus(params['filename'])
     url      = urllib.parse.unquote_plus(params['url'])
-
     log('**** In playFile ****')
     log(title)
     log(url)
@@ -523,7 +510,7 @@ def play(sys, params):
     log('**** FILE %s NOW AVAILABLE ****' % filename)
     liz = xbmcgui.ListItem(title, path=filename)
     
-    liz.setArt({'icon': image, 'thumb': image}) 
+    liz.setArt({'icon': image, 'thumb': image, 'poster': image, 'fanart': image}) 
 
     liz.setInfo('music', {'Title':title, 'Artist':artist, 'Album':album, 'Duration':duration})
     liz.setProperty('mimetype', 'audio/mpeg')

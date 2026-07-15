@@ -23,22 +23,22 @@ class TMDbListAPI:
 		import requests
 		headers = self.read_access_headers()
 		data = requests.post('%s/auth/request_token' % self.base_url, headers=headers, timeout=20).json()
-		if not 'success' in data: return notification('Failed to Auth Account')
+		if not 'success' in data: return notification('No se pudo autenticar la cuenta')
 		request_token = data['request_token']
 		token_url = 'https://www.themoviedb.org/auth/access?request_token=%s' % request_token
 		qr_code = make_qrcode(token_url) or ''
 		short_url = make_tinyurl(token_url)
 		copy2clip(short_url)
-		if short_url: p_dialog_insert = '[CR]OR visit this URL: [B]%s[/B]' % short_url
+		if short_url: p_dialog_insert = '[CR]O visita esta URL: [B]%s[/B]' % short_url
 		else: p_dialog_insert = ''
-		progressDialog = progress_dialog(heading='TMDb Account Authorisation', icon=qr_code)
+		progressDialog = progress_dialog(heading='Autorización de la Cuenta de TMDb', icon=qr_code)
 		count, success = 72, None
 		while not progressDialog.iscanceled() and count >= 0 and success == None:
 			try:
 				count -= 1
 				response = requests.post('%s/auth/access_token' % self.base_url, json={'request_token': request_token}, headers=headers, timeout=20).json()
 				if response.get('success') and response.get('access_token'): success = True
-				progressDialog.update('Please Scan the QR Code%s[CR]Confirm Access to your TMDb Account' % p_dialog_insert, count)
+				progressDialog.update('Por favor, escanea el código QR%s[CR]Confirma el acceso a tu cuenta de TMDb' % p_dialog_insert, count)
 				sleep(2500)
 			except: success = False
 		canceled = progressDialog.iscanceled()
@@ -50,9 +50,9 @@ class TMDbListAPI:
 			success = self.add_tmdb3_to_session(response['access_token'], response['account_id'])
 		tmdb_lists_cache.clear_all()
 		if success is True:
-			notification('Success')
+			notification('Éxito')
 		else:
-			notification('Failed')
+			notification('Fallido')
 
 	def add_tmdb3_to_session(self, access_token, account_id):
 		import requests
@@ -78,9 +78,9 @@ class TMDbListAPI:
 		import requests
 		headers = self.read_access_headers()
 		data = requests.delete('https://api.themoviedb.org/3/auth/access_token', json={'access_token': self.read_access_token()}, headers=headers, timeout=20).json()
-		if not 'success' in data: notice = 'Failed to Revoke Account Auth'
+		if not 'success' in data: notice = 'No se pudo revocar la autenticación de la cuenta'
 		else:
-			notice = 'Success! Auth Revoked'
+			notice = '¡Éxito! Autenticación revocada'
 			set_setting('tmdb.token', 'empty_setting')
 			set_setting('tmdb.account_id', 'empty_setting')
 			set_setting('tmdb.username', 'empty_setting')

@@ -781,7 +781,7 @@ def trakt_comments(media_type, imdb_id):
 		return all_comments
 	all_comments = []
 	all_comments_append = all_comments.append
-	template, spoiler_template, date_format = '[B]%02d. [I]%s%s - %s[/I][/B][CR][CR]%s', '[B][COLOR red][CONTAINS SPOILERS][/COLOR][CR][/B]', '%Y-%m-%dT%H:%M:%S.000Z'
+	template, spoiler_template, date_format = '[B]%02d. [I]%s%s - %s[/I][/B][CR][CR]%s', '[B][COLOR khaki][CONTAINS SPOILERS][/COLOR][CR][/B]', '%Y-%m-%dT%H:%M:%S.000Z'
 	media_type = 'movies' if media_type in ('movie', 'movies') else 'shows'
 	string = 'trakt_comments_%s %s' % (media_type, imdb_id)
 	params = {'path': '%s/%s/comments', 'path_insert': (media_type, imdb_id), 'params': {'sort': 'likes'}, 'fetch_all': True}

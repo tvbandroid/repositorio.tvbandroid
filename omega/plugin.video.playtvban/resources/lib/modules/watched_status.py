@@ -383,7 +383,7 @@ def mark_tvshow(params):
 
 def mark_season(params):
 	season = int(params.get('season'))
-	if season == 0: return notification('Fallido')
+	if season == 0: return notification('Failed')
 	insert_list = []
 	insert_append = insert_list.append
 	action, title, tmdb_id = params.get('action'), params.get('title'), params.get('tmdb_id')
@@ -418,7 +418,7 @@ def mark_season(params):
 
 def mark_episode(params):
 	season, episode, title = int(params.get('season')), int(params.get('episode')), params.get('title')
-	if season == 0: return notification('Fallido')
+	if season == 0: return notification('Failed')
 	action, media_type = params.get('action'), 'episode'
 	refresh, from_playback = params.get('refresh', 'true') == 'true', params.get('from_playback', 'false') == 'true'
 	if from_playback: refresh = False

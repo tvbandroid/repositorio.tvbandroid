@@ -84,7 +84,7 @@ def get_imdb(params):
 					try: date = i['node']['submissionDate']
 					except: date = '-----'
 					review = '[B]%02d. [I]%s/10 - %s - %s[/I][/B][CR][CR]%s' % (count, rating, date, title, content)
-					if spoiler: review = '[B][COLOR red][CONTAINS SPOILERS][/COLOR][CR][/B]' + review
+					if spoiler: review = '[B][COLOR khaki][CONTAINS SPOILERS][/COLOR][CR][/B]' + review
 					count += 1
 					reviews.append(review)
 				except: pass

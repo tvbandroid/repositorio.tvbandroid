@@ -200,7 +200,7 @@ def clean_databases():
 		start_bytes = get_size(location)
 		result = function.clean_database()
 		if not result:
-			append('[B]%s: [COLOR red]FALLIDO[/COLOR][/B]' % name)
+			append('[B]%s: [COLOR khaki]FALLIDO[/COLOR][/B]' % name)
 			continue
 		end_bytes = get_size(location)
 		saved_bytes = start_bytes - end_bytes

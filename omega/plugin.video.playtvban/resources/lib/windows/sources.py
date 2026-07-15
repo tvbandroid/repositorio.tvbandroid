@@ -263,7 +263,7 @@ class SourcesResults(BaseDialog):
 						source_site = (get('aio_site_name') or get('aio_source_name') or aio_label.replace('AIO / ', '')).upper()
 						provider = aio_label
 						provider_icon = self.get_provider_and_path(get('aio_source_icon', 'aiostreams'))[1]
-												hoster_label = get('aio_hoster') or 'DIRECT'
+						hoster_label = get('aio_hoster') or 'DIRECT'
 					elif scrape_provider == 'nzb':
 						source_site = (get('nzb_indexer') or 'NZB').upper()
 						provider = 'NZB'
@@ -273,7 +273,7 @@ class SourcesResults(BaseDialog):
 						source_site = source.upper()
 						provider, provider_icon = self.get_provider_and_path(source.lower())
 						hoster_label = 'DIRECT'
-					if highlight_type == 0: key = source.lower() if scrape_provider == 'aiostreams' else provider
+					if highlight_type == 0: key = source.lower() if scrape_provider in ('aiostreams', 'nzb') else provider
 					else: key = basic_quality
 					item_highlight = self.info_highlights_dict[key]
 					set_properties({'source_type': hoster_label, 'provider': provider.upper()})
@@ -291,13 +291,13 @@ class SourcesResults(BaseDialog):
 				elif scrape_provider == 'aiostreams':
 					scraper_module = get('aio_release_group') or ''
 					if scraper_module:
-						scraper_module_label = 'Grupo'
-						scraper_suffix = '     [COLOR %s][B]Grupo: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
-						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Grupo: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
+						scraper_module_label = 'Group'
+						scraper_suffix = '     [COLOR %s][B]Group: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
+						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Group: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
 				elif scrape_provider == 'nzb':
 					scraper_module = get('nzb_indexer') or ''
 					if scraper_module:
-						scraper_module_label = 'Sitio'
+						scraper_module_label = 'Site'
 						scraper_suffix = '     [COLOR %s][B]Sitio: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
 						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Sitio: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
 				set_properties({'name': name.upper(), 'source_site': source_site, 'provider_icon': provider_icon, 'quality_icon': quality_icon, 'count': '%02d.' % count,
@@ -386,7 +386,7 @@ class SourcesResults(BaseDialog):
 		self.setProperty('clearlogo', self.meta_get('clearlogo') or '')
 		self.setProperty('title', self.meta_get('title'))
 		self.setProperty('total_results', self.total_results)
-		self.setProperty('filters_ignored', '| Filtros Ignorados' if self.filters_ignored else '')
+		self.setProperty('filters_ignored', '| Filters Ignored' if self.filters_ignored else '')
 
 	def set_poster(self):
 		if self.window_id == 2000: self.set_image(200, self.poster)
@@ -424,7 +424,7 @@ class SourcesResults(BaseDialog):
 		if down_pack_params: choices_append(('Descargar Pack', down_pack_params))
 		if down_file_params: choices_append(('Descargar Archivo', down_file_params))
 		if provider_source == 'rd_cloud': choices_append(('Eliminar de la Nube de RD', 'rd_cloud_delete'))
-		if provider_source == 'tb_cloud': choices_append(('Delete from TorBox Cloud', 'tb_cloud_delete'))
+		if provider_source == 'tb_cloud': choices_append(('Eliminar de la nube de TorBox', 'tb_cloud_delete'))
 		list_items = [{'line1': i[0], 'icon': self.poster} for i in choices]
 		kwargs = {'items': json.dumps(list_items)}
 		choice = select_dialog([i[1] for i in choices], **kwargs)
@@ -559,13 +559,13 @@ class SourcesPlayback(BaseDialog):
 		self.setProperty('window_mode', self.window_mode)
 		self.setProperty('text', self.text)
 
-def set_resume_properties(self, percent):
+	def set_resume_properties(self, percent):
 		percent_str = str(percent)
 		self.setProperty('resume_ready', 'false')
 		self.setProperty('window_mode', self.window_mode)
 		self.setProperty('resume_percent', percent_str)
 		self.setProperty('resume_btn_label', 'Reanudar %s%%' % percent_str)
-		self.setProperty('startover_btn_label', 'Empezar Desde el Principio')
+		self.setProperty('startover_btn_label', 'Desde el inicio')
 		self.setProperty('cancel_btn_label', 'Cancelar')
 		self.setProperty('resume_timeout_percent', '0')
 		self.setProperty('text', '')
@@ -590,12 +590,12 @@ def set_resume_properties(self, percent):
 		from modules.kodi_utils import sync_scrape_progress_ui
 		pct = int(percent)
 		sync_scrape_progress_ui(pct, results_sd, results_720p, results_1080p, results_4k, results_total)
-		self.setProperty('resultados_4k', str(results_4k))
-		self.setProperty('resultados_1080p', str(results_1080p))
-		self.setProperty('resultados_720p', str(results_720p))
-		self.setProperty('resultados_sd', str(results_sd))
-		self.setProperty('resultados_total', str(results_total))
-		self.setProperty('por ciento', str(pct))
+		self.setProperty('results_4k', str(results_4k))
+		self.setProperty('results_1080p', str(results_1080p))
+		self.setProperty('results_720p', str(results_720p))
+		self.setProperty('results_sd', str(results_sd))
+		self.setProperty('results_total', str(results_total))
+		self.setProperty('percent', str(pct))
 		self.set_text(2001, content)
 
 	def update_resolver(self, text='', percent=0):

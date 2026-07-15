@@ -1152,7 +1152,7 @@ class PlayTVBanPlayer(xbmc.Player):
 			ku.clear_property(PROP_NEXTEP_NATURAL_END)
 			ku.clear_property(PROP_AUTOSCRAPE_NEXTEP_READY)
 			ku.clear_property(PROP_NEXTEP_AUTOPLAY_CANCELLED)
-	ku.clear_property(PROP_RANDOM_CONTINUAL_SKIP_ATTEMPTS)
+			ku.clear_property(PROP_RANDOM_CONTINUAL_SKIP_ATTEMPTS)
 			ku.clear_property(ku.PROP_AUTOSCRAPE_TOAST_SHOWN)
 			self._autoscrape_ready_notified = False
 			self._nextep_alert_pending_logged = False
@@ -1166,7 +1166,6 @@ class PlayTVBanPlayer(xbmc.Player):
 			self._intro_skip_last_curr = None
 			self._intro_skip_settle_ready = False
 			self._outro_credits_start_cached = '__unset__'
-
 	def _start_intro_skip_fetch(self):
 		play_type = getattr(self.sources_object, 'play_type', '')
 		if not st.autoplay_skip_intro_enabled(play_type) or self.media_type != 'episode':

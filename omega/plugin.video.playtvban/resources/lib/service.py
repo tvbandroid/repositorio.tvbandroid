@@ -47,6 +47,7 @@ class SetAddonConstants:
 		kodi_utils.clear_property('playtvban.language_invoker_ready')
 		kodi_utils.clear_property('playtvban.addon_xml_applied')
 		kodi_utils.clear_property(kodi_utils.SHUTTING_DOWN_PROP)
+		kodi_utils.reset_boot_sync_gate()
 		try:
 			from modules.utils import _prune_qr_cache
 			_prune_qr_cache(kodi_utils.translate_path(kodi_utils.addon_info('profile')))
@@ -154,6 +155,8 @@ class TraktMonitor:
 						kodi_utils.logger('Play TVBan', trakt_service_string % ('Success. %s' % trakt_success_line_dict[status], next_update_string))
 					else:
 						kodi_utils.logger('Play TVBan', trakt_service_string % ('Success. No Changes Needed', next_update_string))# 'not needed'
+					if status in ('success', 'not needed'):
+						kodi_utils.mark_boot_trakt_sync_ready()
 					if status == 'success' and not kodi_utils.service_shutting_down(monitor):
 						from modules.settings import provider_sync_refresh_widgets
 						if provider_sync_refresh_widgets(1):
@@ -293,6 +296,16 @@ class AutoStart:
 			kodi_utils.run_addon()
 		return kodi_utils.logger('Play TVBan', 'AutoStart Service Finished')
 
+class ServiceExpiryAlerts:
+	def run(self, monitor):
+		kodi_utils.logger('Play TVBan', 'ServiceExpiryAlerts Service Starting')
+		from modules.service_expiry import run_expiry_alerts
+		monitor.waitForAbort(60)
+		if not monitor.abortRequested() and not kodi_utils.service_shutting_down(monitor):
+			try: run_expiry_alerts()
+			except Exception as e: kodi_utils.logger('ServiceExpiryAlerts', str(e))
+		return kodi_utils.logger('Play TVBan', 'ServiceExpiryAlerts Service Finished')
+
 class AddonXMLCheck:
 	def run(self):
 		kodi_utils.logger('Play TVBan', 'AddonXMLCheck Service Starting')
@@ -326,6 +339,7 @@ class PlayTVBanMonitor(Monitor):
 		_start_daemon(lambda: WidgetRefresher().run(self))
 		try: AutoStart().run(self)
 		except Exception as e: kodi_utils.logger('AutoStart', str(e))
+		_start_daemon(lambda: ServiceExpiryAlerts().run(self))
 
 	def onNotification(self, sender, method, data):
 		if method in ('GUI.OnScreensaverActivated', 'System.OnSleep'):

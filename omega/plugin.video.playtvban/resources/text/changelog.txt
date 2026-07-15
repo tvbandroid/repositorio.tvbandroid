@@ -1,4 +1,10 @@
-[COLOR red][B]Versión 1.2.3[/B][/COLOR]
+[COLOR red][B]Versión 1.2.5[/B][/COLOR]
+- [B]Mis Servicios[/B]: formato de caducidad compartido en la Información de la Cuenta para Real Debrid, Premiumize, All Debrid, EasyNews, TorBox y Offcloud ([B]Caduca[/B] como una fecha legible más [B]Días restantes[/B]).
+- [B]Mis Servicios[/B]: las etiquetas del menú muestran los días restantes en caché (por ejemplo, [B]EasyNews · 42 días[/B]) — caché de 12 horas, sin llamadas a la API en cada apertura del menú.
+- [B]Mis Servicios[/B]: [B]Avisar cuando un servicio caduque en menos de (días)[/B] en [B]General > Mis Servicios[/B] (7 por defecto; 0 = desactivado). Notificación al iniciar para las cuentas autorizadas de Debrid y EasyNews; cada número de días restantes solo avisa una vez. Corregidas las alertas repetidas en cada inicio cuando el número de días restantes no había cambiado.
+- [B]Reproducción Aleatoria Continua[/B]: opción [B]Usar ¿Sigues viendo? con Reproducción Aleatoria Continua[/B] en [B]Reproducción > Episodios[/B] (visible cuando [B]Reproducción Automática del Siguiente Episodio[/B] y [B]Comprobar ¿Sigues viendo? después de X[/B] están activados). Cuando está desactivado, las cadenas de omisión de la reproducción aleatoria continua ya no activan el aviso de ¿Sigues viendo?; la Reproducción Automática del Siguiente Episodio funciona igual (#62 seguimiento).
+
+[COLOR red][B]Versión 1.2.4[/B][/COLOR]
 - [B]Progreso de Búsqueda[/B]: el contador de resultados [B]TOTAL[/B] del diálogo de progreso de búsqueda ahora tiene su propio selector de color ([B]Color del Contador TOTAL del Progreso de Búsqueda[/B], blanco por defecto). La etiqueta [B]TOTAL[/B] permanece en gris tenue; solo el número se colorea (cuando [B]Colores del Contador del Progreso de Búsqueda[/B] está activado).
 
 [COLOR red][B]Versión 1.2.2[/B][/COLOR]

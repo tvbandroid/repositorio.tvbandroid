@@ -24,11 +24,11 @@ def tb_cloud():
 				folder_id = item.get('id')
 				if folder_id is None:
 					continue
-				label_type = {'torrent': 'TORRENT', 'usenet': 'USENET', 'webdl': 'WEB DL'}.get(media_type, 'FOLDER')
+				label_type = {'torrent': 'TORRENT', 'usenet': 'USENET', 'webdl': 'WEB DL'}.get(media_type, 'CARPETA')
 				display = '%02d | [B]%s[/B] | [I]%s [/I]' % (count, label_type, clean_file_name(normalize(item.get('name') or '')).upper())
 				url_params = {'mode': 'torbox.browse_tb_cloud', 'folder_id': folder_id, 'media_type': media_type}
 				delete_params = {'mode': 'torbox.delete', 'folder_id': folder_id, 'media_type': media_type}
-				cm_append(('[B]Delete Folder[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
+				cm_append(('[B]Eliminar Carpeta[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
@@ -90,7 +90,7 @@ def tb_history():
 				finished = bool(item.get('download_finished'))
 				display = '%02d | %d%% | [B]%s[/B] | [I]%s [/I]' % (count, progress, type_label, name)
 				delete_params = {'mode': 'torbox.delete', 'folder_id': item['id'], 'media_type': media_type}
-				cm_append(('[B]Delete[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
+				cm_append(('[B]Eliminar[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
 				if finished:
 					url_params = {'mode': 'torbox.browse_tb_cloud', 'folder_id': item['id'], 'media_type': media_type}
 					is_folder = True
@@ -102,7 +102,7 @@ def tb_history():
 				listitem.setLabel(display)
 				listitem.addContextMenuItems(cm)
 				listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': fanart, 'banner': icon})
-				plot = item.get('status') or ('Ready' if finished else 'In progress')
+				plot = item.get('status') or ('Listo' if finished else 'En progreso')
 				if isinstance(plot, str) and plot.strip():
 					listitem.getVideoInfoTag(True).setPlot(plot)
 				yield (url, listitem, is_folder)
@@ -124,7 +124,7 @@ def tb_history():
 		if errors:
 			kodi_utils.notification('TorBox: %s' % errors[0], 4000)
 		else:
-			kodi_utils.notification('TorBox: No transfers in history', 2500)
+			kodi_utils.notification('TorBox: No hay transferencias en el historial', 2500)
 	handle = int(sys.argv[1])
 	kodi_utils.add_items(handle, list(_builder()))
 	kodi_utils.set_content(handle, 'files')
@@ -143,7 +143,7 @@ def browse_tb_cloud(folder_id, media_type):
 	else:
 		files = TorBox.user_cloud_info_usenet(folder_id)
 	if not files or not files.get('success'):
-		kodi_utils.notification('TorBox: %s' % _api_error_text(files, 'Failed to load folder'))
+		kodi_utils.notification('TorBox: %s' % _api_error_text(files, 'No se pudo cargar la carpeta'))
 		kodi_utils.end_directory(handle)
 		return
 	data = files.get('data')
@@ -154,7 +154,7 @@ def browse_tb_cloud(folder_id, media_type):
 	extensions = tuple(supported_video_extensions())
 	video_files = [{**i, 'media_type': media_type} for i in (data.get('files') or []) if (i.get('short_name') or '').lower().endswith(extensions)]
 	if not video_files:
-		kodi_utils.notification('TorBox: No playable video files in this folder', 4000)
+		kodi_utils.notification('TorBox: No hay archivos de vídeo reproducibles en esta carpeta', 4000)
 
 	def _builder():
 		for count, item in enumerate(video_files, 1):
@@ -165,14 +165,14 @@ def browse_tb_cloud(folder_id, media_type):
 					continue
 				name = clean_file_name(short_name).upper()
 				size_gb = float(int(item.get('size') or 0)) / 1073741824
-				display = '%02d | [B]FILE[/B] | %.2f GB | [I]%s [/I]' % (count, size_gb, name)
+				display = '%02d | [B]ARCHIVO[/B] | %.2f GB | [I]%s [/I]' % (count, size_gb, name)
 				url_link = '%d,%d' % (int(folder_id), int(file_id))
 				url_params = {
 					'mode': 'torbox.resolve_tb', 'play': 'true', 'url': url_link,
 					'media_type': media_type, 'filename': short_name,
 				}
 				down_file_params = {'mode': 'downloader.runner', 'name': name, 'url': url_link, 'media_type': media_type, 'action': 'cloud.torbox', 'image': icon}
-				cm = [('[B]Download File[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params))]
+				cm = [('[B]Descargar Archivo[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params))]
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
@@ -199,9 +199,9 @@ def tb_delete(folder_id, media_type):
 	elif media_type == 'webdl': result = TorBox.delete_webdl(folder_id)
 	else: result = TorBox.delete_usenet(folder_id)
 	if not result or not result.get('success'):
-		return kodi_utils.notification('TorBox: %s' % _api_error_text(result, 'Delete failed'), 4000)
+		return kodi_utils.notification('TorBox: %s' % _api_error_text(result, 'Error al eliminar'), 4000)
 	TorBox.clear_cache()
-	kodi_utils.notification('TorBox: Deleted', 2500)
+	kodi_utils.notification('TorBox: Eliminado', 2500)
 	kodi_utils.execute_builtin('Container.Refresh')
 
 
@@ -234,7 +234,7 @@ def resolve_tb(params):
 	file_id, media_type = params.get('url'), params.get('media_type') or 'torrent'
 	filename = params.get('filename') or ''
 	if not file_id:
-		kodi_utils.notification('TorBox: Missing file reference', 4000)
+		kodi_utils.notification('TorBox: Falta la referencia del archivo', 4000)
 		return None
 	kodi_utils.show_busy_dialog()
 	try:
@@ -248,7 +248,7 @@ def resolve_tb(params):
 	finally:
 		kodi_utils.hide_busy_dialog()
 	if not resolved_link:
-		kodi_utils.ok_dialog(heading='TorBox', text='Unable to resolve this cloud link. It may be expired or no longer available.')
+		kodi_utils.ok_dialog(heading='TorBox', text='No se pudo resolver este enlace de la nube. Puede haber caducado o ya no estar disponible.')
 		return None
 	if params.get('play', 'false') != 'true':
 		return resolved_link
@@ -256,10 +256,10 @@ def resolve_tb(params):
 
 
 def tb_send_webdl():
-	url = kodi_utils.kodi_dialog().input('Paste URL to send to TorBox WebDL:').strip()
+	url = kodi_utils.kodi_dialog().input('Pegue la URL para enviar a TorBox WebDL:').strip()
 	if not url: return
 	if not (url.startswith('http://') or url.startswith('https://') or url.startswith('magnet:')):
-		return kodi_utils.ok_dialog(text='Invalid URL. Must start with http://, https:// or magnet:')
+		return kodi_utils.ok_dialog(text='URL no válida. Debe comenzar por http://, https:// o magnet:')
 	kodi_utils.show_busy_dialog()
 	try:
 		if url.startswith('magnet:'):
@@ -273,29 +273,30 @@ def tb_send_webdl():
 	kodi_utils.hide_busy_dialog()
 	if result and result.get('success'):
 		TorBox.clear_cache()
-		detail = result.get('detail') or 'Submitted'
+		detail = result.get('detail') or 'Enviado'
 		kodi_utils.notification('TorBox %s: %s' % (kind, detail), 4000)
 		kodi_utils.execute_builtin('Container.Refresh')
 	else:
-		kodi_utils.ok_dialog(text='TorBox: %s' % _api_error_text(result, 'Failed to submit to TorBox'))
+		kodi_utils.ok_dialog(text='TorBox: %s' % _api_error_text(result, 'Error al enviar a TorBox'))
 
 
 def tb_account_info():
 	try:
 		kodi_utils.show_busy_dialog()
-		plans = {0: 'Free plan', 1: 'Essential plan', 2: 'Pro plan', 3: 'Standard plan'}
+		plans = {0: 'Plan Free', 1: 'Plan Essential', 2: 'Plan Pro', 3: 'Plan Standard'}
 		account_info = TorBox.account_info()
 		if not account_info or not account_info.get('success'):
 			kodi_utils.hide_busy_dialog()
-			return kodi_utils.ok_dialog(text='TorBox: %s' % _api_error_text(account_info, 'Unable to load account info'))
+			return kodi_utils.ok_dialog(text='TorBox: %s' % _api_error_text(account_info, 'No se pudo cargar la información de la cuenta'))
 		account_info = account_info['data']
 		body = []
 		append = body.append
 		append('[B]Email[/B]: %s' % account_info.get('email', ''))
-		append('[B]Customer[/B]: %s' % account_info.get('customer', ''))
-		append('[B]Plan[/B]: %s' % plans.get(account_info.get('plan'), 'Unknown'))
-		append('[B]Expires[/B]: %s' % account_info.get('premium_expires_at', ''))
-		append('[B]Downloaded[/B]: {:,}'.format(account_info.get('total_downloaded', 0)))
+		append('[B]Cliente[/B]: %s' % account_info.get('customer', ''))
+		from modules.service_expiry import append_expiry_lines, fetch_expiry_summary
+		append('[B]Plan[/B]: %s' % plans.get(account_info.get('plan'), 'Desconocido'))
+		append_expiry_lines(body, fetch_expiry_summary('tb'))
+		append('[B]Descargado[/B]: {:,}'.format(account_info.get('total_downloaded', 0)))
 		kodi_utils.hide_busy_dialog()
 		return kodi_utils.show_text('TorBox'.upper(), '\n\n'.join(body), font_size='large')
 	except Exception:

@@ -682,12 +682,12 @@ def sync_settings(params={}):
 		settings_cache.clear_db_cache()
 		if _properties_loaded():
 			_apply_settings_properties_from_db()
-	if not silent: kodi_utils.notification('Settings Cache Remade')
+	if not silent: kodi_utils.notification('Caché de Configuración  Rehecha')
 	return 'synced'
 
 def set_default(setting_ids):
 	if not isinstance(setting_ids, list): setting_ids = [setting_ids]
-	if not kodi_utils.confirm_dialog(text='Are You Sure?', ok_label='Yes', cancel_label='No', default_control=11): return
+	if not kodi_utils.confirm_dialog(text='Estas seguro?', ok_label='Sí', cancel_label='No', default_control=11): return
 	for setting_id in setting_ids:
 		try: set_setting(setting_id, default_setting_values(setting_id)['setting_default'])
 		except: pass
@@ -707,12 +707,12 @@ def set_string(params):
 	current_value = get_setting('playtvban.%s' % setting_id)
 	current_value = current_value.replace('empty_setting', '')
 	new_value = kodi_utils.kodi_dialog().input('', defaultt=current_value)
-	if not new_value and not kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
+	if not new_value and not kodi_utils.confirm_dialog(text='Introduzca un Valor en Blanco?', ok_label='Sí', cancel_label='Vuelva a Introducir el Valor.', default_control=11):
 		return set_string(params)
 	if setting_id in _CREDENTIAL_STRING_SETTINGS:
 		new_value = normalize_credential_string(new_value)
 	if setting_id == 'tmdb_api' and new_value and looks_like_tmdb_v4_jwt(new_value):
-		kodi_utils.ok_dialog(heading='Wrong key type', text='This is a TMDb v4 Read Access Token (JWT), not the v3 API Key.[CR]Use TMDb Lists → Read Access Token for v4 tokens.')
+		kodi_utils.ok_dialog(heading='Tipo de clave incorrecto', text='Este es un Token de Acceso de Lectura (JWT) de TMDb v4, no la Clave API v3.[CR]Utilice Listas de TMDb → Token de acceso de lectura para tokens v4.')
 		return set_string(params)
 	if setting_id == 'playback.submaker_manifest' and new_value:
 		new_value = new_value.strip()
@@ -736,14 +736,14 @@ def set_numeric(params):
 	if negative_included:
 		multiplier_values = [('Positive(+)', 1), ('Negative(-)', -1)]
 		list_items = [{'line1': item[0]} for item in multiplier_values]
-		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true', 'heading': 'Will this be a positive or negative number?'}
+		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true', 'heading': 'Será este un número positivo o negativo??'}
 		multiplier = kodi_utils.select_dialog(multiplier_values, **kwargs)
 	else: multiplier = None
 	new_value = kodi_utils.kodi_dialog().input('Range [B]%s - %s[/B].' % (min_value, max_value), type=1)
 	if not new_value: return
 	if multiplier: new_value = str(int(float(new_value) * multiplier[1]))
 	if int(new_value) < min_value or int(new_value) > max_value:
-		kodi_utils.ok_dialog(text='Please Choose Between the Range [B]%s - %s[/B].' % (min_value, max_value))
+		kodi_utils.ok_dialog(text='Por favor, Elija un valor entre el Rango [B]%s - %s[/B].' % (min_value, max_value))
 		return set_numeric(params)
 	set_setting(setting_id, new_value)
 
@@ -753,9 +753,9 @@ def set_path(params):
 	current = get_setting('playtvban.%s' % setting_id)
 	if browse_mode == 0:
 		force_defaultt = setting_id == 'import_export_directory'
-		new_value = kodi_utils.browse_directory(current, heading='Choose folder', use_defaultt=True, force_defaultt=force_defaultt)
+		new_value = kodi_utils.browse_directory(current, heading='Elegir carpeta', use_defaultt=True, force_defaultt=force_defaultt)
 	else:
-		result = kodi_utils.kodi_dialog().browse(browse_mode, 'Choose file', '', defaultt=current or None)
+		result = kodi_utils.kodi_dialog().browse(browse_mode, 'Elegir archivo', '', defaultt=current or None)
 		new_value = result if result and str(result).strip() else None
 	if not new_value:
 		return
@@ -800,26 +800,26 @@ def set_from_list(params):
 		mode_label = mode_opts.get(setting_value, '')
 		current = str(get_setting('playtvban.external_scraper.run_mode', '1'))
 		warning_text = (
-			'Many indexers are volunteer-run community resources. '
-			'[B]%s[/B] can query the same indexers multiple times. [B]Series (Fallback by Slot Order)[/B] is the recommended default.[CR][CR]'
-			'Please scrape responsibly.' % mode_label
+			'Muchos indexadores son recursos comunitarios mantenidos por voluntarios. '
+			'[B]%s[/B] puede consultar los mismos indexadores varias veces. [B]Series (Repliegue por Orden de Ranura)[/B] es la opción predeterminada recomendada.[CR][CR]'
+			'Por favor, realice las búsquedas de forma responsable.' % mode_label
 		)
 		if current == '1':
 			confirmed = kodi_utils.confirm_dialog(
-				heading='Search Mode',
+				heading='Modo de Búsqueda',
 				text=warning_text,
-				ok_label='Continue',
-				cancel_label='Cancel',
+				ok_label='Continuar',
+				cancel_label='Cancelar',
 				default_control=11,
 			)
 			if confirmed is None or not confirmed:
 				return
 		else:
 			confirmed = kodi_utils.confirm_dialog(
-				heading='Search Mode',
+				heading='Modo de Búsqueda',
 				text=warning_text,
-				ok_label='Series (Fallback)',
-				cancel_label='Continue',
+				ok_label='Series (Repliegue)',
+				cancel_label='Continuar',
 				default_control=10,
 			)
 			if confirmed is None:
@@ -858,10 +858,10 @@ def set_source_folder_path(params):
 	setting_id = params['setting_id']
 	current_setting = get_setting('playtvban.%s' % setting_id)
 	if current_setting not in (None, 'None', ''):
-		if kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
+		if kodi_utils.confirm_dialog(text='Introducir un Valor en Blanco?', ok_label='Sí', cancel_label='Volver a Introducir el Valor', default_control=11):
 			return set_setting(setting_id, 'None')
 	return set_path(params)
-
+    
 def restore_setting_default(params):
 	silent = params.get('silent', 'false') == 'true'
 	if not silent and not kodi_utils.confirm_dialog(): return
@@ -870,7 +870,7 @@ def restore_setting_default(params):
 		setting_default = default_setting_values(setting_id)['setting_default']
 		set_setting(setting_id, setting_default)
 	except:
-		if not silent: kodi_utils.ok_dialog(text='Error restoring default setting')
+		if not silent: kodi_utils.ok_dialog(text='Error al restaurar la configuración predeterminada.')
 
 def default_setting_values(setting_id):
 	if 'playtvban.' in setting_id: setting_id = setting_id.replace('playtvban.', '')
@@ -1149,6 +1149,8 @@ def default_settings():
 {'setting_id': 'tb.priority', 'setting_type': 'action', 'setting_default': '10', 'min_value': '1', 'max_value': '10'},
 #==================== EasyNews
 {'setting_id': 'provider.easynews', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'services.expiry_alert_days', 'setting_type': 'action', 'setting_default': '7', 'min_value': '0', 'max_value': '90'},
+{'setting_id': 'services.expiry_alert_state', 'setting_type': 'string', 'setting_default': '{}'},
 {'setting_id': 'easynews_user', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'easynews_password', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'easynews.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
@@ -1304,6 +1306,7 @@ def default_settings():
 {'setting_id': 'autoplay_skip_intro', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '2': 'Automático', '1': 'Preguntar'}},
 {'setting_id': 'skip_intro_all_episodes', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'autoplay_watching_check', 'setting_type': 'action', 'setting_default': '3', 'min_value': '0', 'max_value': '5'},
+{'setting_id': 'autoplay_random_continual_watching_check', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'autoscrape_next_episode', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'autoscrape_next_window_percentage', 'setting_type': 'action', 'setting_default': '95', 'min_value': '75', 'max_value': '99'},
 {'setting_id': 'autoscrape_alert_timing', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Porcentaje de Reproducción', '1': 'Información de Capítulo', '2': 'Información de Subtítulos', '3': 'Información de IntroDB'}},

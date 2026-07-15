@@ -377,7 +377,7 @@ class Sources():
 		if self.background and (self.autoplay_nextep or self.play_type == 'random_continual') and self.nextep_settings and not getattr(self, '_nextep_alert_handled', False):
 			if not self.still_watching_check():
 				self._decline_nextep_prep('still watching')
-				kodi_utils.notification('Cancel Autoplay', icon=self.meta.get('poster'))
+				kodi_utils.notification('Cancelar Reproducción Automática', icon=self.meta.get('poster'))
 				return
 		if getattr(self, '_nextep_stash_results', None):
 			try:
@@ -441,11 +441,11 @@ class Sources():
 			self._clear_stale_sources_busy()
 			if kodi_utils.get_property(PROP_RESOLVE_BUSY) == 'true' and not allow_concurrent:
 				if not self.background:
-					kodi_utils.notification('Resolve or playback in progress.', 2500)
+					kodi_utils.notification('Resolución o reproducción en curso.', 2500)
 				return
 			if kodi_utils.get_property(PROP_SOURCES_BUSY) == 'true' and not allow_concurrent:
 				if not self.background:
-					kodi_utils.notification('Source search already running.', 2500)
+					kodi_utils.notification('La búsqueda de fuentes ya está en ejecución.', 2500)
 				return
 			self._scrape_user_cancelled = False
 			self._sources_busy_owner = str(id(self))
@@ -1091,6 +1091,14 @@ class Sources():
 	def _wait_active_playback_end(self):
 		player = kodi_utils.kodi_player()
 		monitor = kodi_utils.kodi_monitor()
+		# Pack Browse closes sources before the player may report isPlaying — wait briefly
+		# for start so we do not immediately reopen the results list over the stream.
+		for _ in range(50):
+			if monitor.abortRequested():
+				return
+			if player.isPlayingVideo() or player.isPlaying():
+				break
+			kodi_utils.sleep(100)
 		while player.isPlayingVideo() or player.isPlaying():
 			if monitor.abortRequested():
 				return
@@ -1202,7 +1210,7 @@ class Sources():
 					kodi_utils.logger('DebridCacheRetry', 'skipped=cache_ignored reason=api_%s' % api_err)
 				except: pass
 				if not self.background:
-					kodi_utils.notification('AllDebrid cache check unavailable (%s). Showing unchecked sources.' % api_err, 6000)
+					kodi_utils.notification('Comprobación de caché de AllDebrid no disponible (%s). Mostrando fuentes sin comprobar.' % api_err, 6000)
 				if self.orig_results:
 					for item in self.orig_results:
 						raw = item.get('cache_provider', '')
@@ -1220,13 +1228,13 @@ class Sources():
 				try:
 					kodi_utils.logger('DebridCacheRetry', 'action=cache_ignored auto=%s orig=%d playable=0' % (next_setting == 1, len(self.orig_results)))
 				except: pass
-				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='No results.[CR]Retry with external cache check disabled?'):
+				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]¿Reintentar con la comprobación de caché externa desactivada?'):
 					self.threads, self.prescrape, self.cache_check_override = [], False, False
 					return self.get_sources()
 			return self._process_post_results()
 		if next_action == 'imdb_year':
 			if next_setting in (1, 2) and self.active_external and not self.orig_results and not self.meta.get('custom_year'):
-				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='No results.[CR]Retry With IMDb Year Data?'):
+				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]Reintentar con los Datos del Año de IMDb?'):
 					from apis.imdb_api import imdb_year_check
 					imdb_year = str(imdb_year_check(self.meta.get('imdb_id')))
 					if imdb_year != self.get_search_year():
@@ -1237,14 +1245,14 @@ class Sources():
 			return self._process_post_results()
 		if next_action == 'with_all':
 			if next_setting in (1, 2) and self.active_external:
-				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='No results.[CR]Retry including disabled external torrent providers?'):
+				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]Reintentar incluyendo los proveedores externos de torrents desactivados?'):
 					self.threads, self.disabled_ext_ignored, self.prescrape = [], True, False
 					return self.get_sources()
 			return self._process_post_results()
 		if next_action == 'episode_group':
 			if next_setting in (1, 2) and self.media_type == 'episode':
 				if next_setting == 1 \
-											or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='No results.[CR]Retry With Custom Episode Group if Possible?'):
+											or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]Reintentar con un Grupo de Episodios personalizado si es posible?'):
 					if self.episode_group_used:
 						return self._process_post_results()
 					if next_setting == 2:
@@ -1259,14 +1267,14 @@ class Sources():
 						except: group_details = None
 						if group_details:
 							season, episode = group_details['season'], group_details['episode']
-							self.params.update({'custom_season': season, 'custom_episode': episode, 'episode_group_label': '[B]CUSTOM GROUP: S%02dE%02d[/B]' % (season, episode)})
+							self.params.update({'custom_season': season, 'custom_episode': episode, 'episode_group_label': '[B]GRUPO PERSONALIZADO: T%02dE%02d[/B]' % (season, episode)})
 							self.threads, self.prescrape = [], False
 							return self.playback_prep()
 			return self._process_post_results()
 		if next_action == 'ignore_filters':
 			if next_setting in (1, 2) and self.orig_results and not self.background:
-				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='No results. Access Filtered Results?'):
-					if self.autoplay: kodi_utils.notification('Filters Ignored & Autoplay Disabled')
+				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='No hay resultados. Acceder a los Resultados Filtrados?'):
+					if self.autoplay: kodi_utils.notification('Filtros Ignorados y Reproducción Automática Desactivada')
 					self.threads, self.ignore_scrape_filters, self.disabled_ext_ignored, self.autoplay = [], True, True, False
 					return self.get_sources()
 			return self._process_post_results()
@@ -1725,7 +1733,7 @@ class Sources():
 			kodi_utils.sleep(100)
 		return self.progress_dialog.resume_choice or 'resume'
 
-	def _make_still_watching_dialog(self, check_text, heading='Still Watching?', right_align=False):
+	def _make_still_watching_dialog(self, check_text, heading='Sigues Viendo?', right_align=False):
 		try: action = open_window(('windows.playback_notifications', 'StillWatching'), 'playback_notifications.xml', meta=self.meta, check_text=check_text,
 			heading=heading, right_align='true' if right_align else 'false')
 		except: action = False
@@ -1837,7 +1845,8 @@ class Sources():
 		"""Explicitly dismiss scrape/resolve/results modals (Android can ignore Dialog.Close(all) over fullscreen)."""
 		if retries is None:
 			retries = 6 if kodi_utils.is_android() else 3
-		dialogs = ('sources_playback.xml', 'sources_results.xml')
+		# extras.xml: Play from Extras used to leave it stacked over fullscreen video.
+		dialogs = ('sources_playback.xml', 'sources_results.xml', 'extras.xml')
 		for _ in range(retries):
 			for name in dialogs:
 				try:
@@ -2005,7 +2014,7 @@ class Sources():
 		if not link and is_pack:
 			link = self._resolve_browse_pack_fallback(source_item, debrid_provider)
 		if not link:
-			kodi_utils.notification('Could not resolve selected file on %s' % debrid_provider, 4500)
+			kodi_utils.notification('No se pudo resolver el archivo seleccionado en %s' % debrid_provider, 4500)
 			self._cleanup_browse_transfer(debrid_provider, debrid_files, is_pack=is_pack)
 			return None
 		link = self._ensure_play_headers(link, {'debrid': debrid_provider, 'cache_provider': debrid_provider})
@@ -2403,7 +2412,7 @@ class Sources():
 			meta = {'title': self.meta.get('title', ''), 'season': self.meta.get('season', 0),
 				'episode': self.meta.get('episode', 0), 'poster': self.meta.get('poster', '') or ''}
 		kodi_utils.clear_property(PROP_AUTOSCRAPE_NEXTEP_READY)
-		kodi_utils.notification('[B]Next Episode Ready:[/B] %s S%02dE%02d' \
+		kodi_utils.notification('[B]Siguiente episodio listo:[/B] %s T%02dE%02d' \
 				% (meta.get('title'), meta.get('season'), meta.get('episode')), 6500, meta.get('poster') or None)
 
 	def _sync_autoscrape_ready_notified_player(self):
@@ -2460,9 +2469,11 @@ class Sources():
 	def still_watching_check(self):
 		watching_check = self.nextep_settings.get('watching_check', 0)
 		if watching_check == 0: return True
+		if self.play_type == 'random_continual' and not settings.random_continual_still_watching_enabled():
+			return True
 		player = kodi_utils.kodi_player()
 		# Autoplay next-episode idle edge case: don't prompt/count when nothing is playing.
-		# Continual random must still count skipped episodes toward the binge threshold (#62),
+		# Continual random counts skipped episodes toward Still Watching when enabled (#62),
 		# including cold-start skip chains where playback never started.
 		if not player.isPlayingVideo() and self.play_type != 'random_continual':
 			return bool(self.background)
@@ -2504,7 +2515,7 @@ class Sources():
 			return False
 
 	def random_continual_handler(self):
-		kodi_utils.notification('[B]Next Up:[/B] %s S%02dE%02d' % (self.meta.get('title'), self.meta.get('season'), self.meta.get('episode')), 6500, self.meta.get('poster'))
+		kodi_utils.notification('[B]Siguiente:[/B] %s T%02dE%02d' % (self.meta.get('title'), self.meta.get('season'), self.meta.get('episode')), 6500, self.meta.get('poster'))
 		player = kodi_utils.kodi_player()
 		while self._player_episode_active(player): kodi_utils.sleep(100)
 		self._make_resolve_dialog()

@@ -44,7 +44,7 @@ def ad_cloud(folder_id=None):
 				display = '%02d | [B]CARPETA[/B] | [I]%s [/I]' % (count, clean_folder_name)
 				url_params = {'mode': 'alldebrid.browse_ad_cloud', 'id': folder_id}
 				delete_params = {'mode': 'alldebrid.delete', 'id': folder_id}
-				cm.append(('[B]Eliminar carpeta[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
+				cm.append(('[B]Eliminar Carpeta[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
@@ -173,7 +173,7 @@ def ad_saved_links():
 				url_link = item['link']
 				url_params = {'mode': 'alldebrid.resolve_ad', 'url': url_link, 'play': 'true'}
 				down_file_params = {'mode': 'downloader.runner', 'name': name, 'url': url_link, 'action': 'cloud.alldebrid', 'image': icon}
-				cm_append(('[B]Descargar archivo[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
+				cm_append(('[B]Descargar Archivo[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(down_file_params)))
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
 				listitem.setLabel(display)
@@ -258,31 +258,19 @@ def ad_delete(file_id):
 
 def ad_account_info():
 	try:
+		from modules.service_expiry import append_expiry_lines, fetch_expiry_summary
 		kodi_utils.show_busy_dialog()
 		account_info = AllDebrid.account_info()['user']
 		username = account_info['username']
 		email = account_info['email']
 		status = 'Premium' if account_info['isPremium'] else 'Not Active'
-		expires = datetime.fromtimestamp(account_info['premiumUntil'])
-		days_remaining = (expires - datetime.today()).days
 		body = []
 		append = body.append
 		append('[B]Nombre de Usuario:[/B] %s' % username)
-		append('[B]Email:[/B] %s' % email)
+		append('[B]Correo Electrónico:[/B] %s' % email)
 		append('[B]Estado:[/B] %s' % status)
-		append('[B]Caduca:[/B] %s' % expires)
-		append('[B]Días Restantes:[/B] %s' % days_remaining)
+		append_expiry_lines(body, fetch_expiry_summary('ad'))
 		kodi_utils.hide_busy_dialog()
 		return kodi_utils.show_text('ALL DEBRID', '\n\n'.join(body), font_size='large')
 	except:
 		kodi_utils.hide_busy_dialog()
-
-
-def active_days():
-	try:
-		account_info = AllDebrid.account_info()['user']
-		expires = datetime.fromtimestamp(account_info['premiumUntil'])
-		days_remaining = (expires - datetime.today()).days
-	except:
-		days_remaining = 0
-	return days_remaining

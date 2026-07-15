@@ -72,13 +72,14 @@ class Navigator:
 		self.end_directory()
 
 	def premium(self):
-		if s.authorized_debrid_check('ad'): self.add({'mode': 'navigator.alldebrid'}, 'All Debrid', 'alldebrid')
-		if s.easynews_authorized(): self.add({'mode': 'navigator.easynews'}, 'EasyNews', 'easynews')
+		from modules.service_expiry import premium_menu_label
+		if s.authorized_debrid_check('ad'): self.add({'mode': 'navigator.alldebrid'}, premium_menu_label('ad', 'All Debrid'), 'alldebrid')
+		if s.easynews_authorized(): self.add({'mode': 'navigator.easynews'}, premium_menu_label('easynews', 'EasyNews'), 'easynews')
 		if s.nzb_indexer_active(): self.add({'mode': 'navigator.nzb_indexers'}, 'NZB Indexers', 'search')
-		if s.authorized_debrid_check('oc'): self.add({'mode': 'navigator.offcloud'}, 'Offcloud', 'offcloud')
-		if s.authorized_debrid_check('pm'): self.add({'mode': 'navigator.premiumize'}, 'Premiumize', 'premiumize')
-		if s.authorized_debrid_check('rd'): self.add({'mode': 'navigator.real_debrid'}, 'Real Debrid', 'realdebrid')
-		if s.authorized_debrid_check('tb'): self.add({'mode': 'navigator.torbox'}, 'TorBox', 'torbox')
+		if s.authorized_debrid_check('oc'): self.add({'mode': 'navigator.offcloud'}, premium_menu_label('oc', 'Offcloud'), 'offcloud')
+		if s.authorized_debrid_check('pm'): self.add({'mode': 'navigator.premiumize'}, premium_menu_label('pm', 'Premiumize'), 'premiumize')
+		if s.authorized_debrid_check('rd'): self.add({'mode': 'navigator.real_debrid'}, premium_menu_label('rd', 'Real Debrid'), 'realdebrid')
+		if s.authorized_debrid_check('tb'): self.add({'mode': 'navigator.torbox'}, premium_menu_label('tb', 'TorBox'), 'torbox')
 		self.end_directory()
 
 	def easynews(self):
@@ -89,43 +90,43 @@ class Navigator:
 
 	def nzb_indexers(self):
 		from caches.settings_cache import get_setting
-		self.add({'mode': 'navigator.search_history', 'action': 'nzb_search'}, 'Buscar en todos los indexadores', 'search')
+		self.add({'mode': 'navigator.search_history', 'action': 'nzb_search'}, 'Buscar en Todos los Indexadores', 'search')
 		for slot in (1, 2, 3):
 			if get_setting('playtvban.nzb%d.enabled' % slot, 'false') != 'true': continue
 			label = get_setting('playtvban.nzb%d.label' % slot) or 'Indexador NZB %d' % slot
-			self.add({'mode': 'nzb.test_connection', 'slot': str(slot), 'isFolder': 'false'}, 'Probar conexión: %s' % label, 'settings')
+			self.add({'mode': 'nzb.test_connection', 'slot': str(slot), 'isFolder': 'false'}, 'Probar Conexión: %s' % label, 'settings')
 		self.end_directory()
 
 	def real_debrid(self):
 		self.add({'mode': 'real_debrid.rd_cloud'}, 'Almacenamiento en la nube', 'realdebrid')
 		self.add({'mode': 'real_debrid.rd_downloads'}, 'Historial', 'realdebrid')
-		self.add({'mode': 'real_debrid.rd_account_info', 'isFolder': 'false'}, 'Información de la cuenta', 'realdebrid')
+		self.add({'mode': 'real_debrid.rd_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'realdebrid')
 		self.end_directory()
 
 	def premiumize(self):
 		self.add({'mode': 'premiumize.pm_cloud'}, 'Almacenamiento en la nube', 'premiumize')
 		self.add({'mode': 'premiumize.pm_transfers'}, 'Historial', 'premiumize')
-		self.add({'mode': 'premiumize.pm_account_info', 'isFolder': 'false'}, 'Información de la cuenta', 'premiumize')
+		self.add({'mode': 'premiumize.pm_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'premiumize')
 		self.end_directory()
 
 	def alldebrid(self):
 		self.add({'mode': 'alldebrid.ad_cloud'}, 'Almacenamiento en la nube', 'alldebrid')
 		self.add({'mode': 'alldebrid.ad_downloads'}, 'Historial', 'alldebrid')
 		self.add({'mode': 'alldebrid.ad_saved_links'}, 'Enlaces guardados', 'alldebrid')
-		self.add({'mode': 'alldebrid.ad_account_info', 'isFolder': 'false'}, 'Información de la cuenta', 'alldebrid')
+		self.add({'mode': 'alldebrid.ad_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'alldebrid')
 		self.end_directory()
 
 	def offcloud(self):
 		self.add({'mode': 'offcloud.oc_cloud'}, 'Almacenamiento en la nube', 'offcloud')
 		self.add({'mode': 'offcloud.oc_history'}, 'Historial', 'offcloud')
-		self.add({'mode': 'offcloud.oc_account_info', 'isFolder': 'false'}, 'Información de la cuenta', 'offcloud')
+		self.add({'mode': 'offcloud.oc_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'offcloud')
 		self.end_directory()
 
 	def torbox(self):
 		self.add({'mode': 'torbox.tb_cloud'}, 'Almacenamiento en la nube', 'torbox')
 		self.add({'mode': 'torbox.tb_history'}, 'Historial', 'torbox')
 		self.add({'mode': 'torbox.send_webdl', 'isFolder': 'false'}, 'Enviar URL a WebDL', 'torbox')
-		self.add({'mode': 'torbox.tb_account_info', 'isFolder': 'false'}, 'Información de la cuenta', 'torbox')
+		self.add({'mode': 'torbox.tb_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'torbox')
 		self.end_directory()
 
 	def favorites(self):

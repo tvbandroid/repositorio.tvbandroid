@@ -270,7 +270,7 @@ def get_trakt_user_lists(params):
 	try:
 		page = params.get('new_page', '1')
 		new_page = str(int(page) + 1)
-		order_prop = 'redlight.trakt.%s.user_lists.order' % list_type
+		order_prop = 'playtvban.trakt.%s.user_lists.order' % list_type
 		lists = list(trakt_get_lists(list_type, page) or [])
 		if shuffle_lists and lists:
 			returning_to_list = 'build_trakt_lists_contents' in kodi_utils.folder_path()

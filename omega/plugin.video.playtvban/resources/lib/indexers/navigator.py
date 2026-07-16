@@ -577,7 +577,7 @@ class Navigator:
 		else:
 			content = self.params.get('content', 'files')
 		name = self.params.get('name') or content or 'menus'
-		self.add({'mode': 'navigator.set_view', 'view_type': view_type, 'name': name, 'isFolder': 'false'}, 'Set view and then click here', 'settings')
+		self.add({'mode': 'navigator.set_view', 'view_type': view_type, 'name': name, 'isFolder': 'false'}, 'Configure la vista y luego haga clic aquí', 'settings')
 		k.set_content(handle, content)
 		k.end_directory(handle)
 		k.set_view_mode(view_type, content, False)

@@ -679,12 +679,13 @@ class TorBoxAPI:
 		if max_attempts is None:
 			try: max_attempts = min(120, max(20, int(get_setting('playtvban.results.timeout', '20')) * 3))
 			except: max_attempts = 45
-		usenet_id = None
+		usenet_id, cleanup_usenet = None, False
 		try:
 			result = self.add_nzb(nzb_link, name=title or '')
 			usenet_id = self._usenet_id_from_create(result)
 			if not usenet_id:
 				return None
+			cleanup_usenet = not store_to_cloud
 			extensions = supported_video_extensions()
 			extras_filter = extras()
 			extras_filtering_list = tuple(i for i in extras_filter if i not in (title or '').lower())
@@ -716,14 +717,12 @@ class TorBoxAPI:
 			file_url = self.coerce_play_url(file_url) or file_url
 			if file_url and store_to_cloud:
 				self.clear_cache()
-			elif file_url and not store_to_cloud:
-				Thread(target=self.delete_usenet, args=(usenet_id,)).start()
 			return file_url
 		except Exception:
-			if usenet_id and not store_to_cloud:
-				try: self.delete_usenet(usenet_id)
-				except: pass
 			return None
+		finally:
+			if cleanup_usenet and usenet_id:
+				Thread(target=self.delete_usenet, args=(usenet_id,), daemon=True).start()
 
 	# ----------- CACHED CHECK -----------
 	def check_cache_single(self, _hash):
@@ -749,11 +748,12 @@ class TorBoxAPI:
 
 	# ----------- RESOLVE -----------
 	def resolve_magnet(self, magnet_url, info_hash, store_to_cloud, title, season, episode):
-		torrent_id = None
+		torrent_id, cleanup_torrent = None, False
 		prior_mylist_ids = self._mylist_torrent_ids(fresh=False)
 		try:
-			if info_hash and not self.hash_is_cached(info_hash):
-				return None
+			# Do not hard-bail on hash_is_cached: scrape cache checks can disagree with a
+			# live single-hash probe (Download File / play then fail with "No URL found").
+			# Always attempt add_magnet; TorBox rejects truly uncached magnets itself.
 			extensions = supported_video_extensions()
 			extras_filter = extras()
 			extras_filtering_list = tuple(i for i in extras_filter if i not in (title or '').lower())
@@ -761,6 +761,7 @@ class TorBoxAPI:
 			torrent_id = self._torrent_id_from_create(torrent)
 			if not torrent_id:
 				return None
+			cleanup_torrent = (not store_to_cloud and str(torrent_id) not in prior_mylist_ids)
 			_item = self._torrent_item_from_info(self.torrent_info_fresh(torrent_id))
 			files = (_item or {}).get('files') or []
 			if not files:
@@ -793,13 +794,12 @@ class TorBoxAPI:
 			file_url = self.unrestrict_link(file_key)
 			if store_to_cloud:
 				self.monitor_torrent_cloud_ready(torrent_id, title)
-			elif str(torrent_id) not in prior_mylist_ids:
-				Thread(target=self.delete_torrent, args=(torrent_id,)).start()
 			return file_url
 		except Exception:
-			if torrent_id:
-				self.delete_torrent(torrent_id)
 			return None
+		finally:
+			if cleanup_torrent and torrent_id:
+				Thread(target=self.delete_torrent, args=(torrent_id,), daemon=True).start()
 
 	def _wait_for_torrent_files(self, torrent_id, max_attempts=45):
 		for attempt in range(max_attempts):
@@ -815,7 +815,7 @@ class TorBoxAPI:
 
 	def parse_magnet_pack(self, magnet_url, info_hash):
 		'''List pack files via create_transfer; caller removes transfer when Store Resolved to Cloud is off.'''
-		torrent_id = None
+		torrent_id, keep_transfer = None, False
 		try:
 			extensions = supported_video_extensions()
 			torrent_id = self.create_transfer(magnet_url)
@@ -839,12 +839,14 @@ class TorBoxAPI:
 					'size': file_item.get('size', 0),
 					'torrent_id': torrent_id,
 				})
+			keep_transfer = bool(pack_files)
 			return pack_files or None
 		except Exception:
-			if torrent_id:
+			return None
+		finally:
+			if torrent_id and not keep_transfer:
 				try: self.delete_torrent(torrent_id)
 				except: pass
-			return None
 
 	def display_magnet_pack(self, magnet_url, info_hash):
 		return self.parse_magnet_pack(magnet_url, info_hash)
@@ -862,20 +864,20 @@ class TorBoxAPI:
 		try:
 			response = requests.get(base_url + 'user/auth/device/start', params={'app': app_name}, timeout=20).json()
 		except Exception:
-			return ok_dialog(text='Unable to start TorBox authorisation')
+			return ok_dialog(text='No se pudo iniciar la autorización de TorBox')
 		if not response.get('success'):
-			return ok_dialog(text=response.get('detail') or 'Unable to start TorBox authorisation')
+			return ok_dialog(text=response.get('detail') or 'No se pudo iniciar la autorización de TorBox')
 		data = response.get('data') or {}
 		device_code = data.get('device_code')
 		user_code = data.get('code')
 		if not device_code or not user_code:
-			return ok_dialog(text='Invalid TorBox authorisation response')
+			return ok_dialog(text='Respuesta de autorización de TorBox no válida')
 		auth_url = _device_auth_url(app_name, user_code)
 		qr_code = make_qrcode(auth_url) or ''
 		copy2clip(auth_url)
-		p_dialog_insert = '[CR]Full link copied to clipboard[CR]OR visit: [B]torbox.app/oauth/device[/B][CR]AND Enter this Code: [B]%s[/B]' % user_code
-		content = 'Please Scan the QR Code%s[CR]' % p_dialog_insert
-		progressDialog = progress_dialog('TorBox Authorise', qr_code)
+		p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visite: [B]torbox.app/oauth/device[/B][CR]E introduzca este Código: [B]%s[/B]' % user_code
+		content = 'Escanee el Código QR%s[CR]' % p_dialog_insert
+		progressDialog = progress_dialog('Autorizar TorBox', qr_code)
 		progressDialog.update(content, 0)
 		sleep_interval = int(data.get('interval') or 5)
 		try:
@@ -914,17 +916,17 @@ class TorBoxAPI:
 			r = self.account_info()
 			if not r or not r.get('success'): raise Exception('invalid account')
 			set_setting('tb.enabled', 'true')
-			ok_dialog(heading='TorBox', text='Account authorised.')
+			ok_dialog(heading='TorBox', text='Cuenta autorizada.')
 		except Exception:
 			set_setting('tb.token', 'empty_setting')
 			set_setting('tb.enabled', 'false')
-			ok_dialog(heading='TorBox', text='Authorisation failed.')
+			ok_dialog(heading='TorBox', text='La autorización ha fallado.')
 
 	def revoke(self):
 		if not confirm_dialog(): return
 		set_setting('tb.token', 'empty_setting')
 		set_setting('tb.enabled', 'false')
-		notification('TorBox Authorisation Reset', 3000)
+		notification('Autorización de TorBox restablecida', 3000)
 
 	def clear_cache(self, clear_hashes=True):
 		try:

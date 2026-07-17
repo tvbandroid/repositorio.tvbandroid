@@ -1,3 +1,5 @@
+[B]Versión 1.2.9[/B][/COLOR] - [B]Trakt[/B]: La búsqueda en listas de usuarios ya no devuelve una carpeta vacía; los propietarios de las listas se leen del objeto [B]usuario[/B] anidado de Trakt (igual que Populares/Tendencias), en lugar de un campo [B]nombre de usuario[/B] de nivel superior que faltaba y que omitía todos los resultados.
+
 [COLOR red][B]Versión 1.2.8[/B][/COLOR]
 - [B]Secuencia automática del siguiente episodio[/B]: seleccionar una fuente de los resultados de la función de secuencia automática ya no desactiva la opción "Siguiente episodio" para esa reproducción; la cadena de reproducción continúa en lugar de detenerse después de un salto ([B]La opción "Siguiente episodio" desactivó esta reproducción[/B]).
 

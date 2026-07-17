@@ -16,6 +16,10 @@ from modules.utils import clean_file_name, string_to_float, safe_string, remove_
 
 PROP_SOURCES_BUSY = 'playtvban.sources_busy'
 PROP_SOURCES_OWNER = 'playtvban.sources_busy_owner'
+PROP_SOURCES_BUSY_AT = 'playtvban.sources_busy_at'
+# Live scrapes refresh the heartbeat every loop pass; anything older than this with no
+# playback means the owning scrape died (e.g. Browse flow killed mid-wait) — clear it.
+SOURCES_BUSY_STALE_SECONDS = 120
 PROP_RESOLVE_BUSY = 'playtvban.resolve_busy'
 PROP_RESOLVE_OWNER = 'playtvban.resolve_busy_owner'
 PROP_RESOLVE_CANCEL = 'playtvban.resolve_cancelled'
@@ -465,6 +469,7 @@ class Sources():
 			self._sources_busy_owner = str(id(self))
 			kodi_utils.set_property(PROP_SOURCES_BUSY, 'true')
 			kodi_utils.set_property(PROP_SOURCES_OWNER, self._sources_busy_owner)
+			self._touch_sources_busy()
 		self._get_sources_depth = depth + 1
 		try:
 			if depth == 0:
@@ -578,6 +583,7 @@ class Sources():
 
 	def process_results(self, results):
 		if not results: return results
+		self._touch_sources_busy()
 		results = self.sort_results(results)
 		min_seeders = settings.uncached_min_seeders()
 		all_uncached_results = [i for i in results if 'Uncached' in i.get('cache_provider', '')]
@@ -1076,6 +1082,7 @@ class Sources():
 			start_time = time.time()
 			while not self.progress_dialog.iscanceled() and not monitor.abortRequested():
 				try:
+					self._touch_sources_busy()
 					remaining_providers = [x.getName() for x in _threads if x.is_alive() is True]
 					self._process_internal_results()
 					current_progress = max((time.time() - start_time), 0)
@@ -1125,10 +1132,12 @@ class Sources():
 		self._sources_busy_owner = str(id(self))
 		kodi_utils.set_property(PROP_SOURCES_BUSY, 'true')
 		kodi_utils.set_property(PROP_SOURCES_OWNER, self._sources_busy_owner)
+		self._touch_sources_busy()
 		return True
 
 	def display_results(self, results):
 		while True:
+			self._touch_sources_busy()
 			window_format, window_number = settings.results_format()
 			window_result = open_window(('windows.sources', 'SourcesResults'), 'sources_results.xml',
 					window_format=window_format, window_id=window_number, results=results, meta=self.meta, sources_ref=self, episode_group_label=self.episode_group_label,
@@ -1311,7 +1320,7 @@ class Sources():
 		return self._process_post_results()
 
 	def _close_progress_before_modal(self):
-		self._kill_progress_dialog(join_timeout=3.0)
+		self._kill_progress_dialog(join_timeout=3.0, close_overlays=False)
 		kodi_utils.hide_busy_dialog()
 		if self.progress_thread and self.progress_thread.is_alive():
 			try:
@@ -1647,6 +1656,11 @@ class Sources():
 		if kodi_utils.get_property(PROP_SOURCES_OWNER) == getattr(self, '_sources_busy_owner', ''):
 			kodi_utils.clear_property(PROP_SOURCES_BUSY)
 			kodi_utils.clear_property(PROP_SOURCES_OWNER)
+			kodi_utils.clear_property(PROP_SOURCES_BUSY_AT)
+
+	def _touch_sources_busy(self):
+		if kodi_utils.get_property(PROP_SOURCES_BUSY) == 'true':
+			kodi_utils.set_property(PROP_SOURCES_BUSY_AT, str(time.time()))
 
 	def _release_resolve_busy(self):
 		if kodi_utils.get_property(PROP_RESOLVE_OWNER) == getattr(self, '_resolve_busy_owner', ''):
@@ -1669,17 +1683,32 @@ class Sources():
 		return True
 
 	def _clear_stale_sources_busy(self):
+		def _clear():
+			kodi_utils.clear_property(PROP_SOURCES_BUSY)
+			kodi_utils.clear_property(PROP_SOURCES_OWNER)
+			kodi_utils.clear_property(PROP_SOURCES_BUSY_AT)
 		if kodi_utils.get_property(PROP_SOURCES_BUSY) != 'true':
 			return False
 		# Browse closes the results window under playback while get_sources may still be
 		# waiting — clear so a new scrape is not blocked until restart.
 		try:
 			if kodi_utils.kodi_player().isPlayingVideo():
-				kodi_utils.clear_property(PROP_SOURCES_BUSY)
-				kodi_utils.clear_property(PROP_SOURCES_OWNER)
+				_clear()
 				return True
 		except:
 			pass
+		# No playback and no recent heartbeat — the owning scrape is dead (killed invoker,
+		# hung Browse wait, crash before release). Never require a Kodi restart.
+		try: busy_at = float(kodi_utils.get_property(PROP_SOURCES_BUSY_AT) or 0)
+		except: busy_at = 0
+		if time.time() - busy_at > SOURCES_BUSY_STALE_SECONDS:
+			try:
+				age = ('%ss' % int(time.time() - busy_at)) if busy_at else 'none'
+				kodi_utils.logger('Play TVBan', 'Cleared stale sources_busy lock (heartbeat age: %s)' % age)
+			except:
+				pass
+			_clear()
+			return True
 		return False
 
 	def _claim_resolve_busy(self):
@@ -1913,7 +1942,10 @@ class Sources():
 			except:
 				pass
 
-	def _kill_progress_dialog(self, join_timeout=3.0, resolve_cancel=False):
+	def _kill_progress_dialog(self, join_timeout=3.0, resolve_cancel=False, close_overlays=True):
+		# close_overlays=False: caller only needs the progress dialog gone while the sources
+		# results window must stay alive (e.g. Browse opens a modal over it) — the overlay
+		# force-close below also kills sources_results.xml.
 		try:
 			if self.progress_dialog:
 				self.progress_dialog.is_canceled = True
@@ -1926,12 +1958,13 @@ class Sources():
 				thread.join(timeout=join_timeout)
 			except:
 				pass
-			if thread.is_alive() and not resolve_cancel and kodi_utils.get_property(PROP_RESOLVE_BUSY) != 'true':
+			if thread.is_alive() and close_overlays and not resolve_cancel and kodi_utils.get_property(PROP_RESOLVE_BUSY) != 'true':
 				try:
 					kodi_utils.close_all_dialog()
 				except:
 					pass
-		self._force_close_sources_overlay_windows()
+		if close_overlays:
+			self._force_close_sources_overlay_windows()
 		self.progress_dialog, self.progress_thread = None, None
 		kodi_utils.hide_busy_dialog()
 
@@ -2141,6 +2174,7 @@ class Sources():
 				try:
 					if self._resolve_user_cancelled or self.cancel_all_playback:
 						break
+					self._touch_sources_busy()
 					kodi_utils.hide_busy_dialog()
 					if not self.progress_dialog:
 						if self._user_cancelled_resolve():
@@ -2607,7 +2641,7 @@ class Sources():
 			self._decline_nextep_prep('superseded')
 			return
 		if not results:
-			kodi_utils.logger('Play TVBan', 'Autoscrape next episode: no results for %s S%02dE%02d' % (
+			kodi_utils.logger('Play TVBan', 'Autoscrape next episode: no results for %s T%02dE%02d' % (
 				self.meta.get('title'), self.meta.get('season'), self.meta.get('episode')))
 			self._decline_nextep_prep('no results')
 			return
@@ -2659,10 +2693,12 @@ class Sources():
 		if not self._autoscrape_playback_ended_naturally():
 			self._decline_nextep_prep('user stopped')
 			return
+		# Leave background scrape mode, but keep Autoscrape nextep armed so the episode
+		# the user picks from these results still monitors / preps the following episode.
 		self.background = False
 		self.autoscrape = False
-		self.autoscrape_nextep = False
-		self.play_type = ''
+		self.autoscrape_nextep = True
+		self.play_type = 'autoscrape_nextep'
 		return self.display_results(results)
 
 	def debrid_importer(self, debrid_provider):

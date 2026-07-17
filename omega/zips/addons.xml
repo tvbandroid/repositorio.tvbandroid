@@ -1951,7 +1951,7 @@ provider-name="ElSupremo">
   </extension>
 </addon>
 
-<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" provider-name="[COLOR white]JoseATeba[/COLOR]" version="1.2.6">
+<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" provider-name="[COLOR white]JoseATeba[/COLOR]" version="1.2.8">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.pil" version="1.1.7"/>

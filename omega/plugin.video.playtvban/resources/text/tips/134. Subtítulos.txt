@@ -1,0 +1,33 @@
+Play TVBan puede activar los subtítulos durante la reproducción y también usar la sincronización de subtítulos para decidir cuándo mostrar las alertas de "Siguiente episodio" y "Créditos". Son dos funciones independientes que comparten la misma configuración.
+
+Todas las opciones de configuración de subtítulos se encuentran en Reproducción -> Subtítulos.
+
+El interruptor principal es "Activar subtítulos automáticamente". Cuando está desactivado, Play TVBan no busca ni activa los subtítulos, pero los controles de subtítulos de Kodi siguen funcionando con normalidad.
+
+Cuando está activado, elige una fuente con "Activar fuente de subtítulos automáticamente"...
+
+LOCAL: Usa solo los subtítulos que ya están en el archivo (integrados/sidecar). No se descarga nada. Si seleccionas "Solo subtítulos forzados" como idioma, solo se usarán las pistas forzadas.
+
+SUBMAKER: Descarga los subtítulos de SubMaker. Solo aparece una vez que introduces la URL del manifiesto de SubMaker. Puede usar OpenSubtitles si está configurado.
+
+OPENSUBTITLES: Descarga los subtítulos de opensubtitles.com. Solo aparece una vez que ingreses tu nombre de usuario y contraseña. Las cuentas gratuitas están limitadas a unas 20 descargas cada 24 horas.
+
+La opción "Preferir subtítulos locales" solo se aplica cuando la fuente es SubMaker u OpenSubtitles. Intenta primero con los subtítulos integrados o auxiliares y mantiene un subtítulo que ya se esté mostrando en lugar de descargar otro.
+
+"Idioma de subtítulos" establece el idioma para la selección de pistas locales y para las descargas de SubMaker/OpenSubtitles.
+
+TIEMPO DE ALERTA (INDIVIDUAL)
+
+Algunas alertas pueden usar el tiempo de las señales de subtítulos en lugar de un porcentaje. Esto se usa cuando el tiempo de alerta para "Reproducción automática del siguiente episodio", "Extracción automática del siguiente episodio" o "Créditos" está configurado en "Información de subtítulos".
+
+Esto requiere un manifiesto de SubMaker y/o una cuenta de OpenSubtitles; de lo contrario, la opción está oculta. Play TVBan obtiene un archivo de subtítulos al principio de la reproducción solo para el tiempo y lee los tiempos de las señales para decidir cuándo mostrar la alerta. Si no encuentra subtítulos utilizables, recurre al porcentaje de reproducción (o a los capítulos disponibles).
+
+Nota: Esto sigue las indicaciones del archivo de subtítulos, no los créditos en pantalla, por lo que la sincronización puede variar entre versiones.
+
+LO QUE PLAY TVBAN NO HACE
+
+Play TVBan no tiene un explorador de subtítulos integrado. Para seleccionarlos manualmente, utilice el menú de subtítulos del reproductor de Kodi. Play TVBan no obtiene subtítulos de otros complementos.
+
+MANTENIMIENTO
+
+Herramientas -> Borrar caché de subtítulos elimina los archivos de subtítulos temporales descargados por Play TVBan. Esto también se ejecuta como parte de una limpieza de caché más amplia.

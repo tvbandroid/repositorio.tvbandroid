@@ -1,3 +1,11 @@
+[COLOR red][B]Versión 1.2.8[/B][/COLOR]
+- [B]Secuencia automática del siguiente episodio[/B]: seleccionar una fuente de los resultados de la función de secuencia automática ya no desactiva la opción "Siguiente episodio" para esa reproducción; la cadena de reproducción continúa en lugar de detenerse después de un salto ([B]La opción "Siguiente episodio" desactivó esta reproducción[/B]).
+
+[COLOR red][B]Versión 1.2.7[/B][/COLOR]
+- [B]Calendario Trakt[/B]: formatos de visualización de títulos de episodios independientes para el complemento y los widgets, sin modificar el formato efectivo de los usuarios existentes durante la actualización (gracias a JMAN730 / #131).
+
+- [B]Subtítulos[/B]: se agregó una descripción general a [B]Herramientas > Consejos de uso[/B], que abarca las fuentes de subtítulos automáticos, las preferencias de idioma y subtítulos locales, la sincronización de alertas basadas en subtítulos, las limitaciones y el mantenimiento de la caché.
+
 [COLOR red][B]Versión 1.2.6[/B][/COLOR]
 - [B]TorBox[/B]: las transferencias temporales de resolución/exploración ahora se limpian de forma consistente cuando [B]Añadir caché Debrid resuelta a la nube[/B] está en [B]Ninguno[/B]. Play TVBan sigue creando una transferencia temporal de TorBox para solicitar enlaces reproducibles, pero las esperas fallidas de archivos, las selecciones sin coincidencias en paquetes, los fallos al resolver NZB y las resoluciones correctas no conservadas ahora intentan limpiar las transferencias que Play TVBan acaba de crear.
 - [B]Descargas[/B]: [B]Descargar archivo[/B] vuelve al comportamiento anterior a la regresión usando [B]RunPlugin[/B]. Corregido un error de diagnóstico en la resolución de nextep que provocaba un [B]AttributeError[/B] en un nuevo [B]Sources()[/B] ([B]play_type[/B] / [B]background[/B] sin definir): el registro ya no se ejecuta antes de la resolución Debrid en la ruta de descarga. [B]Descargar archivo[/B] muestra una notificación de [B]Descarga iniciada[/B] tras confirmar el título; [B]Descargar paquete[/B] ya no duplica [B]Descarga del paquete iniciada[/B] encima de [B]Descarga de paquete de varios archivos iniciada[/B].

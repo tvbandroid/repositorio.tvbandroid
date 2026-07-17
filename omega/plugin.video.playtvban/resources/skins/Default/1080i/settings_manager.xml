@@ -552,10 +552,10 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(10)</visible>
-                          <property name="setting_label">Alert When Service Expires Within (Days)</property>
+                          <property name="setting_label">Avisar cuando un Servicio caduque en menos de (días)</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert_days)]</property>
-                          <property name="setting_description">On Kodi startup, notify when authorised Debrid and EasyNews accounts expire within this many days. Set to 0 to disable. Each service alerts once per remaining-day count.</property>
+                          <property name="setting_description">Al iniciar Kodi, notifica cuando las cuentas autorizadas de Debrid y EasyNews caduquen dentro del número de días indicado. Establézcalo en 0 para desactivarlo. Cada servicio solo avisará una vez por cada número de días restantes.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=services.expiry_alert_days)</onclick>
                       </item>
         <!-- Watched Indicators -->
@@ -1661,10 +1661,10 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Clave Client ID</property>
+                          <property name="setting_label">Clave ID del Cliente</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.client)]</property>
-                          <property name="setting_description">Introduce el Client ID de tu aplicación en trakt.tv/oauth/applications (o deja el predeterminado de Play TVBan)</property>
+                          <property name="setting_description">Introduce el ID del Cliente de tu aplicación en trakt.tv/oauth/applications (o deja el predeterminado de Play TVBan)</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=trakt.client)</onclick>
                       </item>
                       <item>
@@ -1672,24 +1672,24 @@
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.client),30e6c73030cc41dbff996200ac3060cde689555ba207020e08a2175533b912c3)</visible>                          <property name="setting_label">    - Restore Default Client ID Key</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Restaurar la Clave Client ID predeterminada de Trakt</property>
+                          <property name="setting_description">Restaurar la Clave ID Cliente predeterminada de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.restore_setting_default&amp;setting_id=trakt.client)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Clave Client Secret</property>
+                          <property name="setting_label">Clave Secreto del Cliente</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.secret)]</property>
-                          <property name="setting_description">Introduce el Client Secret de la misma aplicación de Trakt utilizada para el Client ID anterior</property>
+                          <property name="setting_description">Introduce el Secreto del Cliente de la misma aplicación de Trakt utilizada para el Client ID anterior</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=trakt.secret)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.secret),726f6b12a9f0079d5850a7bb0e15860725cd487cbfb54ce5471de217639465c5)</visible>
-                          <property name="setting_label">    - Restaurar Clave Client Secret Predeterminada</property>
+                          <property name="setting_label">    - Restaurar Clave Secreto del Cliente Predeterminada</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Restaurar la Clave Client Secret predeterminada de Trakt</property>
+                          <property name="setting_description">Restaurar la Clave Secreto del Cliente predeterminada de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.restore_setting_default&amp;setting_id=trakt.secret)</onclick>
                       </item>
                       <item>

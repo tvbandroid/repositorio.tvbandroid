@@ -1377,7 +1377,7 @@ class Sources():
 
 	def _show_no_results(self):
 		heading = self.meta.get('rootname', '') or self.meta.get('title', '') or 'Play TVBan'
-		return self._show_modal_message(heading, 'No results found.', '[B]Next Up:[/B] No Results')
+		return self._show_modal_message(heading, 'No se encontraron resultados.', '[B]Siguiente:[/B] Sin resultados')
 
 	def _random_continual_skip(self):
 		"""Continual random: no links for this episode — try another (capped), keep Still Watching count."""
@@ -2629,7 +2629,7 @@ class Sources():
 	def autoscrape_nextep_handler(self):
 		autoscrape_confirmed = False
 		if settings.autoscrape_confirm():
-			if not self._make_still_watching_dialog('Autoscrape Next Episode of [B]%s[/B]?', heading='Autoscrape Next Episode?', right_align=True):
+			if not self._make_still_watching_dialog('Buscar automáticamente el siguiente episodio de [B]%s[/B]?', heading='Siguiente episodio?', right_align=True):
 				self._decline_nextep_prep('autoscrape confirm')
 				return
 			autoscrape_confirmed = True
@@ -2641,7 +2641,7 @@ class Sources():
 			self._decline_nextep_prep('superseded')
 			return
 		if not results:
-			kodi_utils.logger('Play TVBan', 'Autoscrape next episode: no results for %s T%02dE%02d' % (
+			kodi_utils.logger('Play TVBan', 'Autobúsqueda del siguiente episodio: sin resultados para %s T%02dE%02d' % (
 				self.meta.get('title'), self.meta.get('season'), self.meta.get('episode')))
 			self._decline_nextep_prep('no results')
 			return

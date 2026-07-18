@@ -21,6 +21,7 @@ list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS
 forced_proxy_opt = 'ProxySSL'
 
+
 canonical = {
              'channel': 'estrenoscinesaa', 
              'host': config.get_setting("current_host", 'estrenoscinesaa', default=''), 
@@ -30,6 +31,8 @@ canonical = {
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
+
+
 host = canonical['host'] or canonical['host_alt'][0]
 channel = canonical['channel']
 __comprueba_enlaces__ = config.get_setting('comprueba_enlaces', channel)
@@ -294,22 +297,29 @@ def findvideos(item):
 
 def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
     logger.info()
-
+    
     matches = []
     findS = AHkwargs.get('finds', finds)
     soup = AHkwargs.get('soup', {})
-    logger.debug(matches_int)
-
+    
+    descargas = soup.find_all('a', href=re.compile(r"links/[A-z0-9]+"))
+    #### descargas solo ofrece un link nuevo de 1fichier
+    # logger.debug(matches_int)
+    # logger.debug(descargas)
+    # if soup.find_all('a', href=re.compile(r"links/[A-z0-9]+")):
+        # for elem in descargas:
+            # data = AlfaChannel.create_soup(elem['href'], **kwargs)
+            # url = data.find('a', id='link')['href']
+            # logger.debug(url)
     for elem in matches_int:
         elem_json = {}
         #logger.error(elem)
-
+        
         try:
-            elem_json['url'] = elem.iframe.get('src', '') or elem.get_text(strip=True)
+            elem_json['url'] = elem.iframe.get('src', '')
             elem_json['url'] = AlfaChannel.do_unquote(elem_json['url'])
             elem_json['server'] = ''
-            elem_json['title'] = '%s'
-
+        
         except:
             logger.error(elem)
             logger.error(traceback.format_exc())

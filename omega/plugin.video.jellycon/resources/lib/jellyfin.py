@@ -27,7 +27,7 @@ class API:
         self.verify_cert = settings.getSetting('verify_cert') == 'true'
 
     def get(self, path):
-        if 'x-mediabrowser-token' not in self.headers or self.token not in self.headers:
+        if 'Authorization' not in self.headers or self.token not in self.headers:
             self.create_headers(True)
 
         # Fixes initial login where class is initialized before wizard completes
@@ -37,8 +37,8 @@ class API:
 
         url = '{}{}'.format(self.server, path)
 
-        r = requests.get(url, headers=self.headers, verify=self.verify_cert)
         try:
+            r = requests.get(url, headers=self.headers, verify=self.verify_cert, timeout=(5,60))
             try:
                 '''
                 The requests library defaults to using simplejson to handle
@@ -51,34 +51,37 @@ class API:
                 response_data = json.loads(r.text)
             except ValueError:
                 response_data = r.json()
-        except:  # noqa
+        except Exception:
             response_data = {}
         return response_data
 
     def post(self, url, payload={}):
-        if 'x-mediabrowser-token' not in self.headers or self.token not in self.headers:
+        if 'Authorization' not in self.headers or self.token not in self.headers:
             self.create_headers(True)
 
         url = '{}{}'.format(self.server, url)
 
-        r = requests.post(url, json=payload, headers=self.headers, verify=self.verify_cert)
         try:
+            r = requests.post(url, json=payload, headers=self.headers, verify=self.verify_cert, timeout=5)
             try:
                 # Much faster on low power devices, see above comment
                 response_data = json.loads(r.text)
             except ValueError:
                 response_data = r.json()
-        except:  # noqa
+        except Exception:
             response_data = {}
         return response_data
 
     def delete(self, url):
-        if 'x-mediabrowser-token' not in self.headers or self.token not in self.headers:
+        if 'Authorization' not in self.headers or self.token not in self.headers:
             self.create_headers(True)
 
         url = '{}{}'.format(self.server, url)
 
-        requests.delete(url, headers=self.headers, verify=self.verify_cert)
+        try:
+            requests.delete(url, headers=self.headers, verify=self.verify_cert, timeout=5)
+        except Exception:
+            pass
 
     def authenticate(self, auth_data):
         # Always force create fresh headers during authentication
@@ -98,7 +101,7 @@ class API:
     def create_headers(self, force=False):
 
         # If the headers already exist with an auth token, return unless we're regenerating
-        if self.headers and 'x-mediabrowser-token' in self.headers and force is False:
+        if self.headers and 'Authorization' in self.headers.get('Authorization', '') and force is False:
             return
 
         headers = {}
@@ -119,18 +122,21 @@ class API:
             version=version
         )
 
-        headers['x-emby-authorization'] = authorization
+        headers['Authorization'] = authorization
 
         # If we have a valid token, ensure it's included in the headers unless we're regenerating
         if self.token and force is False:
-            headers['x-mediabrowser-token'] = self.token
+            headers['Authorization'] += ', Token="{}"'.format(self.token)
         else:
             # Check for updated credentials since initialization
             user_details = load_user_details()
             token = user_details.get('token')
             if token:
                 self.token = token
-                headers['x-mediabrowser-token'] = self.token
+                headers['Authorization'] += ", Token={}".format(self.token)
+
+        # Kodi doesn't support br or zstd compression, exclude them
+        headers['Accept-Encoding'] = 'gzip, deflate'
 
         # Make headers available to api calls
         self.headers = headers

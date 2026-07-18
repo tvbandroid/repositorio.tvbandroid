@@ -11,9 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
-
-from lib.alfa_assistant import is_alfa_installed
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 # Canal común con Kacktorrent, Pelispanda
 
@@ -23,10 +21,9 @@ list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES_T
 list_quality_tvshow = AlfaChannelHelper.LIST_QUALITY_TVSHOW
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_T
-forced_proxy_opt = 'ProxySSL'
 
-cf_assistant = True if is_alfa_installed() else False
-forced_proxy_opt = None if cf_assistant else 'ProxyCF'
+cf_assistant = True if AlfaChannelHelper.IS_ASSISTANT_INSTALLED else False
+forced_proxy_opt = 'ProxySSL'
 debug = config.get_setting('debug_report', default=False)
 
 canonical = {
@@ -34,14 +31,10 @@ canonical = {
              'host': config.get_setting("current_host", 'pelispanda', default=''), 
              'host_alt': ['https://pelispanda.org/'], 
              'host_black_list': ['https://pelispanda.win/', 'https://pelispanda.re/', 'https://pelispanda.com/'], 
-             'set_tls': True, 'set_tls_min': True, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': cf_assistant, 
-             'cf_assistant_ua': True, 'cf_assistant_get_source': True if cf_assistant == 'force' else False, 
-             'cf_no_blacklist': True, 'cf_removeAllCookies': False if cf_assistant == 'force' else True,
-             'cf_challenge': True, 'cf_returnkey': 'url', 'cf_partial': True, 'cf_debug': debug, 
-             'cf_cookies_names': {'cf_clearance': False},
-             'CF_if_assistant': True if cf_assistant is True else False, 'retries_cloudflare': -1, 
-             'CF_stat': True if cf_assistant is True else False, 'session_verify': True, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': True, 'set_tls_min': True, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             'retries_cloudflare': -1 if cf_assistant else 1, 'session_verify': True, 
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False, 
+             'data_js': ''
             }
 host = canonical['host'] or canonical['host_alt'][0]
 channel = canonical['channel']
@@ -51,7 +44,6 @@ min_temp = modo_ultima_temp if not modo_ultima_temp else 'continue'
 
 timeout = config.get_setting('timeout_downloadpage', channel)
 kwargs = {}
-debug = config.get_setting('debug_report', default=False)
 movie_path = "/peliculas"
 tv_path = '/series'
 anime_path = '/animes'
@@ -146,6 +138,8 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=thumb_settings))
 
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
+
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
     autoplay.show_option(item.channel, itemlist)                                # Activamos Autoplay
@@ -235,7 +229,8 @@ def list_all_matches(item, matches_int, **AHkwargs):
             elem_json['mediatype'] = 'movie' if elem.get('type', 'pelicula') == 'pelicula' else 'tvshow'
             elem_json['title'] = elem.get('title', '')
             elem_json['url'] = '%swp-json/wpreact/v1/%s/%s/' % (host, elem_json['mediatype'] if elem_json['mediatype'] == 'movie' \
-                                                                                             else 'serie' if item.extra != 'animes' \
+                                                                                             else 'serie' if (item.extra != 'animes' \
+                                                                                                and elem.get('type', '') != 'anime') \
                                                                                              else 'anime', elem.get('slug', ''))
             if elem_json['mediatype'] in ['tvshow']: elem_json['url'] = elem_json['url'] + 'related/'
             elem_json['thumbnail'] = elem.get('featured', '')
@@ -252,7 +247,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
             logger.error(traceback.format_exc())
             continue
 
-        if item.extra in ['Idioma', 'anime']: AlfaChannel.filter_languages = 0
+        if item.extra in ['Idioma', 'anime'] or elem.get('type', '') == 'anime': AlfaChannel.filter_languages = 0
 
     return matches
 
@@ -293,6 +288,8 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
     findS = AHkwargs.get('finds', finds)
     if anime_path.rstrip('s') in item.url: AlfaChannel.filter_languages = 0
 
+    if matches_int and not isinstance(matches_int[0], list):
+        matches_int = [matches_int]
     for elem_season in matches_int:
         if not elem_season or elem_season[0].get('season', 0) != item.infoLabels['season']: continue
         

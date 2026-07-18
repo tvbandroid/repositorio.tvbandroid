@@ -14,38 +14,6 @@ from core import httptools, scrapertools, tmdb, servertools
 from lib import decrypters
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
 host = 'https://seriesmega.org/'
 
 
@@ -88,8 +56,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
-    if '/release/' in url: raise_weberror = False
-
     hay_proxies = False
     if config.get_setting('channel_megaserie_proxies', default=''): hay_proxies = True
 
@@ -109,7 +75,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MegaSerie', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -117,23 +83,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                     data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('megaserie', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -190,8 +139,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
-
     return itemlist
 
 
@@ -206,8 +153,6 @@ def mainlist_series(item):
     itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -256,29 +201,11 @@ def generos(item):
 
     for opc, tit in opciones:
         url = host + opc
+
         if item.search_type == 'movie': url += '/?type=movies'
         else: url += '/?type=series'
 
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = text_color ))
-
-    return itemlist
-
-
-def anios(item):
-    logger.info()
-    itemlist = []
-
-    if item.search_type == 'movie': text_color = 'deepskyblue'
-    else: text_color = 'hotpink'
-
-    from datetime import datetime
-    current_year = int(datetime.today().year)
-
-    if item.search_type == 'movie': top_year = 1955
-    else: top_year = 1998
-
-    for x in range(current_year, top_year, -1):
-        itemlist.append(item.clone( title = str(x), url = host + 'release/' + str(x) + '/', action = 'list_all', text_color = text_color ))
 
     return itemlist
 
@@ -289,7 +216,18 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '(.*?)<p class="copy">MegaSerie')
+    if '/?type=' in item.url:
+        if item.search_type == 'movie':
+            bloque = scrapertools.find_single_match(data, '</h1>(.*?)>Peliculas Populares<')
+        else:
+            bloque = scrapertools.find_single_match(data, '</h1>(.*?)>Ultimos Episodios<')
+    else:
+        if '/peliculas/' in item.url:
+            bloque = scrapertools.find_single_match(data, '</h1>(.*?)>Peliculas Populares<')
+        elif '/series/' in item.url:
+            bloque = scrapertools.find_single_match(data, '</h1>(.*?)>Ultimos Episodios<')
+        else:
+            bloque = scrapertools.find_single_match(data, '(.*?)<p class="copy">MegaSerie')
 
     matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
@@ -314,14 +252,15 @@ def list_all(item):
         if '/Mexico.png' in article: langs.append('Lat')
         if '/United-States-Minor-Outlying.png' in article: langs.append('Vose')
 
-        tipo = 'tvshow' if '/series/' in url else 'movie'
+        tipo = 'tvshow' if '/series/' in url or '/episodes/' in url else 'movie'
         sufijo = '' if item.search_type != 'all' else tipo
 
         if tipo == 'movie':
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
-            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs), fmt_sufijo=sufijo,
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        qualities=qlty, languages=', '.join(langs),
                                         contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
         if tipo == 'tvshow':
@@ -369,11 +308,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = numtempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = numtempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
@@ -489,6 +428,8 @@ def findvideos(item):
 
         srv = scrapertools.find_single_match(srv_lang, '(.*?)-').lower().strip()
 
+        if not srv: srv = scrapertools.find_single_match(srv_lang, '(.*?)$').lower().strip()
+
         if not srv == 'descargaonline':
             if servertools.is_server_available(srv):
                 if not servertools.is_server_enabled(srv): continue
@@ -521,11 +462,8 @@ def findvideos(item):
                         if 'https://player.megaxserie.me/f/' in link: link = link.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
 
                         servidor = servertools.get_server_from_url(link)
-                        servidor = servertools.corregir_servidor(servidor)
 
                         if servidor != 'directo':
-                            link = servertools.normalize_url(servidor, link)
-
                             other = ''
                             if servidor == 'various': other = servertools.corregir_other(link)
 
@@ -576,11 +514,8 @@ def findvideos(item):
                         if 'https://player.megaxserie.me/f/' in link: link = link.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
 
                         servidor = servertools.get_server_from_url(link)
-                        servidor = servertools.corregir_servidor(servidor)
 
                         if servidor != 'directo':
-                            link = servertools.normalize_url(servidor, link)
-
                             other = ''
                             if servidor == 'various': other = servertools.corregir_other(link)
 
@@ -603,11 +538,8 @@ def findvideos(item):
                 if 'https://player.megaxserie.me/f/' in link: link = link.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
 
                 servidor = servertools.get_server_from_url(link)
-                servidor = servertools.corregir_servidor(servidor)
 
                 if servidor != 'directo':
-                    link = servertools.normalize_url(servidor, link)
-
                     other = ''
                     if servidor == 'various': other = servertools.corregir_other(link)
 
@@ -655,16 +587,16 @@ def play(item):
             if 'https://player.megaxserie.me/f/' in new_url: new_url = new_url.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
 
             servidor = servertools.get_server_from_url(new_url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, new_url)
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if not new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
-            if servidor != 'directo':
-                itemlist.append(item.clone( url = url, server = servidor ))
+            itemlist.append(item.clone( url = url, server = servidor ))
 
             return itemlist
 
@@ -677,16 +609,16 @@ def play(item):
             if 'https://player.megaxserie.me/f/' in url: url = url.replace('https://player.megaxserie.me/f/', 'https://waaw.to/f/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if not new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
-            if servidor != 'directo':
-                itemlist.append(item.clone( url = url, server = servidor ))
+            itemlist.append(item.clone( url = url, server = servidor ))
 
             return itemlist
 
@@ -704,11 +636,12 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
             url = servertools.normalize_url(servidor, url)
 

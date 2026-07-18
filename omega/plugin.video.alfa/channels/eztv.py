@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -19,7 +19,10 @@ list_quality_movies = []
 list_quality_tvshow = AlfaChannelHelper.LIST_QUALITY_TVSHOW
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_T
-forced_proxy_opt = 'ProxySSL'
+
+cf_assistant = True if AlfaChannelHelper.IS_ASSISTANT_INSTALLED else False
+forced_proxy_opt = None if cf_assistant else 'ProxyCF'
+debug = config.get_setting('debug_report', default=False)
 
 canonical = {
              'channel': 'eztv', 
@@ -27,8 +30,10 @@ canonical = {
              'host_alt': ["https://eztvx.to/"], 
              'host_black_list': ["https://eztv.li/", "https://eztv.re/"], 
              'pattern': '<div\s*id="header_logo">\s*<a\s*href="([^"]+)"', 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': True, 'set_tls_min': True, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             'retries_cloudflare': -1 if cf_assistant else 1, 
+             'CF': False, 'CF_test': True, 'alfa_s': True, 'renumbertools': False, 
+             'data_js': ''
             }
 host = canonical['host'] or canonical['host_alt'][0]
 host_torrent = 'https://zoink.ch/'
@@ -39,7 +44,6 @@ min_temp = modo_ultima_temp if not modo_ultima_temp else 'continue'
 
 timeout = (5, (config.get_setting('timeout_downloadpage', channel) * 2))
 kwargs = {}
-debug = config.get_setting('debug_report', default=False)
 movie_path = "/peliculas/"
 tv_path = '/shows'
 language = ['VO']
@@ -58,21 +62,25 @@ finds = {'find': {'find_all': [{'tag': ['tr'], 'name': ['hover'], '@LIM': 500}]}
          'last_page': {}, 
          'year': {}, 
          'season_episode': {}, 
-         'seasons': dict([('find', [{'tag': ['table'], 'class': ['show_info_description']}]), 
-                          ('find_all', [{'tag': ['h3'], 'string': re.compile('(?i)season')}])]), 
-         'season_num': {'get_text': [{'tag': '', '@STRIP': True, '@TEXT': '(?i)season\s+(\d{1,2})\s+'}]}, 
+         'seasons': dict([('find', [{'tag': ['div'], 'id': ['tab-episodes']}]), 
+                          ('find_all', [{'tag': ['div'], 'string': re.compile('(?i)season')}])]), 
+         #'seasons': dict([('find', [{'tag': ['table'], 'class': ['show_info_description']}]), 
+         #                 ('find_all', [{'tag': ['h3'], 'string': re.compile('(?i)season')}])]), 
+         'season_num': {'get_text': [{'tag': '', '@STRIP': True, '@TEXT': '(?i)season\s+(?:\d{2})?(\d{1,2})\s+'}]}, 
          'seasons_search_num_rgx': [], 
          'seasons_search_qty_rgx': [], 
          'episode_url': '', 
-         'episodes': dict([('find', [{'tag': ['table'], 'class': ['show_info_description']}]), 
-                           ('find_all', [{'string': re.compile('[^-]+\s+--\s+[^\-]+(?:\s+--\s+[^$]*)?$')}])]), 
+         'episodes': dict([('find', [{'tag': ['div'], 'id': ['tab-episodes']}]), 
+                           ('find_all', [{'tag': ['div'], 'class': ['episode-row']}])]), 
+         #'episodes': dict([('find', [{'tag': ['table'], 'class': ['show_info_description']}]), 
+         #                  ('find_all', [{'string': re.compile('[^-]+\s+--\s+[^\-]+(?:\s+--\s+[^$]*)?$')}])]), 
          'episode_num': [], 
          'episode_clean': [], 
          'plot': {}, 
          'findvideos': {'find_all': [{'tag': ['tr'], 'name': ['hover']}]}, 
          'find_torrents': dict([('find', [{'tag': ['td'], 'class': ['section_post_header'], 'string': re.compile('(?i)download\s*links')}]), 
                                 ('find_next', [{'tag': ['tr']}]), 
-                                ('find_all', [{'tag': ['a'], 'title': re.compile('(?i)download\s*torrent')}])]), 
+                                ('find_all', [{'tag': ['a'], 'title': re.compile('(?i)magnet\s*link')}])]), 
          'title_clean': [['(?i)TV|Online|(4k-hdr)|(fullbluray)|4k| - 4k|(3d)|miniserie|\s*imax|documental|completo|\s*torrent', ''],
                          ['[\(|\[]\s+[\)|\]]', '']],
          'quality_clean': [['(?i)proper\s*|unrated\s*|directors\s*|cut\s*|german\s*|repack\s*|internal\s*|real\s*|korean\s*', ''],
@@ -82,7 +90,7 @@ finds = {'find': {'find_all': [{'tag': ['tr'], 'name': ['hover'], '@LIM': 500}]}
          'controls': {'min_temp': min_temp, 'url_base64': True, 'add_video_to_videolibrary': True, 'cnt_tot': 20,
                       'get_lang': False, 'reverse': False, 'videolab_status': True, 'tmdb_extended_info': True, 'seasons_search': False, 
                       'host_torrent': host_torrent, 'btdigg': False, 'duplicates': [], 'dup_list': 'title', 'dup_movies': True, 
-                      'join_dup_episodes': False, 'manage_torrents': True, 'sort_findvideos': True},
+                      'join_dup_episodes': False, 'manage_torrents': True, 'sort_findvideos': True, 'season_TMDB_limit': False},
          'timeout': timeout}
 AlfaChannel = DictionaryAllChannel(host, movie_path=movie_path, tv_path=tv_path, canonical=canonical, finds=finds, 
                                    idiomas=IDIOMAS, language=language, list_language=list_language, list_servers=list_servers, 
@@ -117,6 +125,8 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
     
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
+
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
     
     autoplay.show_option(item.channel, itemlist)
@@ -148,7 +158,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
 
     matches = []
     search_list = []
-    patron_sxe = '(?i)S(\d+)E(\d+)'
+    patron_sxe = '(?i)(?:S\d+E\d+|\d{4}\s+\d{2}\s+\d{2})'
     findS = AHkwargs.get('finds', finds)
 
     for y, elem_tr in enumerate(matches_int):
@@ -246,6 +256,7 @@ def episodesxseason(item, data=[]):
     logger.info()
 
     kwargs['headers'] = {'Referer': item.url}
+    kwargs['post'] = 'layout=def_wlinks'
     #kwargs['matches_post_get_video_options'] = findvideos_matches
 
     return AlfaChannel.episodes(item, data=data, matches_post=episodesxseason_matches, generictools=True, **kwargs)
@@ -257,9 +268,15 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
     matches = []
     elem_json_list = {}
     findS = finds.copy()
+    patron_sxe = '(?i)S\d+E\d+'
+    patron_date_in = '(?i)(\w+)\s+(\d{1,2})\,\s+(\d{4})'
+    months_dict = {'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+                   'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'}
 
     soup = AHkwargs.get('soup', {})
-    findS['episodes'] = {'find_all': [{'tag': ['tr'], 'name': ['hover']}]}
+    #findS['episodes'] = {'find_all': [{'tag': ['tr'], 'name': ['hover']}]}
+    findS['episodes'] = dict([('find', [{'tag': ['div'], 'id': ['tab-releases']}]), 
+                              ('find_all', [{'tag': ['tr'], 'class': ['torrent-row']}])])
     matches_links = AlfaChannel.parse_finds_dict(soup, findS['episodes'])
 
     for elem in matches_int:
@@ -267,14 +284,22 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
         #logger.error(elem)
 
         try:
-            info = elem.split(' -- ')
+            if elem.find('div', class_='episode-season'):
+                seaepi = elem.find('div', class_='episode-season').get_text(strip=True)
+                date_ = elem.find('div', class_='episode-date').get_text(strip=True)
+                title = elem.find('div', class_='episode-title').get_text(strip=True) or ''
+            else:
+                info = elem.split(' -- ')
+                seaepi = info[0]
+                date_ = info[1]
+                title = info[2] if len(info) > 2 else ''
 
             try:
-                elem_json['season'], elem_json['episode'] = scrapertools.find_single_match(info[0], '(?i)(\d{1,2})x(\d{1,3})')
+                elem_json['season'], elem_json['episode'] = scrapertools.find_single_match(seaepi, '(?i)(\d{1,2})x(\d{1,3})')
                 elem_json['season'] = int(elem_json['season'])
                 elem_json['episode'] = int(elem_json['episode']) or 1
             except Exception:
-                logger.error('ERROR Info: %s' % info)
+                logger.error('ERROR seaepi: %s' % seaepi)
                 elem_json['season'] = item.contentSeason
                 elem_json['episode'] = 0
                 continue
@@ -282,7 +307,12 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
 
             sxe = 's%se%s' % (str(elem_json['season']).zfill(2), str(elem_json['episode']).zfill(2))
             elem_json['url'] = elem_json['url_episode'] = '%ssearch/%s-%s' % (host, item.contentSerieName.replace(' ', '-').lower(), sxe)
-            elem_json['title'] = '%sx%s %s' % (str(elem_json['season']), str(elem_json['episode']).zfill(2), (info[2] if len(info) > 2 else ''))
+            elem_json['title'] = '%sx%s %s' % (str(elem_json['season']), str(elem_json['episode']).zfill(2), title)
+
+            if scrapertools.find_single_match(date_, patron_date_in):
+                elem_json['date'] = scrapertools.find_single_match(date_, patron_date_in)
+                elem_json['date'] = '%s %s %s' % (elem_json['date'][2], months_dict.get(elem_json['date'][0], '00'), elem_json['date'][1])
+                elem_json['title'] += ' - %s' % elem_json['date'].replace(' ', '-')
 
             elem_json['language'] = item.language
             elem_json['quality'] = ''
@@ -294,6 +324,7 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
             continue
 
         elem_json_list[sxe] = elem_json.copy()
+        if elem_json.get('date'): elem_json_list[elem_json['date']] = elem_json.copy()
 
     for elem_links in matches_links:
         elem_json = {}
@@ -303,12 +334,17 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
         if not elem_json.get('url'): continue
 
         sxe = 's%se%s' % (str(elem_json['season']).zfill(2), str(elem_json['episode']).zfill(2))
+        if elem_json.get('date') and elem_json_list.get(elem_json['date']):
+            elem_json['season'] = elem_json_list[elem_json['date']]['season']
+            elem_json['episode'] = elem_json_list[elem_json['date']]['episode']
+            sxe = 's%se%s' % (str(elem_json['season']).zfill(2), str(elem_json['episode']).zfill(2))
         if elem_json_list.get(sxe):
             elem_json_list[sxe]['matches'] += [elem_json.copy()]
             if elem_json['quality'] not in elem_json_list[sxe]['quality']:
                 elem_json_list[sxe]['quality'] += '%s, ' % elem_json['quality']
 
     for key, elem_json in elem_json_list.items():
+        if not key.startswith('s'): continue
         if item.infoLabels['number_of_seasons'] and item.infoLabels['number_of_seasons'] == elem_json['season']:
             if not elem_json['matches']: continue
         elem_json['quality'] = elem_json['quality'].rstrip(', ')
@@ -322,6 +358,8 @@ def findvideos(item):
     logger.info()
 
     kwargs['matches_post_episodes'] = episodesxseason_matches
+    kwargs['headers'] = {'Referer': item.url}
+    kwargs['post'] = 'layout=def_wlinks'
 
     return AlfaChannel.get_video_options(item, item.url, matches_post=findvideos_matches, 
                                          verify_links=False, generictools=True, findvideos_proc=True, **kwargs)
@@ -352,6 +390,7 @@ def findvideos_links(item, elem_in, elem_json):
     patron_title_epi = '(?i)(.*?)\s*(\d{4}(?:\s*\d+\s*\d+)?)'
     patron_quality = '(?i)((?:\d{3,4}p|xvid|web)[^-]*)'
     patron_sxe = '(?i)S(\d+)E(\d+)'
+    patron_date = '(?i)\d{4}.\d{2}.\d{2}'
 
     for x, elem in enumerate(elem_in.find_all('td')):
         #logger.error(elem)
@@ -376,31 +415,42 @@ def findvideos_links(item, elem_in, elem_json):
                     if not scrapertools.find_single_match(info, patron_sxe):
                         elem_json['season'] = item.contentSeason
                         elem_json['episode'] = 1
+                        if scrapertools.find_single_match(info, patron_date):
+                            elem_json['date'] = scrapertools.find_single_match(info, patron_date)
+                            elem_json['url_episode'] = item.url
                     else:
                         season, elem_json['episode'] = scrapertools.find_single_match(info, patron_sxe)
                         if item.contentSeason != int(season): break
                         elem_json['season'] = item.contentSeason
                         elem_json['episode'] = int(elem_json['episode'])
-                    elem_json['url_episode'] = '%ssearch/%s-s%se%s' % (host, item.contentSerieName.replace(' ', '-').lower(), 
-                                                                       str(elem_json['season']).zfill(2), str(elem_json['episode']).zfill(2))
+                        elem_json['url_episode'] = '%ssearch/%s-s%se%s' % (host, item.contentSerieName.replace(' ', '-').lower(), 
+                                                                           str(elem_json['season']).zfill(2), str(elem_json['episode']).zfill(2))
                     elem_json['title'] = '%sx%s - ' % (str(elem_json['season']), str(elem_json['episode']).zfill(2))
                     
                 elem_json['language'] = item.language
                 elem_json['server'] = 'torrent'
                 elem_json['url'] = ''
                 for url in elem.find_all('a'):
+                    if not url.get('href', '').startswith('magnet') and \
+                       not url.get('href', '').endswith('.torrent'): continue
                     elem_json['url'] = url.get('href', '')
+                    if elem_json['url'].startswith('magnet'): break
                     if elem_json['url'].endswith('.torrent'): break
                 if elem_json.get('url'): elem_json['url'] = AlfaChannel.urljoin(host, elem_json['url'])
+                if not elem_json.get('url_episode'): elem_json['url_episode'] = elem_json['url']
                 elem_json['quality'] = '*%s' % scrapertools.find_single_match(info, patron_quality)
                 elem_json['quality'] = AlfaChannel.find_quality(elem_json, item)
 
             if x == 2:
                 if elem.find('a'):
                     for url in elem.find_all('a'):
+                        if not url.get('href', '').startswith('magnet') and \
+                           not url.get('href', '').endswith('.torrent'): continue
                         elem_json['url'] = url.get('href', '')
+                        if elem_json['url'].startswith('magnet'): break
                         if elem_json['url'].endswith('.torrent'): break
                     if elem_json.get('url'): elem_json['url'] = AlfaChannel.urljoin(host, elem_json['url'])
+                    if not elem_json.get('url_episode'): elem_json['url_episode'] = elem_json['url']
                 elif not elem_json.get('torrent_info') and not 'POST' in str(elem):
                     elem_json['torrent_info'] = elem_json['size'] = elem.get_text(strip=True)
 
@@ -419,9 +469,10 @@ def findvideos_links(item, elem_in, elem_json):
             logger.error(traceback.format_exc())
             break
 
-    if not elem_json.get('url') \
-        or (item.contentSerieName.lower().replace(' ', '.') not in elem_json.get('url', '').lower() + elem_json.get('url_episode', '').lower()\
-            and item.contentSerieName.lower().replace(' ', '-') not in elem_json.get('url', '').lower() + elem_json.get('url_episode', '').lower()): 
+    if not elem_json.get('url') or scrapertools.slugify(item.contentSerieName.replace('\'', '') \
+                                                        or elem_json.get('title', '').replace('\'', ''), strict=False).lower() \
+                                not in elem_json.get('url', '').lower().replace('.', ' ').replace('-', ' ').replace('\'', '')  \
+                                     + elem_json.get('url_episode', '').lower().replace('.', ' ').replace('-', ' ').replace('\'', ''): 
         elem_json = {}
 
     return elem_json

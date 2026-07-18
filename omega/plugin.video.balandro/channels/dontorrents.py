@@ -6,22 +6,48 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
 
-import re, os, string
+import re, os, string, time, hashlib
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
+from lib import decrypters
+
 
 host = 'https://4144-don.mirror.pm/'
 
-# ~ 6/6/25 last domain  'https://dontorrent.haus/'
+
+# ~ 3/6/26 last domain  'https://dontorrent.review/'
+
+# ~ Web Search
+web_search_dontorrent = 'https://dontorrent.review/'
+
+
+# ~ Alternative Webs Clons
+web_clon = False
+
+alt_web_clons = ['https://divxatope.net/',
+                 'https://elitedivx.net/',
+                 'https://www21.dontorrent.link/',
+                 'https://mejortorrent.in/',
+                 'https://reinventorrent.org/',
+                 'https://todotorrents.org/'] 
+
+# ~ Alternative Webs Findvideos
+alt_find_divxatope = 'https://divxatope.net/'
+alt_find_elitedivx = 'https://elitedivx.net/'
+alt_find_dontorrent21 = 'https://www21.dontorrent.link/'
+alt_find_mejortorrentin = 'https://mejortorrent.in/'
+alt_find_reinventorrent = 'https://reinventorrent.org/'
+alt_find_todotorrents = 'https://todotorrents.org/'
 
 
 try:
     data_tor_proxy = httptools.downloadpage('https://donproxies.com/').data
 except:
     data_tor_proxy = ''
+    tor_proxy = ''
 
 if data_tor_proxy:
     tor_proxy = scrapertools.find_single_match(data_tor_proxy, 'Pulse el boton inferior para que se le genere un proxy.*?<a href="(.*?)".*?>Ingresar al Proxy Generado<')
@@ -32,12 +58,15 @@ if data_tor_proxy:
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/',
+ant_hosts =  [
+             # ~ 2021
+             'https://dontorrents.org/', 'https://dontorrents.net/', 'https://dontorrent.one/',
              'https://dontorrent.app/', 'https://dontorrent.lol/', 'https://dontorrent.nz/',
              'https://dontorrent.rip/', 'https://dontorrent.vip/', 'https://dontorrent.ws/',
              'https://dontorrent.win/', 'https://dontorrent.rs/', 'https://dontorrent.bz/',
              'https://dontorrent.men/', 'https://dontorrent.fit/', 'https://dontorrent.art/',
              'https://dontorrent.fun/', 'https://dontorrent.se/', 'https://dontorrent.pw/',
+             # ~ 2022
              'https://dontorrent.li/', 'https://dontorrent.it/', 'https://dontorrent.red/',
              'https://dontorrent.nu/', 'https://dontorrent.si/', 'https://dontorrent.sk/',
              'https://dontorrent.eu/', 'https://dontorrent.top/', 'https://dontorrent.pm/',
@@ -54,6 +83,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.fans/', 'https://dontorrent.ltd/', 'https://dontorrent.me/',
              'https://dontorrent.gs/', 'https://dontorrent.gy/', 'https://dontorrent.click/',
              'https://dontorrent.fail/', 'https://dontorrent.futbol/', 'https://dontorrent.mba/',
+             # ~ 2023
              'https://dontorrent.army/', 'https://dontorrent.blue/', 'https://dontorrent.beer/',
              'https://dontorrent.surf/', 'https://dontorrent.how/', 'https://dontorrent.casa/',
              'https://dontorrent.chat/', 'https://dontorrent.plus/', 'https://dontorrent.ninja/',
@@ -67,6 +97,7 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.tokyo/', 'https://dontorrent.boston/', 'https://dontorrent.rodeo/',
              'https://dontorrent.durban/', 'https://dontorrent.party/', 'https://dontorrent.joburg/',
              'https://dontorrent.wales/', 'https://dontorrent.nagoya/', 'https://dontorrent.contact/',
+             # ~ 2024
              'https://dontorrent.cymru/', 'https://dontorrent.capetown/', 'https://dontorrent.yokohama/',
              'https://dontorrent.makeup/', 'https://dontorrent.band/', 'https://dontorrent.center/',
              'https://dontorrent.cooking/', 'https://dontorrent.cyou/', 'https://dontorrent.agency/',
@@ -79,12 +110,24 @@ ant_hosts = ['https://dontorrents.org/', 'https://dontorrents.net/', 'https://do
              'https://dontorrent.education/', 'https://dontorrent.exposed/', 'https://dontorrent.faith/',
              'https://dontorrent.gratis/', 'https://dontorrent.equipment/', 'https://dontorrent.fashion/',
              'https://dontorrent.gallery/', 'https://dontorrent.yoga/', 'https://dontorrent.foundation/',
+             # ~ 2025
              'https://dontorrent.co/', 'https://dontorrent.auction/', 'https://dontorrent.football/',
              'https://dontorrent.wiki/', 'https://dontorrent.games/', 'https://dontorrent.tube/',
              'https://dontorrent.trade/', 'https://dontorrent.webcam/', 'https://dontorrent.schule/',
              'https://dontorrent.stream/', 'https://dontorrent.website/', 'https://dontorrent.group/',
              'https://dontorrent.download/', 'https://dontorrent.gift/', 'https://dontorrent.report/',
-             'https://dontorrent.homes/']
+             'https://dontorrent.homes/', 'https://dontorrent.haus/', 'https://dontorrent.news/',
+             'https://dontorrent.institute/', 'https://dontorrent.jetzt/', 'https://dontorrent.loan/',
+             'https://dontorrent.graphics/', 'https://dontorrent.international/', 'https://dontorrent.irish/',
+             'https://dontorrent.lighting/', 'https://dontorrent.istanbul/', 'https://dontorrent.onl/',
+             'https://dontorrent.kids/', 'https://dontorrent.kiwi/', 'https://dontorrent.live/',
+             'https://dontorrent.phd/', 'https://dontorrent.gripe/', 'https://dontorrent.sarl/',
+             'https://dontorrent.club/',
+             # ~ 2026
+             'https://dontorrent.prof/', 'https://dontorrent.info/', 'https://dontorrent.promo/',
+             'https://dontorrent.photos/', 'https://dontorrent.cfd/', 'https://dontorrent.pink/',
+             'https://dontorrent.reisen/', 'https://dontorrent.racing/', 'https://dontorrent.rocks/',
+             'https://dontorrent.science/', 'https://dontorrent.support/']
 
 
 domain = config.get_setting('dominio', 'dontorrents', default='')
@@ -128,6 +171,8 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None):
+    global web_clon
+
     # ~ por si viene de enlaces guardados
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -142,6 +187,115 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage_proxy('dontorrents', url, post=post, headers=headers).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if not '/buscar/' in url:
+        if '<title>Just a moment...</title>' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+            return ''
+
+        elif 'Asegurándonos de que no eres un robot' in data:
+            for alt_web_clon in alt_web_clons:
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('dontorrents', alt_web_clon).data
+                else:
+                    data = httptools.downloadpage(alt_web_clon).data
+
+                if 'Asegurándonos de que no eres un robot' in data:
+                     platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Boot[COLOR orangered] Protection [COLOR plum]Robots[/B][/COLOR]')
+                     continue
+
+                if tor_proxy:
+                    if config.get_setting('developer_team'):
+                        if not web_clon:
+                            platformtools.dialog_notification(config.__addon_name + ' [COLOR palegreen][B]Acceso con el Clon[/COLOR][/B]', '[B][COLOR cyan]' + alt_web_clon + '[/COLOR][/B]')
+
+                    web_clon = True
+
+                    url = url.replace(tor_proxy, alt_web_clon)
+
+                    if not alt_web_clon in url: url = url.replace(web_search_dontorrent, alt_web_clon)
+
+                    data = alt_do_downloadpage(url, post=None, headers=None)
+                    break
+                else:
+                    platformtools.dialog_ok(config.__addon_name + ' - Dontorrents', '[COLOR red][B]Boot[/COLOR][COLOR orangered] Protection [/COLOR][COLOR plum]Robots[/B][/COLOR]', '[B][COLOR cyan]Acceda con su Canal Clon[/COLOR][/B]', '[B][COLOR yellow]' + alt_web_clon + '[/COLOR][/B]')
+                    return ''
+
+    return data
+
+
+def alt_do_downloadpage(url, post=None, headers=None):
+    if alt_find_divxatope in url:
+        hay_proxies = False
+        if config.get_setting('channel_divxatope_proxies', default=''): hay_proxies = True
+
+        if not url.startswith(alt_find_divxatope):
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('divxatope', url, post=post, headers=headers).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    elif alt_find_elitedivx in url:
+        hay_proxies = False
+        if config.get_setting('channel_elitedivx_proxies', default=''): hay_proxies = True
+
+        if not url.startswith(alt_find_elitedivx):
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('elitedivx', url, post=post, headers=headers).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    elif alt_find_dontorrent21 in url:
+        hay_proxies = False
+        if config.get_setting('channel_dontorrent21_proxies', default=''): hay_proxies = True
+
+        if not url.startswith(alt_find_divxatope):
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('dontorrent21', url, post=post, headers=headers).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    elif alt_find_mejortorrentin in url:
+        hay_proxies = False
+        if config.get_setting('channel_mejortorrenin_proxies', default=''): hay_proxies = True
+
+        if not url.startswith(alt_find_mejortorrentin):
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('mejortorrentin', url, post=post, headers=headers).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    elif alt_find_reinventorrent in url:
+        hay_proxies = False
+        if config.get_setting('channel_reinventorrent_proxies', default=''): hay_proxies = True
+
+        if not url.startswith(alt_find_reinventorrent):
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('reinventorrent', url, post=post, headers=headers).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    else:
+        hay_proxies = False
+        if config.get_setting('channel_todotorrents_proxies', default=''): hay_proxies = True
+
+        if not url.startswith(alt_find_todotorrents):
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+        else:
+            if hay_proxies:
+                data = httptools.downloadpage_proxy('todotorrents', url, post=post, headers=headers).data
+            else:
+                data = httptools.downloadpage(url, post=post, headers=headers).data
 
     return data
 
@@ -211,6 +365,10 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='cyan' ))
 
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', text_color='tan' ))
+
     itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie', tipo = 'genero' ))
@@ -232,15 +390,11 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/page/1', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
-
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='cyan' ))
 
-    itemlist.append(item.clone( title = 'Catálogo HD', action = 'list_all', url = host + 'series/hd/page/1', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'series/4K/page/1', search_type = 'tvshow', text_color='moccasin' ))
 
-    itemlist.append(item.clone( title = 'Catálogo HD (alfabético)', action = 'list_all', url = host + 'series/hd/letra-.', search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'tv-series', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'series/hd/page/1', search_type = 'tvshow', text_color='tan' ))
 
     return itemlist
 
@@ -255,11 +409,7 @@ def mainlist_documentary(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'documentales/page/1', search_type = 'documentary'))
 
-    itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'documentales/letra-.', search_type = 'documentary'))
-
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='cyan' ))
-
-    itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'documentales', search_type = 'documentary' ))
 
     return itemlist
 
@@ -268,10 +418,21 @@ def calidades(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', search_type = 'movie', text_color='moccasin' ))
+    # ~ Alternative Webs Clons  No existen las opciones
 
-    return itemlist
+    data = do_downloadpage(host)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, 'id="calidadx"(.*?)</select>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<option>(.*?)</option>')
+
+    for qlty in matches:
+        url = host + 'peliculas/buscar'
+
+        itemlist.append(item.clone( title = qlty, url = url, qlty = qlty, tipo = 'qltys', action = 'call_post', text_color='moccasin' ))
+
+    return sorted(itemlist, key=lambda x: x.title)
 
 
 def generos(item):
@@ -298,7 +459,9 @@ def generos(item):
        ]
 
     for genre in genres:
-        itemlist.append(item.clone( action = "call_post", title = genre, url = host + 'peliculas/buscar', tipo='genero', genre=genre, text_color = 'deepskyblue' ))
+        url = host + 'peliculas/buscar'
+
+        itemlist.append(item.clone( action = "call_post", title = genre, url = url, tipo='genero', genre=genre, text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -404,12 +567,13 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
+        next_page = scrapertools.find_single_match(data, '<a class="page-link" href="([^"]+)">Siguiente')
+        if not next_page: next_page = scrapertools.find_single_match(data, '<a class="page-link".*?<li class="page-item">.*?href="([^"]+)".*?<i class="fas fa-chevron-right">')
 
-        if next_url:
-            next_url = host[:-1] + next_url
+        if next_page:
+            next_page = host[:-1] + next_page
 
-            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -418,18 +582,42 @@ def list_last(item):
     logger.info()
     itemlist = []
 
-    if item.search_type == "movie": search_type = "PELÍCULAS"
-    elif item.search_type == "tvshow": search_type = "SERIES"
-    elif item.search_type == "documentary": search_type = "DOCUMENTALES"
-
     data = do_downloadpage(item.url)
 
     if not data: return itemlist
 
-    match = re.compile("""(?s)<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>""" % (search_type)).findall(data)[0]
+    if item.search_type == "movie": search_type = "PELÍCULAS"
+    elif item.search_type == "tvshow": search_type = "SERIES"
+    elif item.search_type == "documentary": search_type = "DOCUMENTALES"
+
+    try:
+        match = re.compile("""(?s)<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>""" % (search_type)).findall(data)[0]
+    except:
+        try:
+            match = re.compile("""(?s)<div class="h5 text-dark">%s:<\/div>(.*?)<br></div>""" % (search_type)).findall(data)[0]
+        except:
+            match = ''
+
     matches = re.compile(r"""<span class="text-muted">\d+-\d+-\d+<\/span> <a href='([^']+)' class="text-primary">([^<]+)""").findall(match)
 
+    if not matches:
+        if item.search_type == "movie": search_type = "PELICULAS"
+        elif item.search_type == "tvshow": search_type = "SERIES"
+        elif item.search_type == "documentary": search_type = "DOCUMENTALES"
+
+        if not '<div class="h5 text-dark">' in data:
+            data = data.replace("<div class='h5 text-dark'>", '<div class="h5 text-dark">')
+            data = data.replace("<span class='text-muted'>", '<span class="text-muted">')
+            data = data.replace("class='text-primary'>", 'class="text-primary">')
+
+        try:
+            bloque = re.compile('<div class="h5 text-dark">%s:<\/div>(.*?)<br><br>' % (search_type)).findall(data)[0]
+            matches = re.compile('<span class="text-muted">.*?' + "<a href='(.*?)'.*?" + 'class="text-primary">(.*?)</a>').findall(bloque)
+        except: return itemlist
+
     for url, title in matches:
+        title = title.replace('&#039;', "'")
+
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
             elif "[" in title: titulo = title.split("[")[0]
@@ -463,6 +651,11 @@ def call_post(item):
 
     elif item.tipo == 'genero':
         item.post = "campo=%s&valor=&valor2=%s&valor3=&valor4=&pagina=%s" % ('genero', item.genre, str(item.page))
+
+        item.contentType = item.search_type
+
+    elif item.tipo == 'qltys':
+        item.post = "campo=%s&valor=&valor2=&valor3=&valor5=%s&pagina=%s" % ('tiporip', item.qlty, str(item.page))
 
         item.contentType = item.search_type
 
@@ -535,9 +728,13 @@ def episodios(item):
     matches = re.compile(patron).findall(data)
 
     if not matches:
-        matches = scrapertools.find_multiple_matches(data, "<td style='vertical-align.*?>(.*?)</td>.*?<a.*?href='(.*?)'.*?download>Descargar</a>.*?</tr>")
+        matches = scrapertools.find_multiple_matches(data, "<tr>.*?<td style='vertical-align.*?>(.*?)</td>.*?" + 'data-content-id="(.*?)".*?</tr>')
 
-    for title, url in matches:
+        # ~ Alternative Webs Clons
+        if not matches:
+            matches = scrapertools.find_multiple_matches(data, "<td style='vertical-align.*?>(.*?)</td>.*?<a.*?href='(.*?)'.*?download>Descargar</a>.*?</tr>")
+
+    for title, id in matches:
         s_e = scrapertools.get_season_and_episode(title)
 
         try:
@@ -548,9 +745,9 @@ def episodios(item):
            season = 0
            episode = i
 
-        if url.startswith("//"): url = "https:" + url
+        titulo = str(season) + 'x' + str(episode) + ' ' + item.contentSerieName
 
-        itemlist.append(item.clone( action='findvideos', url=url, title="%s %s" % (title, item.contentSerieName),
+        itemlist.append(item.clone( action='findvideos', url = item.url, id = id, title = titulo,
                                     language = 'Esp', contentSeason = season, contentType = 'episode', contentEpisodeNumber = episode ))
 
     tmdb.set_infoLabels(itemlist)
@@ -558,42 +755,191 @@ def episodios(item):
     return itemlist
 
 
+def nonce_gen(_challenge, difficulty=3):
+    nonce = 0
+
+    target = '0' * difficulty
+
+    while True:
+          text = _challenge + str(nonce)
+          hash_hex = hashlib.sha256(text.encode()).hexdigest()
+
+          if hash_hex.startswith(target): return nonce 
+
+          nonce += 1
+
+          if nonce % 1000 == 0: time.sleep(0.1)
+
+
 def findvideos(item):
     logger.info()
     itemlist = []
 
-    if item.contentType == "episode":
-        url = item.url
-        qlty = ''
+    url = ''
 
-    elif not item.contentType == "tvshow":
+    _tabla = '"peliculas\"'
+
+    if item.contentType == "episode": _tabla = '"series\"'
+    else:
+        if item.contentType == 'documentary' or item.contentExtra == 'documentary': _tabla = _tabla = '"documentales\"'
+
+    if not item.id:
         data = do_downloadpage(item.url)
 
-        qlty = scrapertools.find_single_match(data, '<b class="bold">Formato:</b>(.*?)</p>').strip()
+        _id = scrapertools.find_single_match(data, 'data-content-id="(.*?)"')
+    else:
+        _id = item.id
+
+    # ~ Alternative Webs Clons
+    if url.startswith("//"): url = "https:" + url
+
+    if _id:
+        headers = {'Referer': item.url, 'Content-Type': 'application/json'}
+
+        post1 = '{\"action\": \"generate\", \"content_id\": %s, \"tabla\": %s}' % (_id, _tabla)
+
+        api = host + 'api_validate_pow.php/'
+
+        data1 = do_downloadpage(api, post = post1, headers = headers)
+
+        _challenge = scrapertools.find_single_match(str(data1), '"challenge":.*?"(.*?)"')
+
+        if _challenge:
+            _nonce = nonce_gen(_challenge)
+
+            post2 = '{\"action\": \"validate\", \"challenge\": "%s", \"nonce\": "%s", \"unescape\": "False"}' % (_challenge, _nonce)
+
+            data2 = do_downloadpage(api, post = post2, headers = headers)
+
+            url = ''
+
+            if '"success"' in str(data2):
+                url = scrapertools.find_single_match(str(data2), '"download_url":.*?"(.*?)"')
+
+                url = url.replace('\\/', '/')
+
+        # ~ Orden Alternative Webs Findvideos
+        if not host in alt_web_clons:
+            if not url:
+                item.url = item.url.replace(host, alt_find_mejortorrentin)
+
+                url = alternative_find(item, 'MejorTorrentIn')
+
+            if not url:
+                item.url = item.url.replace(host, alt_find_dontorrent21)
+
+                url = alternative_find(item, 'DonTorrent21')
+
+            if not url:
+                item.url = item.url.replace(host, alt_find_reinventorrent)
+
+                url = alternative_find(item, 'ReinvenTorrent')
+
+            if not url:
+                item.url = item.url.replace(host, alt_find_todotorrents)
+
+                url = alternative_find(item, 'TodoTorrents')
+
+            if not url:
+                item.url = item.url.replace(host, alt_find_elitedivx)
+
+                url = alternative_find(item, 'EliteDivx')
+
+            if not url:
+                item.url = item.url.replace(host, alt_find_divxatope)
+
+                url = alternative_find(item, 'DivxATope')
+
+    # ~ Alternative Webs Clons
+    if not url:
+        if item.contentType == "episode":
+            url = item.url
+            qlty = ''
+
+        elif not item.contentType == "tvshow":
+            data = do_downloadpage(item.url)
+
+            qlty = scrapertools.find_single_match(data, '<b class="bold">Formato:</b>(.*?)</p>').strip()
+
+            patron = '<div class="text-center">.*?'
+            patron += "href='([^']+)'.*?download>Descargar</a>"
+            url = scrapertools.find_single_match(data, patron)
+
+            if not url:
+                if item.contentType == 'documentary' or item.contentExtra == 'documentary':
+                    patron = '<b class="bold">Formato:</b>.*?'
+                    patron += "href='([^']+)'.*?download>Descargar</a>"
+
+                    url = scrapertools.find_single_match(data, patron)
+
+            if url:
+                url = url if url.startswith("http") else "https:" + url
+        else:
+            url = item.url
+            qlty = ''
+
+        if url:
+            if not url == 'https:':
+               lang = 'Esp'
+
+               servidor = 'torrent'
+               other = ''
+
+               if url.endswith(".torrent"): pass
+               elif url.startswith('magnet:'): other = 'magnet'
+               else:
+                  servidor = 'directo'
+                  if '/ttlinks.live/' in url: other = 'ttlinks'
+
+               itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url, server = servidor, other = other))
+
+    if not url:
+        platformtools.dialog_ok(config.__addon_name + ' - DonTorrents', '[COLOR red][B]No se pudo obtener los enlaces.[/B][/COLOR]', '[COLOR cyan][B]Intentélo desde cualquiera de sus Clones.[/B][/COLOR]', 'Vea cuales son sus Clones en [B][COLOR turquoise]Acciones[/COLOR] [COLOR plum](si no hay resultados)[/B][/COLOR]')
+        return
+
+    if not 'http' in url: url = 'https:' + url
+
+    itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = 'Esp', url = url, server = 'torrent'))
+
+    return itemlist
+
+
+def alternative_find(item, canal):
+    logger.info()
+
+    url = ''
+
+    if item.contentType == "episode":
+        data = alt_do_downloadpage(item.url)
+
+        url = scrapertools.find_single_match(data, "<td style='vertical-align.*?'>" + str(item.contentSeason) + 'x' + str(item.contentEpisodeNumber) + "</td>.*?href='(.*?)'.*?>Descargar<")
+
+        if url:
+            url = url if url.startswith("http") else "https:" + url
+
+    elif not item.contentType == "tvshow":
+        data = alt_do_downloadpage(item.url)
 
         patron = '<div class="text-center">.*?'
-        patron += "href='([^']+)'.*?download.*?Descargar</a>"
+        patron += "href='([^']+)'.*?download>Descargar</a>"
+
         url = scrapertools.find_single_match(data, patron)
 
         if not url:
             if item.contentType == 'documentary' or item.contentExtra == 'documentary':
                 patron = '<b class="bold">Formato:</b>.*?'
-                patron += "href='([^']+)'.*?download.*?Descargar</a>"
+                patron += "href='([^']+)'.*?download>Descargar</a>"
+
                 url = scrapertools.find_single_match(data, patron)
 
         if url:
             url = url if url.startswith("http") else "https:" + url
-    else:
-        url = item.url
-        qlty = ''
 
     if url:
-        if not url == 'https:':
-           lang = 'Esp'
+        if config.get_setting('channels_re_charges', default=True):
+            platformtools.dialog_notification('DonTorrents - [COLOR palegreen]Acceso alternativo[/COLOR]', '[COLOR cyan][B]' + canal + '[/B][/COLOR]')
 
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url, server = 'torrent'))
-
-    return itemlist
+    return url
 
 
 def play(item):
@@ -619,6 +965,45 @@ def play(item):
         else:
             itemlist.append(item.clone( url = item.url, server = 'torrent' ))
 
+        return itemlist
+
+    if 'magnet' in item.url:
+        itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+        return itemlist
+
+    host_torrent = alt_find_divxatope[:-1]
+    url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+    if not url_base64:
+        host_torrent = alt_find_dontorrent21[:-1]
+        url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+    if not url_base64:
+        host_torrent = alt_find_[mejortorrentin:-1]
+        url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+    if url_base64.startswith('magnet:'):
+        itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+
+    elif url_base64.endswith(".torrent"):
+        if config.get_setting('proxies', item.channel, default=''):
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(url_base64, 'divxatope')
+            else:
+                data = do_downloadpage(url_base64)
+
+            if data:
+                if '<h1>Not Found</h1>' in str(data) or '<!DOCTYPE html>' in str(data) or '<!DOCTYPE>' in str(data):
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        else:
+            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+
     return itemlist
 
 
@@ -626,33 +1011,57 @@ def list_search(item):
     logger.info()
     itemlist = []
 
-    headers = {'Referer': host}
+    if not item.page: item.page = 1
 
-    data = do_downloadpage(item.url, headers=headers)
+    # ~ Alternative Webs Clons
+    if web_clon:
+        headers = {'Referer': host}
+
+        data = do_downloadpage(item.url, headers=headers)
+
+        bloque = data
+    else:
+        headers = {'Referer': web_search_dontorrent}
+
+        post = {'valor': item.tex, 'Buscar': 'Buscar', 'p': str(item.page)}
+
+        data = do_downloadpage(item.url, post = post, headers = headers)
+
+        new_web_search_dontorrent = scrapertools.find_single_match(data, '<meta property="og:url" content="(.*?)"')
+
+        if new_web_search_dontorrent:
+            if not new_web_search_dontorrent == web_search_dontorrent:
+                headers = {'Referer': new_web_search_dontorrent}
+
+                post = {'valor': item.tex, 'Buscar': 'Buscar', 'p': str(item.page)}
+
+                data = do_downloadpage(new_web_search_dontorrent, post = post, headers = headers)
+
+        bloque = scrapertools.find_single_match(data, '>Resultados<(.*?)</nav>')
 
     patron = "<a href='(.*?)'.*?"
     patron += 'class="text-decoration-none">(.*?)</a>'
 
-    matches = re.compile(patron).findall(data)
+    matches = re.compile(patron).findall(bloque)
 
     for url, title in matches:
         title = title.replace('<span class="text-secondary">', '').replace('<span class="text-secondary" >', '').replace('</span>', '').strip()
 
         if not url or not title: continue
 
-        if "pelicula" in url: contentType = "movie"
-        elif "documental" in url: contentType = "documentary"
+        if "/pelicula/" in url: contentType = "movie"
+        elif "/documental/" in url: contentType = "documentary"
         else: contentType = "tvshow"
 
         if item.search_type not in ['all', contentType]: continue
 
         sufijo = ''
+
         if item.search_type == 'all': 
             sufijo = contentType
-            if sufijo == "documentary":
-                sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+            if sufijo == "documentary": sufijo = '[COLOR cyan]Documental[/COLOR]'
 
-        if contentType == 'tvshow':
+        if contentType == 'tvshow' or item.search_type == 'all':
             if not item.search_type == 'all':
                 if item.search_type == "movie": continue
 
@@ -660,10 +1069,10 @@ def list_search(item):
 
             title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo, 
+            itemlist.append(item.clone( action='episodios', url=host[:-1] + url, title=title, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': "-"} ))
 
-        if contentType == 'movie' or contentType == "documentary":
+        if contentType == 'movie' or contentType == "documentary" or item.search_type == 'all':
             if not item.search_type == 'all':
                 if item.search_type == "tvshow": continue
 
@@ -681,15 +1090,12 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        if '>Siguiente<' in data:
-             next_page = scrapertools.find_single_match(data, '<a class="page-link".*?current="page">.*?li class="page-item"><a class="page-link".*?href="(.*?)"')
-
-             if next_page:
-                 next_page = host[:-1] + next_page
-
-                 itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_search', text_color='coral' ))
+        if '<nav class="page-navigator"' in data:
+             if 'onclick="buscarPagina' in data:
+                 itemlist.append(item.clone( title='Siguientes ...', url = item.url, page = item.page + 1, action='list_search', text_color='coral' ))
 
     return itemlist
+
 
 def corregir_SerieName(SerieName):
     logger.info()
@@ -724,10 +1130,20 @@ def corregir_SerieName(SerieName):
     return SerieName
 
 
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
+
+
 def search(item, texto):
     logger.info()
     try:
-       item.url = host + 'buscar/' + texto
+       item.url = web_search_dontorrent + 'buscar/'
+       item.tex = texto
        return list_search(item)
     except:
        import sys

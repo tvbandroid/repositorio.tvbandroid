@@ -2,8 +2,7 @@
 
 import re
 
-
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -51,7 +50,8 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
-        title = scrapertools.find_single_match(match, ' alt="(.*?)"')
+
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
 
@@ -82,13 +82,22 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
+    i = 0
+
     url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
     if url:
+        i += 1
+
         servidor = servertools.get_server_from_url(url)
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vo' ))
+
+    if not itemlist:
+        if not i == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

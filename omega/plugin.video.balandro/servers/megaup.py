@@ -57,22 +57,28 @@ def get_video_url(page_url, url_referer=''):
 
     data = httptools.downloadpage(page_url).data
 
-    if ">File not found<" in data:
+    if ">File not found<" in data or ">File Not Found<" in data:
         return "Archivo inexistente ó eliminado"
 
     msg_error = scrapertools.find_single_match(data, "<li class='no-side-margin'>([^<]+)</li>")
 
     if "no longer available!" in msg_error:
         return "Archivo inexistente ó eliminado"
+
     elif msg_error:
         return msg_error
 
-    url = scrapertools.find_single_match(data, "href='([^']+)'>download now</a>")
+    url = scrapertools.find_single_match(data, "href='([^']+)'.*?>DOWNLOAD / VIEW NOW<")
 
     if url:
-        headers = {'Referer': page_url}
+        resp = httptools.downloadpage(url)
 
-        url = httptools.downloadpage(url, headers=headers, follow_redirects=False, only_headers=True).headers.get('location', '')
+        if not resp.sucess:
+            return 'CloudFlare Human Verify'
+
+        data = resp.data
+
+        url = scrapertools.find_single_match(data, '.*?in a few seconds.*?<a href="(.*?)"')
 
         if url:
             video_urls.append(['mp4', url])
@@ -91,6 +97,9 @@ def get_video_url(page_url, url_referer=''):
 
             try:
                 import_libs('script.module.resolveurl')
+
+                if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                    import_libs('script.module.cloudrequest')
 
                 import resolveurl
                 page_url = ini_page_url
@@ -117,18 +126,31 @@ def get_video_url(page_url, url_referer=''):
                     trace = traceback.format_exc()
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
+
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
 
                     elif 'File cannot be located or removed' in trace:
                        return 'Acceso Denegado CloudFlare'
 
+                    elif 'Cloudflare challenge' in trace:
+                       return 'Cloudflare Challenge Check'
+
+                elif "No module named 'cloudscraper'" in traceback.format_exc():
+                    return 'Falta script.module.cloudrequest'
+
+                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                    return 'Archivo inexistente'
+
                 elif '<urlopen error' in traceback.format_exc():
                     return 'No se puede establecer la conexión'
 
                 return 'Sin Respuesta ResolveUrl'
 
-    new_url = scrapertools.find_single_match(data, '<a class="btn btn-default" href="(.*?)"')
+        else:
+            return 'Falta ResolveUrl'
+
+    new_url = scrapertools.find_single_match(data, '<a class="btn btn-default".*?href="(.*?)"')
 
     if new_url:
         data_new_url = httptools.downloadpage(new_url).data
@@ -153,6 +175,9 @@ def get_video_url(page_url, url_referer=''):
 
             try:
                 import_libs('script.module.resolveurl')
+
+                if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                    import_libs('script.module.cloudrequest')
 
                 import resolveurl
                 page_url = ini_page_url
@@ -179,15 +204,28 @@ def get_video_url(page_url, url_referer=''):
                    trace = traceback.format_exc()
                    if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                        return 'Archivo inexistente ó eliminado'
+
                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                        return 'Fichero sin link al vídeo ó restringido'
 
+                   elif 'Cloudflare challenge' in trace:
+                       return 'Cloudflare Challenge Check'
+
                    elif 'File cannot be located or removed' in trace:
-                      return 'Acceso Denegado CloudFlare'
+                       return 'Acceso Denegado CloudFlare'
+
+               elif "No module named 'cloudscraper'" in traceback.format_exc():
+                   return 'Falta script.module.cloudrequest'
+
+               elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                   return 'Archivo inexistente'
 
                elif '<urlopen error' in traceback.format_exc():
                    return 'No se puede establecer la conexión'
 
                return 'Sin Respuesta ResolveUrl'
+
+        else:
+            return 'Falta ResolveUrl'
 
     return video_urls

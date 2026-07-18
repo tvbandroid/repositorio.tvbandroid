@@ -23,13 +23,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if descartar_xxx: return itemlist
-
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -58,6 +57,8 @@ def canales(item):
 
     for url, title, thumb in matches:
         title = title.capitalize()
+
+        thumb = thumb.replace("366x206", "320x180")
 
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, thumbnail = thumb, text_color = 'violet' ))
 
@@ -107,8 +108,8 @@ def pornstars(item):
         next_url = scrapertools.find_single_match(data, '<li class="page-current">.*?<a href="(.*?)"')
 
         if next_url:
-            itemlist.append(item.clone( title = 'Siguientes ...', action = 'pornstars', url = next_url if next_url.startswith('http') else host[:-1] + next_url,
-                                        text_color = 'coral' ))
+            itemlist.append(item.clone( title = 'Siguientes ...', action = 'pornstars', url = next_url if next_url.startswith('http') else host[:-1] + next_url, text_color = 'coral' ))
+
 
     return itemlist
 
@@ -128,6 +129,8 @@ def list_all(item):
         if '</i>' in time: time = scrapertools.find_single_match(time, '</i>(.*?)$')
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
+
+        thumb = thumb.replace("366x206", "320x180")
 
         itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
@@ -153,6 +156,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
@@ -160,7 +170,7 @@ def findvideos(item):
 
     if not vid_id: return itemlist
 
-    url = item.url + '/?video_id=' + vid_id
+    url = item.url + '?video_id=' + vid_id
 
     data = do_downloadpage(url)
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
@@ -172,7 +182,6 @@ def findvideos(item):
     url = vid_url
 
     servidor = servertools.get_server_from_url(url)
-    servidor = servertools.corregir_servidor(servidor)
 
     url = servertools.normalize_url(servidor, url)
 
@@ -184,6 +193,8 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
+        config.set_setting('search_last_video', texto)
+
         item.tex = texto.replace(" ", "+") + '/'
         item.url = host + 'search/' + item.tex
         return list_all(item)

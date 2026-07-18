@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
@@ -12,8 +12,7 @@ def mainlist(item):
     logger.info()
     itemlist = []
 
-    # ~ reCaptcha
-    # ~ itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'all'))
 
@@ -80,14 +79,25 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
+    i = 0
+
     url = scrapertools.find_single_match(data, '<meta itemprop="embedUrl" content="(.*?)"')
     if not url: url = scrapertools.find_single_match(data, "<meta itemprop='embedUrl' content='(.*?)'")
 
     if url:
+        i += 1
+
         servidor = servertools.get_server_from_url(url)
 
+        url = url.replace('/www.youtube-nocookie.com/', '/www.youtube.com/')
+
         if servidor and servidor != 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor, language = 'Vo' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, language = 'Vo' ))
+
+    if not itemlist:
+        if not i == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -95,7 +105,7 @@ def findvideos(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + 'search/?results=' + texto.replace(" ", "+")
+        item.url = host + 'search/?s=' + texto.replace(" ", "+")
         return list_all(item)
     except:
         import sys

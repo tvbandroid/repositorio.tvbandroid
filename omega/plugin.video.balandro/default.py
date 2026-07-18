@@ -3,164 +3,212 @@
 import sys
 
 if sys.version_info[0] < 3:
+    PY3 = False
     import urllib2
 else:
+    PY3 = True
     import urllib.error as urllib2
 
 
-import os
+import os, traceback
 
-from platformcode import config, logger, platformtools, updater
+
+from platformcode import config
+
+# ~ Primera Ejecución
+if str(config.get_setting('PY3')) == '': config.set_setting('PY3', PY3)
+
+
+from platformcode import logger, platformtools, updater
 from core.item import Item
+from core import servertools
 
 from platformcode.config import WebErrorException
 
 
+txt_pys = '[COLOR yellow]Película y/ó Serie[/COLOR] texto a buscar ...'
+txt_pel = '[COLOR deepskyblue]Película[/COLOR] texto a buscar ...'
+txt_ser = '[COLOR hotpink]Serie[/COLOR] texto a buscar ...'
+txt_doc = '[COLOR cyan]Documental[/COLOR] texto a buscar ...'
+txt_tor = '[COLOR blue]Torrent[/COLOR] [COLOR yellow]Película y/ó Serie[/COLOR] texto a buscar ...'
+txt_dor = '[COLOR firebrick]Dorama[/COLOR] texto a buscar ...'
+txt_ani = '[COLOR springgreen]Anime[/COLOR] texto a buscar ...'
+txt_lis = '[COLOR greenyellow]Lista[/COLOR] texto a buscar ...'
+txt_per = '[COLOR tan]Persona[/COLOR] texto a buscar ...'
+txt_vid = '[COLOR darkorange]+18 Vídeo[/COLOR] texto a buscar ...'
+txt_yt  = '[COLOR darksalmon]Youtube[/COLOR] texto a buscar ...'
+
+
+# ~ Obtener parámetros ejecución
 logger.info('[COLOR blue]Starting with %s[/COLOR]' % sys.argv[1])
 
-# ~ Obtener parámetros de lo que hay que ejecutar
+if sys.argv[2]: item = Item().fromurl(sys.argv[2])
+else: item = Item(channel='mainmenu', action='mainlist')
 
-if sys.argv[2]:
-    item = Item().fromurl(sys.argv[2])
-else:
-    item = Item(channel='mainmenu', action='mainlist')
 
 sys.path.append(os.path.join(config.get_runtime_path(), 'lib'))
 
 
-# ~ Establecer si channel es un canal web o un módulo
-
+# ~ Establecer si channel es un canal ó un módulo
 tipo_channel = ''
 
-if item.channel == '' or item.action == '':
-    logger.info('Empty channel/action, nothing to do')
-
+if item.channel == '' or item.action == '': logger.info('Empty channel/action, Nothing to do')
 else:
-    # ~ channel puede ser un canal web o un módulo
+    # ~ channel puede ser un canal ó un módulo
     path = os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")
-    if os.path.exists(path):
-        tipo_channel = 'channels.'
+    if os.path.exists(path): tipo_channel = 'channels.'
     else:
         path = os.path.join(config.get_runtime_path(), 'modules', item.channel + ".py")
-        if os.path.exists(path):
-            tipo_channel = 'modules.'
-        else:
-            logger.error('Channel/Module not found, nothing to do')
+        if os.path.exists(path): tipo_channel = 'modules.'
+        else: tipo_channel = 'modules.'
 
 
-# ~ Ejecutar según los parámetros recibidos
-
+# ~ Ejecutar según parámetros
 if tipo_channel != '':
     try:
         canal = __import__(tipo_channel + item.channel, fromlist=[''])
 
-        # ~ findvideos se considera reproducible y debe acabar haciendo play (o play_fake en su defecto)
+        # ~ findvideos se considera reproducible y debe acabar haciendo play (ó play_fake en su defecto)
         if item.action == 'findvideos':
-            if hasattr(canal, item.action):
-                itemlist = canal.findvideos(item)
-            else:
-                from core import servertools
-                itemlist = servertools.find_video_items(item)
+            if hasattr(canal, item.action): itemlist = canal.findvideos(item)
+            else: itemlist = servertools.find_video_items(item)
 
             platformtools.play_from_itemlist(itemlist, item)
-
         else:
             # ~ search pide el texto a buscar antes de llamar a la rutina del canal (pasar item.buscando para no mostrar diálogo)
             if item.action == 'search':
-                if item.buscando != '':
-                    tecleado = item.buscando
+                if item.buscando != '': tecleado = item.buscando
                 else:
                     last_search = config.get_last_search(item.search_type)
 
-                    search_type = ''
+                    txt_search = txt_pys
 
                     if item.search_type == 'all':
                         if item.search_pop:
-                            last_search = config.get_setting('search_last_list')
-                            search_type = 'para [COLOR yellow]Listas[/COLOR]'
+                            last_search = config.get_last_search('list')
+                            txt_search = txt_lis
+                        elif item.search_video:
+                            last_search = config.get_last_search('video')
+                            txt_search = txt_vid
+                        elif item.search_special == 'torrent':
+                            last_search = config.get_last_search('torrent')
+                            txt_search = txt_tor
+                        elif item.search_special == 'dorama':
+                            last_search = config.get_last_search('dorama')
+                            txt_search = txt_dor
+                        elif item.search_special == 'anime':
+                            last_search = config.get_last_search('anime')
+                            txt_search = txt_ani
+                        elif item.search_special == 'youtube':
+                            last_search = config.get_last_search('youtube')
+                            txt_search = txt_yt
+                        else: last_search = config.get_last_search('all')
 
                     elif item.search_type == 'movie':
-                        if item.search_video: search_type = 'para [COLOR yellow]Vídeos[/COLOR]'
-                        else: search_type = 'para [COLOR yellow]Películas[/COLOR]'
+                        if item.search_video:
+                            last_search = config.get_last_search('video')
+                            txt_search = txt_vid
+                        else: txt_search = txt_pel
 
-                    elif item.search_type == 'tvshow': search_type = 'para [COLOR yellow]Series[/COLOR]'
+                    elif item.search_type == 'tvshow': txt_search = txt_ser
+                    elif item.search_type == 'documentary': txt_search = txt_doc
+                    elif item.search_type == 'person': txt_search = txt_per
 
-                    elif item.search_type == 'documentary': search_type = 'para [COLOR yellow]Documentales[/COLOR]'
-                    elif item.search_type == 'person': search_type = 'para [COLOR yellow]Personas[/COLOR]'
+                    elif item.search_special == 'torrent': txt_search = txt_tor
+                    elif item.search_special == 'dorama': txt_search = txt_dor
+                    elif item.search_special == 'anime': txt_search = txt_ani
+                    elif item.search_special == 'youtube': txt_search = txt_yt
 
-                    elif item.search_special == 'torrent': search_type = 'para [COLOR yellow]Torrents[/COLOR]'
-                    elif item.search_special == 'anime': search_type = 'para [COLOR yellow]Animes[/COLOR]'
-                    elif item.search_special == 'dorama': search_type = 'para [COLOR yellow]Doramas[/COLOR]'
+                    else:
+                        if item.search_video:
+                            last_search = config.get_last_search('video')
+                            txt_search = txt_vid
 
-                    tecleado = platformtools.dialog_input(last_search, 'Texto a buscar ' + search_type)
+                    tecleado = platformtools.dialog_input(last_search, txt_search)
 
                 if tecleado is not None and tecleado != '':
                     itemlist = canal.search(item, tecleado)
 
                     if item.buscando == '':
-                        search_type = item.search_type
+                        last_bus = item.search_type
 
-                        if item.search_pop: search_type = 'search_last_list'
-                        elif item.search_video: search_type = 'search_last_video'
+                        if item.search_type == 'all':
+                            if item.search_pop: last_bus = 'list'
+                            elif item.search_video: last_bus = 'video'
+                            elif item.search_special == 'torrent': last_bus = 'torrent'
+                            elif item.search_special == 'dorama': last_bus = 'dorama'
+                            elif item.search_special == 'anime': last_bus = 'anime'
+                            elif item.search_special == 'youtube': last_bus = 'youtube'
+                            else: last_bus = 'all'
 
-                        config.set_last_search(search_type, tecleado)
+                        elif item.search_type == 'movie':
+                            if item.search_video: last_bus = 'video'
+                            else: last_bus = 'movie'
+
+                        elif item.search_pop: last_bus = 'list'
+
+                        elif item.search_video: last_bus = 'video'
+
+                        elif item.search_type == 'person': last_bus = 'person'
+
+                        elif item.search_special == 'torrent': last_bus = 'torrent'
+                        elif item.search_special == 'dorama': last_bus = 'dorama'
+                        elif item.search_special == 'anime': last_bus = 'anime'
+                        elif item.search_special == 'youtube': last_bus = 'youtube'
+
+                        if last_bus: config.set_last_search(last_bus, tecleado)
                 else:
                     itemlist = []
-                    # ~ (desactivar si provoca ERROR: GetDirectory en el log)
+                    # ~ Desactivar si provoca ERROR: GetDirectory en el Log
                     item.folder = False
                     itemlist = False
 
-            # ~ cualquier otra acción se ejecuta en el canal, y se renderiza si devuelve una lista de items
+            # ~ Cualquier otra acción se ejecuta en el canal, y se renderiza si devuelve una lista de items
             else:
                 if hasattr(canal, item.action):
                     func = getattr(canal, item.action)
                     itemlist = func(item)
                 else:
                     # ~ Si item.folder kodi espera un listado
-                    logger.info('Action not found in channel')
+                    logger.info('Action Not Found in channel')
                     itemlist = [] if item.folder else False
 
             if type(itemlist) == list:
-                logger.info('renderizar itemlist')
+                logger.info('Renderizar itemlist')
                 platformtools.render_items(itemlist, item)
 
             elif itemlist == None:
-                # ~ Si kodi espera un listado (desactivar si provoca ERROR: GetDirectory en el log)
-                logger.info('sin renderizar')
+                # ~ Si kodi espera un listado (Desactivar si provoca ERROR: GetDirectory en el Log)
+                logger.info('Sin renderizar')
                 platformtools.render_no_items()
 
-            elif itemlist == True:
-                logger.info('El canal ha ejecutado correctamente una acción que no devuelve ningún listado.')
+            elif itemlist == True: logger.info('El canal ha ejecutado Correctamente una acción que no devuelve ningún listado.')
 
-            elif itemlist == False:
-                logger.info('El canal ha ejecutado una acción que no devuelve ningún listado.')
+            elif itemlist == False:logger.info('El canal ha ejecutado una acción que no devuelve ningún listado.') 
 
     except urllib2.URLError as e:
-        import traceback
         logger.error(traceback.format_exc())
 
         # ~ Grab inner and third party errors
         if hasattr(e, 'reason'):
             logger.error("Razon del error, codigo: %s | Razon: %s" % (str(e.reason[0]), str(e.reason[1])))
-            texto = "No se puede conectar con el servidor ó con el sitio web"
+            texto = "No se puede Conectar con el Servidor ó con el sitio Web"
             platformtools.dialog_ok(config.__addon_name, texto)
 
         # ~ Grab server response errors
         elif hasattr(e, 'code'):
-            logger.error("Codigo de error HTTP : %d" % e.code)
-            platformtools.dialog_ok(config.__addon_name, "El sitio web no funciona correctamente (error http %d)" % e.code)
+            logger.error("Codigo de error HTTP: %d" % e.code)
+            platformtools.dialog_ok(config.__addon_name, "El sitio Web no Funciona Correctamente (error http %d)" % e.code)
 
     except WebErrorException as e:
-        import traceback
         logger.error(traceback.format_exc())
 
-        # ~ Ofrecer buscar en otros canales o en el mismo canal, si está activado en la configuración
+        # ~ Ofrecer buscar en otros canales ó en el mismo canal
         if item.contentType in ['movie', 'tvshow', 'season', 'episode'] and config.get_setting('tracking_weberror_dialog', default=True):
             if item.action == 'findvideos': platformtools.play_fake()
 
             item_search = platformtools.dialogo_busquedas_por_fallo_web(item)
-            if item_search is not None:
-                platformtools.itemlist_update(item_search)
+            if item_search is not None: platformtools.itemlist_update(item_search)
 
         else:
             try: last_ver = updater.check_addon_version()
@@ -171,11 +219,10 @@ if tipo_channel != '':
 
             release = '[COLOR goldenrod][B]' + config.get_addon_version().replace('.fix', '-Fix') + str(last_ver) + ' '
 
-            platformtools.dialog_ok(release + '[COLOR red][B]Error en el canal [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]', 
-                                    '[COLOR yellowgreen][B]La web asociada a este canal, parece no estar disponible[/B][/COLOR], puede volver a intentarlo pasados unos minutos, y si el problema persiste compruebe mediante un navegador de internet la web: [COLOR cyan][B]%s[/B][/COLOR]' % (e) )
+            platformtools.dialog_ok(release + ' [COLOR red][B]Error en el Canal[/COLOR] [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]', 
+                                    '[COLOR yellowgreen][B]La Web asociada al Canal, parece No estar Disponible[/B][/COLOR], Intentélo de Nuevo pasados unos minutos, y si el Problema Persiste compruebe mediante un Navegador de Internet la Web: [COLOR cyan][B]%s[/B][/COLOR]' % (e) )
 
     except:
-        import traceback
         logger.error(traceback.format_exc())
 
         try: last_ver = updater.check_addon_version()
@@ -187,10 +234,10 @@ if tipo_channel != '':
         release = '[COLOR goldenrod][B]' + config.get_addon_version().replace('.fix', '-Fix') + str(last_ver) + ' '
 
         if item.channel in ['mainmenu', 'actions', 'domains', 'downloads', 'favoritos', 'filmaffinitylists', 'filters', 'generos', 'groups', 'helper', 'proxysearch', 'search', 'submnuctext', 'submnuteam', 'tester', 'tmdblists', 'tracking']:
-            platformtools.dialog_ok(release + '[COLOR red][B]Error inesperado en [COLOR gold]' + item.channel.capitalize() + '[/B][/COLOR]',
-                                    '[COLOR moccasin][B]Puede estar Corrupto su Fichero de [COLOR chocolate][B]Ajustes[/COLOR][COLOR goldenrod][B] de [/B][/COLOR][COLOR yellow][B]Balandro[/B][/COLOR], Pruebe a [COLOR cyan][B]Re-Instalar el Add-On[/B][/COLOR][COLOR goldenrod][B] (consulte nuestro Telegram ó Foro)[/B][/COLOR][COLOR moccasin][B], ó [/COLOR][COLOR darkcyan][B]bien hay un Error en el Add-On/Modulo.[/B][/COLOR] [COLOR chartreuse][B]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
+            platformtools.dialog_ok(release + ' [COLOR red][B]Error Inesperado en[/COLOR] [COLOR gold]' + item.channel.capitalize() + '[/B][/COLOR]',
+                                    '[COLOR moccasin][B]Puede estar Corrupto su Fichero de [/COLOR][COLOR chocolate]Ajustes[/COLOR][COLOR goldenrod] de [/COLOR][COLOR yellow]Balandro[/B][/COLOR], Pruebe a [COLOR cyan][B]Re-Instalar el Add-On[/COLOR][COLOR goldenrod] (consulte nuestro Telegram ó Foro)[/COLOR][COLOR moccasin], ó [/COLOR][COLOR darkcyan]bien hay un Error en el Add-On/Modulo.[/COLOR] [COLOR chartreuse]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
         else:
-            platformtools.dialog_ok(release + ' [COLOR red]Error inesperado en [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
-                                    '[COLOR moccasin][B]Puede deberse a un fallo de Conexión[/B][/COLOR], ó [COLOR cyan][B]la Web asociada al Canal varió su estructura[/B][/COLOR], ó [COLOR goldenrod][B]estar Corrupto su Fichero de [COLOR chocolate][B]Ajustes[/COLOR][COLOR goldenrod][B] de [/B][/COLOR][COLOR yellow][B]Balandro[/B][/COLOR][COLOR moccasin], ó [/COLOR][COLOR darkcyan][B]Hay un Error en el Add-On.[/B][/COLOR] [COLOR chartreuse][B]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
+            platformtools.dialog_ok(release + ' [COLOR red]Error Imprevisto en[/COLOR] [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
+                                    '[COLOR moccasin][B]Puede ser un Fallo de Conexión[/COLOR], ó [COLOR cyan]la Web asociada al Canal varió su estructura[/COLOR], [COLOR moccasin]ó [/COLOR][COLOR darkcyan]Hay un Error en el Add-On.[/COLOR] [COLOR chartreuse]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
 
 logger.info('[COLOR blue]Ending with %s[/COLOR]' % sys.argv[1])

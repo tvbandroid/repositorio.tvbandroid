@@ -148,7 +148,12 @@ def addFavourite(item):
 
     if not done:
         if msg:
-            if not config.get_setting('developer_mode', default=False):
+            avisar = True
+
+            if not config.get_setting('developer_team'): avisar = False
+            elif not config.get_setting('developer_mode', default=False): avisar = False
+
+            if avisar:
                 platformtools.dialog_notification(config.__addon_name, '[B][COLOR red]No se Pudo Añadir los Enlaces[/COLOR][/B]')
             else:
                 platformtools.dialog_ok(config.__addon_name, '[B][COLOR red]No se Pudieron Añadir los Enlaces[/COLOR][/B]', msg)
@@ -196,7 +201,7 @@ def mainlist(item):
             elem += 1
 
         if not count_shows == 0:
-            tit = '[COLOR %s][B]Información New Episodes[/B][/COLOR]' % color_exec
+            tit = '[COLOR %s][B]Información Nuevos episodios[/B][/COLOR]' % color_exec
             context = [ {'title': tit, 'channel': item.channel, 'action': 'info_tracking_shows'} ]
 
             tit = '[COLOR %s][B]Buscar ahora nuevos episodios[/B][/COLOR]' % color_adver
@@ -278,6 +283,7 @@ def mainlist_pelis(item):
 
     return itemlist
 
+
 def mainlist_series(item):
     logger.info()
     itemlist = []
@@ -298,6 +304,7 @@ def mainlist_series(item):
 
     for tmdb_id, infolabels in rows:
         title = valor_infolabel('tvshowtitle', infolabels)
+
         if tracking_order == 1: title += '  [COLOR gray](%s)[/COLOR]' % valor_infolabel_informado(['aired', 'year'], infolabels)
         else:
            anyo = valor_infolabel_informado(['year'], infolabels)
@@ -417,7 +424,9 @@ def serie_temporadas(item):
         titulo = '[COLOR tan]Temporada %d[/COLOR]' % season
         nombre = valor_infolabel('temporada_nombre', infolabels)
 
-        if nombre != '' and nombre != titulo and nombre != 'Season %d' % season: titulo += ' ' + nombre
+        if nombre != '' and nombre != titulo and nombre != 'Season %d' % season:
+            txt_temp = titulo.replace('[COLOR tan]','').replace('[/COLOR]', '')
+            if not nombre == txt_temp: titulo += ' ' + nombre
 
         thumbnail = valor_infolabel_informado(['temporada_poster','thumbnail'], infolabels)
         if thumbnail == '': thumbnail = item.thumbnail
@@ -569,7 +578,7 @@ def info_tracking_shows(item):
     series = db.cur.fetchall()
     db.close()
 
-    txt = '%d Series con búsqueda de nuevos episodios.' % len(series)
+    txt = '[B][COLOR cyan]%d Series con búsqueda de nuevos episodios.[/B][/COLOR]' % len(series)
 
     if config.get_setting('addon_tracking_atstart', default=True):
         interval = config.get_setting('addon_tracking_interval', default='12')
@@ -577,10 +586,11 @@ def info_tracking_shows(item):
         dt_scrap = datetime.fromtimestamp(float(lastscrap))
         txt += ' El servicio de búsqueda se ejecuta cada %d horas. Última ejecución: %s.' % (int(interval), dt_scrap.strftime('%d/%m/%Y a las %H:%M'))
     else:
-        txt += ' Servicio de búsqueda desactivado en los Ajustesc preferencias (categoria Preferidos).'
+        txt += '[CR][CR]Servicio de búsqueda Desactivado en sus [COLOR chocolate][B]Ajustes[/B][/COLOR] preferencias (categoría [COLOR wheat][B]Preferidos[/B][/COLOR]).'
 
     for tmdb_id, periodicity, tvdbinfo, lastscrap, title in series:
         txt += '[CR][CR][B][COLOR gold]%s[/COLOR][/B], con tmdb_id %s : ' % (title.encode('utf-8'), tmdb_id.encode('utf-8'))
+
         periodicity = int(periodicity)
         if periodicity == 0: txt += ' cada vez que se ejecute el servicio'
         elif periodicity == 24: txt += ' una vez al día'
@@ -595,7 +605,7 @@ def info_tracking_shows(item):
             dt_scrap = datetime.fromtimestamp(float(lastscrap))
             txt += ' Última comprobación: %s.' % dt_scrap.strftime('%A %d/%m/%Y a las %H:%M')
 
-    platformtools.dialog_textviewer('Info tracking new episodes', txt)
+    platformtools.dialog_textviewer('Información Tracking Nuevos Episodios', txt)
     return True
 
 
@@ -657,12 +667,15 @@ def acciones_peli(item):
         db.cur.execute('UPDATE movies SET updated=? WHERE tmdb_id=?', (datetime.now(), tmdb_id))
 
     elif acciones[ret] == 'Eliminar película':
-        if not platformtools.dialog_yesno('Eliminar película', '¿Confirma Eliminar la película [COLOR gold][B]%s[/B][/COLOR] con tmdb_id: %s ?' % (item.contentTitle, tmdb_id)): return False
+        if not platformtools.dialog_yesno('Eliminar película', '¿ [COLOR red][B]Confirma Eliminar la Película[/B][/COLOR] [COLOR deepskyblue][B]%s[/B][/COLOR] con tmdb_id: %s ?' % (item.contentTitle, tmdb_id)): return False
+		
+
         db.delete_movie(tmdb_id)
 
     elif acciones[ret].startswith('Eliminar enlaces del canal '):
         channel = config.quitar_colores(acciones[ret].replace('Eliminar enlaces del canal ', ''))
-        if not platformtools.dialog_yesno('Eliminar enlaces Película', '¿Confirma Elimiar los enlaces del canal [COLOR blue][B]%s[/B][/COLOR] ?' % channel): return False
+
+        if not platformtools.dialog_yesno('Eliminar enlaces Película', '¿ Confirma Elimiar los Enlaces del Canal[/B][/COLOR] [COLOR deepskyblue][B]%s[/B][/COLOR] ?' % channel): return False
 
         el_canal = str(channel)
         el_canal = el_canal.replace("b'", '').replace("'", '').strip()
@@ -684,7 +697,7 @@ def acciones_peli(item):
             txt += '[CR][CR]No hay enlaces guardados con ningún canal.'
 
         db.close()
-        platformtools.dialog_textviewer('Información de enlaces guardados', txt)
+        platformtools.dialog_textviewer('Información de Enlaces Guardados', txt)
         return True
 
     elif acciones[ret] == 'Copiar película a otra lista' or acciones[ret] == 'Mover película a otra lista':
@@ -804,12 +817,13 @@ def acciones_serie(item):
         db.cur.execute('UPDATE shows SET updated=? WHERE tmdb_id=?', (datetime.now(), tmdb_id))
 
     elif acciones[ret] == 'Eliminar serie':
-        if not platformtools.dialog_yesno('Eliminar serie', '¿Confirma Eliminar la serie [COLOR gold][B]%s[/B][/COLOR] con tmdb_id: %s ?' % (item.contentSerieName, tmdb_id)): return False
+        if not platformtools.dialog_yesno('Eliminar serie', '¿ [COLOR red][B]Confirma Eliminar la Serie[/B][/COLOR] [COLOR hotpink][B]%s[/B][/COLOR] con tmdb_id: %s ?' % (item.contentSerieName, tmdb_id)): return False
+
         db.delete_show(tmdb_id)
 
     elif acciones[ret].startswith('Eliminar enlaces del canal '):
         channel = config.quitar_colores(acciones[ret].replace('Eliminar enlaces del canal ', ''))
-        if not platformtools.dialog_yesno('Eliminar enlaces Serie', '¿Confirma Eliminar los enlaces del canal [COLOR hotpink][B]%s[/B][/COLOR] ?' % channel): return False
+        if not platformtools.dialog_yesno('Eliminar enlaces Serie', '¿ [COLOR red][B]Confirma Eliminar los Enlaces del Canal[/B][/COLOR] [COLOR hotpink][B]%s[/B][/COLOR] ?' % channel): return False
 
         el_canal = str(channel)
         el_canal = el_canal.replace("b'", '').replace("'", '').strip()
@@ -889,11 +903,10 @@ def acciones_serie(item):
             else:
                 el_canal = str(channel.encode('utf-8'))
                 el_canal = el_canal.replace("b'", '').replace("'", '').strip()
-                links_channels += ('[CR][CR]Con enlace al canal: [COLOR hotpink]%s[/COLOR] ' 'episodios sueltos.') % el_canal.capitalize()
+                links_channels += ('[CR][CR]Con enlaces al canal: [COLOR hotpink]%s[/COLOR] ' 'episodios sueltos.') % el_canal.capitalize()
 
                 txt += links_channels 
 
-        txt += '[CR][CR]Episodios por canal:'
         for (channel,) in canales:
             # ~ db.cur.execute('SELECT season, episode FROM channels_episodes WHERE tmdb_id=? AND channel=? ORDER BY season ASC, episode ASC', (tmdb_id, channel.encode('utf-8')))
             # ~ enlaces = db.cur.fetchall()
@@ -904,7 +917,10 @@ def acciones_serie(item):
 
             db.cur.execute('SELECT season, COUNT() FROM channels_episodes WHERE tmdb_id=? AND channel=? GROUP BY season ORDER BY season ASC', (tmdb_id, channel.encode('utf-8')))
             enlaces = db.cur.fetchall()
+
             if len(enlaces) > 0:
+                txt += '[CR][CR]Episodios por canal:'
+
                 links_channels = ''
 
                 for season, count in enlaces:
@@ -915,7 +931,7 @@ def acciones_serie(item):
                 txt += links_channels 
 
         db.close()
-        platformtools.dialog_textviewer('Información de enlaces guardados', txt)
+        platformtools.dialog_textviewer('Información de Enlaces Guardados', txt)
         return True
 
     elif acciones[ret] == 'Programar búsqueda automática de nuevos episodios':
@@ -1067,7 +1083,8 @@ def acciones_temporada(item):
         platformtools.dialog_notification('Temporada %d' % season, msg)
 
     elif acciones[ret].startswith('Eliminar'):
-        if not platformtools.dialog_yesno('Eliminar temporada', '¿ Confirma Eliminar la [COLOR gold][B]Temporada %d[/B][/COLOR] de la serie [COLOR gold][B]%s[/B][/COLOR] y todos sus episodios ?' % (season, item.contentSerieName)): return False
+        if not platformtools.dialog_yesno('Eliminar temporada', '¿ [COLOR red][B]Confirma Eliminar la[/B][/COLOR] [COLOR tan][B]Temporada %d[/B][/COLOR] de la serie [COLOR hotpink][B]%s[/B][/COLOR] con Todos sus Episodios ?' % (season, item.contentSerieName)): return False
+
         db = trackingtools.TrackingData()
         db.delete_season(tmdb_id, season)
         db.close(commit=True)
@@ -1100,7 +1117,8 @@ def acciones_episodio(item):
         platformtools.dialog_notification('Actualizar de TVDB', msg)
 
     elif acciones[ret].startswith('Eliminar'):
-        if not platformtools.dialog_yesno('Eliminar episodio', '¿ Confirma Eliminar el episodio [COLOR gold][B]%dx%d[/B][/COLOR] de la serie [COLOR gold][B]%s[/B][/COLOR] ?' % (season, episode, item.contentSerieName)): return False
+        if not platformtools.dialog_yesno('Eliminar episodio', '¿ [COLOR red][B]Confirma Eliminar el Episodio[/B][/COLOR] [COLOR gold][B]%dx%d[/B][/COLOR] de la serie [COLOR hotpink][B]%s[/B][/COLOR] ?' % (season, episode, item.contentSerieName)): return False
+
         db = trackingtools.TrackingData()
         db.delete_episode(tmdb_id, season, episode)
         db.close(commit=True)
@@ -1154,6 +1172,7 @@ def copiar_lista(item):
 
     # ~ 1:ShowAndGetFile
     origen = xbmcgui.Dialog().browseSingle(1, 'Selecciona el fichero .sqlite a copiar', 'files', '.sqlite', False, False, '')
+
     if origen is None or origen == '': return False
 
     lista_origen = filetools.basename(origen)
@@ -1176,6 +1195,7 @@ def crear_lista(item):
     logger.info()
 
     titulo = platformtools.dialog_input(default='', heading='Nombre de la lista')
+
     if titulo is None or titulo == '': return False
 
     titulo = config.text_clean(titulo, blank_char='_')
@@ -1272,7 +1292,7 @@ def eliminar_lista(item):
         platformtools.dialog_ok(config.__addon_name, 'La lista activa no se puede eliminar', item.lista)
         return False
 
-    if not platformtools.dialog_yesno('Eliminar lista', '[COLOR red][B]¿ Confirma Eliminar la lista %s ?[/B][/COLOR]' % item.lista):
+    if not platformtools.dialog_yesno('Eliminar lista', '¿ [COLOR red][B]Confirma Eliminar la Lista:[/B][/COLOR] %s ?' % item.lista):
         return False
 
     filetools.remove(fullfilename)
@@ -1303,5 +1323,5 @@ def informacion_lista(item):
 
     txt += '[CR][CR]Tamaño de la base de datos: [B]%s[/B]' % config.format_bytes(filetools.getsize(fullfilename))
 
-    platformtools.dialog_textviewer('Información de la lista', txt)
+    platformtools.dialog_textviewer('Información de la Lista', txt)
     return True

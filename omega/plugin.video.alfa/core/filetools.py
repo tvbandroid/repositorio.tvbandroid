@@ -7,7 +7,6 @@
 from __future__ import division
 #from builtins import str
 from builtins import range
-from past.utils import old_div
 import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; basestring = str
@@ -66,10 +65,10 @@ def validate_path(path, replacement='', trans_none=''):
     if not path or not isinstance(path, (unicode, basestring, bytes)):
         if path is None: path = trans_none
 
-    pattern = "[:\*\?<>\|\\/]"
-    pattern_url = "[:\*\?<>\|]"
-    if find_single_match(path, '(^\w+:\/\/)'):
-        protocolo = find_single_match(path, '(^\w+:\/\/)')
+    pattern = r"[:\*\?<>\|\\/]"
+    pattern_url = r"[:\*\?<>\|]"
+    if find_single_match(path, r'(^\w+:\/\/)'):
+        protocolo = find_single_match(path, r'(^\w+:\/\/)')
         parts = re.split(r'^\w+:\/\/(.+?)/(.+)', path)[1:3]
         parts[1] = parts[1].replace("\\", "/")
         return '{}{}/{}'.format(protocolo, parts[0], re.sub(pattern_url, replacement, parts[1]))
@@ -180,7 +179,7 @@ def encode(path, _samba=False, trans_none=''):
     if not isinstance(path, unicode):
         path = unicode(path, "utf-8", "ignore")
 
-    if find_single_match(path, '(^\w+:\/\/)') or _samba:
+    if find_single_match(path, r'(^\w+:\/\/)') or _samba:
         path = path.encode("utf-8", "ignore")
     else:
         if fs_encoding:
@@ -749,7 +748,7 @@ def copy(path, dest, silent=False, vfs=True, ch_mod='', su=False):
             copiado = 0
             while True:
                 if not silent:
-                    dialogo.update(old_div(copiado * 100, size), basename(path))
+                    dialogo.update((copiado * 100 // size), basename(path))
                 buf = fo.read(1024 * 1024)
                 if not buf:
                     break
@@ -807,7 +806,7 @@ def isfile(path, silent=False, vfs=True):
     path = encode(path)
     try:
         if xbmc_vfs and vfs:
-            if not find_single_match(path, '(^\w+:\/\/)') and not (platform in ['windows', 'xbox'] and len(path) > 260):
+            if not find_single_match(path, r'(^\w+:\/\/)') and not (platform in ['windows', 'xbox'] and len(path) > 260):
                 return os.path.isfile(path)
             if path.endswith('/') or path.endswith('\\'):
                 path = path[:-1]
@@ -840,7 +839,7 @@ def isdir(path, silent=False, vfs=True):
     path = encode(path)
     try:
         if xbmc_vfs and vfs:
-            if not find_single_match(path, '(^\w+:\/\/)'):
+            if not find_single_match(path, r'(^\w+:\/\/)'):
                 return os.path.isdir(path)
             if path.endswith('/') or path.endswith('\\'):
                 path = path[:-1]
@@ -1178,7 +1177,7 @@ def join(*paths):
                 path = encode(path)
             list_path += path.replace("\\", "/").strip("/").split("/")
 
-    if find_single_match(encode(paths[0]), '(^\w+:\/\/)'):
+    if find_single_match(encode(paths[0]), r'(^\w+:\/\/)'):
         return str("/".join(list_path))
     else:
         return str(os.sep.join(list_path))
@@ -1193,8 +1192,8 @@ def split(path, vfs=True):
     @rtype: tuple
     """
     path = encode(path)
-    if find_single_match(path, '(^\w+:\/\/)'):
-        protocol = find_single_match(path, '(^\w+:\/\/)')
+    if find_single_match(path, r'(^\w+:\/\/)'):
+        protocol = find_single_match(path, r'(^\w+:\/\/)')
         if '/' not in path[6:]:
             path = path.replace(protocol, protocol + "/", 1)
         return path.rsplit('/', 1)
@@ -1249,7 +1248,7 @@ def remove_tags(title):
     """
     logger.info()
 
-    title_without_tags = find_single_match(title, '\[color .+?\](.+)\[\/color\]')
+    title_without_tags = find_single_match(title, r'\[color .+?\](.+)\[\/color\]')
 
     if title_without_tags:
         return title_without_tags
@@ -1267,11 +1266,11 @@ def remove_smb_credential(path):
     """
     logger.info()
     
-    if not find_single_match(path, '(^\w+:\/\/)'):
+    if not find_single_match(path, r'(^\w+:\/\/)'):
         return path
     
-    protocol = find_single_match(path, '(^\w+:\/\/)')
-    path_without_credentials = find_single_match(path, '^\w+:\/\/(?:[^;\n]+;)?(?:[^:@\n]+[:|@])?(?:[^@\n]+@)?(.*?$)')
+    protocol = find_single_match(path, r'(^\w+:\/\/)')
+    path_without_credentials = find_single_match(path, r'^\w+:\/\/(?:[^;\n]+;)?(?:[^:@\n]+[:|@])?(?:[^@\n]+@)?(.*?$)')
 
     if path_without_credentials:
         return (protocol + path_without_credentials)
@@ -1289,12 +1288,12 @@ def ftp_to_smb_credential(path, remove=False):
     """
     logger.info()
     
-    if not find_single_match(path, '(^\w+:\/\/)'):
+    if not find_single_match(path, r'(^\w+:\/\/)'):
         return path
     
     if path.lower().startswith("ftp://"):
         path = path.replace("ftp://", "smb://")
-        path = re.sub("\:\d+(?:\/|$)", "/", path)
+        path = re.sub(r"\:\d+(?:\/|$)", "/", path)
         if remove:
             path = remove_smb_credential(path)
 

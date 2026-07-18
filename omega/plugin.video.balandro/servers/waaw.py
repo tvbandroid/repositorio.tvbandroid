@@ -1,8 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import sys
 
-from core import httptools, scrapertools
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time
+
+from core import filetools, scrapertools
 from platformcode import config, logger, platformtools
 
 
@@ -14,8 +27,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -42,7 +54,9 @@ def get_video_url(page_url, url_referer=''):
     video_urls = []
 
     if '/watch_video.php?v=/watch_video.php?v=/player/embed_player.php?vid=' in page_url: page_url = page_url.replace('/watch_video.php?v=/watch_video.php?v=/player/embed_player.php?vid=', '/watch_video.php?v=')
+
     elif '/watch_video.php?v=/player/embed_player.php?vid=' in page_url: page_url = page_url.replace('/watch_video.php?v=/player/embed_player.php?vid=', '/watch_video.php?v=')
+
     elif '/watch_video.php?v=/watch_video.php?v=' in page_url: page_url = page_url.replace('/watch_video.php?v=/watch_video.php?v=', '/watch_video.php?v=')
 
     page_url = page_url.replace('&amp;', '&').replace('&autoplay=no/', '').replace('&autoplay=no', '').replace('&autoplay=yes/', '').replace('&autoplay=yes', '')
@@ -52,6 +66,12 @@ def get_video_url(page_url, url_referer=''):
     if not xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
         return 'Falta ResolveUrl'
 
+    path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'waaw.py'))
+
+    existe = filetools.exists(path)
+    if not existe:
+        return 'El Plugin No existe en Resolveurl'
+
     if config.get_setting('servers_time', default=True):
         platformtools.dialog_notification('Cargando [COLOR cyan][B]Waaw[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
         time.sleep(int(espera))
@@ -59,10 +79,16 @@ def get_video_url(page_url, url_referer=''):
     try:
         import_libs('script.module.resolveurl')
 
+        if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+            import_libs('script.module.cloudrequest')
+
         import resolveurl
         page_url = ini_page_url
 
         page_url = page_url.replace('watch_video.php?v=', 'f/')
+
+        if "|Referer=" in page_url: page_url = page_url.replace("|Referer=", '$$')
+
         resuelto = resolveurl.resolve(page_url)
 
         if resuelto:
@@ -84,10 +110,17 @@ def get_video_url(page_url, url_referer=''):
 
         if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
             trace = traceback.format_exc()
-            if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
+            if 'File Removed' in trace or 'File Not Found' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                 return 'Archivo inexistente ó eliminado'
+
             elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                 return 'Fichero sin link al vídeo ó restringido'
+
+            elif 'Unable to solve captcha' in trace:
+                return 'Unable Solve Captcha'
+
+            elif 'Cloudflare challenge' in trace:
+                return 'Cloudflare Challenge Check'
 
             elif 'Wrong captcha. Please try again.' in trace:
                 return 'Captcha erróneo. [COLOR cyan][B]Inténtelo de nuevo[/COLOR]'
@@ -98,8 +131,14 @@ def get_video_url(page_url, url_referer=''):
         elif "AttributeError: 'int'" in traceback.format_exc():
             return 'AttributeError [COLOR red][B]get_int[/COLOR]'
 
-        elif 'HTTP Error 404: Not Found' in traceback.format_exc():
+        elif "No module named 'cloudscraper'" in traceback.format_exc():
+             return 'Falta script.module.cloudrequest'
+
+        elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
             return 'Archivo inexistente'
+
+        elif 'HTTP Error 403: Forbidden' in traceback.format_exc() or '403 Forbidden' in traceback.format_exc():
+            return 'Archivo bloqueado'
 
         elif '<urlopen error' in traceback.format_exc():
             return 'No se puede establecer la conexión'

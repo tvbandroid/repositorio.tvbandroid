@@ -8,10 +8,11 @@ from core.item import Item
 from core import httptools
 from core import urlparse
 
+
 canonical = {
              'channel': 'jizzbunker', 
              'host': config.get_setting("current_host", 'jizzbunker', default=''), 
-             'host_alt': ["https://jizzbunker.com"], 
+             'host_alt': ["https://jizzbunker.com/"], 
              'host_black_list': [], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
@@ -22,10 +23,10 @@ host = canonical['host'] or canonical['host_alt'][0]
 def mainlist(item):
     logger.info()
     itemlist = []
-    itemlist.append(Item(channel=item.channel, title="Nuevas" , action="lista", url=host + "/en/newest"))
-    itemlist.append(Item(channel=item.channel, title="Popular" , action="lista", url=host + "/en/straight/popular1"))
-    itemlist.append(Item(channel=item.channel, title="Tendencia" , action="lista", url=host + "/en/straight/trending"))
-    itemlist.append(Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "/en/channels/"))
+    itemlist.append(Item(channel=item.channel, title="Nuevas" , action="lista", url=host + "en/newest"))
+    itemlist.append(Item(channel=item.channel, title="Popular" , action="lista", url=host + "en/straight/popular1"))
+    itemlist.append(Item(channel=item.channel, title="Tendencia" , action="lista", url=host + "en/straight/trending"))
+    itemlist.append(Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "en/channels/alphabetically"))
     itemlist.append(Item(channel=item.channel, title="Buscar", action="search"))
     return itemlist
 
@@ -33,7 +34,7 @@ def mainlist(item):
 def search(item, texto):
     logger.info()
     texto = texto.replace(" ", "+")
-    item.url = "%s/en/search?query=%s/" % (host, texto)
+    item.url = "%sen/search?query=%s/" % (host, texto)
     try:
         return lista(item)
     except Exception:
@@ -48,15 +49,15 @@ def categorias(item):
     itemlist = []
     data = httptools.downloadpage(item.url, canonical=canonical).data
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
-    patron  = '<li><figure>.*?<a href="([^"]+)".*?'
-    patron += '<img class="lazy" data-original="([^"]+)" alt="([^"]+)".*?'
-    patron += '<span class="score">(\d+)</span>'
+    patron  = '<a href="([^"]+)" class="category-card".*?'
+    patron += '<img src="([^"]+)" alt="([^"]+)".*?'
+    patron += 'count">([^<]+)'
     matches = re.compile(patron,re.DOTALL).findall(data)
     scrapertools.printMatches(matches)
     for url,thumbnail,title,cantidad in matches:
         plot = ""
         url = url.replace("channel", "channel30")
-        title = "%s (%s)" %(title,cantidad)
+        title = "%s (%s)" %(title,cantidad.replace(' videos', ''))
         itemlist.append(Item(channel=item.channel, action="lista", title=title, url=url,
                              fanart=thumbnail , thumbnail=thumbnail, plot=plot))
     itemlist.sort(key=lambda x: x.title)
@@ -68,9 +69,9 @@ def lista(item):
     itemlist = []
     data = httptools.downloadpage(item.url, canonical=canonical).data
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>", "", data)
-    patron  = '<li><figure>.*?<a href="([^"]+)".*?'
-    patron += '<img class="lazy" data-original="([^"]+)" alt="([^"]+)".*?'
-    patron += '<time datetime=".*?">([^"]+)</time>'
+    patron  = '<a href="([^"]+)" class="video-card".*?'
+    patron += '<img src="([^"]+)" alt="([^"]+)".*?'
+    patron += 'duration">([^<]+)</'
     matches = re.compile(patron,re.DOTALL).findall(data)
     for url,thumbnail,title,duracion in matches:
         title = "[COLOR yellow]%s[/COLOR] %s" %(duracion,title)
@@ -80,7 +81,7 @@ def lista(item):
             action = "findvideos"
         itemlist.append(Item(channel=item.channel, action=action, title=title, contentTitle=title, url=url,
                              fanart=thumbnail , thumbnail=thumbnail, plot=plot))
-    next_page = scrapertools.find_single_match(data,'<li><a href="([^"]+)" rel="next">&rarr;</a>')
+    next_page = scrapertools.find_single_match(data,'<a href="([^"]+)" [^<]+>Next')
     if next_page !="":
         next_page = urlparse.urljoin(item.url,next_page)
         itemlist.append(Item(channel=item.channel, action="lista", title="[COLOR blue]Página Siguiente >>[/COLOR]", url=next_page) )

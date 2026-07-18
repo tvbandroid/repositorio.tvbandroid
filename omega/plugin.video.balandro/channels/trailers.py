@@ -13,7 +13,7 @@ else:
 
 import re
 
-from platformcode import logger
+from platformcode import logger, config
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 
@@ -29,7 +29,9 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Buscar tráiler ...', action = 'search', search_type = 'movie', text_color = 'darkgoldenrod' ))
+    itemlist.append(item.clone( title = '[B][COLOR yellow]Buscar[/COLOR][/B] Tráiler ...', action = 'search', search_type = 'movie', text_color = 'darkgoldenrod' ))
+
+    itemlist.append(item.clone( channel='youtubetrailers', action='search', title= '[B][COLOR yellow]Buscar[/COLOR][/B] Youtube ...', thumbnail=config.get_thumb('youtube'), text_color='darksalmon', search_special = 'youtube', search_type = 'all' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'videos/', search_type = 'movie' ))
 
@@ -96,6 +98,8 @@ def findvideos(item):
             matches = re.compile('<source src="([^"]+)"', re.DOTALL).findall(data)
 
     for url in matches:
+        if '/manifest.mpd' in url: continue
+
         url = urlparse.urljoin(item.url, url)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, language = 'VO' ))
@@ -122,6 +126,8 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title = clean_title(title)
+
         url = host + '/peliculas/' + url
 
         itemlist.append(item.clone( action='findvideos', url=url, title=title, contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
@@ -129,6 +135,20 @@ def list_search(item):
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
+
+
+def clean_title(title):
+    logger.info()
+
+    title = title.replace('\\u00e1', 'a').replace('\\u00c1', 'a').replace('\\u00e9', 'e').replace('\\u00ed', 'i').replace('\\u00f3', 'o').replace('\\u00fa', 'u')
+    title = title.replace('\\u00f1', 'ñ').replace('\\u00bf', '¿').replace('\\u00a1', '¡').replace('\\u00ba', 'º')
+    title = title.replace('\\u00eda', 'a').replace('\\u00f3n', 'o').replace('\\u00fal', 'u').replace('\\u00e0', 'a')
+
+    title = title.replace('\\u2019', "'").replace('\\u00e3o', 'o').replace('\\u010c', 'c').replace('\\u00c9', 'v').replace('\\u00da', 't').replace('\\u0113', 'i').replace('\\u014d', 'v').replace('\\u00d4', '').replace('\\u0130', '').replace('\\u00e8', ' ')
+
+    title = title.replace('\\u00c0', "A").replace('\\u010c0', "C").replace('\\u00c5l', "Islas Al")
+
+    return title
 
 
 def search(item, texto):

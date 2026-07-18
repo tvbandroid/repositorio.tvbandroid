@@ -24,17 +24,16 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + "video/" ))
-
-    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + "language/spanish", text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + "video?o=cm", text_color = 'cyan' ))
 
@@ -43,7 +42,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Más candentes', action = 'list_all', url = host + "video?o=ht" ))
 
-    itemlist.append(item.clone( title = 'Caseros', action = 'list_all', url = host + "video?p=homemade&o=tr", text_color = 'tan' ))
+    itemlist.append(item.clone( title = 'En castellano', action = 'list_all', url = host + "language/spanish", text_color = 'moccasin' ))
+
+    itemlist.append(item.clone( title = 'Caseros', action = 'list_all', url = host + "video?p=homemade&o=tr", text_color = 'pink' ))
 
     itemlist.append(item.clone( title = 'Long play', action = 'list_all', url = host + "video?o=lg" ))
 
@@ -130,7 +131,7 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<h1>(.*?)<div class="pagination')
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)<div class="pagination')
     if not bloque: bloque = scrapertools.find_single_match(data, 'id="videoSearchResult"(.*?)div class="pagination')
 
     if '/video/search?search=' in item.url:
@@ -257,6 +258,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     headers = {'Referer': item.url}
 
     data = do_downloadpage(item.url, headers = headers)
@@ -302,9 +310,19 @@ def get_video_url(page_url):
             if not 'K,' in url and not "get_media" in url:
                 qlty = scrapertools.find_single_match(url, '/(\d+P)_')
 
+                url = url + '|Referer=' + host + '&Origin=' + host
+
                 video_urls.append([qlty, url])
 
     return video_urls
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + "video?o=cm"
+
+    return list_all(item)
 
 
 def search(item, texto):

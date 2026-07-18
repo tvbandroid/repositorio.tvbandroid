@@ -1,0 +1,43 @@
+{
+  "active": true,
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "https://(?:all4tube|tubexplayer).com/(?:embed-|e/)([a-z0-9]+)",
+        "url": "https://all4tube.com/e/\\1"
+      }
+    ]
+  },
+  "free": true,
+  "id": "all4tube",
+  "name": "all4tube",
+  "settings": [
+    {
+      "default": false,
+      "enabled": true,
+      "id": "black_list",
+      "label": "@60654",
+      "type": "bool",
+      "visible": true
+    },
+    {
+      "default": 0,
+      "enabled": true,
+      "id": "favorites_servers_list",
+      "label": "@60655",
+      "lvalues": [
+        "No",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "type": "list",
+      "visible": false
+    }
+  ],
+  "thumbnail": "https://all4tube.com/images/logo.png",
+  "force_inputstream": "adaptive"
+}

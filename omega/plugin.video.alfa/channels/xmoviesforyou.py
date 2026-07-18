@@ -19,17 +19,22 @@ list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES_A
 list_quality_tvshow = []
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_A
-forced_proxy_opt = 'ProxySSL'
+
+forced_proxy_opt = '' #'ProxySSL'
 
 canonical = {
              'channel': 'xmoviesforyou', 
              'host': config.get_setting("current_host", 'xmoviesforyou', default=''), 
              'host_alt': ["https://xmoviesforyou.com/"], 
              'host_black_list': [], 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             # 'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
+             # 'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': None, 'set_tls_min': False, 'retries_cloudflare': 5, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             'cf_assistant': False, 'CF_stat': True, 
+             'CF': True, 'CF_test': False, 'alfa_s': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
+
 
 timeout = 5
 kwargs = {}
@@ -39,19 +44,20 @@ tv_path = ''
 language = []
 url_replace = []
 
-finds = {'find': {'find_all': [{'tag': ['article']}]},
-         'categories': {'find_all': [{'tag': ['li'], 'class': ['category_item', 'tm_pornstar_box', 'channel-box']}]}, 
+
+finds = {'find': dict([('find', [{'tag': ['section', 'main']}]),
+                                 ('find_all', [{'tag': ['a'], 'class': ['gap-2']}])]),
+         'categories': dict([('find', [{'tag': ['main'], 'class': ['container']}]),
+                             ('find_all', [{'tag': ['a'], 'href': re.compile("/(?:category|pornstar|studio)/[A-z0-9-]+(?:/|)")}])]),
          'search': {}, 
          'get_quality': {}, 
          'get_quality_rgx': '', 
-         'next_page': {},
-         'next_page_rgx': [['\/page\/\d+', '/page/%s']], 
-         'last_page': dict([('find', [{'tag': ['div'], 'class': ['pagination']}]), 
-                            ('find_all', [{'tag': ['a'], '@POS': [-2], 
-                                           '@ARG': 'href', '@TEXT': 'page/(\d+)'}])]), 
+         'next_page': {'find': [{'tag': ['a'], 'string': re.compile('(?i)next'), '@ARG': 'href'}]},
+         'next_page_rgx': [['\?page=d+', '?page=%s']], 
+         'last_page': {}, 
          'plot': {}, 
-         'findvideos': dict([('find', [{'tag': ['div'], 'class': 'post_content'}]),
-                             ('find_all', [{'tag': ['a'], '@ARG': 'href'}])]),
+         'findvideos': dict([('find', [{'tag': ['div'], 'class': ['lg:col-span-3']}]),
+                                       ('find_all', [{'tag': ['a'], 'class': ['gap-3']}])]),
          'title_clean': [['[\(|\[]\s*[\)|\]]', ''],['(?i)\s*videos*\s*', '']],
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
@@ -70,7 +76,10 @@ def mainlist(item):
     itemlist = []
     autoplay.init(item.channel, list_servers, list_quality)
 
-    itemlist.append(Item(channel=item.channel, title="Nuevas" , action="list_all", url=host + "page/1"))
+    itemlist.append(Item(channel=item.channel, title="Nuevas" , action="list_all", url=host + "?page=1"))
+    itemlist.append(Item(channel=item.channel, title="Canal" , action="section", url=host + "studios?page=1", extra="Canal"))
+    itemlist.append(Item(channel=item.channel, title="Pornstars" , action="section", url=host + "pornstars?page=1", extra="PornStar"))
+    itemlist.append(Item(channel=item.channel, title="Categorias" , action="section", url=host + "categories/", extra="Categorias"))
     itemlist.append(Item(channel=item.channel, title="Buscar", action="search"))
     
     autoplay.show_option(item.channel, itemlist)
@@ -80,8 +89,10 @@ def mainlist(item):
 
 def section(item):
     logger.info()
+    findS = finds.copy()
+    findS['url_replace'] = [['(\/(?:category|pornstar|studio)\/[^$]+$)', r'\1?page=1']]
     
-    return AlfaChannel.section(item, matches_post=section_matches, **kwargs)
+    return AlfaChannel.section(item, finds=findS, **kwargs)
 
 
 def list_all(item):
@@ -104,27 +115,14 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
     logger.info()
     matches = []
     findS = AHkwargs.get('finds', finds)
-    srv_ids = {"Doodstream": "Doodstream",
-               "dooood": "Doodstream",
-               "ds2play": "Doodstream",
-               "Streamtape": "Streamtape ",
-               "streamSB": "Streamsb",
-               "VOE": "voe",
-               "mixdrop": "Mixdrop",
-               "upstream": "Upstream"}
     
     for elem in matches_int:
         elem_json = {}
         
         try:
-            elem_json['url'] = elem
-            if AlfaChannel.obtain_domain(elem_json['url']):
-                elem_json['server'] = AlfaChannel.obtain_domain(elem_json['url']).split('.')[-2]
-            if elem_json['server'] in ["Netu", "trailer"]: continue
-            if elem_json['server'] in srv_ids:
-                elem_json['server'] = srv_ids[elem_json['server']]
+            elem_json['url'] = elem['href']
+            elem_json['server'] = ''
             elem_json['language'] = ''
-        
         except:
             logger.error(elem)
             logger.error(traceback.format_exc())
@@ -139,7 +137,7 @@ def search(item, texto, **AHkwargs):
     logger.info()
     kwargs.update(AHkwargs)
     
-    item.url = "%spage/1/?s=%s" % (host, texto.replace(" ", "+"))
+    item.url = "%ssearch?q=%s&page=1" % (host, texto.replace(" ", "+"))
     
     try:
         if texto:

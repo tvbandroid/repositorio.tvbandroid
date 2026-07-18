@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from platformcode import logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, servertools
 
@@ -55,7 +55,7 @@ def categorias(item):
 
         if title in str(cats): continue
 
-        url = host + '/category/blog/' + url + '/'
+        url = host + 'category/blog/' + url + '/'
 
         cats.append(title)
 
@@ -70,10 +70,11 @@ def list_all(item):
 
     data = httptools.downloadpage(item.url).data
 
-    matches = scrapertools.find_multiple_matches(data, 'by: <a href=.*?data-a2a-url="(.*?)".*?data-a2a-title="(.*?)".*?src="(.*?)"')
+    matches = scrapertools.find_multiple_matches(data, 'by: <a href=.*?data-a2a-url="(.*?)".*?data-a2a-title="(.*?)".*?<img.*?src="(.*?)"')
 
     for url, title, thumb in matches:
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb, contentType='movie', contentTitle=title, contentExtra='documentary' ))
+        itemlist.append(item.clone( action = 'findvideos', url = url, title = title, thumbnail = thumb,
+                                    contentType='movie', contentTitle=title, contentExtra='documentary' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, 'class="page-numbers current">.*?href="(.*?)"')
@@ -91,13 +92,27 @@ def findvideos(item):
 
     data = httptools.downloadpage(item.url).data
 
-    url = scrapertools.find_single_match(data, '<iframe  id=".*?src="(.*?)"')
+    i = 0
+
+    url = scrapertools.find_single_match(data, 'data-src-cmplz="(.*?)"')
 
     if url:
-        servidor = servertools.get_server_from_url(url)
+        i += 1
+
+        url = scrapertools.find_single_match(url, '/embed/(.*?)enablejsapi')
+
+        if url:
+            url = 'https://www.youtube.com/watch?v=%s' % url.replace('?', '').strip()
+
+            servidor = servertools.get_server_from_url(url)
 
         if servidor and servidor != 'directo':
             itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp' ))
+
+    if not itemlist:
+        if not i == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 

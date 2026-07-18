@@ -21,8 +21,6 @@ list_servers = []
 forced_proxy_opt = ''
 timeout = 45
 
-#### ImputStream FFmpeg
-
 canonical = {
              'channel': 'camsoda', 
              'host': config.get_setting("current_host", 'camsoda', default=''), 

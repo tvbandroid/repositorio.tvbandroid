@@ -17,7 +17,7 @@ import re
 import time
 import urllib
 import traceback
-from base64 import b64decode
+from base64 import b64decode, b64encode
 
 from core import httptools, scrapertools
 from core.item import Item
@@ -501,3 +501,375 @@ def sortened_urls(url, url_base64, host, retry=False, referer=None, alfa_s=True,
         from lib.alfaresolver_py3 import unlock_urls
 
     return unlock_urls(url, url_base64, host, retry=retry, referer=referer, alfa_s=alfa_s, item=item)
+
+
+def solve_pow(params):
+    import hashlib
+    import random
+
+    # ──────────────────────────────────────────────
+    # RESOLVE POW
+    # ──────────────────────────────────────────────
+
+    try:
+        challenge = params.get("challenge", "")
+        difficulty = params.get("difficulty", 3)
+        salt = params.get("salt", "")
+        format_candidate = params.get("challenge_separator", "%s%d")
+        format_aes_key = params.get("challenge_separator_aes_key", "%s%d%s")
+        timer = params.get("timer", False)
+
+        prefix = "0" * difficulty
+        nonce = 0
+        aes_key = ""
+        start = time.time()
+
+        while True:
+
+            candidate = format_candidate % (challenge, nonce)
+            hash_hex = hashlib.sha256(candidate.encode("utf-8")).hexdigest()
+
+            if hash_hex.startswith(prefix):
+
+                if salt:
+                    key_material = (format_aes_key % (challenge, nonce, salt)).encode()
+                    aes_key = hashlib.sha256(key_material).digest()
+
+                elapsed = int((time.time() - start) * 1000)
+                # Simular tiempo humano mínimo
+                if timer and elapsed < 350:
+                    fake_delay = random.randint(400, 900)
+                    time.sleep((fake_delay - elapsed) / 1000.0)
+                    elapsed = fake_delay
+
+                return {"nonce": nonce, "elapsed": elapsed, "hash_hex": hash_hex, "aes_key": aes_key}
+
+            nonce += 1
+
+    except Exception:
+        logger.error(traceback.format_exc())
+        return {}
+
+
+def bypass_embed69(data, **kwargs):
+
+    try:
+        clave = ""
+
+        import ast
+        from lib.crylink import crylink
+
+        clave_pattern = kwargs.get("clave_pattern", r"decryptLink\(server.link, '(.+?)'\),")
+        challenge_pattern = kwargs.get("challenge_pattern",
+                                       r"POW_CHALLENGE\s*=\s*'([^']+)';\s*\w*\s*POW_DIFFICULTY\s*=\s*(\d+);\s*\w*\s*POW_SALT\s*=\s*'([^']+)';")
+        dataLink_patter = kwargs.get("dataLink_patter", r"dataLink\s*=\s*([^;]+)")
+        challenge_separator = kwargs.get("challenge_separator", "%s%d")
+        challenge_separator_aes_key = kwargs.get("challenge_separator_aes_key", "%s%d%s")
+        aes_key_apply = kwargs.get("aes_key_apply", True)
+
+        clave = scrapertools.find_single_match(data, clave_pattern)
+
+        if not clave and scrapertools.find_single_match(data, challenge_pattern):
+
+            challenge_params = scrapertools.find_single_match(data, challenge_pattern)
+            resolve_pow = {
+                "challenge": challenge_params[0],
+                "difficulty": int(challenge_params[1]),
+                "salt": challenge_params[2],
+                "challenge_separator": challenge_separator,
+                "challenge_separator_aes_key": challenge_separator_aes_key,
+            }
+            resolved_pow = solve_pow(resolve_pow)
+            clave = resolved_pow.get("aes_key", "")
+
+        if clave and aes_key_apply:
+
+            dataLinkString = scrapertools.find_single_match(data, dataLink_patter) or "[]"
+            dataLinkString = dataLinkString.replace(r"\/", "/")
+            dataLink = ast.literal_eval(dataLinkString)
+
+            for langSection in dataLink:
+                for elem in langSection.get('sortedEmbeds', []):
+                    if elem['servername'] == "download": continue
+                    url = crylink(elem['link'], clave)
+
+                    if url:
+                        data = data.replace(elem['link'].replace(r"/", "\/"), url)
+
+    except Exception:
+        logger.error(traceback.format_exc())
+
+    return clave, data
+
+
+def bypass_anubis(url, response, debug=False, **kwargs):
+    import requests
+
+    debug = debug or kwargs.get("cf_debug", False)
+    domain = httptools.obtain_domain(url, sub=True).lstrip(".")
+    domain_base = httptools.obtain_domain(url, sub=False)
+    base = httptools.obtain_domain(url, scheme=True)
+
+    # ──────────────────────────────────────────────
+    # MONTAR TLS EN SESION
+    # ──────────────────────────────────────────────
+
+    def mount_TLS(url, domain, debug, kwargs):
+
+        if (
+            (domain in httptools.CF_LIST or kwargs.get("CF", False))
+            and kwargs.get("CF_test", True)
+        ):
+            from lib.cloudscraper import create_scraper
+            session = create_scraper(user_url=url, user_opt=kwargs)
+        else:
+            session = requests.session()
+
+        ssl = httptools.ssl
+        ssl._create_default_https_context = ssl._create_unverified_context
+        ssl_context = ssl.create_default_context()
+        ssl_version = httptools.ssl_version
+        ssl_version_min = httptools.ssl_version_min
+        requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
+        session.verify = kwargs.get("session_verify", False)
+        if kwargs.get('set_tls', True):
+            if not kwargs.get('session_verify', False):
+                ssl_context.check_hostname = False
+                ssl_context.verify_mode = ssl.CERT_NONE
+            else:
+                ssl_context = ssl.SSLContext(ssl_version)
+
+            class TLSHttpAdapter(requests.adapters.HTTPAdapter):
+                def init_poolmanager(self, connections, maxsize, block=False):
+                    self.poolmanager = requests.packages.urllib3.poolmanager.PoolManager(num_pools=connections,
+                                                                                         maxsize=maxsize,
+                                                                                         block=block,
+                                                                                         assert_hostname=False,
+                                                                                         ssl_version=ssl_version, 
+                                                                                         ssl_context=ssl_context)
+            session.mount(url.rstrip('/'), TLSHttpAdapter())
+            if debug: logger.debug(("TLS: %s" % ssl_version, "Verify: %s" % session.verify, "Session: %s" % session))
+
+        return session
+
+    # ──────────────────────────────────────────────
+    # EXTRAER CHALLENGE DEL HTML
+    # ──────────────────────────────────────────────
+
+    def extract_json(html, challenge_txt, kwargs):
+        """
+        Busca JSON de Anubis dentro del HTML.
+        """
+        
+        patterns = [regex for cha, regex in kwargs.get("challenge_regex", []) if cha == challenge_txt]
+        patterns.extend([
+            r'(?i)<script\s*id="%s"\s*type="application\/json">\s*(.*?)\s*<\/script>' % challenge_txt,
+            r'window\.__ANUBIS_CHALLENGE__\s*=\s*({.*?})\s*;',
+            r'anubisChallenge\s*=\s*({.*?})\s*;',
+            r'id="anubis-state".*?>(.*?)<',
+        ])
+
+        for pattern in patterns:
+            m = re.search(pattern, html, re.S)
+
+            if not m:
+                continue
+
+            raw = m.group(1).strip()
+
+            if raw == "null":
+                return None
+
+            try:
+                return json.loads(raw)
+            except Exception:
+                pass
+
+        return None
+    
+    def set_proxy(url_, resp):
+        """
+        Adapta la URL si hay proxy
+        """
+        domain_proxy = "." + domain_base
+        base_org = base
+
+        if "croxyproxy.com" in resp.proxy__ :
+            domain_proxy = "." + (httptools.obtain_domain(resp.proxy__.replace('retry', '').rstrip('|').split('|')[-1]) or domain_base)
+            cpo =  b64encode(base.encode('utf-8')).decode('utf-8')
+            separator = '?' if not '?' in url_ else '&'
+            base_ = httptools.obtain_domain(url, scheme=False)
+            url_ = url_.replace(base_, domain_proxy.lstrip(".")) + '%s__cpo=%s' % (separator, cpo)
+            base_org = httptools.obtain_domain(url_, scheme=True)
+
+        return url_, domain_proxy, base_org
+
+
+    url, domain_proxy, base_org = set_proxy(url, response)
+
+    session = mount_TLS(url, domain, debug, kwargs)
+
+    cookies_list = kwargs.get("cookies_import", [])
+    for cookie in cookies_list:
+        httptools.set_cookies(cookie, clear=False, alfa_s=True)
+    httptools.load_cookies(alfa_s=True)
+    jar = httptools.cj
+    session.cookies = jar
+    if debug: logger.debug("[*] Cookies iniciales: %s / %s" \
+                           % (cookies_list, [cookie for cookie in session.cookies if domain in cookie.domain]))
+
+    UA = httptools.ua
+    if kwargs.get("cf_assistant_ua", False):
+        UA = config.get_setting("cf_assistant_ua", None)
+        if not UA:
+            UA = httptools.ua
+    session.headers.update({
+        "User-Agent": UA,
+        "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",
+        "Accept-Encoding": "gzip, deflate",
+        "Connection": "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+    })
+    if debug: logger.debug("[*] Url: %s; Headers iniciales: %s" % (url, session.headers))
+
+    challenge_txt = kwargs.get("challenge", "anubis_challenge")
+
+    try:
+        r = session.get(
+            url,
+            timeout=kwargs.get("timeout", 20),
+            allow_redirects=True,
+        )
+    except Exception as e:
+        r = requests.Response()
+        r.status_code = str(e)
+    html = r.text if challenge_txt.lower() in r.text.lower() else response.data
+    code = r.status_code
+
+    # ¿Ya pasó?
+    if code not in httptools.SUCCESS_CODES + httptools.REDIRECTION_CODES or challenge_txt.lower() not in html.lower():
+        logger.error("[+] Status_code: %s, Sin challenge: %s, Kwargs: %s, \n\nDatos: %s" \
+                     % (code, challenge_txt, kwargs, html+(("\n\n"+r.text) if code in httptools.CLOUDFLARE_CODES else "")))
+        return False
+
+    challenge_data = extract_json(html, challenge_txt, kwargs)
+
+    if not challenge_data:
+        logger.error("[*] No se pudo extraer challenge: %s / %s" % (challenge_txt, html))
+        return False
+
+    id_challenge = (
+        challenge_data.get("challenge", {}).get("id")
+        or challenge_data.get("id")
+    )
+
+    for dom in ["."+domain, domain, domain_base, domain_proxy]:
+        cookies_list.append({
+            "name": "browser-pow-cookie-verification",
+            "value": id_challenge, 
+            "domain": dom,
+            "expires": 3600 * 12,
+        })
+
+    challenge = (
+        challenge_data.get("challenge", {}).get("randomData")
+        or challenge_data.get("challenge")
+        or challenge_data.get("data")
+        or challenge_data.get("token")
+    )
+
+    difficulty = int(
+        challenge_data.get("rules", {}).get("difficulty", 4)
+    )
+
+    if debug: logger.debug("[*] Id: %s, Challenge: %s, Difficulty: %s, challenge_dict: %s" \
+                            % (id_challenge, challenge, difficulty, challenge_data))
+    if not challenge:
+        raise Exception("Challenge inválido")
+
+    # Resolver PoW
+    response_pow = solve_pow({
+        "challenge": challenge,
+        "difficulty": difficulty,
+        "challenge_separator": kwargs.get("challenge_separator", "%s%d"),
+        "timer": True
+    })
+
+    if not response_pow:
+        return False
+
+    payload = {
+        "id": id_challenge,
+        "response": response_pow["hash_hex"],
+        "nonce": response_pow["nonce"],
+        "redir": base + '/',
+        "elapsedTime": response_pow["elapsed"],
+    }
+
+    if debug: logger.debug("[+] Solución encontrada: nonce: %s, tiempo: %s, hash: %s" \
+                           % (response_pow["nonce"], response_pow["elapsed"], response_pow["hash_hex"]))
+
+    # URL API
+    api = kwargs.get("challenge_api") or "/.within.website/x/cmd/anubis/api/pass-challenge"
+    verify_url, domain_proxy, base_org = set_proxy(base_org + api, response)
+
+    verify_headers  = {
+        "Referer": url,
+        "Origin": base,
+        "Accept": "*/*",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Dest": "empty",
+    }
+    if debug: logger.debug("[*] Headers finales: %s" % verify_headers)
+
+    try:
+        if not kwargs.get("challenge_post", False):
+
+            r2 = session.get(
+                verify_url,
+                timeout=kwargs.get("timeout", 20),
+                params=payload,
+                headers=verify_headers,
+                allow_redirects=False,
+            )
+        
+        else:
+            r2 = session.post(
+                verify_url,
+                timeout=kwargs.get("timeout", 20),
+                data=payload,
+                headers=verify_headers,
+                allow_redirects=False,
+                cookies=jar,
+            )
+    except Exception as e:
+        r2 = requests.Response()
+        r2.status_code = str(e)
+
+    if r2.status_code not in httptools.SUCCESS_CODES + httptools.REDIRECTION_CODES:
+        logger.debug("[*] Status_code: %s, URL: %s / %s, Headers: %s, Cookies: %s, Datos: %s" \
+                     % (r2.status_code, verify_url, payload, r2.headers, jar, r2.text))
+        return False
+
+    else:
+        cookie_pow_auth_raw = r2.headers.get("Set-Cookie", "").split(";")
+        for dom in ["."+domain, domain, domain_base, domain_proxy]:
+            cookie_pow_auth_dict = {}
+            for cookie in cookie_pow_auth_raw:
+                cookie_kv = cookie.replace("path=/,", "").split("=")
+                if "browser-pow-auth" in cookie_kv[0]:
+                    cookie_pow_auth_dict["name"] = cookie_kv[0].strip()
+                    cookie_pow_auth_dict["value"] = cookie_kv[1].strip()
+            cookie_pow_auth_dict["domain"] = dom
+            cookie_pow_auth_dict["expires"] = 3600 * 12
+            cookies_list.append(cookie_pow_auth_dict)
+        if debug: logger.debug("[*] Status_code: %s, URL: %s / %s, Headers: %s, Cookies: %s, Datos: %s" \
+                                % (r2.status_code, verify_url, payload, r2.headers, cookies_list, r2.text))
+
+        clear = kwargs.get("cookies_clear", False)
+        for cookie in cookies_list:
+            httptools.set_cookies(cookie, clear=clear, alfa_s=True)
+
+    return r2

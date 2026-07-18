@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -19,20 +19,27 @@ list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES_T
 list_quality_tvshow = AlfaChannelHelper.LIST_QUALITY_TVSHOW
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_T
-forced_proxy_opt = 'ProxySSL'
+
+cf_assistant = True if AlfaChannelHelper.IS_ASSISTANT_INSTALLED else False
+forced_proxy_opt = None if cf_assistant else None
+debug = config.get_setting('debug_report', default=False)
 
 canonical = {
              'channel': 'mejortorrent', 
              'host': config.get_setting("current_host", 'mejortorrent', default=''), 
-             'host_alt': ["https://www30.mejortorrent.eu/"], 
-             'host_black_list': ["https://www29.mejortorrent.eu/", 
+             'host_alt': ["https://www38.mejortorrent.eu/"], 
+             'host_black_list': ["https://www37.mejortorrent.eu/", "https://www36.mejortorrent.eu/", "https://www35.mejortorrent.eu/",
+                                 "https://www34.mejortorrent.eu/", "https://www33.mejortorrent.eu/", "https://www32.mejortorrent.eu/", 
+                                 "https://www31.mejortorrent.eu/", "https://www30.mejortorrent.eu/", "https://www29.mejortorrent.eu/", 
                                  "https://www28.mejortorrent.eu/", "https://www26.mejortorrent.eu/", "https://www24.mejortorrent.zip/", 
                                  "https://www23.mejortorrent.zip/", "https://www22.mejortorrent.zip/", "https://www21.mejortorrent.zip/", 
                                  "https://www3.mejortorrent.rip/", 'https://mejortorrent.cc/', 'https://mejortorrent.one/', 
                                  'https://mejortorrent.nz', 'https://www.mejortorrentes.org/'], 
              'pattern': '<div\s*class="header-logo[^>]*>\s*<a\s*href="([^"]+)"', 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': True, 'set_tls_min': True, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             'retries_cloudflare': -1 if cf_assistant else 1, 
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False,
+             'data_js': ''
             }
 host = canonical['host'] or canonical['host_alt'][0]
 host_torrent = host
@@ -122,6 +129,8 @@ def mainlist(item):
                          folder=False, thumbnail=get_thumb("next.png")))
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
+
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 

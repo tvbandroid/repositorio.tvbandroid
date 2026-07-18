@@ -40,6 +40,7 @@ isAlfaAssistantOpen = False
 window = None
 timer1 = 30
 timer2 = 5
+android_15 = False
 
 
 def check_assistant_servers(time1=timer1, time2=timer2):
@@ -264,6 +265,91 @@ JS_CODE_CLICK_ON_JWPLAYER = """
 
 ## Comunica con el navegador Alfa Assistant ##################################################################################################################################
 #
+# Ejecuta JsCode y devuelve el resultado
+#
+# Uso típico: 
+#
+#   from lib.alfa_assistant import is_alfa_installed, get_js_result
+#   cf_assistant = True if is_alfa_installed() else False
+#   jsCode = """
+#       var a = 1;
+#       var b = 3;
+#       var c = a + b;
+#       return c;
+#   """
+#   if cf_assistant: resultado = get_js_result(url="about:blank", timeout=0.001, extraPostDelay=0, jsCode=jsCode, formatJSdata=True)
+#   ==> resultado = 4    
+#
+def get_js_result(
+    url=None,
+    timeout=3,
+    jsCode=None,
+    jsDirectCodeNoReturn=None,
+    jsDirectCode2NoReturn=None,
+    extraPostDelay=0,
+    userAgent=None,
+    debug=None,
+    headers=None,
+    malwareWhiteList=None,
+    disableCache=None,
+    closeAfter=None,
+    getData=None,
+    postData=None,
+    getCookies=None,
+    update=None,
+    alfa_s=False,
+    version=None,
+    clearWebCache=False,
+    removeAllCookies=False,
+    hardResetWebView=False,
+    keep_alive=False,
+    returnWhenCookieNameFound=None,
+    retryIfTimeout=False,
+    mute=True,
+    urlParamRemoveAllCookies=False,
+    useAdvancedWebView=False,
+    cleanObjects=False,
+    formatJSdata=False,
+):
+    return get_generic_call(
+        "getJSResult",
+        url,
+        timeout,
+        jsCode,
+        jsDirectCodeNoReturn,
+        jsDirectCode2NoReturn,
+        extraPostDelay,
+        userAgent,
+        debug,
+        headers,
+        malwareWhiteList,
+        disableCache,
+        closeAfter,
+        getData,
+        postData,
+        getCookies,
+        update,
+        alfa_s,
+        version,
+        clearWebCache,
+        removeAllCookies,
+        hardResetWebView,
+        keep_alive,
+        returnWhenCookieNameFound,
+        retryIfTimeout,
+        mute,
+        urlParamRemoveAllCookies,
+        useAdvancedWebView,
+        cleanObjects,
+        formatJSdata,
+    )
+
+
+##############################################################################################################################################################################
+
+
+## Comunica con el navegador Alfa Assistant ##################################################################################################################################
+#
 # Recupera el código fuente de los recursos visitados y las URLS
 #
 def get_source_by_page_finished(
@@ -294,6 +380,8 @@ def get_source_by_page_finished(
     mute=True,
     urlParamRemoveAllCookies=False,
     useAdvancedWebView=False,
+    cleanObjects=False,
+    formatJSdata=False,
 ):
     return get_generic_call(
         "getSourceByPageFinished",
@@ -324,6 +412,8 @@ def get_source_by_page_finished(
         mute,
         urlParamRemoveAllCookies,
         useAdvancedWebView,
+        cleanObjects,
+        formatJSdata,
     )
 
 
@@ -362,6 +452,8 @@ def get_urls_by_page_finished(
     mute=True,
     urlParamRemoveAllCookies=False,
     useAdvancedWebView=False,
+    cleanObjects=False,
+    formatJSdata=False,
 ):
     return get_generic_call(
         "getUrlsByPageFinished",
@@ -392,6 +484,8 @@ def get_urls_by_page_finished(
         mute,
         urlParamRemoveAllCookies,
         useAdvancedWebView,
+        cleanObjects,
+        formatJSdata,
     )
 
 
@@ -526,6 +620,8 @@ def get_generic_call(
     mute=True,
     urlParamRemoveAllCookies=False,
     useAdvancedWebView=False,
+    cleanObjects=False,
+    formatJSdata=False,
     retry=True,
 ):
     EXTRA_TIMEOUT_PLUS = 0
@@ -569,6 +665,7 @@ def get_generic_call(
             )
     elif not timeout:
         timeout = 0
+
     if endpoint in ["ping", "getWebViewInfo", "quit", "terminate"]:
         serverCall = URL_PING
     else:
@@ -584,7 +681,6 @@ def get_generic_call(
             base64.b64encode(url.encode("utf8")).decode("utf8"),
             str(int(timeout * 1000)),
         )
-
     if jsCode:
         serverCall += "&jsCode=%s" % base64.b64encode(jsCode.encode("utf8")).decode(
             "utf8"
@@ -643,9 +739,10 @@ def get_generic_call(
         if not alfa_s:
             logger.info("##Assistant get-data: %s" % getData)
     if postData:
-        serverCall += "&postData=%s" % base64.b64encode(postData.encode("utf8")).decode(
-            "utf8"
-        )
+        if "POST_FORM" not in str(jsCode):
+            serverCall += "&postData=%s" % base64.b64encode(postData.encode("utf8")).decode(
+                "utf8"
+            )
         if not alfa_s:
             logger.info("##Assistant post-data: %s" % postData)
     if returnWhenCookieNameFound:
@@ -719,6 +816,7 @@ def get_generic_call(
         keep_alive=keep_alive,
         retry_alt=False,
         proxy_retries=0,
+        clean_objects=cleanObjects,
     )
 
     change = False
@@ -759,6 +857,7 @@ def get_generic_call(
                 keep_alive=keep_alive,
                 retry_alt=False,
                 proxy_retries=0,
+                clean_objects=cleanObjects,
             )
             sucess = res.sucess
             code = res.code
@@ -824,6 +923,7 @@ def get_generic_call(
                 keep_alive=keep_alive,
                 retry_alt=False,
                 proxy_retries=0,
+                clean_objects=cleanObjects,
             )
         else:
             platformtools.dialog_notification(
@@ -836,6 +936,8 @@ def get_generic_call(
 
     if data:
         if endpoint in ["update"]:
+            return data
+        if endpoint in ["getJSResult"] and not formatJSdata:
             return data
         try:
             if ':"sec-ch-ua' in data:
@@ -900,7 +1002,16 @@ def get_generic_call(
                         round((ASSISTANT_SERVERS_AGE - time.time()) / 60, 2),
                     )
                 )
+
+        if formatJSdata:
+            for html_source in data_ret.get("htmlSources", []):
+                if html_source.get("url", "") == "javascript:jscode" and html_source.get("source", ""):
+                    data_ret = base64.b64decode(html_source.get("source", ""))
+                    if PY3 and isinstance(data_ret, bytes):
+                        data_ret = "".join(chr(x) for x in bytes(data_ret))
+                    break
         return data_ret
+
     else:
         data = ""
         return data
@@ -1000,7 +1111,7 @@ def open_alfa_assistant(
     if ASSISTANT_SERVERS_AGE < time.time():
         check_assistant_servers(time1=timer1, time2=timer2)
 
-    if not isAlfaAssistantOpen:
+    if not isAlfaAssistantOpen or android_15:
         try:
             if ASSISTANT_MODE == "este":
                 if not is_alfa_installed():
@@ -1016,9 +1127,13 @@ def open_alfa_assistant(
                     force=True,
                 )
 
-                ver_upd = get_generic_call(
-                    "ping", timeout=2 - EXTRA_TIMEOUT, alfa_s=True, retry=False
-                )
+                if not android_15:
+                    ver_upd = get_generic_call(
+                        "ping", timeout=2 - EXTRA_TIMEOUT, alfa_s=True, retry=False
+                    )
+                else:
+                    ver_upd = None
+
                 if closeAfter:
                     cmd = "openAndQuit"
                 else:
@@ -1526,7 +1641,7 @@ def execute_binary_from_alfa_assistant(
             USER_APP_URL = "%s:%s" % (ASSISTANT_SERVER, "48886")
             USER_APP_URL_ALT = "%s:%s" % (ASSISTANT_SERVER, "48885")
             separator = "|"
-            separator_escaped = "\|"
+            separator_escaped = r"\|"
             separator_kwargs = "|||"
             command = []
             status_code = 0
@@ -1969,6 +2084,8 @@ def binary_stat(p, action, retry=False, init=False, app_response={}):
 ## Instala o actualiza la app de Assitant ##################################################################################################################################
 #
 def install_alfa_assistant(update=False, remote="", verbose=VERBOSE):
+    global android_15
+
     if PLATFORM not in ["android", "atv2"] and ASSISTANT_MODE == "este":
         return install_alfa_desktop_assistant(
             update=update, remote=remote, verbose=verbose
@@ -1995,10 +2112,13 @@ def install_alfa_assistant(update=False, remote="", verbose=VERBOSE):
     download = addonid + ".apk"
     package = addonid + ".apk"
     version = addonid + ".version"
+    version_path = filetools.join(DATA_PATH, version)
     forced_menu = False
     respuesta = False
     alfa_s = True
     addons_path = RUNTIME_PATH
+    version_app = ''
+    version_act = ''
     if filetools.exists(filetools.join(addons_path, "channels", "custom.py")):
         alfa_s = False
 
@@ -2019,21 +2139,45 @@ def install_alfa_assistant(update=False, remote="", verbose=VERBOSE):
         "data",
         app_name,
     )
+    android_15 = True if PLATFORM in ["android", "atv2"] and ASSISTANT_MODE == "este" \
+                                                         and filetools.exists(filetools.dirname(apk_files)) \
+                                                         and len(filetools.listdir(filetools.dirname(apk_files))) == 0 \
+                                                         else False
+    apk_files_exists = filetools.exists(apk_files) or android_15
+    
     if ASSISTANT_MODE == "este" and not filetools.exists(filetools.dirname(apk_files)):
         apk_files_alt = scrapertools.find_single_match(
-            os.getenv("HOME"), "(.*?)\/\w*.\w*.\w*\/files"
+            os.getenv("HOME"), r"(.*?)\/\w*.\w*.\w*\/files"
         )
         logger.info("HOME: " + apk_files_alt)
         if apk_files_alt and filetools.exists(apk_files_alt):
             apk_files = "%s/%s" % (apk_files_alt, app_name)
+    elif android_15:
+        logger.info("Android 15+")
+        version_dict = get_generic_call(
+            "getWebViewInfo", timeout=1, alfa_s=True, retry=False
+        )
+        if not version_dict:
+            execute_in_alfa_assistant_with_cmd(
+                "open"
+            )  # activamos la app por si no se ha inicializado
+            time.sleep(2)
+            version_dict = get_generic_call(
+                "getWebViewInfo", timeout=1, alfa_s=True, retry=False
+            )
+            if version_dict and isinstance(version_dict, dict):
+                version_app = version_act = version_dict.get("assistantVersion", "")
+                filetools.write(version_path, version_act, mode="wb", silent=True)
+            else:
+                apk_files_exists = False
 
-    version_path = filetools.join(DATA_PATH, version)
-    version_act = filetools.read(version_path, silent=True)
+    if not version_act: 
+        version_act = filetools.read(version_path, silent=True)
     if not version_act:
         version_act = "0.0.0"
 
     # Averiguamos si es instalacción, update, o forzado desde el Menú de Ajustes
-    if not update and ASSISTANT_MODE == "este" and filetools.exists(apk_files):
+    if not update and ASSISTANT_MODE == "este" and apk_files_exists:
         return version_act, app_name
     if ASSISTANT_MODE == "este" and not update:
         check_permissions_alfa_assistant()  # activamos la app por si no se ha inicializado
@@ -2043,12 +2187,13 @@ def install_alfa_assistant(update=False, remote="", verbose=VERBOSE):
         else:
             filetools.remove(version_path, silent=True)
     # Mirarmos si la app está activa y obtenemos el nº de versión
-    version_dict = get_generic_call(
-        "getWebViewInfo",
-        timeout=2 - EXTRA_TIMEOUT,
-        alfa_s=True,
-        retry=False if ASSISTANT_MODE == "este" else True,
-    )
+    if not version_app:
+        version_dict = get_generic_call(
+            "getWebViewInfo",
+            timeout=2 - EXTRA_TIMEOUT,
+            alfa_s=True,
+            retry=False if ASSISTANT_MODE == "este" else True,
+        )
     if isinstance(version_dict, dict):
         version_app = version_dict.get("assistantVersion", "")
         try:
@@ -2120,14 +2265,14 @@ def install_alfa_assistant(update=False, remote="", verbose=VERBOSE):
             config.set_setting("assistant_flag_install", True)
             if not update:
                 return version_app, app_name
-    elif not update and not filetools.exists(apk_files):
+    elif not update and not apk_files_exists:
         logger.info("NO está instalada. No es Update: %s" % app_name)
         return False, app_name
-    elif update and isinstance(update, bool) and not filetools.exists(apk_files):
+    elif update and isinstance(update, bool) and not apk_files_exists:
         logger.info("NO está instalada. No se va a actualizar: %s" % app_name)
         filetools.remove(version_path, silent=True)
         return False, app_name
-    elif update and not isinstance(update, bool) and not filetools.exists(apk_files):
+    elif update and not isinstance(update, bool) and not apk_files_exists:
         logger.info(
             "NO está instalada. Viene del Menú y se va a instalar: %s" % app_name
         )

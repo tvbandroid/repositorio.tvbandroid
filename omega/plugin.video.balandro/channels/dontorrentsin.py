@@ -12,7 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www20.dontorrent.link/'
+host = 'https://www21.dontorrent.link/'
 
 
 # ~ por si viene de enlaces guardados
@@ -22,7 +22,8 @@ ant_hosts = ['https://dontorrent.in/', 'https://dontorrent.tv/', 'https://www1.d
              'https://www8.dontorrent.fr/', 'https://www9.dontorrent.link/', 'https://www10.dontorrent.link/',
              'https://www11.dontorrent.link/', 'https://www12.dontorrent.link/', 'https://www13.dontorrent.link/',
              'https://www14.dontorrent.link/', 'https://www15.dontorrent.link/', 'https://www16.dontorrent.link/',
-             'https://www17.dontorrent.link/', 'https://www18.dontorrent.link/', 'https://www19.dontorrent.link/']
+             'https://www17.dontorrent.link/', 'https://www18.dontorrent.link/', 'https://www19.dontorrent.link/',
+             'https://www20.dontorrent.link/']
 
 
 domain = config.get_setting('dominio', 'dontorrentsin', default='')
@@ -93,9 +94,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_dontorrentsin', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='dontorrentsin', folder=False, text_color='chartreuse' ))
@@ -107,7 +108,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'dontorrentsin', thumbnail=config.get_thumb('dontorrentsin') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'dontorrentsin' ))
 
     platformtools.itemlist_refresh()
 
@@ -141,7 +144,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'movie', text_color='cyan' ))
 
-    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades',  search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie', text_color='moccasin' ))
+
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', search_type = 'movie', text_color='tan' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie', tipo = 'genero' ))
 
@@ -165,6 +170,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Catálogo (alfabético)', action = 'list_all', url = host + 'series/letra-.', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'tvshow', text_color='cyan' ))
+
+    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'series/4K/page/1', search_type = 'tvshow', text_color='moccasin' ))
 
     itemlist.append(item.clone( title = 'Catálogo HD', action = 'list_all', url = host + 'series/hd/page/1', search_type = 'tvshow' ))
 
@@ -190,16 +197,6 @@ def mainlist_documentary(item):
     itemlist.append(item.clone( title = 'Lo último', action = 'list_last', url = host + 'ultimos', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Por letra (A - Z)', action = 'alfabetico', url = host + 'documentales', search_type = 'documentary' ))
-
-    return itemlist
-
-
-def calidades(item):
-    logger.info()
-    itemlist = []
-
-    itemlist.append(item.clone( title = 'En 4K', action = 'list_all', url = host + 'peliculas/4K/page/1', search_type = 'movie', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas/hd/page/1', search_type = 'movie', text_color='moccasin' ))
 
     return itemlist
 
@@ -367,6 +364,8 @@ def list_last(item):
     except: return itemlist
 
     for url, title in matches:
+        title = title.replace('&#039;', "'")
+
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
             elif "[" in title: titulo = title.split("[")[0]
@@ -587,7 +586,7 @@ def list_search(item):
         if item.search_type == 'all': 
             sufijo = contentType
             if sufijo == "documentary":
-                sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+                sufijo = '[COLOR cyan]Documental[/COLOR]'
 
         if contentType == 'tvshow':
             if not item.search_type == 'all':
@@ -659,6 +658,16 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
+
 
 def search(item, texto):
     logger.info()

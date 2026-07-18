@@ -1,4 +1,4 @@
-[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.17 Fix-5[/COLOR] [COLOR chartreuse] 7 de Junio de 2025[/B][/COLOR]
+[COLOR coral][B]Balandro[/COLOR]  [COLOR yellow]Version 4.0.30 Fix-6[/COLOR] [COLOR chartreuse] 18 de Julio de 2026[/B][/COLOR]
 
  [COLOR yellow][B]CONTACTO:[/B][/COLOR]
     Foro  [COLOR dodgerblue][B][I]www.mimediacenter.info/foro/[/I][/B][/COLOR]  Instalaciones, Tutoriales, Sugerencias, etc.
@@ -30,6 +30,8 @@
        plugin.video.torrest
 
     [B][COLOR indianred]Otros Add-ons que pueden necesitarse:[/COLOR][/B]
+       inputstream.adaptive
+       inputstream.ffmpegdirect
        plugin.video.youtube
        script.module.resolveurl
 
@@ -48,20 +50,29 @@
        Servidores: Sin novedades
 
  [COLOR yellowgreen][B]CANALES QUE REQUIEREN REGISTRARSE (Cuenta):[/B][/COLOR]
-    HdFull,  PlayDede
+    HdFull
 
- [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR]
-    [COLOR springgreen][B]Son en los que Predominan Sin enlaces Disponibles, Invalidos y/o Servidores No Soportados[/B][/COLOR]
-    Mega1Link
+ [COLOR palegreen][B]SITUACION CANALES:[/B][/COLOR]
+    [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]
+
+ [COLOR greenyellow][B]CANALES PROBLEMATICOS:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
+
+ [COLOR cyan][B]CANALES INESTABLES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
+
+ [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
+    [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]
+
+ [COLOR slateblue][B]CANALES PROBABLEMENTE NO ACCESIBLES:[/B][/COLOR]
+    [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]
+
+ [COLOR palevioletred][B]ULTIMOS CAMBIOS DE DOMINIOS:[/B][/COLOR]
+    [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]
 
  [COLOR sienna][B]SITUACION SERVIDORES:[/B][/COLOR]
     [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]
 
- [COLOR cyan][B]CANALES INESTABLES:[/B][/COLOR] [B][COLOR darkorange] Sin Novedades[/B][/COLOR]
- 
- [COLOR darkcyan][B]CANALES TEMPORALMENTE DES-ACTIVADOS:[/B][/COLOR]
-    [COLOR tomato]Vea la lista en la Ayuda [B]Ultimos Cambios de Dominios[/B][/COLOR]
-
  [COLOR gold][B]SERVIDORES VIAS ALTERNATIVAS/ADICIONALES QUE PUEDEN NECESITARSE:[/B][/COLOR]
+    inputstream.adaptive
+    inputstream.ffmpegdirect
     plugin.video.youtube
     script.module.resolveurl

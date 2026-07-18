@@ -62,6 +62,22 @@ def do_downloadpage(url, post=None, headers=None):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers).data
 
+        if not data:
+            if not '/search/' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('EzTv', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('eztv', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/search/' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -73,6 +89,8 @@ def acciones(item):
                                 from_channel='eztv', folder=False, text_color='chartreuse' ))
 
     itemlist.append(item_configurar_proxies(item))
+
+    itemlist.append(Item( channel='helper', action='show_help_eztv', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('eztv') ))
 
     platformtools.itemlist_refresh()
 
@@ -91,7 +109,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'showlist/rating/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'showlist/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'showlist/rating/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Temporadas completas', action='list_all', url = host + 'cat/tv-packs-1/', search_type = 'tvshow' ))
 
@@ -118,6 +138,15 @@ def list_all(item):
 
         if not url or not title: continue
 
+        if '/search/' in item.url:
+            urlp = scrapertools.find_single_match(match, '<td class="forum_thread_post">.*?<a href="(.*?)"')
+            titp = scrapertools.find_single_match(match, '<td class="forum_thread_post">.*?title="(.*?)"')
+
+            if urlp: url = urlp
+            if titp: title = titp
+
+        if '[eztv]' in title: title = title.split("[eztv]")[0]
+
         title = title.replace('Torrent', '').strip()
 
         SerieName = title
@@ -130,7 +159,12 @@ def list_all(item):
 
         titulo = title.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action='temporadas', url=url, title=titulo, contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
+        if '/ep/' in url:
+            itemlist.append(item.clone( action='findvideos', url=url, title=titulo,
+                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
+        else:
+            itemlist.append(item.clone( action='temporadas', url=url, title=titulo,
+                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -185,11 +219,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0,
                                     contentType = 'season', contentSeason = int(tempo), text_color = 'tan' ))

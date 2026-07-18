@@ -10,7 +10,7 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://seriesbiblicas.net/'
 
 
-perpage = 35
+perpage = 25
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -58,13 +58,11 @@ def mainlist_series(item):
 
     # ~ itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_ser', url = host, search_type = 'tvshow' ))
-
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'last_epis', url = host, search_type = 'tvshow', text_color = 'cyan' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_ser', url = host + 'series/' , search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'lasts', text_color = 'moccasin' ))
 
-    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'recom' ))
+    itemlist.append(item.clone( title = 'Más vistas', action = 'list_ser', url = host, search_type = 'tvshow', group = 'recom' ))
 
     itemlist.append(item.clone( title = 'Otras series', action = 'otras', search_type = 'tvshow', text_color = 'hotpink' ))
 
@@ -113,9 +111,9 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>PELÍCULAS DISPONIBLES<(.*?)>SIGUENOS<')
+    bloque = scrapertools.find_single_match(data, 'PELÍCULAS DISPONIBLES<(.*?)>SIGUENOS<')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div class="wpb_column vc_column_container td-pb-span3">(.*?)</div></div>')
+    matches = scrapertools.find_multiple_matches(bloque, '<div class="wpb_column vc_column_container td-pb-.*?">(.*?)</div></div>')
 
     num_matches = len(matches)
 
@@ -126,9 +124,10 @@ def list_all(item):
 
         if not link or not title: continue
 
-        thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
+        thumb = scrapertools.find_single_match(match, 'data-lazy-src="(.*?)"')
 
         year = scrapertools.find_single_match(title, '<span>(\d{4})')
+
         if year:
              title = title.replace('(' + year + ')', '').strip
         else: year = '-'
@@ -165,11 +164,11 @@ def list_ser(item):
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     if item.group == 'recom':
-        bloque = scrapertools.find_single_match(data, '>SERIES RECOMENDADAS<(.*?)</script>')
+        bloque = scrapertools.find_single_match(data, 'MÁS VISTAS<(.*?)</script>')
     elif item.group == 'lasts':
         bloque = scrapertools.find_single_match(data, '>SERIES DISPONIBLES<(.*?)</script>')
     else:
-        bloque = scrapertools.find_single_match(data, '>SERIES<(.*?)>MÁS SERIES<')
+        bloque = scrapertools.find_single_match(data, '>SERIES<(.*?)>OTRAS SERIES<')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
@@ -217,40 +216,6 @@ def list_ser(item):
     return itemlist
 
 
-def last_epis(item):
-    logger.info()
-    itemlist = []
-
-    data = do_downloadpage(item.url)
-    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
-
-    bloque = scrapertools.find_single_match(data, '>CAPÍTULOS MÁS RECIENTES<(.*?)>SERIES RECOMENDADAS<')
-
-    matches = re.compile('<a href="(.*?)".*?data-lazy-src="(.*?)"', re.DOTALL).findall(bloque)
-
-    for url, thumb in matches:
-        title = url
-
-        title = url.replace('-hd-google-drive', ' ').replace('-google-drive', ' ').replace('-hd-ok-ru', ' ').replace('-ok-ru', ' ').replace('-hd', ' ').replace('-sd', ' ').strip()
-
-        title = title.replace('-recordtv-subtitulada', ' ').replace('-recordtv', ' ').strip()
-        title = title.replace('-en-espanol-2', ' ').replace('-en-espanol', ' ').replace('-portugues', ' ').replace('-audio-latino', ' ').replace('-latino', ' ').strip()
-        title = title.replace('-sub', ' ').replace('-imagentv', ' ').replace('-unife', ' ').strip()
-
-        title = title.replace(host, ' ').replace('-', ' ').replace('/', '').strip()
-
-        SerieName = title
-
-        title = title.capitalize()
-
-        itemlist.append(item.clone( action='temporadas', url=url, title=title,
-                                    contentType = 'tvshow', contentSerieName = title, infoLabels={'year': '-'} ))
-
-    tmdb.set_infoLabels(itemlist)
-
-    return itemlist
-
-
 def temporadas(item):
     logger.info()
     itemlist = []
@@ -261,9 +226,9 @@ def temporadas(item):
     if not ' TEMPORADA<' in data:
         if not '>TEMPORADA ' in data:
             if not '>SEASON ' in data:
-                if config.get_setting('channels_seasons', default=True):
-                    if not item.contentSerieName: item.contentSerieName = item.title
-                    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+                if not item.contentSerieName: item.contentSerieName = item.title
+
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
 
                 item.page = 0
                 item.contentSerieName = item.title
@@ -288,20 +253,22 @@ def temporadas(item):
         elif '<center>' in tempo: tempo = scrapertools.find_single_match(tempo, '(.*?)</div>').strip()
         elif '</div>' in tempo: tempo = tempo.replace('</div>', '').strip()
 
+        if '<br' in tempo: tempo = tempo.split("<br")[0]
+
         title = 'Temporada ' + tempo
 
         if len(temporadas) == 1:
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
+                item.page = 0
 
-            if not item.contentSerieName: item.contentSerieName = item.title
+                if not item.contentSerieName: item.contentSerieName = item.title
 
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         if not item.contentSerieName: item.contentSerieName = item.title
 
@@ -331,14 +298,14 @@ def episodios(item):
     elif ' TEMPORADA<' in data:
         text_season = ''
 
-        if item.i == 1: text_season = '>PRIMERA'
+        if item.i == 1: text_season = '>PRIME'
         elif item.i == 2: text_season = '>SEGUNDA'
         elif item.i == 3: text_season = '>TERCERA'
         elif item.i == 4: text_season = '>CUARTA'
         elif item.i == 5: text_season = '>QUINTA'
         elif item.i == 6: text_season = '>SEXTA'
 
-        bloque = scrapertools.find_single_match(data, text_season + ' TEMPORADA<.*?</p>(.*?)</center>')
+        bloque = scrapertools.find_single_match(data, text_season + '.*?TEMPORADA<.*?</p>(.*?)</center>')
         if not bloque:
             if '>CAPITULOS<' in data:
                 bloque = scrapertools.find_single_match(data, '>CAPITULOS</span></center>(.*?)</div></div></div></center>')
@@ -349,9 +316,16 @@ def episodios(item):
     elif '>CAPÍTULOS<' in data:
         bloque = scrapertools.find_single_match(data, '>CAPÍTULOS</span>(.*?)</div></div></div></div></div></div></div>')
 
+    elif '>EPISODES<' in data:
+        bloque = scrapertools.find_single_match(data, '>EPISODES</span>(.*?)</div></div></div></div></div></div></div>')
+
     else:
         bloque = scrapertools.find_single_match(data, '>CAPITULOS</span></center>(.*?)</center>')
         if not bloque: bloque = scrapertools.find_single_match(data, '>CAPITULOS</span>(.*?)</div></div></div></center>')
+
+        if not bloque:
+            bloque = scrapertools.find_single_match(data, '>EPISODIOS</span></center>(.*?)</center>')
+            if not bloque: bloque = scrapertools.find_single_match(data, '>EPISODIOS</span>(.*?)</div></div></div></center>')
 
     matches = re.compile('<div class="su-spoiler-title">.*?</span>(.*?)</div>.*?<a href="(.*?)".*?</i>(.*?)</div></div>', re.DOTALL).findall(bloque)
     if not matches: matches = re.compile("class='sa_hover_(.*?)'" + '.*?data-mfp-src="(.*?)".*?<noscript>(.*?)</noscript>', re.DOTALL).findall(bloque)
@@ -414,10 +388,25 @@ def episodios(item):
             link = url
             url = ''
 
-        titulo = str(item.contentSeason) + 'x' + str(i) + ' ' + title
+        epis = i
+
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo:
+            titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
+            epis = scrapertools.find_single_match(titulo, 'Epis.(.*?)HD').strip()
+            epis = epis.replace('[/COLOR]', '').replace('- ', '').strip()
+
+            if epis: titulo = titulo.replace(str(item.contentSeason) + 'x' + str(i), str(item.contentSeason) + 'x' + str(epis))
+            else: epis = i
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, link = link, resto = resto,
-                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=str(i) ))
+                                    contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -426,7 +415,8 @@ def episodios(item):
 
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage, i = i, text_color='coral' ))
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page = item.page + 1, perpage = item.perpage,
+                            i = i, text_color='coral' ))
 
     return itemlist
 
@@ -444,7 +434,6 @@ def findvideos(item):
         if item.link.startswith("//"): item.link = 'https:' + item.link
 
         servidor = servertools.get_server_from_url(item.link)
-        servidor = servertools.corregir_servidor(servidor)
 
         if '/ok.ru' in item.link: servidor = 'okru'
         elif '/drive.' in item.link: servidor = 'gvideo'
@@ -467,7 +456,6 @@ def findvideos(item):
 
         if not url == '#':
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(url)
 
             if '/ok.ru' in url: servidor = 'okru'
             elif '/drive.' in url: servidor = 'gvideo'
@@ -490,7 +478,6 @@ def findvideos(item):
             if link.startswith("//"): link = 'https:' + link
 
             servidor = servertools.get_server_from_url(link)
-            servidor = servertools.corregir_servidor(servidor)
 
             if '/ok.ru' in link: servidor = 'okru'
             elif '/drive.' in link: servidor = 'gvideo'

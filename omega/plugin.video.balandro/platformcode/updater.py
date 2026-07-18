@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import os, xbmc, time, traceback, hashlib
+import os, xbmc, xbmcaddon, time, traceback, hashlib, zipfile
+
+from xml.etree import ElementTree
 
 from platformcode import config, logger, platformtools
 from core import httptools, jsontools, filetools, downloadtools, scrapertools
+
+from modules import actions
 
 
 ant_repos = ['4.0.0', '3.0.0', '2.0.0', '1.0.5', '1.0.3'] 
@@ -45,8 +49,6 @@ def check_repo(force=False):
 
     if os.path.isdir(path_repo) == True:
         try:
-            import xbmcaddon
-
             repo_version = xbmcaddon.Addon(REPO_ID).getAddonInfo("version").strip()
 
             for ant in ant_repos:
@@ -71,7 +73,6 @@ def check_repo(force=False):
             return
 
         try:
-            import zipfile
             dir = zipfile.ZipFile(repo_zip, 'r')
             dir.extractall(addons_path)
             dir.close()
@@ -229,7 +230,6 @@ def check_addon_updates(verbose=False, force=False):
 
         if data['hash'] == hash_localfilename:
             try:
-                import zipfile
                 dir = zipfile.ZipFile(localfilename, 'r')
                 dir.extractall(config.get_runtime_path())
                 dir.close()
@@ -244,13 +244,9 @@ def check_addon_updates(verbose=False, force=False):
 
             logger.info('Addon actualizado correctamente a %s.fix%d' % (data['addon_version'], data['fix_version']))
 
-            if addon_update_verbose:
-                from modules import helper
-                helper.resumen_fix('')
+            if addon_update_verbose: actions.resumen_fix('')
 
-            if addon_update_domains:
-                from modules import actions
-                actions.show_latest_domains('')
+            if addon_update_domains: actions.show_latest_domains('')
 
             if verbose:
                 tex = '[B][COLOR %s]Actualizado a la versión %s.fix%d[/COLOR][/B]' % (color_avis, data['addon_version'], data['fix_version'])
@@ -309,16 +305,36 @@ def put_proxies_list():
 def check_addon_version():
     logger.info()
 
-    from xml.etree import ElementTree
-
     repo_data = httptools.downloadpage(ADDON_VERSION, timeout=10).data
 
-    if '404: Not Found' in repo_data: return False
+    vers_addon = False
 
-    xml = ElementTree.fromstring(repo_data)
-    addon = list(filter(lambda x: x.get("id") == config.__addon_id, xml.findall('addon')))[0]
+    xml_addon = ''
 
-    if addon.get('version') == config.get_addon_version(False): return True
+    if not '404: Not Found' in repo_data: vers_addon = True
+
+    if vers_addon:
+        xml = ElementTree.fromstring(repo_data)
+        addon = list(filter(lambda x: x.get("id") == config.__addon_id, xml.findall('addon')))[0]
+
+        xml_addon = addon.get('version').strip()
+        run_addon = config.get_addon_version(False).strip()
+
+        if xml_addon == run_addon: vers_addon = True
+        else: vers_addon = False
+
+    if vers_addon: return True
+
+    if not xml_addon:
+        vers = ADDON_VERSION.replace('https://', '')
+
+        if config.get_setting('developer_mode', default=False):
+            if config.get_setting('developer_team'):
+                platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]Updater[/B][/COLOR]', '[B][COLOR red]Error Versión Desarrollo[/COLOR][/B]', vers)
+
+                return False
+
+        platformtools.dialog_ok(config.__addon_name + ' [COLOR yellow][B]Updater[/B][/COLOR]', '[B][COLOR red]Error Versión Xml[/COLOR][/B]', vers)
 
     return False
 

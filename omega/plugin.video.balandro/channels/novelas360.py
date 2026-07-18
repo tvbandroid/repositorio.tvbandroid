@@ -252,8 +252,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('channels_seasons', default=True):
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
 
     item.page = 0
     item.contentType = 'season'
@@ -399,7 +398,6 @@ def findvideos(item):
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
 
@@ -446,7 +444,7 @@ def list_search(item):
 
             if not epis: epis = 1
 
-            titulo = title + ' Capítulo ' + epis
+            titulo = title + ' [COLOR goldenrod]Epis.[/COLOR] ' + epis
 
             itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
                                         contentSerieName = SerieName, contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis ))
@@ -465,6 +463,15 @@ def list_search(item):
                 itemlist.append(item.clone( title = "Siguientes ...", action = "list_search", url = next_page, text_color='coral' ))
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

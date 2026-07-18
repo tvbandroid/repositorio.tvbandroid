@@ -41,7 +41,7 @@ language = []
 url_replace = []
 
 
-finds = {'find':  dict([('find', [{'tag': ['div'], 'class': ['v-cards']}]),
+finds = {'find':  dict([('find', [{'tag': ['div'], 'id': ['videos-list']}]),
                         ('find_all', [{'tag': ['a'], 'href': re.compile("/video/[0-9]+/")}])]),
          'categories': dict([('find', [{'tag': ['div'], 'class': ['v-cards']}]),
                              ('find_all', [{'tag': ['div'], 'class': ['item']}])]),
@@ -50,15 +50,15 @@ finds = {'find':  dict([('find', [{'tag': ['div'], 'class': ['v-cards']}]),
          'get_quality_rgx': '', 
          'next_page': {},
          'next_page_rgx': [['&page=\d+', '&page=%s']], 
-         'last_page': dict([('find', [{'tag': ['div', 'nav', 'ul'], 'class': ['n-pagination', 'pagination']}]), 
-                            ('find_all', [{'tag': ['a'], '@POS': [-2], 
-                                           '@ARG': 'href', '@TEXT': 'page=(\d+)'}])]), 
+         'last_page': {'find_all': [{'tag': ['a'], 'href': re.compile(r"page=\d+"), '@POS': [-2],
+                                     '@ARG': 'href', '@TEXT': 'page=(\d+)'}]},
          'plot': {}, 
          'findvideos': {},
          'title_clean': [['[\(|\[]\s*[\)|\]]', ''],['(?i)\s*videos*\s*', '']],
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
          'profile_labels': {
+                            'list_all_stime': {'find': [{'tag': ['div'], 'class': ['bottom-2'], '@TEXT': '(\d+:\d+)' }]},
                             'section_cantidad': dict([('find', [{'tag': ['li']}]),
                                                       ('get_text', [{'tag': '', 'strip': True, '@TEXT': '(\d+)'}])])
                             },

@@ -23,22 +23,23 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + '/0/', text_color = 'cyan' ))
-
-    itemlist.append(item.clone( title = 'Los mejores', action = 'list_all', url = host + 'best-videos/', text_color = 'tan' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_all', url = host + 'cat/4k-porn/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Más populares', action = 'list_all', url = host + 'most-viewed/' ))
     itemlist.append(item.clone( title = 'Más valorados', action = 'list_all', url = host + 'top-rated/' ))
+
+    itemlist.append(item.clone( title = 'Más vistos', action = 'list_all', url = host + 'best-videos/' ))
 
     itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'cats/', group = 'cats' ))
 
@@ -130,7 +131,6 @@ def list_all(item):
 
         if not url or not title: continue
 
-
         title = title.replace('&amp;', '&').replace('&#039;t', "'t").replace('&#039;', '')
 
         url = host[:-1] + url
@@ -144,7 +144,8 @@ def list_all(item):
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb,
+                                    contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
         bloque = scrapertools.find_single_match(data, '<div class="numlist2(.*?)</div>')
@@ -162,6 +163,13 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
@@ -174,6 +182,10 @@ def findvideos(item):
 
         qlty = qlty.replace('<u>', '').strip()
 
+        if '@' in qlty: qlty = qlty.split("@")[0]
+
+        if '(2K)' in qlty or '(4K)' in qlty: continue
+
         url = scrapertools.find_single_match(link, 'href="(.*?)"')
 
         if url:
@@ -182,6 +194,14 @@ def findvideos(item):
             itemlist.append(Item( channel = item.channel, action='play', title='', url=url, server='directo', language = 'Vo', quality = qlty) )
 
     return itemlist
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'cat/4k-porn/'
+
+    return list_all(item)
 
 
 def search(item, texto):

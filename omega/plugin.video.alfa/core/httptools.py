@@ -101,8 +101,8 @@ DEBUG_EXC = [
     "/api/stats",
 ]
 
-patron_host = "((?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?[\w|\-\d]+\.(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+))(?:\/|\?|$)"
-patron_domain = "(?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?([\w|\-\d]+\.(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+))(?:\/|\?|$)"
+patron_host = r"((?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?[\w|\-\d]+\.(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+))(?:\/|\?|$)"
+patron_domain = r"(?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?([\w|\-\d]+\.(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+))(?:\/|\?|$)"
 
 retry_alt_default = True
 
@@ -220,7 +220,7 @@ def get_cookie(url, name, follow_redirects=False):
 
 def get_url_headers(url, forced=False, dom=False):
     domain = urlparse.urlparse(url)[1]
-    sub_dom = scrapertools.find_single_match(domain, "\.(.*?\.\w+)")
+    sub_dom = scrapertools.find_single_match(domain, r"\.(.*?\.\w+)")
     if sub_dom and "google" not in url:
         domain = sub_dom
     if dom:
@@ -503,7 +503,7 @@ def check_proxy(url, **opt):
         url = proxy_data["url"]
         proxy_data["stat"] = proxy_data.get("stat", "").replace(",P", ", P")
 
-        if not "proxy_addr_forced" in proxy_data:
+        if "proxy_addr_forced" not in proxy_data:
             if proxy_data.get("dict", {}).get("https", ""):
                 proxy_data["dict"]["http"] = str("http://" + proxy_data["dict"]["https"])
                 proxy_data["dict"]["https"] = proxy_data["dict"]["http"]
@@ -649,9 +649,10 @@ def proxy_post_processing(url, proxy_data, response, **opt):
                 url = opt["url_save"]
 
             elif ", Proxy Web" in proxy_data.get("stat", ""):
-                if channel_proxy_list(
+                if opt.get("CF_proxy_alt", True) and (channel_proxy_list(
                     opt["url_save"], forced_proxy=proxy_data["web_name"]
-                ) or channel_proxy_list(opt["url_save"], forced_proxy="ProxyCF"):
+                ) or channel_proxy_list(opt["url_save"], forced_proxy="ProxyCF")
+                ):
                     opt["forced_proxy"] = "ProxyCF"
                     url = opt["url_save"]
                     opt["post"] = opt["post_save"]
@@ -804,7 +805,6 @@ def blocking_error(url, req, proxy_data, **opt):
         if code:
             data = re.sub(r"\n|\r|\t|\s{2,}", "", data)
             proxy = proxy_stat(opt.get("url_save", ""), proxy_data, **opt)
-            print_DEBUG(url, proxy_data, label="BLOCKING", **opt)
             if proxy and "ProxyWeb" in proxy:
                 url += " / %s" % opt.get("url_save", "")
             if "croxyproxy" in proxy_data.get("web_name", "") and code == "400":
@@ -911,8 +911,8 @@ def canonical_check(url, response, req, **opt):
         return response
 
     patterns = [
-        'href="?([^"|\s*]+)["|\s*]\s*rel="?canonical"?',
-        'rel="?canonical"?\s*href="?([^"|>]+)["|>|\s*]',
+        r'href="?([^"|\s*]+)["|\s*]\s*rel="?canonical"?',
+        r'rel="?canonical"?\s*href="?([^"|>]+)["|>|\s*]',
     ]
     if canonical.get("pattern_forced", ""):
         if isinstance(canonical["pattern_forced"], list):
@@ -1334,6 +1334,10 @@ def downloadpage(url, **opt):
         opt["cf_jscode"] = opt["canonical"]["cf_jscode"]
     if "cf_cookie_send" not in opt and "cf_cookie_send" in opt.get("canonical", {}):
         opt["cf_cookie_send"] = opt["canonical"]["cf_cookie_send"]
+    if "canonical_check" not in opt and "canonical_check" in opt.get("canonical", {}):
+        opt["canonical_check"] = opt["canonical"]["canonical_check"]
+    if "CF_proxy_alt" not in opt and "CF_proxy_alt" in opt.get("canonical", {}):
+        opt["CF_proxy_alt"] = opt["canonical"]["CF_proxy_alt"]
 
     # Preparando la url
     if not PY3:
@@ -1467,10 +1471,6 @@ def downloadpage(url, **opt):
                 ssl_context.verify_mode = ssl.CERT_NONE
             CS_stat = False
 
-        # Activa DEBUG extendido cuando se extrae un Informe de error (log)
-        print_DEBUG(url, opt, label="OPT", **opt)
-        print_DEBUG(url, proxy_data, label="PROXY_DATA", req=session, **opt)
-
         # Conectar la versión de SSL TLS con la sesión
         if (
             url.startswith("https:")
@@ -1510,8 +1510,8 @@ def downloadpage(url, **opt):
         if proxy_data.get("dict", {}):
             session.proxies = proxy_data["dict"]
             # if opt["session_verify_save"] is None: session.verify = opt['session_verify'] = False
-        if opt.get("headers_proxy", {}):
-            req_headers.update(dict(opt["headers_proxy"]))
+        if proxy_data.get("headers_proxy", {}):
+            req_headers.update(dict(proxy_data["headers_proxy"]))
         if cf_ua and cf_ua != "Default" and (get_cookie(url, "cf_clearance") or opt.get("cf_assistant_ua", False)):
             req_headers["User-Agent"] = cf_ua
 
@@ -1574,56 +1574,8 @@ def downloadpage(url, **opt):
                                 opt.get("file_name", "Default") + ", Buffer de memoria"
                             )
 
-                    info_dict = fill_fields_pre(url, proxy_data, file_name_, **opt)
-                    if opt.get("only_headers", False):
-                        ### Makes the request with HEAD method
-                        req = session.head(
-                            url,
-                            allow_redirects=opt.get("follow_redirects", True),
-                            timeout=opt.get("timeout", None),
-                            params=opt.get("params", {}),
-                        )
-                    elif str(opt.get("cf_assistant", '')) == 'force':
-                        ### Makes the request thru Assistant
-                        from lib.cloudscraper import cf_assistant
-
-                        if opt.get("post", None) is not None and payload:
-                            opt["post"] = payload
-                        if opt.get("files", {}) and files:
-                            opt["files"] = files
-                        req = requests.Response()
-                        req.status_code = 403
-                        req = cf_assistant.get_cl(opt, req, cache=True)
-                        # If no Assistant
-                        if req.status_code in [503, 429, 400]:
-                            opt['cf_assistant'] = True
-                            return downloadpage(url, **opt)
-                    else:
-                        ### Makes the request with POST method
-                        req = session.post(
-                            url,
-                            data=payload,
-                            allow_redirects=opt.get("follow_redirects", True),
-                            files=files,
-                            timeout=opt.get("timeout", None),
-                            params=opt.get("params", {}),
-                        )
-
-                elif str(opt.get("cf_assistant", '')) == 'force':
-                    info_dict = fill_fields_pre(url, proxy_data, file_name_, **opt)
-                    ### Makes the request thru Assistant
-                    from lib.cloudscraper import cf_assistant
-
-                    req = requests.Response()
-                    req.status_code = 403
-                    req = cf_assistant.get_cl(opt, req, cache=True)
-                    # If no Assistant
-                    if req.status_code in [503, 429, 400]:
-                        opt['cf_assistant'] = True
-                        return downloadpage(url, **opt)
-
-                elif opt.get("only_headers", False):
-                    info_dict = fill_fields_pre(url, proxy_data, file_name_, **opt)
+                info_dict = fill_fields_pre(url, proxy_data, file_name_, **opt)
+                if opt.get("only_headers", False):
                     ### Makes the request with HEAD method
                     req = session.head(
                         url,
@@ -1632,8 +1584,23 @@ def downloadpage(url, **opt):
                         params=opt.get("params", {}),
                     )
 
+                elif str(opt.get("cf_assistant", '')) == 'force':
+                    ### Makes the request thru Assistant
+                    from lib.cloudscraper import cf_assistant
+
+                    if opt.get("post", None) is not None and payload:
+                        opt["post"] = payload
+                    if opt.get("files", {}) and files:
+                        opt["files"] = files
+                    req = requests.Response()
+                    req.status_code = 403
+                    req = cf_assistant.get_cl(opt, req, cache=True)
+                    # If no Assistant
+                    if req.status_code in [503, 429, 400]:
+                        opt['cf_assistant'] = True
+                        return downloadpage(url, **opt)
+
                 elif opt.get("method", False):
-                    info_dict = fill_fields_pre(url, proxy_data, file_name_, **opt)
                     ### Makes the request with SEND method
                     req_send = requests.Request(
                         opt["method"],
@@ -1649,8 +1616,18 @@ def downloadpage(url, **opt):
                         allow_redirects=opt.get("follow_redirects", True),
                     )
 
+                elif opt.get("post", None) or files:
+                    ### Makes the request with POST method
+                    req = session.post(
+                        url,
+                        data=payload,
+                        allow_redirects=opt.get("follow_redirects", True),
+                        files=files,
+                        timeout=opt.get("timeout", None),
+                        params=opt.get("params", {}),
+                    )
+
                 else:
-                    info_dict = fill_fields_pre(url, proxy_data, file_name_, **opt)
                     ### Makes the request with GET method
                     req = session.get(
                         url,
@@ -1842,7 +1819,6 @@ def downloadpage(url, **opt):
                 else:
                     from . import proxytools_py3 as proxytools
                 domain = obtain_domain(opt["url_save"], sub=True)
-                print_DEBUG(url, proxy_data, label="TIMEOUT", req=req, **opt)
                 opt["post"] = opt["post_save"]
                 opt["proxy_web"] = False
                 opt["proxy_retries"] = 1 if not TEST_ON_AIR else 0
@@ -1862,8 +1838,8 @@ def downloadpage(url, **opt):
                     ] = opt["CF_if_assistant"] = True
                     if opt.get("canonical", {}):
                         opt["canonical"]["CF_stat"] = opt["CF"]
-                    opt["retries_cloudflare"] = 1
-                    opt["forced_proxy_ifnot_assistant"] = "ProxyCF"
+                    opt["retries_cloudflare"] = 1 if opt.get("CF_proxy_alt", True) else -1 
+                    opt["forced_proxy_ifnot_assistant"] = "ProxyCF" if opt.get("CF_proxy_alt", True) else None
                     opt["proxy_web"] = False
                     opt["proxy_addr_forced"] = None
                     opt["forced_proxy"] = None
@@ -2396,7 +2372,9 @@ def fill_fields_pre(url, proxy_data, file_name_, **opt):
             info_dict.append(("Keep Alive", opt.get("keep_alive", True)))
         if opt.get("cf_v2", False):
             info_dict.append(("CF v2 Assistant", opt.get("cf_v2", False)))
-        if opt.get("post", None) is not None or opt.get("files", None):
+        if opt.get("method", None):
+            info_dict.append(("Peticion", str(opt["method"]).upper() + proxy_data.get("stat", "")))
+        elif opt.get("post", None) is not None or opt.get("files", None) or file_name_:
             info_dict.append(("Peticion", "POST" + proxy_data.get("stat", "")))
         elif opt.get("only_headers", False):
             info_dict.append(("Peticion", "HEAD" + proxy_data.get("stat", "")))
@@ -2404,8 +2382,8 @@ def fill_fields_pre(url, proxy_data, file_name_, **opt):
             info_dict.append(("Peticion", "GET" + proxy_data.get("stat", "")))
         info_dict.append(("Descargar Pagina", not opt.get("only_headers", False)))
         info_dict.append(("BeautifulSoup", opt.get("soup", False)))
-        if opt.get("files", {}) and not isinstance(opt.get("files"), (tuple, dict)):
-            info_dict.append(("Objeto fichero", opt.get("files", {})))
+        if opt.get("files", {}) and not file_name_:
+            info_dict.append(("Objeto fichero", True))
         elif file_name_:
             info_dict.append(("Fichero para Upload", file_name_))
         if opt.get("params", {}):
@@ -2497,7 +2475,7 @@ def obtain_domain(url, sub=False, point=False, scheme=False):
 
     if url and len(url) > 1:
         url = urlparse.urlparse(url).netloc
-        ip = bool(scrapertools.find_single_match(url, "\d+\.\d+\.\d+\.\d+"))
+        ip = bool(scrapertools.find_single_match(url, r"\d+\.\d+\.\d+\.\d+"))
         if sub and not ip:
             split_lst = url.split(".")
             if len(split_lst) > 2:
@@ -2530,31 +2508,6 @@ def build_response(HTTPResponse=False):
     response["time_elapsed"] = 0
 
     return type("HTTPResponse", (), response) if HTTPResponse else response
-
-
-def print_DEBUG(url, obj, label="", req={}, **opt):
-    url_stat = ""
-    if DEBUG and not CACHING_DOMAINS:
-        for exc in DEBUG_EXC:
-            if exc in url:
-                break
-            if "proxy" in label.lower():
-                url_stat = "Proxy_SESSION: %s; SSL_version: %s; " % (req, ssl_version)
-            if "blocking" in label.lower():
-                url_stat = "Blocking_WEBS: %s; " % alfa_domain_web_list
-            if "opt" in label.lower():
-                # if opt_logger.get('post'): opt_logger['post'] = '******'
-                # if opt_logger.get('post_save'): opt_logger['post_save'] = '******'
-                url_stat = "Opt_URL: %s; " % url
-            if "timeout" in label.lower():
-                url_stat = "Error_CODE: %s; PROXY: %s; " % (
-                    req.status_code,
-                    channel_proxy_list(opt["url_save"]),
-                )
-
-        else:
-            opt["alfa_s"] = opt["hide_infobox"] = False
-            logger.debug("%s%s: %s" % (url_stat, label, obj))
 
 
 def update_alfa_domain_web_list(url, code, proxy_data, **opt):

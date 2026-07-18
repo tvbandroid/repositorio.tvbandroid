@@ -3,16 +3,17 @@
   "name": "Supervideo",
 
   "active": true,
+  "notes": "Alternative vía: Script.Module.ResolveUrl",
 
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "http(?:s|)://supervideo.tv/(?:e/|embed-|emb.html\\?|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://supervideo.tv/(?:e/|k/|embed-|emb.html\\?|)([A-z0-9]+)",
         "url": "https://supervideo.cc/\\1"
       },
       {
-        "pattern": "http(?:s|)://supervideo.cc/(?:e/||embed-|emb.html\\?|)([A-z0-9]+)",
+        "pattern": "http(?:s|)://supervideo.cc/(?:e/|k/|embed-|emb.html\\?|)([A-z0-9]+)",
         "url": "https://supervideo.cc/\\1"
       }
     ]

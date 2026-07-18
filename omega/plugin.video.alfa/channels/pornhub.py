@@ -29,6 +29,7 @@ canonical = {
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
+
 host = canonical['host'] or canonical['host_alt'][0]
 
 timeout = 5
@@ -52,7 +53,7 @@ finds = {'find': dict([ ('find', [{'tag': ['ul'], 'class': ['videoList', 'search
          'last_page': {}, 
          'plot': {}, 
          'findvideos': {}, 
-         'title_clean': [['[\(|\[]\s*[\)|\]]', ''], ['(?i)\s*videos*\s*', ''], ['Porn Category', '']],
+         'title_clean': [['[\(|\[]\s*[\)|\]]', ''], ['(?i)\s*videos*\s*', ''], ['Porn Category', ''], [' Categoria Porno', '']],
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
          'controls': {'url_base64': False, 'cnt_tot': 30, 'reverse': False}, 
@@ -166,7 +167,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
             elem_json['url'] = elem.a.get('href', '')
             elem_json['title'] = elem.img.get('alt', '')
             elem_json['thumbnail'] = elem.img.get('data-original', '') \
-                                     or elem.img.get('data-src', '') \
+                                     or elem.img.get('data-mediumthumb', '') \
                                      or elem.img.get('src', '')
             elem_json['stime'] = elem.find(class_='duration').get_text(strip=True) if elem.find(class_='duration') else ''
             if elem.find('span', class_='views'):

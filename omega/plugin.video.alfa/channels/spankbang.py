@@ -13,6 +13,8 @@ from bs4 import BeautifulSoup
 forced_proxy_opt = ''
 timeout = 45
 
+                    ####   Fotos error 403 en canal y pornstar
+
 canonical = {
              'channel': 'spankbang', 
              'host': config.get_setting("current_host", 'spankbang', default=''), 
@@ -32,8 +34,8 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Mas valorados", action="lista", url=host + "trending_videos/"))
     itemlist.append(Item(channel=item.channel, title="Mas vistos", action="lista", url= host + "most_popular/"))
     itemlist.append(Item(channel=item.channel, title="Pornstars" , action="catalogo", url=host + "pornstars"))
-    itemlist.append(Item(channel=item.channel, title="Canal" , action="catalogo", url=host + "channels/1?o=top"))
-    itemlist.append(Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "tags"))
+    itemlist.append(Item(channel=item.channel, title="Canal" , action="categorias", url=host + "channels/1?o=top"))
+    # itemlist.append(Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "tags"))
     itemlist.append(Item(channel=item.channel, title="Buscar", action="search"))
     return itemlist
 
@@ -54,15 +56,18 @@ def search(item, texto):
 def catalogo(item):
     logger.info()
     itemlist = []
-    soup = create_soup(item.url).find('main', id='container')
-    matches = soup.find_all('a', class_='image')
+    soup = create_soup(item.url)
+    matches = soup.find_all('div', attrs={"data-testid": "hottest-models"})
     for elem in matches:
-        url = elem['href']
-        title = elem.img['title']
-        thumbnail = elem.img['src']
-        cantidad = elem.find('span', class_='videos')
+        url = elem.a['href']
+        title = elem.img['alt']
+        thumbnail = elem.img['data-src']
+        if thumbnail.startswith("//"):
+            thumbnail = "https:%s" % thumbnail
+        # thumbnail += "|Referer=%s" % host
+        cantidad = elem.find_all('span', class_='absolute')
         if cantidad:
-            title = "%s (%s)" %(title, cantidad.text)
+            title = "%s (%s)" %(title, cantidad[-1].text.strip())
         url =  urlparse.urljoin(host,url)
         url += "?o=new"
         thumbnail =  urlparse.urljoin(host,thumbnail)
@@ -80,17 +85,26 @@ def catalogo(item):
 def categorias(item):
     logger.info()
     itemlist = []
-    soup = create_soup(item.url).find('ul', class_='list')
-    matches = soup.find_all('li')
+    soup = create_soup(item.url)
+    matches = soup.find('ul', class_='results').find_all('li')
     for elem in matches:
         url = elem.a['href']
-        title = elem.a.text
-        thumbnail = ""
+        title = elem.img['alt']
+        thumbnail = elem.img['src']
+        if thumbnail.startswith("//"):
+            thumbnail = "https:%s" % thumbnail
+        # thumbnail += "|Referer=%s" % host
+        
         url =  urlparse.urljoin(item.url,url)
         url += "?o=new"
         plot = ""
         itemlist.append(Item(channel=item.channel, action="lista", title=title , url=url , 
                              fanart=thumbnail, thumbnail=thumbnail, plot=plot) )
+    next_page = soup.find('li', class_='next')
+    if next_page:
+        next_page = next_page.a['href']
+        next_page = urlparse.urljoin(host,next_page)
+        itemlist.append(Item(channel=item.channel, action="categorias", title="[COLOR blue]Página Siguiente >>[/COLOR]", url=next_page ) )
     return itemlist
 
 
@@ -110,18 +124,18 @@ def create_soup(url, referer=None, unescape=False):
 def lista(item):
     logger.info()
     itemlist = []
-    soup = create_soup(item.url).find('div', class_='results')
-    matches = soup.find_all('div', id=re.compile(r"^v_id_\d+"))
+    soup = create_soup(item.url) #.find('div', class_='results')
+    matches = soup.find_all('div', attrs={'data-id': re.compile(r"^[0-9]+")})
     for elem in matches:
         url = elem.a['href']
         title = elem.img['alt']
-        thumbnail = elem.img['data-src']
-        time = elem.find('span', class_='l')
-        quality = elem.find('span', class_='h')
+        thumbnail = elem.img['src']
+        time = elem.find('div', attrs={'data-testid': 'video-item-length'})
+        quality = elem.find('div', attrs={'data-testid': 'video-item-resolution'})
         if quality:
-            title = "[COLOR yellow]%s[/COLOR] [COLOR red]%s[/COLOR] %s" % (time.text,quality.text,title)
+            title = "[COLOR yellow]%s[/COLOR] [COLOR red]%s[/COLOR] %s" % (time.text.strip(),quality.text.strip(),title)
         else:
-            title = "[COLOR yellow]%s[/COLOR] %s" % (time.text,title)
+            title = "[COLOR yellow]%s[/COLOR] %s" % (time.text.strip(),title)
         url =  urlparse.urljoin(item.url,url)
         plot = ""
         action = "play"

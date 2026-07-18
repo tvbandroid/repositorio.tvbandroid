@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-
-    unicode = str
-    unichr = chr
-
-    import urllib.parse as urllib
-else:
-    PY3 = False
-
-    import urllib
-
-
 from platformcode import config, logger, platformtools
 from core import filetools, scrapertools
 from core.item import Item
+
+
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    import urllib.parse as urllib
+else:
+    import urllib
 
 
 color_alert = config.get_setting('notification_alert_color', default='red')
@@ -54,7 +48,7 @@ def mainlist(item):
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Aún no tiene Favoritos[/COLOR][/B]' % color_exec)
         return
 
-    itemlist.append(item.clone( action='', title='[B]FAVORITOS:[/B]', folder=False, text_color='plum' ))
+    itemlist.append(item.clone( action='', title='[B]FAVORITOS BALANDRO:[/B]', folder=False, text_color='plum' ))
 
     ses = 0
 

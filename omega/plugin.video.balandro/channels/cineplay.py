@@ -61,7 +61,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CinePlay', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('CinePlay', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -256,11 +256,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -336,7 +336,10 @@ def episodios(item):
 
     for match in matches[item.page * item.perpage:]:
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
-        if thumb: thumb = 'https:' + thumb
+        if thumb.startswith("//"): thumb = 'https:' + thumb
+
+        proximamente = False
+        if '/themes/torofilm/public/img/cnt/noimg-episode.png' in thumb: proximamente = True
 
         epis = scrapertools.find_single_match(match, '<span class="num-epi">.*?x(.*?)</span>')
 
@@ -348,9 +351,11 @@ def episodios(item):
 
         titulo = titulo.replace('Temporada', '[COLOR tan]Temp.[/COLOR]').replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-        titulo = titulo.replace('Capitulo', '[COLOR goldenrod]Epis..[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb, proximamente = proximamente,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
@@ -373,6 +378,11 @@ def findvideos(item):
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
     matches = scrapertools.find_multiple_matches(data, 'href="#options-(.*?)</li>')
+
+    if not matches:
+        if item.proximamente:
+             platformtools.dialog_notification('CinePlay', '[COLOR cyan][B]Proximamente[/B][/COLOR]')
+             return
 
     ses = 0
 
@@ -408,36 +418,47 @@ def findvideos(item):
             if 'peliplaywish' in srv:
                 servidor = 'directo'
                 other = 'peliplaywish'
+
             elif 'mivideoplay' in srv:
                 servidor = 'directo'
                 other = 'mivideoplay'
+
             elif 'peliplaymoon' in srv:
                 servidor = 'directo'
                 other = 'peliplaymoon'
+
             elif 'fmoonembed' in srv:
                 servidor = 'directo'
                 other = 'fmoonembed'
+
             elif 'embedmoon' in srv:
                 servidor = 'directo'
                 other = 'embedmoon'
+
             elif 'jodwish' in srv:
                 servidor = 'directo'
                 other = 'jodwish'
+
             elif 'swhoi' in srv:
                 servidor = 'directo'
                 other = 'swhoi'
+
             elif 'swdyu' in srv:
                 servidor = 'directo'
                 other = 'swdyu'
+
             elif 'strwish' in srv:
                 servidor = 'directo'
                 other = 'strwish'
+
             elif 'vidhidepre' in srv:
                 servidor = 'directo'
                 other = 'vidhidepre'
+
             elif 'playerwish' in srv:
                 servidor = 'directo'
                 other = 'playerwish'
+
             elif 'fastream' in srv:
                 servidor = 'directo'
                 other = 'fastream'
@@ -446,9 +467,11 @@ def findvideos(item):
                 if 'wish' in srv:
                     servidor = 'directo'
                     other = 'streamwish'
+
                 elif 'vidhide' in srv:
                     servidor = 'directo'
                     other = 'vidhidepro'
+
                 else:
                     servidor = 'directo'
                     other = 'indeterminado'
@@ -479,6 +502,8 @@ def play(item):
     url = scrapertools.find_single_match(data, '<iframe.*?src="([^"]+)')
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="([^"]+)')
 
+    es_wish = False
+
     if item.other == 'Indeterminado' or item.other == 'Peliplaywish' or item.other == 'Mivideoplay' or item.other == 'Peliplaymoon' or item.other == 'Fmoonembed' or item.other == 'Embedmoon' or item.other == 'Jodwish' or item.other == 'Swhoi' or item.other == 'Swdyu' or item.other == 'Strwish' or item.other == 'Vidhidepre' or item.other == 'Playerwish' or item.other == 'Streamwish' or item.other == 'Vidhidepro' or item.other == 'Fastream':
         if '/?trembed' in url:
             data = do_downloadpage(url)
@@ -487,17 +512,23 @@ def play(item):
             if not url: url = scrapertools.find_single_match(str(data), "location.href = '(.*?)'")
             if not url: url = scrapertools.find_single_match(str(data), 'sources:.*?file:.*?"(.*?)"')
 
+        if url:
+            if 'jodwish' in url or 'swhoi' in url or 'swdyu' in url or 'strwish' in url or 'playerwish' in url or 'streamwish' in url: es_wish = True
+
     if url:
         if '//e/' in url: url = url.replace('//e/', '/e/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
+
+        if es_wish: url = url + '|Referer=' + url
 
         itemlist.append(item.clone(server = servidor, url = url))
 

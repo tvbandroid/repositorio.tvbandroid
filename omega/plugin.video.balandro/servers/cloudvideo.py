@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, time
+import sys
 
-from core import httptools, scrapertools
+PY3 = False
+if sys.version_info[0] >= 3: PY3 = True
+
+if PY3:
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+else:
+    import xbmc
+    translatePath = xbmc.translatePath
+
+
+import os, xbmc, time
+
 from platformcode import config, logger, platformtools
+from core import filetools, httptools, scrapertools
 
 from lib import jsunpack
 
@@ -16,8 +29,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -71,12 +83,21 @@ def get_video_url(page_url, url_referer=''):
 
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'cloudvideo.py'))
+
+            existe = filetools.exists(path)
+            if not existe:
+                return 'El Plugin No existe en Resolveurl'
+
             if config.get_setting('servers_time', default=True):
                 platformtools.dialog_notification('Cargando [COLOR cyan][B]Cloudvideo[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))
 
             try:
                 import_libs('script.module.resolveurl')
+
+                if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                    import_libs('script.module.cloudrequest')
 
                 import resolveurl
                 page_url = ini_page_url
@@ -103,13 +124,26 @@ def get_video_url(page_url, url_referer=''):
                     trace = traceback.format_exc()
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
+
                     elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
+
+                    elif 'Cloudflare challenge' in trace:
+                        return 'Cloudflare Challenge Check'
+
+                elif "No module named 'cloudscraper'" in traceback.format_exc():
+                    return 'Falta script.module.cloudrequest'
+
+                elif 'HTTP Error 404: Not Found' in traceback.format_exc() or '404 Not Found' in traceback.format_exc():
+                    return 'Archivo inexistente'
 
                 elif '<urlopen error' in traceback.format_exc():
                     return 'No se puede establecer la conexión'
 
                 return 'Sin Respuesta ResolveUrl'
+
+        else:
+            return 'Falta ResolveUrl'
 
     return video_urls
 

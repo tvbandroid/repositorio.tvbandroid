@@ -20,12 +20,15 @@ list_language = list(IDIOMAS.values())
 list_quality = []
 list_servers = list(SERVER.values())
 
+# https://pelisflixhd.win/  https://pelisflix1.autos/    https://pelisflix200.life/  https://pelisplushd20.lat/
 
 canonical = {
              'channel': 'pelisflix', 
              'host': config.get_setting("current_host", 'pelisflix', default=''), 
-             'host_alt': ["https://pelisflixhd.fit/"], 
-             'host_black_list': ['https://pelisflixhd.click/', 'https://pelisflixhd.buzz/', 'https://pelisflixhd.biz/',
+             'host_alt': ['https://pelisflix1.cc/'], 
+             'host_black_list': ['https://pelisflix1.autos/',
+                                 'https://pelisflix1.net/', 'https://pelisflix1.loan/', 'https://pelisflixhd.fit/',
+                                 'https://pelisflixhd.click/', 'https://pelisflixhd.buzz/', 'https://pelisflixhd.biz/',
                                  'https://pelisflixhd.cam/', 'https://pelisflixhd.fun/', 'https://pelisflixhd.net/', 
                                  'https://pelisflixhd.vip/', 'https://pelisflixhd.com/', 'https://pelisflixhd.pro/', 
                                  'https://pelisflixtv.lat/', 'https://pelisflix.town/', 'https://pelisflix.food/', 
@@ -52,15 +55,13 @@ def mainlist(item):
     
     autoplay.init(item.channel, list_servers, list_quality)
     
-    itemlist.append(item.clone(title="FINDVIDEOS" , action="findvideos", url= host + "pelicula1/sie-sagt-er-sagt/", thumbnail=get_thumb("movies", auto=True)))
     
     itemlist.append(item.clone(title="Estrenos" , action="lista", url= host + "genero/estrenos/", thumbnail=get_thumb("premieres", auto=True)))
     itemlist.append(item.clone(title="Peliculas" , action="lista", url= host + "peliculas-online/", thumbnail=get_thumb("movies", auto=True)))
     itemlist.append(item.clone(title="Series", action="lista", url= host + "series-online/", thumbnail=get_thumb("tvshows", auto=True)))
-    itemlist.append(item.clone(title="Anime", action="lista", url= host + "genero/anime/", thumbnail=get_thumb("anime", auto=True)))
+    
     itemlist.append(item.clone(title="Genero" , action="categorias", url= host, thumbnail=get_thumb('genres', auto=True)))
-
-    itemlist.append(item.clone(title="Productora" , action="categorias", url= host + "peliculas", thumbnail=get_thumb("studio", auto=True)))
+    itemlist.append(item.clone(title="Productora" , action="categorias", url= host, thumbnail=get_thumb("studio", auto=True)))
     # itemlist.append(item.clone(title="Año" , action="anno"))
     # itemlist.append(item.clone(title="Alfabetico", action="section", url=host, thumbnail=get_thumb("alphabet", auto=True)))
     itemlist.append(item.clone(title="Buscar...", action="search", thumbnail=get_thumb("search", auto=True)))
@@ -119,7 +120,7 @@ def anno(item):
     now = datetime.now()
     year = int(now.year)
     while year >= 1940:
-        itemlist.append(item.clone(title="%s" %year, action="lista", url= "%srelease/%s" % (host,year)))
+        itemlist.append(item.clone(title="%s" %year, action="lista", url= "%s?año=%s&nota=0&orden=recientes" % (item.url,year)))
         year -= 1
     
     return itemlist
@@ -133,7 +134,7 @@ def categorias(item):
     if "Genero" in item.title:
         soup = create_soup(item.url).find("ul", class_="sub-menu")
     else:
-        soup = create_soup(item.url).find("li", class_="menu-item-109").parent
+        soup = create_soup(item.url).find("li", id="menu-item-109").parent
     matches = soup.find_all("li")
     
     for elem in matches:
@@ -142,7 +143,7 @@ def categorias(item):
         if "/estrenos/" not in url: 
             itemlist.append(item.clone(action="lista", url=url, title=title))
     if "Genero" not in item.title:
-        itemlist.append(item.clone(action="lista", url="%sgenero/dc-comics/" % host, title="DC"))
+        itemlist.append(item.clone(action="lista", url="%sgenero/dc/" % host, title="DC"))
         itemlist.append(item.clone(action="lista", url="%sgenero/marvel/" % host, title="MARVEL"))
     
     return itemlist
@@ -233,7 +234,7 @@ def lista(item):
         if year == '':
             year = '-'
         
-        new_item = item.clone(url=url, title=title, thumbnail=thumbnail, infoLabels={"year": year})
+        new_item = item.clone(url=url, title=title, thumbnail=thumbnail, language="", infoLabels={"year": year})
         
         if "serie" in url:
             new_item.action = "seasons"
@@ -243,8 +244,6 @@ def lista(item):
             new_item.action = "findvideos"
             new_item.contentTitle = title
             new_item.contentType = 'movie'
-            # if language:
-                # new_item.language = language
         
         itemlist.append(new_item)
 
@@ -338,77 +337,18 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
-    data = httptools.downloadpage(item.url, ignore_response_code=ignore_response_code).data
-    patron = '"(\d{1})":"([^"]+)"'
-    matches = re.compile(patron,re.DOTALL).findall(data)
-    for lang, url in matches:
-        lang = IDIOMAS.get(lang, lang)
+    
+    soup = create_soup(item.url)
+    matches = soup.find('div', class_='optns-bx').find_all('li')
+    for elem in matches:
         import base64
-        url = base64.b64decode(url).decode('utf-8')
+        url = base64.b64decode(elem.div['data-url']).decode('utf-8')
+        lang = ''
+        if "LATINO" in elem.text: lang = 'LAT'
+        if "CASTELLANO" in elem.text: lang = 'CAST'
+        if "SUBTITULADO" in elem.text: lang = 'VOSE'
+        # lang = IDIOMAS.get(lang, lang)
         itemlist.append(item.clone(action = "play", title = "%s", language=lang, url = url))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     return itemlist
-
-
-# def play(item):
-    # logger.info()
-    # logger.debug("ITEM: %s" % item)
-    
-    # itemlist = []
-
-    # if "pelisflix" in item.url:
-        # url = create_soup(item.url).find(class_='Video').iframe['src']
-    # else:
-        # url = item.url
-    
-    # if "index.php?h=" in url:
-        # id = scrapertools.find_single_match(url, r"\?h=([A-z0-9]+)")
-        # post_url= "%sstream/r.php" % host
-        # post = {'h' : id}
-        # url = httptools.downloadpage(post_url, post=post, ignore_response_code=ignore_response_code, 
-                                     # follow_redirects=False).headers.get('location', '')
-    
-    # if "vip/?url=" in url:
-        # url = create_soup(url).iframe['src'].replace("embed.html#", "details.php?v=")
-        # data = httptools.downloadpage(url, ignore_response_code=ignore_response_code).json
-        # url = data['file']
-    
-    # if "byegoto" in url:
-        # id = scrapertools.find_single_match(url, '=([^"]+)')
-        # url = "%sbyegoto/rd.php" % host
-        # post = {'url': id}
-        # url = httptools.downloadpage(url, ignore_response_code=ignore_response_code, post=post).url
-    
-    # if "nuuuppp" in url:
-       
-        
-        # server = "https://nuuuppp.pro/"
-        # headers={"referer": server}
-        # data = httptools.downloadpage(url, headers=headers).data
-        # id = scrapertools.find_single_match(data, 'sesz="([^"]+)"')
-        # url = "https://sv4.nupload.site/?s=%s" % id
-        # url = httptools.downloadpage(url, headers=headers).url
-        # url += "|Referer=%s" % server
-        # url += "|Origin=https://nuuuppp.pro"
-    
-    # if "mega1080p" in url:
-        # from lib import jsunpack
-        # url = httptools.downloadpage(url, ignore_response_code=ignore_response_code).data
-        # pack = scrapertools.find_single_match(url, "p,a,c,k,e,d.*?</script>")
-        # unpack = jsunpack.unpack(pack).replace("\\", "")
-        # url = scrapertools.find_single_match(unpack, "'file':'([^']+)'")
-        # url = url.replace("/master", "/720/720p")
-        # url = "https://pro.mega1080p.club/%s" %url
-        # url += "|Referer=%s" %url
-    
-    # if "VIP" in server:
-        # url = create_soup(url).find(class_='Video').iframe['src']
-        # data = httptools.downloadpage(url, ignore_response_code=ignore_response_code).data
-        # matches = re.compile("go_to_player\('([^']+)'\)", re.DOTALL).findall(data)
-        # for url in matches:
-            # itemlist.append(Item(channel=item.channel, title="%s", url=url, action="play", language=lang))
-        # itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server)
-    # itemlist.append(['m3u', url])
-    
-    # return itemlist
 

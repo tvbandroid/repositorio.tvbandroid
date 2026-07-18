@@ -6,7 +6,7 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
 
-import re, os
+import os, re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -51,6 +51,9 @@ def configurar_proxies(item):
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/lanzamiento/' in url: raise_weberror = False
 
+    hay_proxies = False
+    if config.get_setting('channel_pelisyseries_proxies', default=''): hay_proxies = True
+
     timeout = None
     if host in url:
         if config.get_setting('channel_pelisyseries_proxies', default=''): timeout = config.get_setting('channels_repeat', default=30)
@@ -58,12 +61,15 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     else:
-        data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
         if not data:
             if not '?s=' in url:
-                platformtools.dialog_notification('PelisySeries', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
-                data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=headers, timeout=timeout).data
+                platformtools.dialog_notification('PelisySeries', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+                data = httptools.downloadpage_proxy('pelisyseries', url, post=post, headers=header, sraise_weberror=raise_weberror, timeout=timeout).data
 
     if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
         if not url.startswith(host):
@@ -128,13 +134,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por calidad', action = 'calidades', search_type = 'movie' ))
-
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por país', action = 'paises', search_type = 'movie' ))
 
     return itemlist
 
@@ -171,14 +177,32 @@ def idiomas(item):
     return itemlist
 
 
-def paises(item):
+def plataformas(item):
+    logger.info()
+    itemlist = []
+
+    text_color = 'hotpink'
+
+    itemlist.append(item.clone( title = 'Amazon prime vídeo', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Antena 3', action = 'list_all', url = host + 'network/antena-3/', text_color = text_color))
+    itemlist.append(item.clone( title = 'Channel 4', action = 'list_all', url = host + 'network/channel-4/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Disney+', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Hbo Max', action = 'list_all', url = host + 'network/hbo/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'network/netflix/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Telecinco', action = 'list_all', url = host + 'network/telecinco/', text_color = text_color ))
+    itemlist.append(item.clone( title = 'Telefe', action = 'list_all', url = host + 'network/telefe/', text_color = text_color ))
+
+    return itemlist
+
+
+def calidades(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'por País<(.*?)por Año<')
+    bloque = scrapertools.find_single_match(data, 'por Calidad<(.*?)por País<')
 
     patron = 'href="(.*?)">(.*?)</a>'
 
@@ -215,32 +239,14 @@ def generos(item):
     return itemlist
 
 
-def plataformas(item):
-    logger.info()
-    itemlist = []
-
-    text_color = 'hotpink'
-
-    itemlist.append(item.clone( title = 'Amazon prime vídeo', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Antena 3', action = 'list_all', url = host + 'network/antena-3/', text_color = text_color))
-    itemlist.append(item.clone( title = 'Channel 4', action = 'list_all', url = host + 'network/channel-4/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Disney+', action = 'list_all', url = host + 'network/amazon/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Hbo Max', action = 'list_all', url = host + 'network/hbo/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Netflix', action = 'list_all', url = host + 'network/netflix/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Telecinco', action = 'list_all', url = host + 'network/telecinco/', text_color = text_color ))
-    itemlist.append(item.clone( title = 'Telefe', action = 'list_all', url = host + 'network/telefe/', text_color = text_color ))
-
-    return itemlist
-
-
-def calidades(item):
+def paises(item):
     logger.info()
     itemlist = []
 
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, 'por Calidad<(.*?)por País<')
+    bloque = scrapertools.find_single_match(data, 'por País<(.*?)por Año<')
 
     patron = 'href="(.*?)">(.*?)</a>'
 
@@ -407,7 +413,15 @@ def episodios(item):
     for thumb, s_e, url, title in matches[item.page * item.perpage:]:
         episode = scrapertools.find_single_match(s_e, ".*? - (.*?)$")
 
+        title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = episode ))
@@ -449,7 +463,9 @@ def findvideos(item):
 
         size = ''
 
-        if servidor == 'ok': servidor = 'okru'
+        if servidor == 'waaw' or servidor == 'hqq' or servidor == 'netu': servidor = 'waaw'
+
+        elif servidor == 'ok': servidor = 'okru'
         elif servidor == 'dood': servidor = 'doodstream'
         elif servidor == 'uptostream': servidor = 'uptobox'
         elif servidor == 'archive': servidor = 'archiveorg'
@@ -473,8 +489,13 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(match, "<a href='(.*?)'")
 
+        age = ''
+        if servidor == 'torrent': age = 'Magnet'
+
+        quality_num = puntuar_calidad(qlty)
+
         itemlist.append(Item( channel = item.channel, action = 'play', url = url, server = servidor, title = '',
-                              language = lang, quality = qlty, other = size, age = 'Magnet'))
+                              language = lang, quality = qlty, quality_num = quality_num, other = size, age = age ))
 
     if not itemlist:
         if not ses == 0:
@@ -487,15 +508,18 @@ def findvideos(item):
 def normalize_server(server):
     server = server.lower()
 
-    server = server.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.ru', '').replace('.tv', '').replace('.to', '').replace('.me', '').replace('.nz', '').replace('.vg', '')
-    server = server.replace('.org', '').replace('.net', '').replace('.club', '').replace('.site', '').replace('.watch', '').strip()
+    server = server.replace('.com', '').replace('.co', '').replace('.cc', '').replace('.ru', '').replace('.tv', '').replace('.to', '').replace('.me', '').replace('.nz', '').replace('.vg', '').replace('.io', '').replace('.eu', '').replace('.ac', '')
 
-    if 'waaw' in server or 'hqq' in server or 'netu' in server: server = ''
+    server = server.replace('.org', '').replace('.net', '').replace('.club', '').replace('.site', '').replace('.watch', '').replace('.life', '').replace('.biz', '').replace('.fun', '').replace('.xyz', '').replace('.host', '').strip()
 
-    elif 'pelisyseries' in server: server = ''
+    if 'pelisyseries' in server: server = ''
 
     elif 'hydrax' in server: server = ''
     elif 'videohost' in server: server = ''
+    elif 'vidto-do' in server: server = ''
+    elif 'videomega' in server: server = ''
+    elif 'gdriveplayer' in server: server = ''
+    elif 'dfiles' in server: server = ''
     elif 'embed.mystream' in server: server = ''
     elif 'storage.googleapis' in server: server = ''
     elif 'goo.gl' in server: server = ''
@@ -503,26 +527,33 @@ def normalize_server(server):
     elif 'vev.io' in server: server = ''
     elif 'pelispng.online' in server: server = ''
     elif 'verlapeliculaonline28.blogspot' in server: server = ''
+    elif 'steamplay' in server or 'streamp1ay' in server: server = ''
+    elif 'powvideo' in server or 'powvldeo' in server or 'powv1deo' in server: server = ''
+    elif 'uploaded' in server: server = ''
+    elif 'vev' in server: server = ''
 
-    elif 'upstream.to' in server:
-           server = server.replace('.to', '').strip()
+    elif 'upstream' in server:
            if '.' in server:
-               server = scrapertools.find_single_match(other, "s.*?.(.*?)$")
+               server = scrapertools.find_single_match(server, "s.*?.(.*?)$")
                server = server.replace('.', '').replace('0', '').replace('1', '').replace('2', '').replace('3', '').replace('4', '').replace('5', '').replace('6', '').replace('7', '').replace('8', '').replace('9', '').strip()
 
     elif 'viduplayer' in server: server = ''
     elif server == 'ul': server = ''
 
     if server:
-        server = servertools.corregir_servidor(server)
-
-        if not server == 'desconocido':
-            if servertools.is_server_available(server):
-                if not servertools.is_server_enabled(server): server = ''
-            else:
-               if not config.get_setting('developer_mode', default=False): server = ''
+        if servertools.is_server_available(server):
+            if not servertools.is_server_enabled(server): server = ''
+        else:
+           if not config.get_setting('developer_mode', default=False):
+               if server == 'desconocido': server = ''
 
     return server
+
+
+def puntuar_calidad(txt):
+    orden = ['SD 240p', 'SD 360p', 'SD 480p', 'HD 720p', 'DVD Rip', 'BD Rip', 'HD 1080p', 'HDTV', 'HD Rip', 'MicroHD 1080p', 'BDremux 1080p', 'BluRay 720p', 'BluRay 1080p', 'FullBluray 1080p', '4K 2160p']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
 
 
 def play(item):
@@ -590,13 +621,14 @@ def play(item):
         if 'archive.org' in url: url = url.replace('https%3A%2F%2Farchive.org%2Fdownload%2F', 'https://archive.org/download/').replace('%2F', '/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(server = servidor, url = url))
 

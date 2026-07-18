@@ -14,38 +14,6 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
 host = 'https://www1.subtorrents.zip/'
 
 
@@ -110,23 +78,6 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
         else:
             data = httptools.downloadpage(url, post=post, headers=headers).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -263,36 +214,68 @@ def list_all(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    datac = ''
 
     patron = '<td class="vertThseccion">.*?<img src="(.*?)".*?<a href="(.*?)".*?title="(.*?)".*?<td>.*?<td>(.*?)</td>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
 
-    for lang, url, title, qlty in matches:
-        if not url or not title: continue
+    if not matches: 
+        if '<!-- Carousel Container -->' in data:
+            datac = scrapertools.find_single_match(data, '<!-- Carousel Container -->(.*?)$')
+        else:
+            datac = data
 
-        title = title.split("(")[0]
-        if "3D" in title: title = title.split("3D")[0]
+        patron = '<div class="w3l-movie-text">.*?<a href="(.*?)".*?title="(.*?)".*?' + "<img src='(.*?)'.*?</a></div>"
+ 
+        matches = re.compile(patron, re.DOTALL).findall(datac)
 
-        if lang.endswith("1.png"): lang = "Esp"
-        elif lang.endswith("2.png"): lang = "Vo"
-        elif lang.endswith("4.png"): lang = "Fr"   
-        elif lang.endswith("8.png"): lang = "It"
-        elif lang.endswith("512.png"): lang = "Lat"
-        else: lang = "Vose"
+    if datac:
+        for url, title, lang in matches:
+            if not url or not title: continue
 
-        title = title.replace('&#038;', '&')
+            title = title.split("(")[0]
+            if "3D" in title: title = title.split("3D")[0]
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, qualities=qlty, languages=lang,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+            if lang.endswith("1.png"): lang = "Esp"
+            elif lang.endswith("2.png"): lang = "Vo"
+            elif lang.endswith("4.png"): lang = "Fr"   
+            elif lang.endswith("8.png"): lang = "It"
+            elif lang.endswith("512.png"): lang = "Lat"
+            else: lang = "Vose"
+
+            title = title.replace('&#038;', '&').replace('&#8217;s', "'s")
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, languages=lang,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
+    else:
+        for lang, url, title, qlty in matches:
+            if not url or not title: continue
+
+            title = title.split("(")[0]
+            if "3D" in title: title = title.split("3D")[0]
+
+            if lang.endswith("1.png"): lang = "Esp"
+            elif lang.endswith("2.png"): lang = "Vo"
+            elif lang.endswith("4.png"): lang = "Fr"   
+            elif lang.endswith("8.png"): lang = "It"
+            elif lang.endswith("512.png"): lang = "Lat"
+            else: lang = "Vose"
+
+            title = title.replace('&#038;', '&').replace('&#8217;s', "'s")
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, qualities=qlty, languages=lang,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, "<span class='current'>\d+<\/span><a href='([^']+)'")
+        next_page = scrapertools.find_single_match(data, "<span class='current'>.*?<a href='(.*?)'")
 
-        if '/page/' in next_url:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_all', text_color='coral' ))
+        if '/page/' in next_page:
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_all', text_color='coral' ))
 
     return itemlist
 
@@ -314,7 +297,7 @@ def list_series(item):
 
         title = title.split("(")[0]
 
-        title = title.replace('&#038;', '&')
+        title = title.replace('&#038;', '&').replace('&#8217;s', "'s")
 
         if not host in url: url = host + url
 
@@ -324,10 +307,10 @@ def list_series(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_url = scrapertools.find_single_match(data, "<span class='current'>.*?<a href='([^']+)'")
+        next_page = scrapertools.find_single_match(data, "<span class='current'>.*?<a href='(.*?)'")
 
-        if '/page/' in next_url:
-            itemlist.append(item.clone( title='Siguientes ...', url=next_url, action='list_series', text_color='coral' ))
+        if '/page/' in next_page:
+            itemlist.append(item.clone( title='Siguientes ...', url=next_page, action='list_series', text_color='coral' ))
 
     return itemlist
 
@@ -347,11 +330,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, url = item.url, page = 0, contentType = 'season', contentSeason = int(tempo), text_color = 'tan' ))
 
@@ -561,6 +544,15 @@ def list_search(item):
             itemlist.append(item.clone (url = next_page, title = 'Siguientes ...', action = 'list_search', text_color='coral' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas-subtituladas/?filtro=estrenos' 
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

@@ -265,14 +265,10 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            if '/series?' in item.url:
-                ref = host + 'serie/' + url + '/'
-
-                url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
-            else:
-                ref = host + 'anime/' + url + '/'
-
+            if '"type":"anime"' in match:
                 url = host + 'wp-json/wpreact/v1/anime/' + url + '/related/'
+            else:
+                url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
@@ -336,11 +332,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -468,6 +464,7 @@ def findvideos(item):
         elif 'Latino' in lang: lang = 'Lat'
         elif 'Subtitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
+        elif 'ingles' in lang: lang = 'Ing'
 
         link = link.replace('\\/', '/')
 

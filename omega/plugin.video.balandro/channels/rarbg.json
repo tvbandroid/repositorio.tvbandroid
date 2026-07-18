@@ -3,15 +3,15 @@
   "name": "RarBg",
   "thumbnail": "rarbg.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
-  "search_types": ["movie"],
+  "search_types": ["all", "movie", "tvshow"],
 
-  "categories": ["torrent", "movie"],
+  "categories": ["movie", "tvshow", "torrent"],
   "language": ["vo"],
 
-  "clusters": ["onlyone", "torrents", "qualityes", "years", "rankings", "kids", "docs", "4k", "3d"],
+  "clusters": ["torrents", "qualityes", "languages", "years", "rankings", "kids", "docs", "4k", "3d"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Películas en Versión Original, por géneros, calidad y año. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Canal con enlaces Torrent exclusivamente. Películas en Versión Original."
 }

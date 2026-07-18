@@ -41,25 +41,17 @@ def test_video_exists(page_url):
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
+    
+    global data
+    domain = scrapertools.get_domain_from_url(page_url)
+    host = "https://%s" % domain
     try:
         enc_data = scrapertools.find_single_match(data, "text/javascript(?:'|\")>(eval.*?)</script>")
         dec_data = jsunpack.unpack(enc_data)
-        m3u8_source = scrapertools.find_single_match(dec_data, '\{(?:file|src|"hls2"):"([^"]+)"')
-        
-        if "master.m3u8" in m3u8_source:
-            datos = httptools.downloadpage(m3u8_source).data
-            if sys.version_info[0] >= 3 and isinstance(datos, bytes):
-                datos = "".join(chr(x) for x in bytes(datos))
-            
-            if datos:
-                matches_m3u8 = re.compile('#EXT-X-STREAM-INF.*?RESOLUTION=\d+x(\d*)[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
-                ## matches_m3u8 = re.compile('#EXT-X-STREAM-INF\:[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
-                for quality, url in matches_m3u8:
-                    url =urlparse.urljoin(m3u8_source,url)
-                    video_urls.append(["[vidhide] %sp" % quality, url])
-        else:
-            video_urls.append(['[vidhide] m3u', m3u8_source])
-
-    except Exception:
-        dec_data = data
+        # logger.debug("dec_data: %s" % dec_data)
+        m3u8_source = scrapertools.find_single_match(dec_data, r'"hls\d":"([^"]+?\.m3u8[^"]+)')
+        m3u8_source = urlparse.urljoin(host, m3u8_source)
+        video_urls.append(['[vidhide] m3u', m3u8_source])
+    except Exception as e:
+        logger.error(str(e))
     return video_urls

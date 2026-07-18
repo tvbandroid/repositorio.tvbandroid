@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -19,15 +19,33 @@ list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES_T
 list_quality_tvshow = AlfaChannelHelper.LIST_QUALITY_TVSHOW
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_T
+
+cf_assistant = True if AlfaChannelHelper.IS_ASSISTANT_INSTALLED else False
 forced_proxy_opt = 'ProxySSL'
+debug = config.get_setting('debug_report', default=False)
+
 # Lista de proxies: https://donproxies.com/
 
 canonical = {
              'channel': 'dontorrent', 
              'host': config.get_setting("current_host", 'dontorrent', default=''), 
-             'host_alt': ["https://dontorrent.download/", "https://elitedivx.net/", "https://reinventorrent.org/", 
-                          "https://todotorrents.org/", "https://lilatorrent.com/", "https://www19.dontorrent.link/"], 
-             'host_black_list': ["https://mastorrents.net/", "https://dontorrent.group/", "https://dontorrent.website/",
+             'host_alt': ["https://dontorrent.review/", 
+                          "https://todotorrents.org/", "https://elitedivx.net/", "https://divxatope.net/", "https://reinventorrent.org"], 
+             'host_alt_new': ["https://dontorrent.review/"], 
+             'host_black_list': ["https://dontorrent.support/", "https://dontorrent.science/", 
+                                 "https://dontorrent.rocks/", "https://dontorrent.racing/", "https://lilatorrent.com/", 
+                                 "https://dontorrent.reisen/", "https://dontorrent.pink/", "https://dontorrent.cfd/", 
+                                 "https://dontorrent.photos/", "https://dontorrent.promo/", "https://dontorrent.info/", 
+                                 "https://dontorrent.prof/", "https://dontorrent.club/", "https://www21.dontorrent.link/", 
+                                 "https://dontorrent.sarl/", "https://dontorrent.gripe/", "https://reinventorrent.org/", 
+                                 "https://dontorrent.phd/", "https://dontorrent.live/", "https://dontorrent.kiwi/", 
+                                 "https://dontorrent.kids/", "https://dontorrent.onl/", "https://dontorrent.istanbul/", 
+                                 "https://dontorrent.lighting/", "https://dontorrent.irish/", "https://dontorrent.international/", 
+                                 "https://dontorrent.graphics/", "https://www20.dontorrent.link/", "https://dontorrent.loan/", 
+                                 "https://www19.dontorrent.link/", "https://dontorrent.jetzt/", "https://dontorrent.institute/", 
+                                 "https://dontorrent.news/", "https://dontorrent.haus/", "https://dontorrent.homes/", 
+                                 "https://dontorrent.report/", "https://dontorrent.gift/", "https://dontorrent.download/", 
+                                 "https://mastorrents.net/", "https://dontorrent.group/", "https://dontorrent.website/",
                                  "https://dontorrent.stream/", "https://dontorrent.schule/", "https://www18.dontorrent.link/", 
                                  "https://dontorrent.webcam/", "https://dontorrent.trade/", "https://dontorrent.tube/", 
                                  "https://dontorrent.games/", "https://dontorrent.wiki/", "https://dontorrent.football/", 
@@ -75,8 +93,10 @@ canonical = {
                                  "https://todotorrents.net/", "https://verdetorrent.com/", "https://dontorrent.in/"], 
              'pattern_proxy': r'<a[^>]*class="text-white[^"]+"\s*style="font-size[^"]+"\s*href="([^"]+)"[^>]*>\s*Descargar\s*<\/a>', 
              'proxy_url_test': 'pelicula/25159/The-Batman', 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'set_tls': True, 'set_tls_min': True, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             'retries_cloudflare': 1 if cf_assistant else 1, 
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False,
+             'data_js': ''
             }
 host = canonical['host'] or canonical['host_alt'][0]
 channel = canonical['channel']
@@ -89,11 +109,11 @@ min_temp = modo_ultima_temp if not modo_ultima_temp else 'continue'
 
 timeout = (5, config.get_setting('timeout_downloadpage', channel))
 kwargs = {}
-debug = config.get_setting('debug_report', default=False)
 movie_path = "/pelicula"
 tv_path = '/serie'
 docu_path = '/documental'
 tienda_path = '/tienda'
+torrent_path = 'api_validate_pow.php'
 language = ['CAST']
 url_replace = []
 
@@ -107,7 +127,7 @@ finds = {'find': {'find_all': [{'tag': ['div'], 'class': ['text-center']}]},
          'get_quality': {}, 
          'get_quality_rgx': [], 
          'next_page': {}, 
-         'next_page_rgx': [[r'\/page\/\d+', '/page/%s'], [r'&pagina=\d+', '&pagina=%s']], 
+         'next_page_rgx': [[r'\/page\/\d+', '/page/%s'], [r'&pagina=\d+', '&pagina=%s'], [r'&p=\d+', '&p=%s']], 
          'last_page': dict([('find', [{'tag': ['ul'], 'class': ['pagination']}]), 
                             ('find_all', [{'tag': ['a'], '@POS': [-2]}]), 
                             ('get_text', [{'tag': '', '@STRIP': True, '@TEXT': r'(\d+)'}])]), 
@@ -140,12 +160,15 @@ finds = {'find': {'find_all': [{'tag': ['div'], 'class': ['text-center']}]},
          'controls': {'min_temp': min_temp, 'url_base64': True, 'add_video_to_videolibrary': True, 'cnt_tot': 15, 
                       'get_lang': False, 'reverse': False, 'videolab_status': True, 'tmdb_extended_info': True, 'seasons_search': True, 
                       'host_torrent': host_torrent, 'btdigg': True, 'btdigg_search': True, 'duplicates': [], 'dup_list': 'title', 
-                      'force_find_last_page': [5, 999, 'url'], 'btdigg_quality_control': True},
+                      'force_find_last_page': [3, 999, 'url'], 'btdigg_quality_control': True},
          'timeout': timeout}
 AlfaChannel = DictionaryAllChannel(host, movie_path=movie_path, tv_path=tv_path, canonical=canonical, finds=finds, 
                                    idiomas=IDIOMAS, language=language, list_language=list_language, list_servers=list_servers, 
                                    list_quality_movies=list_quality_movies, list_quality_tvshow=list_quality_tvshow, 
                                    channel=canonical['channel'], actualizar_titulos=True, url_replace=url_replace, debug=debug)
+if host != canonical['host'] and channel in canonical['host']: canonical['host_alt_new'][0] = canonical['host']
+host_new = True if canonical.get('host', 'xyz') in canonical.get('host_alt_new', []) else False
+debug = debug or canonical.get('print_DEBUG', False)
 
 
 def mainlist(item):
@@ -185,6 +208,8 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
 
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
+
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
     
     autoplay.show_option(item.channel, itemlist)
@@ -201,6 +226,7 @@ def configuracion(item):
 
 
 def submenu(item):
+    global host, host_new
     logger.info()
 
     itemlist = []
@@ -227,12 +253,16 @@ def submenu(item):
 
         itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                              thumbnail=get_thumb("setting_0.png")))
+        itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
         itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
         return itemlist
 
     soup = AlfaChannel.create_soup(host, **kwargs)
     matches_int = AlfaChannel.parse_finds_dict(soup, findS['sub_menu'])
+    if host != canonical['host'] and channel in canonical['host']: canonical['host_alt_new'][0] = canonical['host']
+    host = canonical['host'] or canonical['host_alt'][0]
+    host_new = True if canonical.get('host', 'xyz') in canonical.get('host_alt_new', []) else False
 
     # En películas las categorías se llaman con Post
     post_alfabeto = 'campo=letra&valor3=%s&valor=&valor2=&pagina=1'
@@ -261,7 +291,7 @@ def submenu(item):
                                  url=url+'/page/1', thumbnail=get_thumb("channels_%s%s.png" % (contentType, '_hd' if quality else '')), 
                                  c_type=item.c_type, quality=quality, category=categoria))
 
-            if item.c_type != 'peliculas':                                      # Para todo, menos películas
+            if item.c_type != 'peliculas' and not host_new:                     # Para todo, menos películas
                 itemlist.append(Item(channel=item.channel, title=' - [COLOR paleturquoise]Por [A-Z][/COLOR]', action="section", 
                                      url=url + "/letra-%s/page/1", thumbnail=get_thumb('channels_movie_az.png'), c_type=item.c_type, 
                                      extra='Alfabético', quality=quality, category=categoria))
@@ -345,7 +375,7 @@ def list_all(item):
     kwargs['headers'] = {'Referer': item.url}
     
     if item.extra in ['novedades']:
-        findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['card shadow-sm p-2']}]}
+        findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['card shadow-sm p-2', 'card shadow-sm']}]}
         
         findS['last_page'] = {}
         if findS['controls'].get('force_find_last_page'): del findS['controls']['force_find_last_page']
@@ -362,10 +392,9 @@ def list_all(item):
         findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['card shadow-sm p-4 mt-3']}]}
 
     elif item.c_type == 'search':
-        findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['card shadow-sm p-4']}]}
+        findS['find'] = {'find_all': [{'tag': ['div'], 'class': ['card shadow-sm p-4', 'card shadow-sm']}]}
 
-        findS['last_page'] = {}
-        if findS['controls'].get('force_find_last_page'): del findS['controls']['force_find_last_page']
+        if host_new: findS['controls'].update({'force_find_last_page': [3, 999, 'post']})
     
     return AlfaChannel.list_all(item, matches_post=list_all_matches, generictools=True, finds=findS, **kwargs)
 
@@ -512,9 +541,11 @@ def list_all_matches(item, matches_int, **AHkwargs):
 
                 matches.append(elem_json.copy())
 
+            """
             if AlfaChannel.last_page in [9999, 99999] and items_found:
                 AlfaChannel.last_page = int(float(items_found_save / float(findS['controls']['cnt_tot'])  + 0.500009))
                 AlfaChannel.cnt_tot = items_found_save
+            """
 
         elif item.c_type in ['peliculas', 'series']:
             for elem_a in elem.find_all('a'):
@@ -658,6 +689,12 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
 
             if x == 1:
                 elem_json['url'] = td.a.get('href', '')
+                if not elem_json['url'] and td.find('a', class_='bg-primary') and td.find('a', class_='bg-primary').get('data-content-id'):
+                    elem_json['matches_verify'] = True
+                    elem_json['url'] = item.url
+                    elem_json['info'] = '{"action":"generate","content_id":%s,"tabla":"%s"}' \
+                                          % (int(elem.find('a', class_='bg-primary').get('data-content-id', 0)), 
+                                             elem.find('a', class_='bg-primary').get('data-tabla', 'peliculas'))
                 if error and docu_path not in elem_json['url']: break
                 if elem_json['url'].startswith('//'):
                     elem_json['url'] = 'https:%s' % elem_json['url']
@@ -669,7 +706,7 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
                     info = AlfaChannel.do_soup(td.a.get('title', ''))
                     if info and info.a: elem_json['password'] = info.a.get('data-clave', '')
 
-        if not elem_json.get('url', ''): 
+        if not elem_json.get('url', ''):
             continue
         if docu_path not in elem_json['url'] and elem_json.get('season', 0) != item.contentSeason:
             continue
@@ -732,15 +769,26 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
             #logger.error(elem)
 
             try:
-                elem_json['url'] = elem.find('a', class_='bg-primary').get('href', '')
+                elem_json['url'] = ''
+                if elem.find('a', class_='bg-primary') and elem.find('a', class_='bg-primary').get('href'):
+                    elem_json['url'] = elem.find('a', class_='bg-primary').get('href', '')
 
-                elem_json['quality'] = elem.find('b', class_='bold', string=re.compile('Formato:'))\
-                                           .find_previous('p').get_text('|', strip=True).split('|')[1]
+                elif elem.find('a', class_='bg-primary') and elem.find('a', class_='bg-primary').get('data-content-id'):
+                    elem_json['url'] = host + torrent_path
+                    elem_json['info'] = item.info or '{"action":"generate","content_id":%s,"tabla":"%s"}' \
+                                                      % (int(elem.find('a', class_='bg-primary').get('data-content-id', 0)), 
+                                                         elem.find('a', class_='bg-primary').get('data-tabla', 'peliculas'))
+                    elem_json['url'] = find_torrent(item, elem_json)
+                else:
+                    continue
+
+                elem_json['quality'] = '*%s' % elem.find('b', class_='bold', string=re.compile('Formato:'))\
+                                                   .find_previous('p').get_text('|', strip=True).split('|')[1]
                 if '3d' in elem_json['url'].lower() and '3d' not in elem_json['quality'].lower():
                         elem_json['quality'] = '%s,3d' % elem_json['quality']
 
-                if  elem.find('b', class_='bold', string=re.compile('Clave:\s*')):
-                    elem_json['password'] = elem.find('b', class_='bold', string=re.compile('Clave:\s*'))\
+                if elem.find('b', class_='bold', string=re.compile(r'Clave:\s*')):
+                    elem_json['password'] = elem.find('b', class_='bold', string=re.compile(r'Clave:\s*'))\
                                                 .find_next('a').get('data-content', '')
                     elem_json['password'] = item.password = scrapertools.find_single_match(elem_json['password'], "value='([^']+)'")
             except Exception:
@@ -766,16 +814,69 @@ def actualizar_titulos(item):
     return AlfaChannel.do_actualizar_titulos(item)
 
 
+def find_torrent(item, elem_json):
+    import hashlib
+
+    kwargs = {'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 0, 'ignore_response_code': True, 
+              'timeout': 5, 'cf_assistant': False, 'hide_infobox': True, 'canonical': {}, 'json': True, 'soup': False}
+    kwargs['headers'] = {'Referer': item.url, 'Content-Type': 'application/json'}
+    kwargs['post'] = elem_json['info']
+    elem_json['url'] = host + torrent_path
+
+    def nonce_gen(challenge, difficulty=3):
+        nonce = 0
+        target = '0' * difficulty
+
+        while True:
+            text = challenge + str(nonce)
+            hash_hex = hashlib.sha256(text.encode()).hexdigest()
+
+            if hash_hex.startswith(target):
+                return nonce
+
+            nonce += 1
+
+            # Yield to event loop to avoid blocking
+            if nonce % 1000 == 0:
+                time.sleep(0.1)
+
+    json = AlfaChannel.create_soup(elem_json['url'], **kwargs)
+    if isinstance(json, _dict) and json.get('success') and json.get('challenge'):
+        kwargs['post'] = '{"action":"validate","challenge":"%s","nonce":%s}' % (json['challenge'], nonce_gen(json['challenge']))
+
+        json = AlfaChannel.create_soup(elem_json['url'], **kwargs)
+        if isinstance(json, _dict) and json.get('success') and json.get('download_url'):
+            elem_json['url'] = json['download_url']
+            if not elem_json['url'].startswith('http'):
+                elem_json['url'] = 'https:%s' % elem_json['url']
+
+            try:
+                matches = (item.matches or [])[:]
+                item.matches = []
+                for match in matches:
+                    if match.get('info', '') == elem_json['info']: continue
+                    item.matches.append(match.copy())
+            except Exception:
+                logger.error(traceback.format_exc())
+
+    return elem_json['url']
+
+
 def search(item, texto, **AHkwargs):
     logger.info()
     kwargs.update(AHkwargs)
 
+    host_new = True if canonical['host'] in canonical.get('host_alt_new', []) else False
     texto = texto.replace(" ", "%20")
 
     try:
         if texto:
             if item.btdigg: item.btdigg = texto
-            item.url = item.referer = host + 'buscar/' + texto
+            if not host_new:
+                item.url = item.referer = host + 'buscar/' + texto
+            else:
+                item.url = item.referer = host + 'buscar'
+                item.post = 'valor=%s&Buscar=Buscar&p=1' % texto
             item.c_type = "search"
             item.texto = texto
             return list_all(item)

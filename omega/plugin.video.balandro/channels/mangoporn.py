@@ -11,12 +11,6 @@ host = 'https://mangoporn.co/'
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://mangoporn.net/']
-
-    for ant in ant_hosts:
-        url = url.replace(ant, host)
-
     raise_weberror = True
     if '/year/' in url: raise_weberror = False
 
@@ -33,11 +27,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -45,13 +40,13 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'adult/genres/porn-movies/' ))
 
-    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'adult/trending/' ))
+    itemlist.append(item.clone( title = ' - Más vistas', action = 'list_all', url = host + 'adult/trending/' ))
 
     itemlist.append(item.clone( title = '[B]Vídeos:[/B]', folder=False, text_color='moccasin' ))
 
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host + 'xxxfree/' ))
 
-    itemlist.append(item.clone( title = ' - Tendencias', action = 'list_all', url = host + 'xxxfree/trending/' ))
+    itemlist.append(item.clone( title = ' - Más vistos', action = 'list_all', url = host + 'xxxfree/trending/' ))
 
     itemlist.append(item.clone( title = ' - Más valorados', action = 'list_all', url = host + 'xxxfree/ratings/' ))
 
@@ -124,7 +119,7 @@ def list_all(item):
 
         title = title.replace('Porn Online Free', '').replace('Watch', '').strip()
 
-        title = title.replace('&#8211;', '').replace('&#038;', '&').replace('&#8217;', "'").replace('&#8230;', '').strip()
+        title = title.replace('&#8211;', '').replace('&#038;', '&').replace('&#8217;', "'").replace('&#8230;', '').replace('&#8220;', '').replace('&#8221;', '').strip()
 
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
         if not thumb: thumb = scrapertools.find_single_match(match, 'data-wpfc-original-src="(.*?)"')
@@ -134,7 +129,7 @@ def list_all(item):
         titulo = title
 
         if time:
-            time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm')
+            time = time.replace(' hrs.', 'h').replace(' mins.', 'm').replace(' min.', 'm').replace(' hrs', 'h').replace(' mins', 'm').replace(' min', 'm')
 
             titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
 
@@ -157,47 +152,70 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     item.url = item.url.replace('http://', 'https://')
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Video Sources(.*?)</div></div></div></div')
+    bloque = scrapertools.find_single_match(data, '>Video Sources(.*?)<script>')
 
     matches = re.compile('href="(.*?)"', re.DOTALL).findall(bloque)
 
     ses = 0
 
     for url in matches:
-        ses += 1
-
         if url:
             if url == '#': continue
+
+            ses += 1
+
+            if '.seekplayer.' in url: continue
+            elif '.streamkithmc.' in url: continue
+            elif '.streamkitagg.' in url: continue
+            elif '.cloudwarebrh.' in url: continue
+            elif '.video-twimg.' in url: continue
+
+            ref = url
 
             url = url.replace('/netu.wiztube.xyz/player/embed_player.php?', '/waaw.to/watch_video.php?v=').replace('&autoplay=yes', '').strip()
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             other = ''
 
             if servidor == 'various': other = servertools.corregir_other(url)
+            elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+            force_input = ''
+            if other == 'Lulustream': force_input = True
+
+            if servidor == 'kinoger':
+                if config.get_setting('developer_team'): other = url
+            else: ref = ''
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, ref=ref,
+                                      language = 'Vo', other = other.capitalize(), force_input=force_input ))
 
     # ~  Download
     if '>Download Sources' in data:
-        bloque = scrapertools.find_single_match(data, '>Download Sources(.*?)</div></div></div></div')
+        bloque = scrapertools.find_single_match(data, '>Download Sources(.*?)</ul></div></div></div')
 
         matches = re.compile('href="(.*?)"', re.DOTALL).findall(bloque)
 
         for url in matches:
-            ses += 1
-
             if 'link=' in url: url = scrapertools.find_single_match(url, 'link=(.*?)$')
 
             if url:
+                ses += 1
+
                 if '/rapidgator.' in url: continue
                 elif '/nitro.' in url: continue
                 elif '/nitroflare.' in url: continue
@@ -207,17 +225,35 @@ def findvideos(item):
                 elif '/hitfile.' in url: continue
                 elif '/frdl.' in url: continue
 
+                elif '/drivevideo.' in url: continue
+                elif '/snowdayonline.' in url: continue
+                elif '/freepopnews.' in url: continue
+                elif '/filepv.' in url: continue
+                elif '/vinovo.' in url: continue
+
                 url = url.replace('//filemoon.sx/download/', '//filemoon.sx/d/')
 
+                ref = url
+
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
+
+                url = servertools.normalize_url(servidor, url)
 
                 other = 'D'
 
                 if servidor == 'various': other = servertools.corregir_other(url) + ' ' + other
+                elif servidor == 'zures': other = servertools.corregir_zures(url) + ' ' + other
+
+                force_input = ''
+                if other == 'Lulustream': force_input = True
+
+                if servidor == 'kinoger':
+                    if config.get_setting('developer_team'): other = url
+                else: ref = ''
 
                 if not servidor == 'directo':
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = 'Vo', other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, ref=ref,
+                                          language = 'Vo', other = other.capitalize(), force_input=force_input ))
 
     if not itemlist:
         if not ses == 0:
@@ -243,9 +279,8 @@ def play(item):
         if not url: return itemlist
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
-    itemlist.append(item.clone(server = servidor, url = url))
+    itemlist.append(item.clone(server = servidor, url = url, url_referer = item.ref))
 
     return itemlist
 

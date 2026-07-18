@@ -14,16 +14,19 @@ from modules import autoplay
 list_quality = ['default']
 list_servers = []
 
+
+########   NO FUNCIONAN LOS FILTROS EN WEB  Y escenas REDIRIGE A PORNKINO
+
+
 # https://playpornfree.org/   https://streamporn.pw/  https://mangoporn.net/   https://watchfreexxx.net/   https://losporn.org/  https://xxxstreams.me/  https://speedporn.net/
 # pandamovie https://watchpornfree.info  https://xxxparodyhd.net  http://www.veporns.com  http://streamporno.eu
-# https://www.netflixporno.net   https://xxxscenes.net   https://mangoporn.net   https://speedporn.net
+# https://www.netflixporno.net   https://xxxscenes.net   https://mangoporn.net   https://speedporn.net  https://streamporn.nl/
 
 canonical = {
              'channel': 'playpornx', 
              'host': config.get_setting("current_host", 'playpornx', default=''), 
              'host_alt': ["https://watchfreexxx.net/"], 
              'host_black_list': [], 
-             'pattern': ['href="?([^"|\s*]+)["|\s*]\s*hreflang="?en"?'], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
@@ -36,12 +39,13 @@ def mainlist(item):
 
     autoplay.init(item.channel, list_servers, list_quality)
     
-    itemlist.append(Item(channel=item.channel, title="Escenas" , action="submenu", url=host + "xxxporn/"))
+    # itemlist.append(Item(channel=item.channel, title="Escenas" , action="submenu", url=host + "xxxporn/"))
+    # itemlist.append(Item(channel=item.channel, title="Escenas" , action="lista", url=host + "xxxporn/"))
     
-    itemlist.append(Item(channel=item.channel, title="Peliculas" , action="lista", url=host + "?filter=latest"))
-    itemlist.append(Item(channel=item.channel, title="Mas visto" , action="lista", url=host + "?filter=most-viewed"))
-    itemlist.append(Item(channel=item.channel, title="Popular" , action="lista", url=host + "?filter=popular"))
-    itemlist.append(Item(channel=item.channel, title="Mas Largo" , action="lista", url=host + "?filter=longest"))
+    itemlist.append(Item(channel=item.channel, title="Peliculas" , action="lista", url=host )) #+ "?filter=latest"
+    # itemlist.append(Item(channel=item.channel, title="Mas visto" , action="lista", url=host + "?filter=most-viewed"))
+    # itemlist.append(Item(channel=item.channel, title="Popular" , action="lista", url=host + "?filter=popular"))
+    # itemlist.append(Item(channel=item.channel, title="Mas Largo" , action="lista", url=host + "?filter=longest"))
     itemlist.append(Item(channel=item.channel, title="Pornstars" , action="categorias", url=host + "pornstars/"))
     itemlist.append(Item(channel=item.channel, title="Canal" , action="canal", url=host + "studios/"))
     itemlist.append(Item(channel=item.channel, title="Categorias" , action="categorias", url=host + "genres/"))
@@ -139,7 +143,7 @@ def lista(item):
         thumbnail = ""
         url = elem.a['href']
         title = elem.find(class_='title').text.strip()
-        thumbnail = elem.img['src'].replace("amp;", "")
+        thumbnail = elem.img.get('src', '').replace("amp;", "")
         if "svg" in thumbnail and elem.img.get('data-lazy-src', ''):
             thumbnail = elem.img['data-lazy-src'].replace("amp;", "")
         elif elem.img.get('data-src', ''):

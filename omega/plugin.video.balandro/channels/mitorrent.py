@@ -127,7 +127,7 @@ def idiomas(item):
 
         url = url_idio + value
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='moccasin' ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='deepskyblue' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -149,7 +149,7 @@ def calidades(item):
 
         url = url_qlty + value
 
-        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='tan' ))
+        itemlist.append(item.clone( action='list_all', title=title, url=url, text_color='moccasin' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -308,22 +308,21 @@ def temporadas(item):
         season = scrapertools.find_single_match(tempo, '(.*?)<a').strip()
         season = season.replace('Temporada', '').strip()
 
-        url = scrapertools.find_single_match(tempo, 'href="(.*?)"')
-
         title = 'Temporada ' + season
 
         if len(temporadas) == 1:
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.url = url
-            item.contentType = 'season'
-            item.contentSeason = season
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.url = item.url
+                item.contentType = 'season'
+                item.contentSeason = season
+                itemlist = episodios(item)
+                return itemlist
 
-        itemlist.append(item.clone( action = 'episodios', title = title, url = url, page = 0, contentType = 'season', contentSeason = season, text_color='tan' ))
+        itemlist.append(item.clone( action = 'episodios', title = title, url = item.url,
+                                    page = 0, contentType = 'season', contentSeason = season, text_color='tan' ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -343,7 +342,11 @@ def episodios(item):
     link = scrapertools.find_single_match(data, '<form action="(.*?)"')
     if not link: link = scrapertools.find_single_match(data, '<a target="_blank".*?href="(.*?)"')
 
-    if not link:
+    if '/acortalink.' in link:
+        link = ''
+
+        data = do_downloadpage(item.url + '?pkgo=c4ca4238a0b923820dcc509a6f75849b')
+    else:
         if '/s.php?' in item.url: link = item.url
 
     if link:
@@ -443,8 +446,11 @@ def findvideos(item):
 
         if 'espanol' in qlty or 'castellano' in qlty: qlty = qlty.replace('espanol', '').replace('castellano', '')
         if 'latino' in qlty: qlty = qlty.replace('latino', '')
+        if 'ingles' in qlty: qlty = qlty.replace('ingles', '')
 
         qlty = qlty.strip()
+
+        if 'Torrent' in qlty: qlty = qlty.replace('Torrent','').strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language=item.languages, quality=qlty))
 
@@ -458,8 +464,11 @@ def findvideos(item):
 
             if 'espanol' in qlty or 'castellano' in qlty: qlty = qlty.replace('espanol', '').replace('castellano', '')
             if 'latino' in qlty: qlty = qlty.replace('latino', '')
+            if 'ingles' in qlty: qlty = qlty.replace('ingles', '')
 
             qlty = qlty.strip()
+
+            if 'Torrent' in qlty: qlty = qlty.replace('Torrent','').strip()
 
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = link, server = 'torrent', language=item.languages, quality=qlty))
 

@@ -10,6 +10,8 @@ from core import httptools
 from core import urlparse
 from bs4 import BeautifulSoup
 
+####  ADAPTIVE
+
 canonical = {
              'channel': 'pornmz', 
              'host': config.get_setting("current_host", 'pornmz', default=''), 
@@ -52,7 +54,7 @@ def canal(item):
     logger.info()
     itemlist = []
     soup = create_soup(item.url).find('nav', id='site-navigation')
-    matches = soup.find_all('a', href=re.compile(r"^%spmvideo/(?:s|c)/\w+" %host))
+    matches = soup.find_all('a', href=re.compile(r"pmzvideo/(?:s|c)/\w+"))
     for elem in matches:
         url = elem['href']
         title = elem.text
@@ -101,7 +103,7 @@ def lista(item):
     logger.info()
     itemlist = []
     soup = create_soup(item.url)
-    matches = soup.find_all('article',id=re.compile(r"^post-\d+"))
+    matches = soup.find_all('article', class_=re.compile(r"^post-\d+"))
     for elem in matches:
         url = elem.a['href']
         title = elem.a['title']
@@ -142,56 +144,51 @@ def lista(item):
 def findvideos(item):
     logger.info()
     itemlist = []
-    soup = create_soup(item.url).find('div', class_='responsive-player')
-    url = soup.find('iframe')['src']
-    url = urlparse.urljoin(item.url,url)
-    soup = create_soup(url, referer=item.url)#.find('video', id='video')
-    matches = soup.find_all('source')
-    for elem in matches:
-        url = elem['src']
-        if elem.has_attr('title'):
-            quality = elem['title']
-        else:
-            quality =  "mp4"
-        url += "|Referer=%s" % item.url
-        itemlist.append(item.clone(action="play", title=quality, url=url) )
-    if not matches:
-        url = soup.find('div', class_='responsive-player').find(re.compile("(?:iframe|source)"))['src']
-        if "php?q=" in url:
-            import base64
-            url = url.split('php?q=')
-            url_decode = base64.b64decode(url[-1]).decode("utf8")
-            url = AlfaChannel.do_unquote(url_decode)
-            url = scrapertools.find_single_match(url, '<iframe src="([^"]+)"')
-        itemlist.append(item.clone(action="play", title= "%s", contentTitle = item.title, url=url))
-        itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
+    soup = create_soup(item.url)
+    
+    match = soup.find('div', class_="responsive-player")
+    if match.find('source'):
+        url = match.source['src']
+    elif match.iframe.get('data-lazy-src', ''):
+        url = match.iframe['data-lazy-src']
+    else:
+        url = match.iframe['src']
+    if "php?q=" in url:
+        import base64
+        url = url.split('php?q=')
+        url_decode = base64.b64decode(url[-1]).decode("utf8")
+        decode = urlparse.unquote(url_decode)
+        url = scrapertools.find_single_match(decode, '<(?:iframe|source) src="([^"]+)"')
+        if not url:
+            url = scrapertools.find_single_match(decode, "<(?:iframe|source) src='([^']+)'")
+        
+    itemlist.append(item.clone(action="play", title= "%s", contentTitle = item.title, url=url))
+    itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     return itemlist[::-1]
 
 
 def play(item):
     logger.info()
     itemlist = []
-    soup = create_soup(item.url).find('div', class_='responsive-player')
-    url = soup.find('iframe')['src']
-    url = urlparse.urljoin(item.url,url)
-    soup = create_soup(url)#.find('video', id='video')
-    matches = soup.find_all('source')
-    for elem in matches:
-        url = elem['src']
-        if elem.has_attr('title'):
-            quality = elem['title']
-        else:
-            quality =  "mp4"
-        url += "|Referer=%s" % item.url
-        itemlist.append(['%s' %quality, url])
-    if not matches:
-        url = soup.find('div', class_='responsive-player').find(re.compile("(?:iframe|source)"))['src']
-        if "php?q=" in url:
-            import base64
-            url = url.split('php?q=')
-            url_decode = base64.b64decode(url[-1]).decode("utf8")
-            url = AlfaChannel.do_unquote(url_decode)
-            url = scrapertools.find_single_match(url, '<iframe src="([^"]+)"')
+    soup = create_soup(item.url)
+    
+    match = soup.find('div', class_="responsive-player")
+    if match.find('source'):
+        url = match.source['src']
+    elif match.iframe.get('data-lazy-src', ''):
+        url = match.iframe['data-lazy-src']
+    else:
+        url = match.iframe['src']
+    if "php?q=" in url:
+        import base64
+        url = url.split('php?q=')
+        url_decode = base64.b64decode(url[-1]).decode("utf8")
+        decode = urlparse.unquote(url_decode)
+        url = scrapertools.find_single_match(decode, '<(?:iframe|source) src="([^"]+)"')
+        if not url:
+            url = scrapertools.find_single_match(decode, "<(?:iframe|source) src='([^']+)'")
+        itemlist.append(["[pornmz]", url])
+    else:
         itemlist.append(item.clone(action="play", title= "%s", contentTitle = item.title, url=url))
         itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
-    return itemlist[::-1]
+    return itemlist

@@ -11,7 +11,7 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 import datetime
 
@@ -29,9 +29,9 @@ canonical = {
              'host_alt': ["https://www.zonapelis.org/"], 
              'host_black_list': ["https://www.torrenflix.com/", "https://www.pelitorrent.com/", 
                                  "https://pelitorrent.com/", "https://pelitorrent.xyz/", "https://www.pelitorrent.com/"], 
-             'pattern': "<link\s*rel='stylesheet'\s*id='wp-block-library-css'\s*href='([^']+)'", 
+             'pattern': r"<link\s*rel='stylesheet'\s*id='wp-block-library-css'\s*href='([^']+)'", 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False
             }
 host = canonical['host'] or canonical['host_alt'][0]
 host_torrent = host
@@ -62,10 +62,10 @@ finds = {'find': dict([('find', [{'tag': ['div'], 'id': ['archive-content']}]),
          'get_quality': {}, 
          'get_quality_rgx': [], 
          'next_page': {}, 
-         'next_page_rgx': [['\/page\/\d+', '/page/%s/']],  
+         'next_page_rgx': [[r'\/page\/\d+', '/page/%s/']],  
          'last_page': dict([('find', [{'tag': ['div'], 'class': ['pagination']}]), 
                             ('find_all', [{'tag': ['span'], '@POS': [0]}]), 
-                            ('get_text', [{'tag': '', '@STRIP': True, '@TEXT': '(?i)(?:\d+\s*de\s*)?(\d+)'}])]), 
+                            ('get_text', [{'tag': '', '@STRIP': True, '@TEXT': r'(?i)(?:\d+\s*de\s*)?(\d+)'}])]), 
          'year': {}, 
          'season_episode': {}, 
          'seasons': dict([('find', [{'tag': ['div'], 'id': ['seasons']}]), 
@@ -83,22 +83,23 @@ finds = {'find': dict([('find', [{'tag': ['div'], 'id': ['archive-content']}]),
          'findvideos': dict([('find', [{'tag': ['div'], 'class': ['links_table']}, 
                                        {'tag': ['tbody']}]), 
                              ('find_all', [{'tag': ['tr']}])]), 
-         'title_clean': [['(?i)TV|Online|(4k-hdr)|(fullbluray)|4k| - 4k|(3d)|miniserie|\s*imax', ''],
-                         ['(?i)[\[|\(]?\d{3,4}p[\]|\)]?|[\[|\(]?(?:4k|3d|uhd|hdr)[\]|\)]?', ''], 
-                         ['(?i)[-|\(]?\s*HDRip\)?|microHD|\(?BR-LINE\)?|\(?HDTS-SCREENER\)?', ''], 
-                         ['(?i)\(?BDRip\)?|\(?BR-Screener\)?|\(?DVDScreener\)?|\(?TS-Screener\)?|[\(|\[]\S*\.*$', ''],
-                         ['(?i)Castellano-*|Ingl.s|Trailer|Audio|\(*SBS\)*|\[*\(*dvd\s*r\d*\w*\]*\)*|[\[|\(]*dv\S*[\)|\]]*', ''], 
-                         ['(?i)Dual|Subt\w*|\(?Reparado\)?|\(?Proper\)?|\(?Latino\)?|saga(?:\s*del)?', ''], 
-                         ['(?i)(?:\s*&#8211;)?\s*temp.*?\d+.*', ''], ['\d?\d?&#.*', ''], ['\d+[x|×]\d+.*', ''], 
-                         ['[\(|\[]\s*[\)|\]]', ''], ['(?i)(?:libro|volumen)?\s+\d{1,2}$', ''], 
-                         ['(?i)\s*-?\s*\d{1,2}.?\s*-?\s*Temp\w*[^$]*$', '']],
-         'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
+         'title_clean': [[r'(?i)TV|Online|(4k-hdr)|(fullbluray)|4k| - 4k|(3d)|miniserie|\s*imax', ''],
+                         [r'(?i)[\[|\(]?\d{3,4}p[\]|\)]?|[\[|\(]?(?:4k|3d|uhd|hdr)[\]|\)]?', ''], 
+                         [r'(?i)[-|\(]?\s*HDRip\)?|microHD|\(?BR-LINE\)?|\(?HDTS-SCREENER\)?', ''], 
+                         [r'(?i)\(?BDRip\)?|\(?BR-Screener\)?|\(?DVDScreener\)?|\(?TS-Screener\)?|[\(|\[]\S*\.*$', ''],
+                         [r'(?i)Castellano-*|Ingl.s|Trailer|Audio|\(*SBS\)*|\[*\(*dvd\s*r\d*\w*\]*\)*|[\[|\(]*dv\S*[\)|\]]*', ''], 
+                         [r'(?i)Dual|Subt\w*|\(?Reparado\)?|\(?Proper\)?|\(?Latino\)?|saga(?:\s*del)?', ''], 
+                         [r'(?i)(?:\s*&#8211;)?\s*temp.*?\d+.*', ''], [r'\d?\d?&#.*', ''], [r'\d+[x|×]\d+.*', ''], 
+                         [r'[\(|\[]\s*[\)|\]]', ''], [r'(?i)(?:libro|volumen)?\s+\d{1,2}$', ''], 
+                         [r'(?i)\s*-?\s*\d{1,2}.?\s*-?\s*Temp\w*[^$]*$', '']],
+         'quality_clean': [[r'(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'language_clean': [], 
          'url_replace': [], 
          'controls': {'min_temp': min_temp, 'url_base64': True, 'add_video_to_videolibrary': True, 'cnt_tot': 15, 
                       'get_lang': False, 'reverse': False, 'videolab_status': True, 'tmdb_extended_info': True, 'seasons_search': False, 
                       'host_torrent': host_torrent, 'duplicates': [], 'join_dup_episodes': False, 'torrent_kwargs': {'follow_redirects': False},
-                      'torrent_url_replace': [[r'\/s\/', '/index.php/s/'], [r'([^^]+/index.php/s/[^$]+$)', r'\1/download']]},
+                      #'torrent_url_replace': [[r'\/s\/', '/index.php/s/'], [r'([^^]+/index.php/s/[^$]+$)', r'\1/download']],
+                     },
          'timeout': timeout * 2}
 AlfaChannel = DictionaryAllChannel(host, movie_path=movie_path, tv_path=tv_path, canonical=canonical, finds=finds, 
                                    idiomas=IDIOMAS, language=language, list_language=list_language, list_servers=list_servers, 
@@ -129,6 +130,8 @@ def mainlist(item):
                          folder=False, thumbnail=get_thumb("next.png")))
     itemlist.append(Item(channel=item.channel, action="configuracion", title="Configurar canal", 
                          thumbnail=get_thumb("setting_0.png")))
+
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
@@ -351,7 +354,7 @@ def seasons_matches(item, matches_int, **AHkwargs):
                 info = elem.get_text(strip=True)
                 if not info: continue
                 episode, quality, season = scrapertools.find_single_match(info, 
-                                           '(?i)epi\w*\s*(\d{1,3})[^<]*(HDTV(?:-\d{3,4}p)?)[^<]*(\d{1,2})[^<]*temp\w*')
+                                           r'(?i)epi\w*\s*(\d{1,3})[^<]*(HDTV(?:-\d{3,4}p)?)[^<]*(\d{1,2})[^<]*temp\w*')
             else:
                 if not info or not episode or not quality or not season: continue
                 info = ''
@@ -485,7 +488,7 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
 
     for elem in matches_int:
         elem_json = {}
-        #logger.error(elem)
+        logger.error(elem)
 
         for x, td in enumerate(elem.find_all('td')):
             try:
@@ -509,6 +512,37 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
 
         if not elem_json.get('url', ''): 
             continue
+
+        if not '.torrent' in elem_json['url']:
+            TORRENT_HOSTS = ['https://www.filekas.com', 'https://www.bajatorrent.org']
+            KWARGS = {'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': -1, 'forced_proxy_opt': None, 'hide_infobox': True, 
+                      'cf_assistant': False, 'canonical': {'preferred_proxy_ip': canonical.get('preferred_proxy_ip', '')}}
+            torrent = AlfaChannel.create_soup(elem_json['url'], **KWARGS)
+
+            if AlfaChannel.response.sucess:
+                if torrent.a:
+                    elem_json['url'] = torrent.a.get('href', '')
+                    if AlfaChannel.obtain_domain(elem_json['url'], scheme=True) in TORRENT_HOSTS:
+                        if not '.torrent' in elem_json['url']:
+                            torrent = AlfaChannel.create_soup(elem_json['url'], soup=False, json=False, **KWARGS)
+
+                            if torrent.sucess:
+                                torrent_url = '%s/%s/download/%s?shareable_link=%s&password=null'
+                                elem_json['host_torrent'] = AlfaChannel.obtain_domain(elem_json['url'], scheme=True)
+                                elem_json['host_torrent_referer'] = elem_json['url']
+                                torrent_json = jsontools.load(scrapertools.find_single_match(torrent.data, r'window\.bootstrapData\s*=\s*([^;]+);'))
+                                url_base = torrent_json.get('loaders', {}).get('shareableLinkPage', {}).get('link', {})
+
+                                if url_base.get('entry', {}):
+                                    elem_json['url'] = torrent_url % (elem_json['host_torrent'], re.sub(r'\/\d+$', '', 
+                                                                      url_base['entry'].get('url', '')), 
+                                                                      url_base['entry'].get('hash', ''), 
+                                                                      url_base.get('id', ''))
+                            elif torrent.code in [404]:
+                                soup = AlfaChannel.do_soup(torrent.content)
+                                if soup.find('span', id='header-primary-action') \
+                                              and soup.find('span', id='header-primary-action').a.get('href', ''):
+                                    elem_json['url'] = soup.find('span', id='header-primary-action').a.get('href', '')
 
         matches.append(elem_json.copy())
 

@@ -1,48 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] < 3: PY3 = False
-else: PY3 = True
-
-
 import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
-
-
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
 
 
 host = 'https://detodopeliculas.net/'
@@ -101,7 +63,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -109,23 +71,6 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage_proxy('dpeliculas', url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('dpeliculas', url, post=post, headers=headers, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '/?s=' in url:
@@ -144,7 +89,7 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_dpeliculas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('dpeliculas') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_dpeliculas', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
 
     platformtools.itemlist_refresh()
 
@@ -152,7 +97,21 @@ def acciones(item):
 
 
 def mainlist(item):
-    return mainlist_pelis(item)
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
+
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
+
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color='springgreen' ))
+
+    return itemlist
+
 
 def mainlist_pelis(item):
     logger.info()
@@ -162,9 +121,11 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'novedades/' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_lst', url = host + 'pelicula/' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas-de-estreno/', text_color = 'cyan' ))
+
+    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host + 'novedades/' ))
 
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host + 'peliculas-recomendadas/' ))
 
@@ -173,20 +134,100 @@ def mainlist_pelis(item):
     return itemlist
 
 
+def mainlist_series(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_lst', url = host + 'ver/serie/', search_type = 'tvshow' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes', action = 'list_lst', url = host + 'ver/anime/', search_type = 'tvshow', text_color = 'springgreen' ))
+
+    return itemlist
+
+
 def generos(item):
     logger.info()
     itemlist = []
 
-    data = do_downloadpage(host)
+    data = do_downloadpage(host + 'generos/')
 
-    bloque = scrapertools.find_single_match(data, '>Generos<(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '</noscript>Generos</a>(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)">(.*?)</a>')
 
     for url, title in matches:
-        itemlist.append(item.clone( action = 'list_all', title = title, url = url, text_color = 'deepskyblue' ))
+        url = host[:-1] + url
+
+        itemlist.append(item.clone( action = 'list_lst', title = title, url = url, text_color = 'deepskyblue' ))
 
     return sorted(itemlist, key=lambda x: x.title)
+
+
+def list_lst(item): 
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+
+    data = do_downloadpage(item.url)
+
+    bloque = scrapertools.find_single_match(data, '<h2>Catálogo(.*?)<div class="vv2-more-wrap">')
+
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h2>Todas(.*?)<div class="vv2-more-wrap">')
+
+    if not bloque: bloque = scrapertools.find_single_match(data, '<h2>Todo(.*?)<div class="vv2-more-wrap">')
+
+    matches = re.compile('<a class="hv2-card"(.*?)</a>', re.DOTALL).findall(bloque)
+
+    num_matches = len(matches)
+
+    for article in matches[item.page * perpage:]:
+        url = scrapertools.find_single_match(article, 'href="(.*?)"')
+        title = scrapertools.find_single_match(article, ' alt="(.*?)"')
+
+        if not url or not title: continue
+
+        title = title.replace('&#038;', '').replace('&#215;', 'x').replace('&#8217;s', "'s").replace('&#8217;', "'").replace('&#8211;', '').replace('&#8230;', '...').strip()
+
+        thumb = scrapertools.find_single_match(article, 'data-lazy-src="(.*?)"')
+
+        year = scrapertools.find_single_match(title, '(\d{4})')
+        if not year: year = '-'
+        else: title = title.replace('(' + year + ')', '').strip()
+
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+
+        if tipo == 'movie':
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+
+        if tipo == 'tvshow':
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
+                                        contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
+
+        if len(itemlist) >= perpage: break
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        buscar_next = True
+        if num_matches > perpage:
+            hasta = (item.page * perpage) + perpage
+            if hasta < num_matches:
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_lst', text_color='coral' ))
+                buscar_next = False
+
+        if buscar_next:
+            next_page = scrapertools.find_single_match(data, 'id="vv2more".*?href="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title='Siguientes ...', url = next_page, page = 0, action='list_lst', text_color='coral' ))
+
+    return itemlist
 
 
 def list_all(item): 
@@ -197,7 +238,7 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<article(.*?)</article', re.DOTALL).findall(data)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
     num_matches = len(matches)
 
@@ -232,7 +273,7 @@ def list_all(item):
         if num_matches > perpage:
             hasta = (item.page * perpage) + perpage
             if hasta < num_matches:
-                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, pagina = item.pagina, action='list_all', text_color='coral' ))
+                itemlist.append(item.clone( title='Siguientes ...', page=item.page + 1, action='list_all', text_color='coral' ))
                 buscar_next = False
 
         if buscar_next:
@@ -241,6 +282,122 @@ def list_all(item):
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone( title='Siguientes ...', url = next_page, page = 0, action='list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def temporadas(item):
+    logger.info()
+    itemlist = []
+
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '>Temporadas y episodios<(.*?)</div>')
+
+    temporadas = re.compile('href="(.*?)".*?data-season="(.*?)"', re.DOTALL).findall(bloque)
+
+    for url, tempo in temporadas:
+        title = 'Temporada ' + tempo
+
+        if len(temporadas) == 1:
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
+                item.page = 0
+                item.url = url
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
+
+        itemlist.append(item.clone( action='episodios', title=title, page=0, url=url, contentType='season', contentSeason=tempo, text_color='tan' ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def episodios(item):
+    logger.info()
+    itemlist = []
+
+    if not item.page: item.page = 0
+    if not item.perpage: item.perpage = 50
+
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    bloque = scrapertools.find_single_match(data, '<h3>Temporada ' + str(item.contentSeason) + '(.*?)</div></div><div')
+
+    matches = re.compile('href="(.*?)".*?data-ep="(.*?)".*?data-eptitle="(.*?)".*?data-epnum="(.*?)".*?src="(.*?)"', re.DOTALL).findall(bloque)
+
+    num_matches = len(matches)
+
+    if item.page == 0 and item.perpage == 50:
+        sum_parts = len(matches)
+
+        try:
+            tvdb_id = scrapertools.find_single_match(str(item), "'tvdb_id': '(.*?)'")
+            if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
+        except: tvdb_id = ''
+
+        if config.get_setting('channels_charges', default=True):
+            item.perpage = sum_parts
+            if sum_parts >= 100:
+                platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+        elif tvdb_id:
+            if sum_parts > 50:
+                platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
+                item.perpage = sum_parts
+        else:
+            item.perpage = sum_parts
+
+            if sum_parts >= 1000:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]500[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Cargando 500 elementos[/COLOR]')
+                    item.perpage = 500
+
+            elif sum_parts >= 500:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]250[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Cargando 250 elementos[/COLOR]')
+                    item.perpage = 250
+
+            elif sum_parts >= 250:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]125[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Cargando 125 elementos[/COLOR]')
+                    item.perpage = 125
+
+            elif sum_parts >= 125:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos en bloques de [COLOR cyan][B]75[/B][/COLOR] elementos ?'):
+                    platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Cargando 75 elementos[/COLOR]')
+                    item.perpage = 75
+
+            elif sum_parts > 50:
+                if platformtools.dialog_yesno(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '¿ Hay [COLOR yellow][B]' + str(sum_parts) + '[/B][/COLOR] elementos disponibles, desea cargarlos [COLOR cyan][B]Todos[/B][/COLOR] de una sola vez ?'):
+                    platformtools.dialog_notification('DPeliculas', '[COLOR cyan]Cargando ' + str(sum_parts) + ' elementos[/COLOR]')
+                    item.perpage = sum_parts
+                else: item.perpage = 50
+
+    for url, datap, title, temp_epis, thumb in matches[item.page * item.perpage:]:
+        epis = scrapertools.find_single_match(temp_epis, "×(.*?)$")
+
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+
+        itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail=thumb, url = url, datap = datap,
+                                    contentType = 'episode', contentSeason=item.contentSeason, contentEpisodeNumber=epis))
+
+        if len(itemlist) >= item.perpage:
+            break
+
+    tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if len(matches) > (item.page + 1) * item.perpage:
+            itemlist.append(item.clone( title="Siguientes ...", action="episodios", page=item.page + 1, perpage=item.perpage, orden='1000', text_color='coral' ))
 
     return itemlist
 
@@ -284,6 +441,8 @@ def findvideos(item):
         else: lang = '?'
 
         if dtype and dpost and dnume:
+            if item.datap: dpost = item.datap
+
             post = {'action': 'doo_player_ajax', 'post': dpost, 'nume': dnume, 'type': dtype}
 
             data1 = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
@@ -298,35 +457,72 @@ def findvideos(item):
 
                     if embed.startswith('//'): embed = 'https:' + embed
 
-                    if '/player/?id=' in embed:
-                        datae = do_downloadpage(embed, headers = headers)
+                    if not '/aviso.mp4' in embed:
+                        if '/player/?id=' in embed:
+                            datae = do_downloadpage(embed, headers = headers)
 
-                        new_url = scrapertools.find_single_match(str(datae), "var url = '(.*?)'")
-                        if new_url: embed = new_url
+                            new_url = scrapertools.find_single_match(str(datae), "var url = '(.*?)'")
+                            if new_url: embed = new_url
 
-                    servidor = servertools.get_server_from_url(embed)
-                    servidor = servertools.corregir_servidor(servidor)
+                        servidor = servertools.get_server_from_url(embed)
 
-                    embed = servertools.normalize_url(servidor, embed)
+                        other = ''
+                        if servidor == 'various': other = servertools.corregir_other(embed)
+                        elif servidor == 'zures': other = servertools.corregir_zures(embed)
 
-                    other = ''
-                    if servidor == 'various': other = servertools.corregir_other(embed)
-                    elif servidor == 'directo':
-                          if '/player/?id=' in embed:
-                              servidor = ''
-                              other = 'Player'
+                        elif servidor == 'directo':
+                              if '/player/?id=' in embed:
+                                  servidor = ''
+                                  other = 'Player'
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = embed,
-                                          language = lang, other = other ))
+                        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = embed,
+                                              language = lang, other = other ))
+
+    # ~ ver ahora
+    post_id = scrapertools.find_single_match(data, '"postID":(.*?),')
+
+    if post_id:
+        numes = scrapertools.find_multiple_matches(data, '"nume":(.*?),')
+
+        for nume in numes:
+            if item.datap: post_id = item.datap
+
+            post = {'action': 'doo_player_ajax', 'post': post_id, 'nume': nume, 'type': 'movie'}
+
+            datav = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
+
+            embed = scrapertools.find_single_match(str(datav), '"embed_url":.*?"(.*?)"')
+
+            embed = embed.replace('\\/', '/')
+
+            if embed.startswith('//'): embed = 'https:' + embed
+
+            if '/aviso.mp4' in embed: continue
+
+            elif '.youtube.' in embed: continue
+
+            servidor = servertools.get_server_from_url(embed)
+
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(embed)
+            elif servidor == 'zures': other = servertools.corregir_zures(embed)
+
+            elif servidor == 'directo':
+               if '/player/?id=' in embed:
+                   servidor = ''
+                   other = 'Player'
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = embed,
+                                  language = '?', other = other ))
 
     # ~ downloads
-    post_id = scrapertools.find_single_match(data, 'name="postid" value="(.*?)"')
-
-    nonce = scrapertools.find_single_match(data, 'admin-ajax.php","nonce":"(.*?)"')
+    nonce = scrapertools.find_single_match(data, 'var ajax_var =.*?"nonce":"(.*?)"')
 
     if post_id and nonce:
         # ~ Castellano
-        if '>Enlaces Castellano<' in data:
+        if '"lang":"Castellano"' in data:
+            if item.datap: post_id = item.datap
+
             post = {'action': 'event-list', 'post_id': post_id, 'idioma': 'Castellano', 'nonce': nonce}
 
             data2 = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
@@ -334,12 +530,17 @@ def findvideos(item):
             links = scrapertools.find_multiple_matches(data2, "<tr id='link-(.*?)</tr>")
 
             for link in links:
+                if not '<td>Castellano</td>' in link: continue
+
                 ses += 1
 
-                if 'powvideo' in link: continue
-                elif '1fichier' in link: continue
-
-                elif '/multiup.' in link: continue
+                if 'powvideo.' in link: continue
+                elif '1fichier.' in link: continue
+                elif 'buzzheavier.' in link: continue
+                elif 'filemirage.' in link: continue
+                elif 'multiup.' in link: continue
+                elif 'they.' in link: continue
+                elif 'uploadg.' in link: continue
 
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
@@ -359,19 +560,21 @@ def findvideos(item):
                         url = ''
 
                     if url:
-                        servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
+                        if '/gdtvid.' in url or '/filepv.' in url: continue
 
-                        url = servertools.normalize_url(servidor, url)
+                        servidor = servertools.get_server_from_url(url)
 
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                              language = 'Esp', other = other ))
 
         # ~ Latino
-        if '>Enlaces Latino<' in data:
+        if '"lang":"Latino"' in data:
+            if item.datap: post_id = item.datap
+
             post = {'action': 'event-list', 'post_id': post_id, 'idioma': 'Latino', 'nonce': nonce}
 
             data2 = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
@@ -379,12 +582,17 @@ def findvideos(item):
             links = scrapertools.find_multiple_matches(data2, "<tr id='link-(.*?)</tr>")
 
             for link in links:
+                if not '<td>Latino</td>' in link: continue
+
                 ses += 1
 
-                if 'powvideo' in link: continue
-                elif '1fichier' in link: continue
-
-                elif '/multiup.' in link: continue
+                if 'powvideo.' in link: continue
+                elif '1fichier.' in link: continue
+                elif 'buzzheavier.' in link: continue
+                elif 'filemirage.' in link: continue
+                elif 'multiup.' in link: continue
+                elif 'they.' in link: continue
+                elif 'uploadg.' in link: continue
 
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
@@ -404,19 +612,21 @@ def findvideos(item):
                         url = ''
 
                     if url:
-                        servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
+                        if '/gdtvid.' in url or '/filepv.' in url: continue
 
-                        url = servertools.normalize_url(servidor, url)
+                        servidor = servertools.get_server_from_url(url)
 
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
                                             language = 'Lat', other = other ))
 
         # ~ Subtitulado
-        if '>Enlaces Subtitulado<' in data:
+        if '"lang":"Subtitulado"' in data:
+            if item.datap: post_id = item.datap
+
             post = {'action': 'event-list', 'post_id': post_id, 'idioma': 'Subtitulado', 'nonce': nonce}
 
             data2 = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
@@ -424,12 +634,17 @@ def findvideos(item):
             links = scrapertools.find_multiple_matches(data2, "<tr id='link-(.*?)</tr>")
 
             for link in links:
+                if not '<td>Subtitulado</td>' in link: continue
+
                 ses += 1
 
-                if 'powvideo' in link: continue
-                elif '1fichier' in link: continue
-
-                elif '/multiup.' in link: continue
+                if 'powvideo.' in link: continue
+                elif '1fichier.' in link: continue
+                elif 'buzzheavier.' in link: continue
+                elif 'filemirage.' in link: continue
+                elif 'multiup.' in link: continue
+                elif 'they.' in link: continue
+                elif 'uploadg.' in link: continue
 
                 enlace = scrapertools.find_single_match(link, "<a href='(.*?)'")
 
@@ -449,16 +664,16 @@ def findvideos(item):
                         url = ''
 
                     if url:
-                        servidor = servertools.get_server_from_url(url)
-                        servidor = servertools.corregir_servidor(servidor)
+                        if '/gdtvid.' in url or '/filepv.' in url: continue
 
-                        url = servertools.normalize_url(servidor, url)
+                        servidor = servertools.get_server_from_url(url)
 
                         other = ''
                         if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                         itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url,
-                                             language = 'vose', other = other ))
+                                             language = 'Vose', other = other ))
 
     if not itemlist:
         if not ses == 0:
@@ -480,15 +695,18 @@ def play(item):
         url = scrapertools.find_single_match(data, "var url = '(.*?)'")
 
     if url:
-        if '/multiup.' in url:
+        if '/multiup.' in url or '/gdtvid.' in url or '/filepv.' in url or '/filemirage.' in url:
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if not new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone(url = url, server = servidor))
 
@@ -502,34 +720,55 @@ def list_search(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = data
+    bloque = scrapertools.find_single_match(data, '>Resultados(.*?)</section></div>')
 
-    if '>Lo + Nuevo<' in data: bloque = scrapertools.find_single_match(data, '(.*?)Nuevo<')
-    elif '>Top Mas Vistas<' in data: bloque = scrapertools.find_single_match(data, '(.*?)>Top Mas Vistas<')
-
-    matches = re.compile('<article(.*?)</article', re.DOTALL).findall(bloque)
+    matches = re.compile('<a class="hv2-card"(.*?)</a>', re.DOTALL).findall(bloque)
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, ' alt="(.*?)"')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
 
-        thumb = scrapertools.find_single_match(match, '<img src=(.*?)"')
-
         title = title.replace('&#038;', '').replace('&#215;', 'x').replace('&#8217;s', "'s").replace('&#8217;', "'").replace('&#8211;', '').replace('&#8230;', '...').strip()
 
-        year = scrapertools.find_single_match(title, '(\d{4})')
-        if not year: year = '-'
-        else: title = title.replace('(' + year + ')', '').strip()
+        thumb = scrapertools.find_single_match(match, 'src=(.*?)"')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        year = scrapertools.find_single_match(match, '·</span>(.*?)<span')
+
+        if not year: year = '-'
+
+        tipo = 'movie' if '/pelicula/' in url else 'tvshow'
+        sufijo = '' if item.search_type != 'all' else tipo
+
+        if tipo == 'movie':
+            if not item.search_type == "all":
+                if item.search_type == "tvshow": continue
+
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+
+        if tipo == 'tvshow':
+            if not item.search_type == "all":
+                if item.search_type == "movie": continue
+
+            itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, fmt_sufijo=sufijo,
+                                        contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas-de-estreno/'
+    item._type = 'movies'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

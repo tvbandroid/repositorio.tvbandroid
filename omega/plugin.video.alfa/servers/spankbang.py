@@ -15,6 +15,8 @@ def test_video_exists(page_url):
     data = httptools.downloadpage(page_url, **kwargs).data
     if "This video is no longer available" in data or 'no está disponible' in data:
         return False, "[spankbang] El fichero no existe o ha sido borrado"
+    if "This video is private" in data:
+        return False, "[spankbang] [COLOR red]VIDEO PRIVADO[/COLOR]"
     return True, ""
 
 
@@ -22,11 +24,11 @@ def get_video_url(page_url, video_password):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
     
+    global data
     if "embed" in page_url:
         page_url = scrapertools.find_single_match(data,'<link rel="canonical" href="([^"]+)"')
     data = httptools.downloadpage(page_url, **kwargs).data
     data = scrapertools.find_single_match(data,'stream_data\s+=\s+([^\}]+)')
-    
     
     # url = scrapertools.find_single_match(data,'<source src="(.*?)"')
     # video_urls.append(['[.mp4]', url])

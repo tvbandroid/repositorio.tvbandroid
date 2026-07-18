@@ -1,18 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY3 = True
-
-    import urllib3
-
-else:
-    PY3 = False
-
-    import urllib2
-
-
 import time, random
 
 from platformcode import logger, config, platformtools
@@ -20,6 +7,7 @@ from core import scrapertools
 
 
 import ssl
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
@@ -31,12 +19,21 @@ except:
     existe_script = False
 
 
+PY3 = False
+if config.get_setting('PY3', default=''): PY3 = True
+
+if PY3:
+    import urllib3
+else:
+    import urllib2
+
+
 color_alert = config.get_setting('notification_alert_color', default='red')
 
 
-# ~ 4/6/25
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.7151.56 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.7151.69 Safari/537.36"
+# ~ 10/7/26
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.47 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.115 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -65,6 +62,13 @@ def read(url, channel):
         return ''
 
     if not url: return ''
+
+    if not 'http' in url:
+        if not url.startswith == 'magnet:':
+            if config.get_setting('developer_team'):
+                platformtools.dialog_ok(config.__addon_name + ' - RequestTools', '[B][COLOR palegreen]Revisar Url Incompleta[/COLOR][/B]', url)
+
+            return ''
 
     # ~ Sin proxies
     if not channel:

@@ -14,39 +14,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
-host = 'https://www1.grantorrent.lol/'
+host = 'https://grantorrent.foo/'
 
 
 _player = host
@@ -61,7 +29,8 @@ ant_hosts = ['http://grantorrent.net/', 'https://grantorrent1.com/', 'https://gr
              'https://grantorrent.se/', 'https://grantorrent.si/', 'https://grantorrent.fi/',
              'https://grantorrent.bz/', 'https://grantorrent.zip/', 'https://www1.grantorrent.pm/',
              'https://www1.grantorrent.wf/', 'https://www2.grantorrent.wf/', 'https://www3.grantorrent.wf/',
-             'https://www4.grantorrent.wf/', 'https://grantorrent.mov/']
+             'https://www4.grantorrent.wf/', 'https://grantorrent.mov/', 'https://www1.grantorrent.lol/',
+             'https://www2.grantorrent.lol/', 'https://www3.grantorrent.lol/', 'https://grantorrent.zip/']
 
 
 domain = config.get_setting('dominio', 'grantorrent', default='')
@@ -139,7 +108,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('GranTorrent', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('GranTorrent', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -148,22 +117,10 @@ def do_downloadpage(url, post=None, headers=None):
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
-    if '<title>You are being redirected...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('grantorrent', url, post=post, headers=headers, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-            except:
-                pass
+    if '<title>Just a moment...</title>' in data:
+        if not '/?s=' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
 
     return data
 
@@ -250,6 +207,7 @@ def generos(item):
         'animacion': 'Animación',
         'aventura': 'Aventura',
         'biografia': 'Biografía',
+        'belica': 'Bélica',
         'ciencia-ficcion': 'Ciencia ficción',
         'comedia': 'Comedia',
         'crimen': 'Crimen',
@@ -262,14 +220,19 @@ def generos(item):
         'historia': 'Historia',
         'misterio': 'Misterio',
         'musica': 'Música',
+        'pelicula-de-tv': 'Película Tv',
         'romance': 'Romance',
         'suspense': 'Suspense',
         'terror': 'Terror',
         'western': 'Western'
         }
 
-    for opc in sorted(opciones):
-        itemlist.append(item.clone( title = opciones[opc], url = host + 'categoria/' + opc + '/', action ='list_all', text_color = 'deepskyblue' ))
+    for opc in opciones:
+        url = host + 'categoria/' + opc + '/'
+
+        if opciones[opc] == 'Terror': url = url.replace('categoria', 'category')
+
+        itemlist.append(item.clone( title = opciones[opc], url = url, action ='list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -280,21 +243,16 @@ def calidades(item):
 
     data = do_downloadpage(host + 'peliculas/')
 
-    bloque = scrapertools.find_single_match(data, '<label for="quality"(.*?)</select>')
+    bloque = scrapertools.find_single_match(data, '<div id=bloque_cat>(.*?)</div>')
 
-    matches = re.compile('<option value="(.*?)".*?>(.*?)</option>', re.DOTALL).findall(bloque)
+    matches = re.compile('href="(.*?)".*?<button.*?>(.*?)</button>', re.DOTALL).findall(bloque)
 
-    for value, title in matches:
-        if not value: continue
-
-        value = value.strip()
+    for url, title in matches:
         title = title.strip()
-
-        url = host + 'tag/' + value.replace(' ', '-').lower() + '/'
 
         itemlist.append(item.clone( title=title, url=url, action='list_all', text_color='moccasin' ))
 
-    return itemlist
+    return sorted(itemlist, key=lambda it: it.title)
 
 
 def list_all(item):
@@ -347,7 +305,10 @@ def list_all(item):
 
             if qlty == 'Temporada': qlty = ''
 
-            qlty = qlty.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
+            qlty = qlty.replace('Temporada', '').strip()
+
+            if qlty == '1' or qlty == '2' or qlty == '3' or qlty == '4' or qlty == '5' or qlty == '6' or qlty == '7' or qlty == '8' or qlty == '9':
+                qlty = ''
 
             title = title.replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
@@ -358,7 +319,7 @@ def list_all(item):
     tmdb.set_infoLabels(itemlist)
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, "<span aria-current='page'>.*?<a href='(.*?)'")
+        next_page = scrapertools.find_single_match(data, "<span aria-current=page>.*?<a href='(.*?)'")
 
         if next_page:
             if '/page/' in next_page:
@@ -373,6 +334,8 @@ def episodios(item):
     logger.info()
     itemlist = []
 
+    tab_episodes = []
+
     if not item.page: item.page = 0
     if not item.perpage: item.perpage = 50
 
@@ -380,7 +343,7 @@ def episodios(item):
 
     bloque = scrapertools.find_single_match(data, '<tbody(.*?)</tbody>')
 
-    matches = re.compile('"episode-.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300">(.*?)</td>.*?<a href="(.*?)"', re.DOTALL).findall(bloque)
+    matches = re.compile('episode-.*?<td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-300">(.*?)</td>.*?<a href="(.*?)"', re.DOTALL).findall(bloque)
 
     num_matches = len(matches)
 
@@ -448,6 +411,10 @@ def episodios(item):
         if 'Temporada' in epis: epis = 1
 
         titulo = str(season) + 'x' + str(epis) + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'") + ' ' + completa
+
+        if (str(season) + 'x' + str(epis)) in tab_episodes: continue
+
+        tab_episodes.append(str(season) + 'x' + str(epis))
 
         itemlist.append(item.clone( action = 'findvideos', url=url, title=titulo,  contentType='episode', contentSeason=season, contentEpisodeNumber=epis ))
 
@@ -527,6 +494,8 @@ def play(item):
     if not item.url.endswith('.torrent'):
         host_torrent = host[:-1]
         url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
+
+        url_base64 = url_base64.replace('.torrent&st=gtn', '.torrent').replace('.torrent&doresume=false', '.torrent').strip()
 
         if url_base64.endswith('.torrent'):
            if not '//dl.' in url_base64: url_base64 = url_base64.replace(host, _player)

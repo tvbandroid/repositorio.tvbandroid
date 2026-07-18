@@ -5,7 +5,6 @@
 
 from __future__ import division
 from builtins import range
-from past.utils import old_div
 
 from channelselector import get_thumb
 from core import filetools
@@ -448,7 +447,7 @@ def cb_servers_blacklist(item, dict_values):
                 config.set_setting("favorites_servers_list", 100, server=k)
                 f = True
                 progreso.update(
-                    old_div((i * 100), n), config.get_localized_string(60559) % k
+                    ((i * 100) // n), config.get_localized_string(60559) % k
                 )
         i += 1
 
@@ -535,7 +534,7 @@ def cb_servers_favorites(server_names, dict_values):
         else:
             config.set_setting("favorites_servers_list", 0, server=server)
         progreso.update(
-            old_div((i * 100), n),
+            ((i * 100) // n),
             config.get_localized_string(60559) % server_parameters["name"],
         )
         i += 1
@@ -1208,7 +1207,7 @@ def icon_set_selector(item=None):
     patron += 'data-target="react-app\.embeddedData">(.+?)</script>'
     data = re.compile(patron, re.DOTALL).findall(data)[0]
     data = json.loads(data)
-    matches = [x["name"] for x in data["payload"]["tree"]["items"]]
+    matches = [x["name"] for x in data["payload"]["codeViewTreeRoute"]["tree"]["items"]]
 
     default = Item(
         plot="El tema por defecto de Alfa",
@@ -1223,6 +1222,31 @@ def icon_set_selector(item=None):
         ),
     )
     options.append(default)
+    themes_folders = list()
+    # Busca temas personalizados en la carpeta themes del perfil
+    themes_path = filetools.join(config.get_data_path(), "themes")
+    # Comprobamos que la carpeta themes existe
+    if filetools.exists(themes_path):
+        # Si existe, buscamos los temas personalizados
+        folders = filetools.listdir(themes_path)
+        for theme in folders:
+            current_path = filetools.join(themes_path, theme)
+            # Si es una carpeta y contiene un thumbnail, lo añadimos a la lista
+            if filetools.isdir(current_path) and \
+               filetools.exists(filetools.join(current_path, "thumb_channels_movie.png")):
+                themes_folders.append(theme)
+                # Si existe el README.md, lo leemos y sino, usamos un texto por defecto
+                readme_path = filetools.join(current_path, "README.md")
+                plot = filetools.read(readme_path, silent=True) \
+                    if filetools.exists(readme_path) \
+                    else "Tema personalizado: {}".format(theme)
+                options.append(Item(
+                    plot=plot,
+                    title=theme.title(),
+                    thumbnail=filetools.join(
+                        current_path, "thumb_channels_movie.png"
+                    ),
+                ))
 
     for set_id in matches:
         logger.info(set_id)
@@ -1258,7 +1282,9 @@ def icon_set_selector(item=None):
         if ret == 0:
             config.set_setting("icon_set", "default")
         else:
-            config.set_setting("icon_set", matches[ret - 1])
+            # Combina los temas personalizados y los de github
+            combined_themes = themes_folders + matches
+            config.set_setting("icon_set", combined_themes[ret - 1])
 
 
 def reset_trakt(item):

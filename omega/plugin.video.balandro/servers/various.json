@@ -53,6 +53,54 @@
         "url": "https://filemoon.sx/e/\\1"
       },
       {
+        "pattern": "https://byseqekaho.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysedikamoum.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysevepoin.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://byseraguci.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysewihe.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysejikuar.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysesukior.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://byselapuix.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysezoxexe.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://embedplaybyse.top/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://bysekoze.com/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
+        "pattern": "https://byse.sx/(?:e/|d/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filemoon.sx/e/\\1"
+      },
+      {
         "pattern": "(https://disk.yandex.(?:ru|com|sk|disk)/(?:d/|i/)[A-z0-9]+)",
         "url": "https://yadi.sk/i/\\2"
       },
@@ -94,6 +142,22 @@
       },
       {
         "pattern": "(https://dropload.io/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
+      },
+      {
+        "pattern": "(https://dropload.tv/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
+      },
+      {
+        "pattern": "(https://dropload.pro/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
+      },
+      {
+        "pattern": "(https://dropload.co/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://dropload.io/\\2"
+      },
+      {
+        "pattern": "(https://dr0pstream.com/)(?:embed-|e/|d/)([0-9a-zA-Z]+)",
         "url": "https://dropload.io/\\2"
       },
       {
@@ -333,7 +397,23 @@
         "url": "https://streamwish.to/\\1"
       },
       {
+        "pattern": "https://hlsflex.com/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://swiftplayers.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://swiftplayers.com/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
         "pattern": "https://stbhg.click/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://stbhg.click/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
       },
       {
@@ -341,8 +421,96 @@
         "url": "https://streamwish.to/\\1"
       },
       {
-        "pattern": "https://hlsflex.com/([0-9a-zA-Z]+)",
+        "pattern": "https://dhcplay.com/([0-9a-zA-Z]+)",
         "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://gradehgplus.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://gradehgplus.com/([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://tryzendm.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://hglink.to/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://hailindihg.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://guxhag.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://habetar.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://yuguaab.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/\\1"
+      },
+      {
+        "pattern": "https://xenolyzb.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://hgplaycdn.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://davioad.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://haxloppd.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://dumbalag.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://kravaxxa.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://hgbazooka.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://cavanhabg.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://uasopt.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://hgcloud.to/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://vibuxer.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://hanerix.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://masukestin.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
+      },
+      {
+        "pattern": "https://audinifer.com/(?:e/|f/|d/)([0-9a-zA-Z]+)",
+        "url": "https://streamwish.to/f/\\1"
       },
       {
         "pattern": "https://(?:wish.(.*))/(?:e/|f/|d/)([0-9a-zA-Z]+)",
@@ -414,6 +582,54 @@
       },
       {
         "pattern": "https://movearnpre.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://seraphinap.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://seraphinapl.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://mivalyo.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://taylorplayer.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://videoland.sbs/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://bingezove.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://dinisglows.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://dingtezuni.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://dintezuvio.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://callistanise.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://filelions.to/f/\\1"
+      },
+      {
+        "pattern": "https://minochinos.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://minochinos.com/f/\\1"
+      },
+      {
+        "pattern": "https://earnvids.xyz/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://filelions.to/f/\\1"
       },
       {
@@ -489,6 +705,10 @@
         "url": "https://lulustream.com/e/\\1"
       },
       {
+        "pattern": "https://luluvid.com/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://lulustream.com/e/\\1"
+      },
+      {
         "pattern": "https://lulu.st/(?:e/|d/)([0-9a-zA-Z]+)",
         "url": "https://lulustream.com/e/\\1"
       },
@@ -505,7 +725,15 @@
         "url": "https://lulustream.com/e/\\1"
       },
       {
+        "pattern": "https://d00ds.site/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://lulustream.com/e/\\1"
+      },
+      {
         "pattern": "https://turboviplay.com/(?:t/|d/)([0-9a-zA-Z]+)",
+        "url": "https://emturbovid.com/t/\\1"
+      },
+      {
+        "pattern": "https://turbovidhls.com/(?:t/|d/)([0-9a-zA-Z]+)",
         "url": "https://emturbovid.com/t/\\1"
       },
       {
@@ -514,6 +742,10 @@
       },
       {
         "pattern": "https://tuborstb.co/(?:t/|d/)([0-9a-zA-Z]+)",
+        "url": "https://emturbovid.com/t/\\1"
+      },
+      {
+        "pattern": "https://stbturbo.xyz/(?:t/|d/)([0-9a-zA-Z]+)",
         "url": "https://emturbovid.com/t/\\1"
       },
       {
@@ -542,19 +774,27 @@
       },
       {
         "pattern": "https://www.vidspeeds.com/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://www.vidspeeds.com/\\1"
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vidspeeds.com/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://www.vidspeeds.com/\\1"
+        "url": "https://vidspeeds.com/\\1"
+      },
+      {
+        "pattern": "https://vidspeeds.com/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vidspeed.cc/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://vidspeed.cc/\\1"
+        "url": "https://vidspeeds.com/\\1"
+      },
+      {
+        "pattern": "https://vidspeed.org/(?:embed-|)([0-9a-zA-Z]+)",
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vidroba.com/(?:embed-|)([0-9a-zA-Z]+)",
-        "url": "https://vidroba.com/\\1"
+        "url": "https://vidspeeds.com/\\1"
       },
       {
         "pattern": "https://vkspeed.com/(?:embed-|)([0-9a-zA-Z]+)",
@@ -593,6 +833,10 @@
         "url": "https://vidhidepro.com/s/\\1"
       },
       {
+        "pattern": "https://vidhidefast.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
         "pattern": "(https://vidhide.)(?:com|fun)/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\2"
       },
@@ -606,6 +850,10 @@
       },
       {
         "pattern": "https://dramacool.men/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
+        "url": "https://vidhidepro.com/s/\\1"
+      },
+      {
+        "pattern": "https://morencius.com/(?:s/|v/|f/|d/|embed/|file/|download/)([0-9a-zA-Z]+)",
         "url": "https://vidhidepro.com/s/\\1"
       },
       {
@@ -674,6 +922,10 @@
       },
       {
         "pattern": "https://rubyvid.com/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "https://rubyvidhub.com/(?:embed-|e/|d/)([0-9a-zA-Z]+)",
         "url": "\\1"
       },
       {

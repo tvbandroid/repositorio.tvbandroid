@@ -4,7 +4,7 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://(?:www.|)(?:0dayporn|severeporn|3movs|xtits|sleazyneasy|babestube|wankoz|vikiporn|katestube|pornomovies|lesbian8|pornsexer|pornmega|xxxymovies|pornestro|exoav|fapcat|pornmeka|deviants).(?:com|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:0dayporn|severeporn|3movs|xtits|sleazyneasy|babestube|wankoz|vikiporn|katestube|pornomovies|lesbian8|pornsexer|pornmega|xxxymovies|pornestro|exoav|fapcat|pornmeka|deviants|modporn).(?:com|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -16,7 +16,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:ballzdeep|pornxpert|hoes|bigtitslust|mondetube|watchporn|faapy|pornvase|sortporn|4wank|porncaper|camstreams|celebsroulette|pornve|xhand|baddies247|baddiesonly).(?:com|xxx|tube|to|tv)/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:ballzdeep|pornxpert|hoes|bigtitslust|mondetube|watchporn|faapy|pornvase|sortporn|4wank|porncaper|camstreams|celebsroulette|pornve|xhand|baddies247|baddiesonly|vidzx).(?:com|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -25,7 +25,7 @@
       },
       {
         "pattern": "(https://(?:www.|)vipporns.com/(?:video|videos|clips|free-porns|porn-videos)/[A-z0-9-]+(?:/|))",
-        "url": "\\1"
+        "url": "\\1/a/"
       },
       {
         "pattern": "(https://(?:www.|)(?:udvl|sexng).com/video/[0-9-]+/[A-z0-9-]+(?:/|))",
@@ -36,6 +36,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "https://(?:www.|)pornkut.com/(?:videos|embed)/([0-9]+)",
+        "url": "https://www.pornkut.com/videos/\\1/a"
+      },
+      {
         "pattern": "https://(?:www.|)heroero.com/embed/([0-9]+)",
         "url": "https://heroero.com/videos/\\1/a/"
       },
@@ -44,11 +48,11 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:mix.|\\w{2,4}.|)(?:onlinetube|pornoreka).(?:tv|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:mix.|x.|\\w{2,4}.|)(?:onlinetube|pornoreka).(?:tv|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
-        "pattern": "(https://www.analdin.com/es/videos/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)analdin.(?:com|\\w{2,4})/(?:es/|)videos/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -72,7 +76,11 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)porngrey.(?:com|net)/video/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)porngrey.(?:com|net)/(?:embed|video)/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)saintporn.(?:com|net)/video/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -121,10 +129,10 @@
       },
       {
         "pattern": "justporn.com/(?:embed|video)/([0-9]+)",
-        "url": "https://www.justporn.com/video/\\1/a"
+        "url": "https://www.justporn.com/video/\\1/a/"
       },
       {
-        "pattern": "(https://pornox.hu/(?:porno|video)/[0-9]+/[A-z0-9-.]+(?:/|))",
+        "pattern": "(https://pornox.hu(?:/\\w{2}|)/(?:porno|video)/[0-9]+/[A-z0-9-.]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -160,10 +168,6 @@
         "url": "https://www.perfectgirls.xxx/embed/\\1"
       },
       {
-        "pattern": "(https://(?:www.|)pornstars.(?:xxx|tube)/video(?:s|)/[0-9]+(?:/|))",
-        "url": "\\1"
-      },
-      {
         "pattern": "(http(?:s|)://(?:www.|)(?:cambro|camvideos).(?:tv|com)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
@@ -173,10 +177,6 @@
       },
       {
         "pattern": "(https://www.(?:tabooporn|teenpornvideo).(?:tv|sex)/videos/[0-9]+/[A-z0-9-]+(?:/|))",
-        "url": "\\1"
-      },
-      {
-        "pattern": "(https://max.porn/videos/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -204,6 +204,10 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://(?:www.|)uppornx.com/(?:video|videos)/[0-9]+/[A-z0-9-]+/)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://pornwild.to(?:/es|)/embed/\\w+(?:/|))",
         "url": "\\1"
       },
@@ -228,7 +232,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://www.(?:tabootube|nubilefilm).xxx/[A-z0-9-]+)(?:/|)",
+        "pattern": "(https://www.(?:tabootube|nubilefilm).xxx/(?:video/|)[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -236,11 +240,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://xcafe.com/[0-9]+/)",
-        "url": "\\1"
-      },
-      {
-        "pattern": "(https://(?:rt.|)bobs-tuber.live/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:rt.|)bobs-tuber.\\w{2,4}/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -248,15 +248,31 @@
         "url": "\\1/a/"
       },
       {
-        "pattern": "(https://(?:www.|)(?:fapnfuck|fuqster|sexpester|w1mp|w4nkr).com/(?:video|embed)/[0-9]+)",
-        "url": "\\1/a/"
+        "pattern": "(https://(?:www.|)(?:zatube|rainblow|transhero|thepornstar|starwank|ifuckedyourgf|moantube|pornfreenow|fapnow|trashreality|sukaporn|dafreeporn|javhdtube|yespornplease|pornvideos|placeofporn).(?:com|\\w{2,4})/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)(?:sexsq).(?:com|\\w{2,4})/video(?:s|)/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(?:get-bokep|bokep).(?:com|\\w{2,4})/(?:videos|pbw)/([0-9-]+(?:/|))",
+        "url": "https://bokep.porn/videos/\\1"
       },
       {
         "pattern": "(https://(?:www.|)(?:143porn|neporn|coralxxx|pervertium).com/(?:video|videos|embed)/[0-9]+)",
         "url": "\\1/a/"
       },
       {
-        "pattern": "(https://(?:www.|\\w{2,4}.|)sslkn.(?:com|\\w{2,4})/(?:video|videos|embed)/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|\\w{2,4}.|)(?:sslkn|sosalkino).(?:com|\\w{2,4})/(?:video|videos|embed)/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://www.porndupe.(/?:art|\\w{2,4})/video/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://josporn.net/[A-z0-9-]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -294,5 +310,6 @@
       "visible": false
     }
   ],
-  "thumbnail": ""
+  "thumbnail": "",
+  "force_inputstream": "adaptive"
 }

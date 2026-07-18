@@ -1,0 +1,30 @@
+{
+  "id": "kinoger",
+  "name": "Kinoger",
+
+  "active": true,
+  "notes": "Alternative vía: Script.Module.ResolveUrl",
+
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "https://((?:kinoger|wasuytm|ultrastream|(?:shiid4u|player)\\.upn|(?:moflix|xxxbold|xfuntaxy|amg|cheemsvids|my)\\.upns|88z)\\.(?:re|one|xyz|store|online|live|io))/#([A-Za-z0-9]+)",
+        "url": "https://\\1/api/v1/video?id=\\2"
+      },
+      {
+        "pattern": "https://([a-z]+.(?:easyvidplayer|embedseek|seekplayer|player4me|ezplayer|rpmplay|4meplayer|upns|strp2p|rpmstream|p2pstream|p2pplay).(?:online|\\w{2,4}))/#([A-z0-9]+)",
+        "url": "https://\\1/api/v1/video?id=\\2"
+      },
+      {
+        "pattern": "https://((?:xfuntaxy|w1tv).(?:xyz|\\w{2,4}))/#([A-z0-9]+)",
+        "url": "https://\\1/api/v1/video?id=\\2"
+      },
+      {
+        "pattern": "https://(bigbuttshubvideos.com)/#([A-z0-9]+)",
+        "url": "https://\\1/api/v1/video?id=\\2"
+      }
+    ]
+  }
+
+}

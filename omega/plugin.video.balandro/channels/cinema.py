@@ -195,14 +195,16 @@ def findvideos(item):
 
             if '/Smoothpre.' in url:
                 url = url.replace('/Smoothpre.', '/smoothpre.')
+            elif '/Mivalyo.' in url:
+                url = url.replace('/Mivalyo.', '/mivalyo.')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             other = ''
-            if servidor == 'various': other = servertools.corregir_other(url)
+
+            if not servidor == 'directo':
+                if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
 
             if 'Latino' in resto: lang = 'Lat'
             elif 'Sub Español' in resto: lang = 'Vose'
@@ -230,11 +232,12 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 
@@ -290,6 +293,15 @@ def list_search(item):
                             itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color = 'coral' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'genero/estreno-1/'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

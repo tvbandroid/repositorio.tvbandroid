@@ -20,31 +20,34 @@ list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES
 list_quality_tvshow = []
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS
+
 forced_proxy_opt = 'ProxySSL'
 
 canonical = {
              'channel': 'homecine', 
              'host': config.get_setting("current_host", 'homecine', default=''), 
-             'host_alt': ["https://homecine.cc/"], 
-             'host_black_list': ["https://www3.homecine.tv/", "https://homecine.tv/"], 
+             'host_alt': ["https://www3.homecine.to/"], 
+             'host_black_list': ["https://homecine.cc/", "https://www3.homecine.tv/", "https://homecine.tv/"], 
              'pattern': '<div\s*class="header-logo">[^>]*href="([^"]+)"', 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
+
 host = canonical['host'] or canonical['host_alt'][0]
 
 timeout = 5
 kwargs = {}
 debug = config.get_setting('debug_report', default=False)
-movie_path = "/pelicula"
-tv_path = '/serie'
+movie_path = ""
+tv_path = 'series/'
 language = []
 url_replace = []
 
-finds = {'find': dict([('find', [{'tag': ['ul'], 'class': ['post-lst']}]), 
-                       ('find_all', [{'tag': ['li']}])]),
-         'categories': dict([('find', [{'tag': ['li'], 'id': ['menu-item-314']}]), 
-                             ('find_all', [{'tag': ['li']}])]), 
+finds = {'find': dict([('find', [{'tag': ['div'], 'class': ['movies-list']}]), 
+                       ('find_all', [{'tag': ['div'], 'data-movie-id': re.compile(r"^\d+")}])]),
+         'categories': {'find_all': [{'tag': ['li'], 'class': ['menu-item-object-category']}]}, 
+         # 'categories': dict([('find', [{'tag': ['li'], 'id': ['menu-item-314']}]), 
+                             # ('find_all', [{'tag': ['li']}])]), 
          'search': {}, 
          'get_language': {}, 
          'get_language_rgx': '(?:flags\/||d{4}\/\d{2}\/)(\w+)\.(?:png|jpg|jpeg|webp)', 
@@ -52,25 +55,23 @@ finds = {'find': dict([('find', [{'tag': ['ul'], 'class': ['post-lst']}]),
          'get_quality_rgx': '', 
          'next_page': {}, 
          'next_page_rgx': [['\/page\/\d+', '/page/%s/']], 
-         'last_page': dict([('find', [{'tag': ['nav'], 'class': ['pagination']}]), 
-                            ('find_all', [{'tag': ['a'], '@POS': [-2], 
+         'last_page': dict([('find', [{'tag': ['ul'], 'class': ['pagination']}]), 
+                            ('find_all', [{'tag': ['a'], '@POS': [-1], 
                                            '@ARG': 'href', '@TEXT': 'page/(\d+)'}])]), 
-         'year': dict([('find', [{'tag': ['div'], 'class': ['jt-info']}]), 
-                       ('find_next', [{'tag': ['div'], 'class': ['jt-info']}, 
-                                      {'tag': ['a']}]), 
-                       ('get_text', [{'tag': '', '@STRIP': True, '@TEXT': '(\d+)'}])]), 
+         'year': dict([('find', [{'tag': ['a'], 'href': re.compile("/release-year/[0-9]+")}]), 
+                       ('get_text', [{'strip': True, '@TEXT': '(\d+)'}])]), 
          'season_episode': '(?i)\s*Temporada\s*(\d+)\s*Capitulo\s*(\d+)', 
-         'seasons': dict([('find', [{'tag': ['div'], 'class': ['choose-season']}]), 
-                          ('find_all', [{'tag': ['li']}])]),
+         'seasons': dict([('find', [{'tag': ['div'], 'id': ['seasons']}]), 
+                          ('find_all', [{'tag': ['div'], 'class':['les-title']}])]),
          'season_num': {'find': [{'tag': ['a'], '@ARG': 'data-season'}]},
          'seasons_search_num_rgx': '', 
          'seasons_search_qty_rgx': '', 
          'episode_url': '', 
-         'episodes': {'find_all': [{'tag': ['article']}]}, 
+         'episodes': {'find_all': [{'tag': ['div'], 'class': ['les-content']}]}, 
          'episode_num': [], 
          'episode_clean': [], 
          'plot': {}, 
-         'findvideos': {'find_all': [{'tag': ['div'], 'id': re.compile(r"^options-\d+")}]},
+         'findvideos': {'find_all': [{'tag': ['div'], 'id': re.compile(r"^tab\d+")}]},
          'title_clean': [['(?i)TV|Online|(4k-hdr)|(fullbluray)|4k| - 4k|(3d)|miniserie|\s*\(\d{4}\)', ''],
                          ['[\(|\[]\s*[\)|\]]', '']],
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real-*|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
@@ -78,7 +79,7 @@ finds = {'find': dict([('find', [{'tag': ['ul'], 'class': ['post-lst']}]),
          'url_replace': [], 
          'profile_labels': {
                            },
-         'controls': {'duplicates': [], 'min_temp': False, 'url_base64': False, 'add_video_to_videolibrary': True, 'cnt_tot': 18, 
+         'controls': {'duplicates': [], 'cnt_tot': 40, 'min_temp': False, 'url_base64': False, 'add_video_to_videolibrary': True, 
                       'get_lang': False, 'reverse': False, 'videolab_status': True, 'tmdb_extended_info': True, 'seasons_search': False}, 
          'timeout': timeout}
 AlfaChannel = DictionaryAllChannel(host, movie_path=movie_path, tv_path=tv_path, canonical=canonical, finds=finds, 
@@ -97,7 +98,7 @@ def mainlist(item):
                          action="list_all",
                          thumbnail=get_thumb('movies', auto=True),
                          c_type='peliculas', 
-                         url='%s%s' % (host, 'cartelera-peliculas/')
+                         url='%s%s' % (host, 'peliculas-nuevas')
                          )
                     )
     
@@ -106,7 +107,7 @@ def mainlist(item):
                          action="section",
                          thumbnail=get_thumb('genres', auto=True),
                          c_type='peliculas', 
-                         url=host
+                         url='%s%s' % (host, 'peliculas-nuevas/')
                          )
                     )
     itemlist.append(Item(channel=item.channel,
@@ -114,7 +115,15 @@ def mainlist(item):
                          action="list_all",
                          thumbnail=get_thumb('tvshows', auto=True),
                          c_type='series', 
-                         url='%s%s'% (host, 'cartelera-series/')
+                         url='%s%s'% (host, 'series/')
+                         )
+                    )
+    itemlist.append(Item(channel=item.channel,
+                         title="Generos",
+                         action="section",
+                         thumbnail=get_thumb('genres', auto=True),
+                         c_type='series', 
+                         url='%s%s'% (host, 'series/')
                          )
                     )
     
@@ -127,20 +136,11 @@ def mainlist(item):
                          # )
                     # )
     
-    # itemlist.append(Item(channel=item.channel,
-                         # title="Documentales",
-                         # action="list_all",
-                         # thumbnail=get_thumb('documentaries', auto=True),
-                         # c_type='series', 
-                         # url='%s%s' % (host, 'genre/documental/')
-                         # )
-                    # )
-    
     itemlist.append(Item(channel=item.channel,
-                         title="Generos",
-                         action="section",
-                         thumbnail=get_thumb('genres', auto=True),
-                         c_type='series', 
+                         title="Año",
+                         action="anno",
+                         thumbnail=get_thumb('year', auto=True),
+                         # c_type='series', 
                          url=host
                          )
                     )
@@ -160,17 +160,57 @@ def mainlist(item):
 
     return itemlist
 
-
 def section(item):
     logger.info()
     
-    findS = finds.copy()
-    if "series" in item.c_type:
-        findS['url_replace'] = [['(\/category\/[^$]+$)', r'\1page/1/?type=series']]
-    else:
-        findS['url_replace'] = [['(\/category\/[^$]+$)', r'\1page/1/?type=movies']]
+    # return AlfaChannel.section(item, **kwargs)
+    return AlfaChannel.section(item, matches_post=section_matches, **kwargs)
+
+
+def section_matches(item, matches_int, **AHkwargs):
+    logger.info()
+    matches = []
     
-    return AlfaChannel.section(item, finds=findS, **kwargs)
+    findS = AHkwargs.get('finds', finds)
+    
+    for elem in matches_int:
+        elem_json = {}
+        
+        try:
+            
+            elem_json['title'] = elem.a.get_text(strip=True)
+            url = elem.a['href']
+            url = url.split('/genre/')
+            id = url[-1]
+            if "series" in item.c_type:
+                elem_json['url'] = "%spage/1?ptype=tvshows&tax_category[]=%s" %(item.url, id)
+            else:
+                elem_json['url'] = "%spage/1?ptype=post&tax_category[]=%s" %(item.url, id)
+        
+        except:
+            logger.error(elem)
+            logger.error(traceback.format_exc())
+            continue
+        
+        if not elem_json['url']: continue
+        matches.append(elem_json.copy())
+    
+    return matches
+
+
+def anno(item):
+    logger.info()
+    from datetime import datetime
+    
+    itemlist = []
+    
+    now = datetime.now()
+    year = int(now.year)
+    while year >= 1922:
+        itemlist.append(item.clone(title="%s" %year, action="list_all", url= "%srelease-year/%s" % (item.url,year)))
+        year -= 1
+    
+    return itemlist
 
 
 def list_all(item):
@@ -191,24 +231,13 @@ def list_all_matches(item, matches_int, **AHkwargs):
         #logger.error(elem)
         
         try:
-            # if item.c_type == 'episodios':
-                # sxe = scrapertools.find_single_match(elem.a.find("span", class_="mli-info").h2.get_text(strip=True), 
-                                   # findS.get('season_episode', ''))
-                # try:
-                    # elem_json['season'] = int(sxe[0] or '1')
-                    # elem_json['episode'] = int(sxe[1] or '1')
-                # except:
-                    # elem_json['season'] = 1
-                    # elem_json['episode'] = 1
             
-            elem_json['info'] = elem['id'].replace('post-', '' )
+            elem_json['info'] = elem['data-movie-id']
             elem_json['url'] = elem.a.get("href", "")
             elem_json['title'] = elem.h2.get_text(strip=True)
             elem_json['thumbnail'] = elem.img["data-original"] if elem.img.has_attr("data-original")\
                                      else elem.img["src"]
-            if elem.find('span', class_="Qlty"): 
-                elem_json['quality'] = elem.find('span', class_="Qlty").get_text(strip=True).replace('HD ', '').split()[0]
-            elem_json['year'] = elem.find('span', class_="year").get_text(strip=True) if elem.find('span', class_="year") else '-' 
+            elem_json['year'] =elem.find('a', href=re.compile("/release-year/[0-9]+")).get_text(strip=True) if elem.find('a', href=re.compile("/release-year/[0-9]+")) else '-' 
             
             if item.c_type == 'search' and not tv_path in elem_json['url']:
                 elem_json['mediatype'] = 'movie'
@@ -240,15 +269,12 @@ def seasons_matches(item, matches_int, **AHkwargs):
     
     for elem in matches_int:
         elem_json = {}
-        # logger.error(elem)
         
         try:
         
-            elem_json['season'] = elem.a['data-season']
+            elem_json['season'] = elem.get_text(strip=True).replace('Season ', '')
             elem_json['title'] = "Temporada %s" %elem_json['season']
-            elem_json['url'] = AlfaChannel.doo_url
-            elem_json['headers'] = {'Referer': item.url}
-            elem_json['post'] = 'action=action_select_season&season=%s&post=%s' % (elem_json['season'], elem.a['data-post'])
+            elem_json['url'] = item.url
         
         except Exception:
             logger.error(elem)
@@ -288,22 +314,17 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
     kwargs['matches_post_get_video_options'] = findvideos_matches
     findS = AHkwargs.get('finds', finds)
     
-    for elem in matches_int:
+    sid = int(item.contentSeason or 1) - 1
+    # season_id = 'season-%s' % sid
+    logger.debug(matches_int[sid])
+    
+    for elem in matches_int[sid].find_all('a'):
         elem_json = {}
-        # logger.error(elem)
         
         try:
-            if 'href' not in str(elem): continue
-            elem_json['url'] = elem.a.get('href', '')
-            elem_json['title'] = elem.find("h2", class_="entry-title").get_text(strip=True)
-            try:
-                elem_json['season'], elem_json['episode'] = elem.find("span", class_="num-epi").get_text(strip=True).split('x')
-                elem_json['season'] = int(elem_json['season'] or 1)
-                elem_json['episode'] = int(elem_json['episode'] or 1)
-                if elem_json['season'] != item.contentSeason: continue
-            except:
-                continue
-            elem_json['thumbnail'] = elem.find("img").get('src', '')
+            elem_json['url'] = elem.get('href', '')
+            elem_json['episode'] = elem.get_text(strip=True).replace('Episode ', '')
+        
         except:
             logger.error(elem)
             logger.error(traceback.format_exc())
@@ -332,18 +353,13 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
     findS = AHkwargs.get('finds', finds)
     soup = AHkwargs.get('soup', {})
     
-    idiomas = soup.find_all('span', class_='server')
+    idiomas = soup.find_all('a', href=re.compile(r"^#tab\d+"))
     
     for elem, lang in zip(matches_int, idiomas):
         elem_json = {}
-        #logger.error(elem)
         
         try:
-            # elem_json['quality'] = '*%s' % elem.a.get_text('', strip=True).split(" - ")[0].replace('HD ', '')
-            
-            url = soup.iframe.get("src", '')
-            data = AlfaChannel.create_soup(url, **kwargs)
-            elem_json['url'] = data.iframe.get("src", '')
+            elem_json['url'] = elem.iframe.get("src", '')
             elem_json['language'] = lang.get_text('', strip=True).split("-")[-1]
             elem_json['server'] = ''
         
@@ -408,5 +424,4 @@ def search(item, texto, **AHkwargs):
         # return []
 
     # return itemlist
-
 

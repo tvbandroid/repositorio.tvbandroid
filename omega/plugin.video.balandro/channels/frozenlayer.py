@@ -25,9 +25,13 @@ def mainlist_series(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     titulo = 'dorama, anime, ova, manga ...'
     text_color = 'hotpink'
@@ -292,6 +296,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, 'Seeds:.*?"stats.*?">(\d+)<.*?Peers:.*?"stats.*?">(\d+)<.*?descargar_torrent.*?href=\'(.*?)\'')
@@ -326,7 +338,6 @@ def findvideos(item):
            age = 'Magnet'
         else:
            servidor = servertools.get_server_from_url(url)
-           servidor = servertools.corregir_servidor(servidor)
 
            url = servertools.normalize_url(servidor, url)
 
@@ -371,7 +382,6 @@ def findvideos(item):
                elif url.startswith('magnet:?'): servidor = 'torrent'
                else:
                   servidor = servertools.get_server_from_url(url)
-                  servidor = servertools.corregir_servidor(servidor)
 
                   url = servertools.normalize_url(servidor, url)
 

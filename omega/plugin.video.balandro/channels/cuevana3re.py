@@ -34,6 +34,9 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title='Animes', action = 'mainlist_series', text_color='springgreen' ))
+
     return itemlist
 
 
@@ -210,13 +213,13 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.url = url
-            item.ref = item.url
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.url = url
+                item.ref = item.url
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action='episodios', title=title, page=0, url=url, ref=item.url, contentType='season', contentSeason=tempo, text_color='tan' ))
 
@@ -318,7 +321,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Latino': 'Lat', 'Español Latino': 'Lat', 'Español': 'Esp', 'Castellano': 'Esp', 'Subtitulado': 'Vose', 'Latinoingles': 'Vose', 'Japonessub': 'Jap'}
+    IDIOMAS = {'Latino': 'Lat', 'Español Latino': 'Lat', 'Español': 'Esp', 'Castellano': 'Esp', 'Subtitulado': 'Vose', 'Latinoingles': 'Vose', 'Japonessub': 'Jap', 'Japones': 'Jap', 'Latinojapones': 'Vose'}
 
     if item.contentType == 'movie':
         headers = {'Referer': host}
@@ -340,10 +343,11 @@ def findvideos(item):
 
         ses += 1
 
+        other = ''
+
         url = url.replace('\\/', '/')
 
         if '/1fichier.' in url: continue
-        elif '/lamovie.' in url: continue
         elif '//cc/' in url: continue
 
         if 'sbplay' in url or 'sbplay1' in url or 'sbplay2' in url or 'pelistop' in url or 'sbfast' in url or 'sbfull' in url or 'ssbstream' in url or  'sbthe' in url or 'sbspeed' in url or 'cloudemb' in url or 'tubesb' in url or 'embedsb' in url or 'playersb' in url or 'sbcloud1' in url or 'watchsb' in url or 'viewsb' in url or 'watchmo' in url or 'streamsss' in url or 'sblanh' in url or 'sbanh' in url or 'sblongvu' in url or 'sbchill' in url or 'sbrity' in url or 'sbhight' in url or 'sbbrisk' in url or 'sbface' in url or 'view345' in url or 'sbone' in url or 'sbasian' in url or 'streaamss' in url or 'lvturbo' in url or 'sbnet' in url or 'sbani' in url or 'sbrapid' in url or 'cinestart' in url or 'vidmoviesb' in url or 'sbsonic' in url or 'sblona' in url or 'likessb' in url: continue
@@ -351,18 +355,21 @@ def findvideos(item):
         elif 'fembed' in url or 'fembed-hd' in url or 'fembeder'in url or 'divload' in url or 'ilovefembed' in url or 'myurlshort' in url or 'jplayer' in url or 'feurl' in url or 'fembedisthebest'in url or 'femax20'in url or 'fcdn' in url or 'fembad' in url or 'pelispng' in url or 'hlshd'in url or  'embedsito' in url or 'mrdhan' in url or 'dutrag' in url or 'fplayer' in url or 'diasfem' in url or 'suzihaza' in url or 'vanfem'in url or  'youtvgratis' in url or 'oceanplay' in url or 'gotovideo.kiev.ua' in url or 'owodeuwu' in url or 'sypl' in url or 'fembed9hd' in url or 'watchse' in url or 'vcdn' in url or 'femoload' in url or 'cubeembed'in url: continue
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
-        other = ''
+        if '/vimeos.' in url:
+            servidor = 'zures'
+            other = 'Vimeos'
 
-        if servidor == 'various':
-            other = servertools.corregir_other(url)
+        if servidor == 'various': other = servertools.corregir_other(url)
 
         lang = clean_title(lang).capitalize()
 
         lang = IDIOMAS.get(lang, lang)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url=url, server=servidor, quality=qlty, language=lang, other=other )) 
+        quality_num = puntuar_calidad(qlty)
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url=url, server=servidor,
+                              quality=qlty, quality_num = quality_num, language=lang, other=other )) 
 
     if not itemlist:
         if not ses == 0:
@@ -370,6 +377,12 @@ def findvideos(item):
             return
 
     return itemlist
+
+
+def puntuar_calidad(txt):
+    orden = ['CAMRip', 'CAM', 'Dual 720p', '720', 'DVDRip', 'WEBRip', 'BDRip', 'Dual 1080p Ligero', 'Dual 1080p', 'WEB-DL 1080p', '1080', 'Full HD', 'HD', 'HDTV', 'WEBRip 1080p', 'WEB-DL 4k', 'WEB-DL 4k HDR', 'WEB-DL 4k DV HDR', '4K']
+    if txt not in orden: return 0
+    else: return orden.index(txt) + 1
 
 
 def play(item):
@@ -393,7 +406,6 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
@@ -406,7 +418,9 @@ def play(item):
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url=url, server=servidor ))
 

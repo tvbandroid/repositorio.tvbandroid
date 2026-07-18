@@ -7,11 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, jsontools
 
 
-host = 'https://www.cam4.com/'
+host = 'https://es.cam4.com/'
 
 
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
     return data
 
 
@@ -23,11 +24,12 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('descartar_xxx', default=False): return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+        config.set_setting('ses_pin', True)
 
     # ~ itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', search_video = 'adult', text_color = 'orange' ))
 
@@ -57,7 +59,7 @@ def list_all(item):
         url = Video['hlsPreviewUrl']
         age = Video['age']
 
-        titulo = title
+        titulo = title.capitalize()
 
         if country: titulo = titulo + ' [COLOR violet]' + str(country).capitalize() + '[/COLOR]'
 
@@ -66,7 +68,8 @@ def list_all(item):
                age = str(age).replace('[', '').replace(']', '')
                titulo = titulo + ' (edad ' + str(age) + ')'
 
-        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, other=titulo, contentType = 'movie', contentExtra='adults' ))
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, other=titulo,
+                                    contentType = 'movie', contentExtra='adults' ))
 
     if itemlist:
         next_page = ''
@@ -88,11 +91,41 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('adults_password'):
+            from modules import actions
+            if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
+    servidor = 'directo'
+
     if not item.url: return itemlist
 
-    elif '//stackvaults' in item.url: return itemlist
+    elif '//stackvaults' in item.url:
+       if not item.url.endswith('.m3u8'): return itemlist
 
-    itemlist.append(Item( channel = item.channel, action = 'play', title='', url = item.url, server = 'directo', other = item.other ))
+       servidor = ''
+
+    itemlist.append(Item( channel = item.channel, action = 'play', title='', url = item.url, server = servidor, other = item.other ))
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    video_urls = []
+
+    url = item.url
+
+    if item.server == 'directo':
+        itemlist.append(item.clone(url = url, server = item.server))
+        return itemlist
+    else:
+        video_urls.append(['m3u8', url])
+        return video_urls
 
     return itemlist
 

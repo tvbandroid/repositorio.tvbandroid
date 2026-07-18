@@ -5,26 +5,36 @@ import sys
 if sys.version_info[0] < 3:
     PY3 = False
 
+    import xbmc
+    translatePath = xbmc.translatePath
+
     import urllib
     import urlparse
 else:
     PY3 = True
 
+    import xbmcvfs
+    translatePath = xbmcvfs.translatePath
+
     import urllib.parse as urllib
     import urllib.parse as urlparse
 
 
-import xbmc, re
+import os, xbmc, xbmcaddon, re, time
 
 from platformcode import config, logger, platformtools
-from core import httptools, scrapertools, servertools
+from core import filetools, httptools, scrapertools, servertools
 
 from core import jsontools as json
 
 
 web_yt = 'https://www.youtube.com'
 
+
 # ~ https://tyrrrz.me/blog/reverse-engineering-youtube
+
+
+espera = config.get_setting('servers_waiting', default=6)
 
 
 color_exec = config.get_setting('notification_exec_color', default='cyan')
@@ -65,6 +75,7 @@ def remove_additional_ending_delimiter(data):
     if pos != -1:
         data = data[:pos + 1]
     return data
+
 
 def normalize_url(url):
     if url[0:2] == "//":
@@ -139,6 +150,7 @@ def label_from_itag(itag):
 js_signature = None
 js_signature_checked = False
 
+
 def obtener_js_signature(youtube_page_data):
     global js_signature, js_signature_checked
 
@@ -154,7 +166,7 @@ def obtener_js_signature(youtube_page_data):
         if not funcname: funcname = scrapertools.find_single_match(data_js, '([A-z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\);\w+\.')
         if not funcname:
             # No se puede decodificar este vídeo
-            logger.info("check-youtube: %s" % 'Youtube signature not found')
+            logger.info("check-Youtube: %s" % 'Youtube signature not found')
             return
 
         from lib.jsinterpreter import JSInterpreter
@@ -202,118 +214,173 @@ def extract_from_player_response(params, youtube_page_data=''):
 
 
 def import_libs(module):
-    import os, xbmcaddon
-    from core import filetools
+    try:
+       path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
+       addon_xml = filetools.read(filetools.join(path, "addon.xml"))
 
-    path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
-    addon_xml = filetools.read(filetools.join(path, "addon.xml"))
+       if addon_xml:
+           require_addons = scrapertools.find_multiple_matches(addon_xml, '(<import addon="[^"]+"[^\/]+\/>)')
+           require_addons = list(filter(lambda x: not 'xbmc.python' in x and 'optional="true"' not in x, require_addons))
 
-    if addon_xml:
-        require_addons = scrapertools.find_multiple_matches(addon_xml, '(<import addon="[^"]+"[^\/]+\/>)')
-        require_addons = list(filter(lambda x: not 'xbmc.python' in x and 'optional="true"' not in x, require_addons))
+           for addon in require_addons:
+               addon = scrapertools.find_single_match(addon, 'import addon="([^"]+)"')
+               if xbmc.getCondVisibility('System.HasAddon("%s")' % (addon)):
+                   import_libs(addon)
+               else:
+                   xbmc.executebuiltin('InstallAddon(%s)' % (addon))
+                   import_libs(addon)
 
-        for addon in require_addons:
-            addon = scrapertools.find_single_match(addon, 'import addon="([^"]+)"')
-            if xbmc.getCondVisibility('System.HasAddon("%s")' % (addon)):
-                import_libs(addon)
-            else:
-                xbmc.executebuiltin('InstallAddon(%s)' % (addon))
-                import_libs(addon)
-
-        lib_path = scrapertools.find_multiple_matches(addon_xml, 'library="([^"]+)"')
-        for lib in list(filter(lambda x: not '.py' in x, lib_path)):
-            sys.path.append(os.path.join(path, lib))
+           lib_path = scrapertools.find_multiple_matches(addon_xml, 'library="([^"]+)"')
+           for lib in list(filter(lambda x: not '.py' in x, lib_path)):
+               sys.path.append(os.path.join(path, lib))
+    except:
+       pass
 
 
 def extract_videos(video_id, ini_page_url):
+    video_urls = []
+
     youtube_page_data = ''
 
+    # ~ Acceso Obligatorio aunque NO sea válido para que ResolveUrl se salte "Sign in to confirm you’re not a bot"
     url =  web_yt + '/get_video_info?c=TVHTML5&cver=7.20201028&html5=1&video_id=%s&eurl=https://youtube.googleapis.com/v/%s&ssl_stream=1' % (video_id, video_id)
 
     data = httptools.downloadpage(url).data
 
-    video_urls = []
-
-    if not data or "<h1>We're sorry" in data:
+    if not data or "We're sorry" in str(data) or "Please sign in" in str(data) or "User is not logged in" in str(data) or "This video is not available" in str(data):
         if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
             try:
-                import_libs('plugin.video.youtube')
-
-                import youtube_resolver
-                page_url = ini_page_url
-
-                items = youtube_resolver.resolve(ini_page_url)
-
-                for item in list(filter(lambda x: not 'opus' in x.get('title') and not 'webm' in x.get('title'), items)):
-                    if '/manifest.googlevideo.com/' in item['url']: continue
-                    elif "'dash/audio': True" in str(item): continue
-
-                    video_urls.append([item['title'], item['url']])
-
+               cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
             except:
-                # YouTubeExceptions: Sign in to confirm your age or private video
-                import traceback
-                logger.error(traceback.format_exc())
+               cod_version = ''
 
-                trace = traceback.format_exc()
+            if cod_version:
+                if config.get_setting('servers_time', default=True):
+                    platformtools.dialog_notification('Accediendo con', '[COLOR cyan][B]YouTube[/B][/COLOR]')
 
-                if 'This video may be inappropriate for some users' in trace:
-                    return 'Vídeo Restringido'
-                elif "Sign in to confirm you’re not a bot" in trace:
-                    return 'Error YouTube Exception'
+                try:
+                    import_libs('plugin.video.youtube')
 
-        if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-            try:
-                import_libs('script.module.resolveurl')
+                    import youtube_resolver
+                    page_url = ini_page_url
+                    items = youtube_resolver.resolve(ini_page_url)
 
-                import resolveurl
-                page_url = ini_page_url
-                resuelto = resolveurl.resolve(page_url)
+                    for item in list(filter(lambda x: not 'opus' in x.get('title') and not 'webm' in x.get('title'), items)):
+                        if '/manifest.googlevideo.com/' in item['url']: continue
+                        elif "'dash/audio': True" in str(item): continue
 
-                if resuelto:
-                    video_urls.append(['mp4', resuelto])
-                    return video_urls
+                        video_urls.append([item['title'], item['url']])
 
-                color_exec = config.get_setting('notification_exec_color', default='cyan')
-                el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                el_srv += ('ResolveUrl[/B][/COLOR]')
-                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+                    if video_urls: return video_urls
+                except:
+                    import traceback
+                    logger.error(traceback.format_exc())
 
-                page_url = ini_page_url
-
-                return 'No se pudo Reproducir el Vídeo con ResolveUrl'
-
-            except:
-                import traceback
-                logger.error(traceback.format_exc())
-
-                if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
                     trace = traceback.format_exc()
-                    if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
-                        return 'Archivo inexistente ó eliminado'
-                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
-                        return 'Fichero sin link al vídeo ó restringido'
 
-                elif '<urlopen error' in traceback.format_exc():
-                    return 'No se puede establecer la conexión'
+                    if 'youtube_plugin.youtube.youtube_exceptions.YouTubeException:' in trace:
+                        return 'Error YouTube Exception'
 
-                return 'Sin Respuesta ResolveUrl'
+                    elif 'This video may be inappropriate for some users' in trace:
+                        return 'Vídeo Restringido'
+                    elif 'This video is private' in trace:
+                        return 'Vídeo Privado'
+                    elif 'Sign in to confirm your age' in trace:
+                        return 'Vídeo Requiere Confirmar Edad'
+                    elif 'Please sign in' in trace or 'User is not logged in' in trace:
+                        return 'Requiere Logearse'
+                    elif "Sign in to confirm you’re not a bot" in trace:
+                        return 'Error YouTube Exception'
+                    elif "This video is not available" in trace:
+                        return 'Vídeo No Disponible'
+
+                    return 'Sin Respuesta YouTube'
 
         if not video_urls:
+            if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
+                try:
+                   cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
+                except:
+                   cod_version = ''
+
+                if cod_version:
+                    path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'youtube.py'))
+
+                    existe = filetools.exists(path)
+                    if not existe:
+                        return 'El Plugin No existe en Resolveurl'
+
+                    if config.get_setting('servers_time', default=True):
+                        platformtools.dialog_notification('Accediendo con', '[COLOR cyan][B]ResolveUrl[/B][/COLOR]')
+
+                    try:
+                        import_libs('script.module.resolveurl')
+
+                        if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                            import_libs('script.module.cloudrequest')
+
+                        import resolveurl
+                        page_url = ini_page_url
+                        resuelto = resolveurl.resolve(page_url)
+
+                        if resuelto:
+                            video_urls.append(['mp4', resuelto])
+                            return video_urls
+
+                        color_exec = config.get_setting('notification_exec_color', default='cyan')
+                        el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+                        el_srv += ('ResolveUrl[/B][/COLOR]')
+                        platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+                        page_url = ini_page_url
+
+                        return 'No se pudo Reproducir el Vídeo con ResolveUrl'
+                    except:
+                        import traceback
+                        logger.error(traceback.format_exc())
+
+                        trace = traceback.format_exc()
+
+                        if 'youtube_plugin.youtube.youtube_exceptions.YouTubeException:' in trace:
+                            return 'Error YouTube Exception'
+
+                        elif 'resolveurl.resolver.ResolverError:' in trace:
+                            if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
+                                return 'Archivo inexistente ó eliminado'
+
+                            elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
+                                return 'Fichero sin link al vídeo ó restringido'
+
+                            elif 'Cloudflare challenge' in trace:
+                                return 'Cloudflare Challenge Check'
+
+                        elif "No module named 'cloudscraper'" in traceback.format_exc():
+                            return 'Falta script.module.cloudrequest'
+
+                        elif 'HTTP Error 404: Not Found' in trace or '404 Not Found' in trace:
+                            return 'Archivo inexistente'
+
+                        elif '<urlopen error' in trace:
+                            return 'No se puede establecer la conexión'
+
+                        return 'Sin Respuesta ResolveUrl'
+
+        if not video_urls:
+            color_exec = config.get_setting('notification_exec_color', default='cyan')
             el_srv = ('Quizás Faltan [B][COLOR %s]') % color_exec
-            el_srv += ('ResolveUrl / YouTube[/B][/COLOR]')
+            el_srv += ('ResolveUrl y/ó YouTube[/B][/COLOR]')
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
         return video_urls
 
-
+    # ~ Antiguas acciones
     if PY3 and isinstance(data, bytes):
         data = data.decode('utf-8')
 
     params = dict(urlparse.parse_qsl(data))
 
     if params.get('hlsvp'):
-        video_urls.append(["LIVE .m3u8", params['hlsvp']])
+        video_urls.append(["m3u8", params['hlsvp']])
         return video_urls
 
     if params.get('player_response'):
@@ -321,8 +388,10 @@ def extract_videos(video_id, ini_page_url):
         if len(video_urls) > 0: return video_urls
 
     if params.get('dashmpd') and platformtools.is_mpd_enabled():
-        if params.get('use_cipher_signature', '') != 'True': video_urls.append(['mpd HD', params['dashmpd'], 0, '', True])
-
+        if params.get('use_cipher_signature', '') != 'True': 
+            video_urls.append(['mpd', params['dashmpd'], 0, '', True])
+            return video_urls
+	
     youtube_page_data = httptools.downloadpage(web_yt + '/watch?v=%s' % video_id).data
 
     params = extract_flashvars(youtube_page_data)
@@ -345,10 +414,12 @@ def extract_videos(video_id, ini_page_url):
                 if not lbl: continue
 
                 if url_desc_map.get("url"): url = urllib.unquote(url_desc_map["url"])
+
                 elif url_desc_map.get("conn") and url_desc_map.get("stream"):
                     url = urllib.unquote(url_desc_map["conn"])
                     if url.rfind("/") < len(url) - 1: url += "/"
                     url += urllib.unquote(url_desc_map["stream"])
+
                 elif url_desc_map.get("stream") and not url_desc_map.get("conn"): url = urllib.unquote(url_desc_map["stream"])
 
                 if url_desc_map.get("sig"): url += "&signature=" + url_desc_map["sig"]
@@ -367,76 +438,139 @@ def extract_videos(video_id, ini_page_url):
                 import traceback
                 logger.info(traceback.format_exc())
 
-        video_urls.reverse()
+        return video_urls.reverse()
 
+    # ~ Re-intentos
     if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'):
             try:
-                import_libs('plugin.video.youtube')
-
-                import youtube_resolver
-                page_url = ini_page_url
-
-                items = youtube_resolver.resolve(page_url)
-
-                for item in list(filter(lambda x: not 'opus' in x.get('title') and not 'webm' in x.get('title'), items)):
-                    if '/manifest.googlevideo.com/' in item['url']: continue
-                    elif "'dash/audio': True" in str(item): continue
-
-                    video_urls.append([item['title'], item['url']])
-
+               cod_version = xbmcaddon.Addon("plugin.video.youtube").getAddonInfo("version").strip()
             except:
-                # YouTubeExceptions: Sign in to confirm your age or private video
-                import traceback
-                logger.error(traceback.format_exc())
+               cod_version = ''
 
-                trace = traceback.format_exc()
+            if cod_version:
+                if config.get_setting('servers_time', default=True):
+                    platformtools.dialog_notification('Re-accediendo con', '[COLOR cyan][B]YouTube[/B][/COLOR]')
 
-                if 'This video may be inappropriate for some users' in trace:
-                    return 'Vídeo Restringido'
-                elif "Sign in to confirm you’re not a bot" in trace:
-                    return 'Error YouTube Exception'
+                try:
+                    import_libs('plugin.video.youtube')
 
+                    import youtube_resolver
+                    page_url = ini_page_url
+                    items = youtube_resolver.resolve(page_url)
+
+                    for item in list(filter(lambda x: not 'opus' in x.get('title') and not 'webm' in x.get('title'), items)):
+                        if '/manifest.googlevideo.com/' in item['url']: continue
+                        elif "'dash/audio': True" in str(item): continue
+
+                        video_urls.append([item['title'], item['url']])
+
+                    if video_urls: return video_urls
+                except:
+                    import traceback
+                    logger.error(traceback.format_exc())
+
+                    trace = traceback.format_exc()
+
+                    if 'youtube_plugin.youtube.youtube_exceptions.YouTubeException:' in trace:
+                        return 'Error YouTube Exception'
+
+                    elif 'This video may be inappropriate for some users' in trace:
+                        return 'Vídeo Restringido'
+                    elif 'This video is private' in trace:
+                        return 'Vídeo Privado'
+                    elif 'Sign in to confirm your age' in trace:
+                        return 'Vídeo Requiere Confirmar Edad'
+                    elif 'Please sign in' in trace or 'User is not logged in' in trace:
+                        return 'Requiere Logearse'
+                    elif "Sign in to confirm you’re not a bot" in trace:
+                        return 'Error YouTube Exception'
+                    elif "This video is not available" in trace:
+                        return 'Vídeo No Disponible'
+
+                    return 'Sin Respuesta YouTube'
+
+    if not video_urls:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
             try:
-                import_libs('script.module.resolveurl')
-
-                import resolveurl
-                page_url = ini_page_url
-                resuelto = resolveurl.resolve(page_url)
-
-                if resuelto:
-                    video_urls.append(['mp4', resuelto])
-                    return video_urls
-
-                color_exec = config.get_setting('notification_exec_color', default='cyan')
-                el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
-                el_srv += ('ResolveUrl[/B][/COLOR]')
-                platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
-
-                page_url = ini_page_url
-
-                return 'No se pudo Reproducir el Vídeo con ResolveUrl'
-
+               cod_version = xbmcaddon.Addon("script.module.resolveurl").getAddonInfo("version").strip()
             except:
-                import traceback
-                logger.error(traceback.format_exc())
+               cod_version = ''
 
-                if 'resolveurl.resolver.ResolverError:' in traceback.format_exc():
+            if cod_version:
+                path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'youtube.py'))
+
+                existe = filetools.exists(path)
+                if not existe:
+                    return 'El Plugin No existe en Resolveurl'
+
+                if config.get_setting('servers_time', default=True):
+                    platformtools.dialog_notification('Re-accediendo con', '[COLOR cyan][B]ResolveUrl[/B][/COLOR]')
+
+                try:
+                    import_libs('script.module.resolveurl')
+
+                    if xbmc.getCondVisibility('System.HasAddon("script.module.cloudrequest")'):
+                        import_libs('script.module.cloudrequest')
+
+                    import resolveurl
+                    page_url = ini_page_url
+                    resuelto = resolveurl.resolve(page_url)
+
+                    if resuelto:
+                        video_urls.append(['mp4', resuelto])
+                        return video_urls
+
+                    color_exec = config.get_setting('notification_exec_color', default='cyan')
+                    el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
+                    el_srv += ('ResolveUrl[/B][/COLOR]')
+                    platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
+
+                    page_url = ini_page_url
+
+                    return 'No se pudo Reproducir el Vídeo con ResolveUrl'
+                except:
+                    import traceback
+                    logger.error(traceback.format_exc())
+
                     trace = traceback.format_exc()
-                    if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
-                        return 'Archivo inexistente ó eliminado'
-                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
-                        return 'Fichero sin link al vídeo ó restringido'
 
-                elif '<urlopen error' in traceback.format_exc():
-                    return 'No se puede establecer la conexión'
+                    if 'youtube_plugin.youtube.youtube_exceptions.YouTubeException:' in trace:
+                        return 'Error YouTube Exception'
 
-                return 'Sin Respuesta ResolveUrl'
+                    elif 'resolveurl.resolver.ResolverError:' in trace:
+                        trace = traceback.format_exc()
 
-        if not video_urls:
+                        if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
+                            return 'Archivo inexistente ó eliminado'
+
+                        elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
+                            return 'Fichero sin link al vídeo ó restringido'
+
+                        elif 'Cloudflare challenge' in trace:
+                            return 'Cloudflare Challenge Check'
+
+                    elif "No module named 'cloudscraper'" in traceback.format_exc():
+                        return 'Falta script.module.cloudrequest'
+
+                    elif 'HTTP Error 404: Not Found' in trace or '404 Not Found' in trace:
+                        return 'Archivo inexistente'
+
+                    elif '<urlopen error' in trace:
+                        return 'No se puede establecer la conexión'
+
+                    return 'Sin Respuesta ResolveUrl'
+
+    if not video_urls:
+        if xbmc.getCondVisibility('System.HasAddon("plugin.video.youtube")'): pass
+
+        elif xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'): pass
+
+        else:
+            color_exec = config.get_setting('notification_exec_color', default='cyan')
+
             el_srv = ('Quizás Faltan [B][COLOR %s]') % color_exec
-            el_srv += ('ResolveUrl / YouTube[/B][/COLOR]')
+            el_srv += ('ResolveUrl y/ó YouTube[/B][/COLOR]')
             platformtools.dialog_notification(config.__addon_name, el_srv, time=3000)
 
     return video_urls

@@ -1,0 +1,41 @@
+{
+  "id": "tubepelis",
+  "name": "Tubepelis",
+  "active": true,
+  "adult": false,
+  "language": ["lat"],
+  "thumbnail": "https://i.postimg.cc/BbxJBcZM/tubepelis.png",
+  "banner": "",
+  "fanart": "",
+  "categories": [
+    "movie"
+  ],
+  "force_unify": true,
+  "settings": [
+    {
+      "id": "include_in_global_search",
+      "type": "bool",
+      "label": "Incluir en busqueda global",
+      "default": true,
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "comprueba_enlaces",
+      "type": "bool",
+      "label": "Verificar si los enlaces existen",
+      "default": false,
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "comprueba_enlaces_num",
+      "type": "list",
+      "label": "Número de enlaces a verificar",
+      "default": 1,
+      "enabled": true,
+      "visible": "eq(-1,true)",
+      "lvalues": [ "5", "10", "15", "20" ]
+    }
+  ]
+}

@@ -4,23 +4,23 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(https://(?:www.|)(?:nonktube|leslez|teenxy|fleshed|xrares).com/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:nonktube|leslez|teenxy|fleshed|xrares|bigboobsxxx).com/video(?:s|)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|en.|)(?:fuqer|luxuretv|sextubefun|freehdporn|wanktv|iporntoo|hdporn-movies).(?:com|xxx)/video(?:s|)/[A-z0-9-]+.html)",
+        "pattern": "(https://(?:www.|en.|)(?:luxuretv|sextubefun|freehdporn|wanktv|iporntoo|hdporn-movies|pornvee).(?:com|xxx)/video(?:s|)/[A-z0-9-]+.html)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:embed.|)fuqer.com/vid/[0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:justporn|pulpo69|publicsexhub|pornzona).(?:com|\\w{2,4})/(?:\\w{2}/|)video(?:s|)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:justporn|pulpo69|publicsexhub).(?:com|net)/video(?:s|)/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)(?:bingato|sexmex|taboodude).(?:com|\\w{2,4})/(?:item|video)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)(?:bingato|sexmex|taboodude).(?:com|net|to)/(?:item|video)/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://jizztube.(?:com|\\w{2,4})/(?:view|video)/[0-9]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -56,7 +56,15 @@
         "url": "\\1"
       },
       {
+        "pattern": "(https://(?:www.|)mrluckypov.com/updates/[A-z0-9-]+.html)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://(?:www.|)canalporno.com/ver/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)hdpornvideos.tv/view/[0-9-]+/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -64,7 +72,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(http://(?:www.|)incestflix.com/watch/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:www.|)incestflixx.com/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -72,12 +80,8 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:www.|)koreanpornmovie.com/[A-z0-9-]+(?:/|))",
-        "url": "\\1"
-      },
-      {
         "pattern": "(vagina.nl/sexfilms/view/[A-z0-9-]+(?:/|))",
-        "url": "https://en.\\1"
+        "url": "https://\\1"
       },
      {
         "pattern": "(https://(?:www.|)errrotica.com/[a-z]/[A-z0-9-]+/[0-9]+(?:/|))",
@@ -99,7 +103,11 @@
         "pattern": "(https://(?:www.|)(?:tubehentai|wetsins|pornyteen).(?:com|sexy)/video/[A-z0-9-]+.html)",
         "url": "\\1"
       },
-     {
+      {
+        "pattern": "(https://pornyteen.com/embed/[0-9]+)",
+        "url": "\\1"
+      },
+      {
         "pattern": "(https://(?:www.|)efukt.com/[A-z0-9-_]+.html)",
         "url": "\\1"
       },     {
@@ -111,7 +119,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:zzztube|bestpornstars|24porn|bigfuck).(?:tv|xxx|com)/(?:video/|)[0-9]+)",
+        "pattern": "(https://(?:zzztube|bestpornstars|24porn).(?:tv|xxx|com)/(?:video/|)[0-9]+)",
         "url": "\\1"
       },
       {
@@ -119,8 +127,8 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://bigfuck.tv/video/[0-9]+/[A-z0-9-]+(?:/|))",
-        "url": "\\1"
+        "pattern": "https://bigfuck.tv/(?:video|embed)/([0-9]+)",
+        "url": "https://bigfuck.tv/embed/\\1"
       },
       {
         "pattern": "(https://eboblack.com/video/[0-9]+/[A-z0-9-]+(?:/|))",
@@ -155,11 +163,7 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://ogporn.com/[A-z0-9-]+(?:/|))",
-        "url": "\\1"
-      },
-      {
-        "pattern": "(https://(?:www.|)dump.xxx/video/[0-9-]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://(?:ogporn|thothub).com(?:.co|)/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
@@ -167,16 +171,63 @@
         "url": "\\1"
       },
       {
-        "pattern": "(https://www.pornoxo.com/(?:videos|embed)/[0-9]+/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://www.serviporno.com/video/[A-z0-9-]+(?:/|))",
         "url": "\\1"
       },
       {
-        "pattern": "(https://www.serviporno.com/video/[A-z0-9-]+(?:/|))",
+        "pattern": "(https://bunkr.\\w{2,4}/e/[A-z0-9]+(?:/|))",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://youperv.\\w{2,4}/[A-z0-9-]+/[A-z0-9-’]+.html)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(?:slutload|camsoda).com/(?:\\w{2}/|)(porn/video/[A-z0-9_]+)",
+        "url": "https://www.camsoda.com/es/\\1"
+      },
+      {
+        "pattern": "(https://www.(?:playvids|pornoeggs).com/(?:es/|)[A-z0-9]+/[A-z0-9-]+(?:/|))",
+        "url": "\\1"
+      },      {
+        "pattern": "(https://www.peekvids.com/v/[A-z0-9-]+/[A-z0-9-_]+(?:/|))",
         "url": "\\1"
       },
       {
         "pattern": "(https://(?:www.|)bustybus.com/video\\?play=[0-9]+)",
         "url": "\\1"
+      },
+      {
+        "pattern": "(https://(?:www.|)(?:fapnfuck|fuqster|sexpester|w1mp|w4nkr|babejizz|bigbigtits|cuminstead|extremehoes|hugewangs|gogoasians|hardwhores|povpow|jizzpov|b1gtits|bigtitsxl|bigbuttz|bigbumfun|thrupnies|threesomerz|pumpjap|fukxl|hugedickz).com/(?:video|embed)/[0-9]+)",
+        "url": "\\1/a/"
+      },
+      {
+        "pattern": "https://(?:www.|)(?:japflaps|hard3r|bigassz|povpoof|an4lporn|porno-cum|public-porno).com/(?:video|embed)/([0-9]+)",
+        "url": "https://w4nkr.com/video/\\1/a/"
+      },
+      {
+        "pattern": "https://(?:www.|)(?:publicpubic|3sumxl|xxxxcum|povrz|jappornxl|lesfix|asianrz|momxl|maturexy|extremewhores|ebonypeek).com/(?:video|embed)/([0-9]+)",
+        "url": "https://fapnfuck.com/video/\\1/a/"
+      },
+      {
+        "pattern": "https://(?:www.|)(?:maturevices|m1lfs|asianslutz|pr1cks).com/(?:video|embed)/([0-9]+)",
+        "url": "https://fuqster.com/video/\\1/a/"
+      },
+      {
+        "pattern": "https://(?:www.|)(?:fetishz|bondagenest|analry|milfxl).com/(?:video|embed)/([0-9]+)",
+        "url": "https://sexpester.com/video/\\1/a/"
+      },
+      {
+        "pattern": "((?:fuqer|dump).(?:com|\\w{2,4}))/(?:vid|embed)/([0-9]+)",
+        "url": "https://www.\\1/embed/\\2"
+      },
+      {
+        "pattern": "(https://(?:\\w{2,3}.|)hdsex.(?:org|\\w{2,4})/video/[0-9]+)",
+        "url": "\\1"
+      },
+      {
+        "pattern": "(https://iceyfile.com/video/embed/[A-z0-9]+/[0-9x]+)",
+        "url": "\\1/a"
       }
     ]
   },
@@ -209,5 +260,6 @@
       "visible": false
     }
   ],
-  "thumbnail": ""
+  "thumbnail": "",
+  "force_inputstream": "none"
 }

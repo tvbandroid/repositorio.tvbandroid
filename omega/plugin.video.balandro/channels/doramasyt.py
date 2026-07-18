@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import re, base64
+import re
 
 from platformcode import config, logger, platformtools
 from core.item import Item
@@ -62,7 +62,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'buscar?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DoramasYt', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -140,6 +140,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Live action', action = 'list_all', url = host + 'doramas?categoria=live-action', search_type = 'tvshow', text_color = 'moccasin' ))
 
     itemlist.append(item.clone( title = 'En emisión', action = 'list_all', url = host + 'emision', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( action='list_all', title='Novelas', url = host + 'doramas?categoria=serie-turcas', search_type = 'tvshow', text_color='limegreen' ))
 
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
@@ -243,7 +245,8 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '</h2>(.*?)>DoramasYT')
+    bloque = scrapertools.find_single_match(data, '</h1>(.*?)>DoramasYT')
+    if not bloque: bloque = scrapertools.find_single_match(data, '</h2>(.*?)>DoramasYT')
 
     matches = re.compile('ficha_efecto">(.*?)</li>').findall(bloque)
 
@@ -260,13 +263,17 @@ def list_all(item):
         elif 'castellano' in title.lower(): lang = 'Esp'
         else: lang = 'Vose'
 
-        title = re.sub(r'Audio|Latino|Castellano|\((.*?)\)', '', title)
+        title = title.replace('Ver ', '').replace(' online - Pelicula en ', '').replace(' online - Dorama en ', '').replace(' online - Live Action en ', '').replace(' online - Dorama estreno 2025 en ', '').replace(' online - Serie Turcas en ', '').replace(' HD', '').strip()
+
+        title = title.replace(' Live Action', '').strip()
+
+        title = re.sub(r'Audio|Latino|Castellano|latino|español|\((.*?)\)', '', title)
         title = re.sub(r'\s:', ':', title)
 
         title = title.replace('&#039;', '')
 
         if '>Pelicula' in match: tipo = 'movie'
-        elif '>Dorama<' in match: tipo = 'tvshow'
+        elif '>Dorama' in match: tipo = 'tvshow'
         else: tipo = item.search_type
 
         sufijo = '' if item.search_type != 'all' else tipo
@@ -329,10 +336,13 @@ def last_epis(item):
         SerieName = title
 
         if "capitulo" in title:SerieName = title.split("capitulo")[0]
-        elif "Capitulo" in title:SerieName = title.split("Capitulo")[0]
-        elif "episodio" in title:SerieName = title.split("episodio")[0]
-        elif "Episodio" in title:SerieName = title.split("Episodio")[0]
-        else: titulo = SerieName
+        if "Capitulo" in title:SerieName = title.split("Capitulo")[0]
+
+        if "episodio" in title:SerieName = title.split("episodio")[0]
+        if "Episodio" in title:SerieName = title.split("Episodio")[0]
+
+        if "latino" in title:SerieName = title.split("latino")[0]
+        if "Latino" in title:SerieName = title.split("Latino")[0]
 
         SerieName = SerieName.strip()
 
@@ -342,7 +352,7 @@ def last_epis(item):
 
         if not epis: epis = 1
 
-        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = title.replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action='findvideos', title = titulo, thumbnail = thumb, url = url,
                                     contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
@@ -356,10 +366,9 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('channels_seasons', default=True):
-        title = 'Sin temporadas'
+    title = 'Sin temporadas'
 
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#039;', "'").replace('&#8217;', "'"), '[COLOR tan]' + title + '[/COLOR]')
+    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#039;', "'").replace('&#8217;', "'"), '[COLOR tan]' + title + '[/COLOR]')
 
     item.page = 0
     item.contentType = 'season'
@@ -495,30 +504,51 @@ def findvideos(item):
         elif srv == 'drive': srv = 'gvideo'
         elif srv == 'pixel': srv = 'pixeldrain'
         elif srv == 'senvid2': srv = 'sendvid'
-        elif srv == 'mixdropco' or srv == 'mxdrop': srv = 'mixdrop'
-        elif srv == 'mdy48tn97com': srv = 'mixdrop'
+        elif srv == 'dsvplay': srv = 'doodstream'
+
+        elif srv == 'mixdropco' or srv == 'mxdrop' or srv == 'mdy48tn97com': srv = 'mixdrop'
 
         elif srv == 'cybervynx':
              srv = 'various'
-
              other = 'Cybervynx'
 
         else:
              if srv == 'vgembedcom': srv = 'vembed'
 
-             other = servertools.corregir_other(srv)
+             elif 'com/' in srv or 'wish' in srv:
+                other = 'streamwish'
+                srv = 'various'
 
-        servidor = servertools.corregir_servidor(srv)
+             elif 'filemoon' in srv:
+                other = srv
+                srv = 'various'
 
-        if servertools.is_server_available(servidor):
-            if not servertools.is_server_enabled(servidor): continue
+             elif 'lulu' in srv:
+                other = 'lulustream'
+                srv = 'various'
+
+             elif 'listeamed' in srv:
+                other = srv
+                srv = 'various'
+
+             elif 'd-s' in srv:
+                other = 'hexupload'
+                srv = 'various'
+
+        if servertools.is_server_available(srv):
+            if not servertools.is_server_enabled(srv): continue
         else:
             if not config.get_setting('developer_mode', default=False): continue
 
-        if not servidor == 'directo':
-            if not servidor == 'various': other = ''
-            
-        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', d_play = d_play, language = 'Vose', other = other ))
+        force_input = ''
+
+        if other == 'lulustream': force_input = True
+
+        if not srv == 'directo':
+            if not srv == 'various': other = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', d_play = d_play,
+                              language = 'Vose', other = other.capitalize(), force_input = force_input ))
 
     # download
     bloque = scrapertools.find_single_match(data, '>Descargas<(.*?)</div>')
@@ -528,10 +558,14 @@ def findvideos(item):
     for url, srv in matches:
         ses += 1
 
+        other = 'D'
+
         srv = srv.lower().strip()
 
         if srv == '1fichier' or srv == '1ficher': continue
         elif srv == '1cloud' or srv == 'cloud': continue
+
+        elif srv == 'mixdropco' or srv == 'mxdrop' or srv == 'mdy48tn97com': srv = 'mixdrop'
 
         elif srv == 'anonfile': srv = 'anonfiles'
         elif srv == 'bay': srv = 'bayfiles'
@@ -539,20 +573,39 @@ def findvideos(item):
         elif srv == 'pixel': srv = 'pixeldrain'
 
         elif srv == 'ok':
-          if '.fireload.com/' in url: continue
+           if '.fireload.com/' in url: continue
 
-          elif '/1cloudfile.' in url: srv = ''
+           elif '/1cloudfile.' in url: srv = ''
 
-          elif '/mega.nz/' in url: srv = 'mega'
+           elif '/mega.nz/' in url: srv = 'mega'
 
-        if not srv: srv = servertools.get_server_from_url(url)
+        elif 'com/' in srv or 'wish' in srv:
+             other = 'streamwish'
+             srv = 'various'
+
+        elif 'filemoon' in srv:
+             other = srv
+             srv = 'various'
+
+        elif 'lulu' in srv:
+             other = 'lulustream'
+             srv = 'various'
+
+        elif 'd-s' in srv:
+             other = 'hexupload'
+             srv = 'various'
 
         if servertools.is_server_available(srv):
             if not servertools.is_server_enabled(srv): continue
         else:
            if not config.get_setting('developer_mode', default=False): continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url, language = 'Vose', other = 'D' ))
+        force_input = ''
+
+        if other == 'lulustream': force_input = True
+
+        itemlist.append(Item( channel = item.channel, action = 'play', server = srv, title = '', url = url,
+                              language = 'Vose', other = other.capitalize(), force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:
@@ -570,7 +623,12 @@ def play(item):
         itemlist.append(item.clone( url = item.url, server = item.server ))
         return itemlist
 
-    player = host + 'reproductor?video=' + item.d_play
+    item.d_play = item.d_play.split('"data-usa-api=')[0] #, '&token=<?php echo Session::get(')
+
+    if "eyJpdi" in item.d_play:
+        player = host + 'reproductor?video=' + item.d_play + '&token=<?php echo Session::get('
+    else:
+        player = host + 'reproductor?video=' + item.d_play
 
     data = do_downloadpage(player)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -580,17 +638,30 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        if 'jodwish' in url or 'swhoi' in url or 'swdyu' in url or 'strwish' in url or 'playerwish' in url or 'streamwish' in url:
+            url = url + '|Referer=' + url
 
         itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

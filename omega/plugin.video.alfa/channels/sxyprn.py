@@ -22,6 +22,7 @@ list_quality = []
 # https://www.sxyprn.com/blog/all/0.html?sm=views                 https://www.sxyprn.com/popular/top-viewed.html?p=all
 # https://www.sxyprn.com/blog/all/0.html?fl=all&sm=orgasmic       https://www.sxyprn.com/orgasm/0
 
+
 def mainlist(item):
     logger.info()
     itemlist = []
@@ -126,24 +127,23 @@ def create_soup(url, referer=None, unescape=False):
 def lista(item):
     logger.info()
     itemlist = []
-    # url = "https://www.sxyprn.com/php/vo.php"
-    # soup = create_soup(url, referer=item.url)
-    # logger.debug(soup)
     soup = create_soup(item.url)
     matches = soup.find_all('div', class_='post_el_small')
     for elem in matches:
-        # logger.debug(elem)
         ext = ""
         time = ""
         quality = ""
         serv = ['jetload', 'waaw', 'aparat.cam/reg', 'ninjastream']
         url = elem.find('a', class_='post_time')['href']
         titulo = elem.find('a', class_='post_time')['title']
-        thumbnail = elem.img
-        if thumbnail.get("src", "" ): 
-            thumbnail = thumbnail['src']
+        if not elem.img:
+            thumbnail = ""
         else:
-            thumbnail = thumbnail['data-src']
+            thumbnail = elem.img
+            if thumbnail.get("src", ""): 
+                thumbnail = thumbnail['src']
+            else:
+                thumbnail = thumbnail['data-src']
         if "removed.png" in thumbnail:
             thumbnail = urlparse.urljoin(item.url,thumbnail)
         titulo = re.sub("#\w+", "", titulo).strip()
@@ -175,8 +175,8 @@ def lista(item):
         url = urlparse.urljoin(item.url,url)
         itemlist.append(Item(channel=item.channel, action="findvideos", title=title, url=url, contentTitle = title,
                           thumbnail=thumbnail, fanart=thumbnail, ext=ext))
+    
     next_page = soup.find('div', class_='next_page')
-    logger.debug(next_page)
     if next_page:
         next_page = next_page.parent['href']
         next_page = urlparse.urljoin(item.url,next_page)
@@ -193,7 +193,7 @@ def findvideos(item):
     soup = create_soup(item.url)
     # if item.ext:  post_el_small 
     matches = soup.find('div', class_='post_el_post').find_all('a', class_='extlink')
-    logger.debug(matches)
+    # logger.debug(matches)
     for elem in matches:
         url = elem['href']
         itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))

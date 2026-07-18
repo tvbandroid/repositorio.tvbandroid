@@ -2,6 +2,11 @@
 <settings>
 
     <category label="Info">
+        <setting label="Balandro Fuente:" type="lsep"/>
+
+        <setting id="_fuen" type="text" label="[COLOR white][B]Fuente: [I]https://repobal.github.io/base/[/I][/B][/COLOR]" enable="false"/>
+        <setting id="_fuen0" type="text" label="[COLOR white][B]Acceso: Repositorio, Add-On y Scripts[/B][/COLOR]" enable="false"/>
+
         <setting label="Información Preliminar:" type="lsep"/>
 
         <setting id="info_grl" type="bool" label="Opciones" default="false"/>
@@ -12,26 +17,29 @@
         <setting id="show_help_addons" type="action" label="[COLOR gold][B]Add-Ons[/B][/COLOR] (Gestión desde Balandro)" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_help_addons)"/>
         <setting id="show_submnu_all_addons" type="action" label="[COLOR limegreen][B]Add-Ons Instalados [/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=submnu_all_addons)"/>
         <setting id="show_help_addons_datos" type="action" label="[COLOR greenyellow][B]Add-Ons Instalados con Datos[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=submnu_resto_addons)"/>
+        <setting id="addons_comunes" type="action" label="[COLOR palegreen][B]Add-Ons Especiales Comunes[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=addons_especiales)"/>
 
         <setting label="Balandro General:" type="lsep"/>
 
         <setting id="info_bro" type="bool" label="Opciones" default="false"/>
-        <setting id="_fuen" type="text" label="[B]Fuente [I]repobal.github.io/base/[/I]  Repo, Add-On, Scripts, etc.[/B]" enable="false" visible="eq(-1,true)"/>
+
+        <setting id="show_contacto" type="action" label="[COLOR limegreen][B]Contacto[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_contacto)"/>
         <setting id="show_help_use" type="action" label="[COLOR darkorange][B]Uso[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_use)"/>
         <setting id="show_help_faq" type="action" label="[COLOR tomato][B]FAQS[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_faq)"/>
-        <setting id="show_not_contemplated" type="action" label="[COLOR red][B]No Contemplado[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_contemplated)"/>
-        <setting id="show_latest_domains" type="action" label="[COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_latest_domains)"/>
-        <setting id="show_help_domains" type="action" label="[COLOR bisque][B]Gestión Dominios[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_domains)"/>
-        <setting id="show_help_bloqueos" type="action" label="[COLOR yellowgreen][B]Bloqueos Operadoras[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
-        <setting id="show_help_proxies" type="action" label="[COLOR crimson][B]Uso de Proxies[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_proxies)"/>
-        <setting id="show_legalidad" type="action" label="[COLOR goldenrod][B]Legalidad[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_legalidad)"/>
+        <setting id="show_msgfixed" type="action" label="[COLOR chartreuse][B]Telegram Mensajes Fijados[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_msgfixed)"/>
+        <setting id="show_not_contemplated" type="action" label="[COLOR red][B]No Contemplado[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_contemplated)"/>
+        <setting id="show_latest_domains" type="action" label="[COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_latest_domains)"/>
+        <setting id="show_help_domains" type="action" label="[COLOR bisque][B]Gestión Dominios[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_domains)"/>
+        <setting id="show_help_bloqueos" type="action" label="[COLOR yellowgreen][B]Bloqueos Operadoras[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
+        <setting id="show_help_proxies" type="action" label="[COLOR crimson][B]Uso de Proxies[/B][/COLOR]" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_proxies)"/>
+        <setting id="show_legalidad" type="action" label="[COLOR goldenrod][B]Legalidad[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_legalidad)"/>
 
         <setting label="Balandro Sistema:" type="lsep"/>
 
         <setting id="info_bry" type="bool" label="Opciones" default="false"/>
         <setting id="show_version" type="action" label="[COLOR violet][B]Versión[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_version)"/>
         <setting id="show_last_fix" type="action" label="[COLOR lime][B]Último Fix[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_last_fix)"/>
-        <setting id="show_res_fix" type="action" label="[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=resumen_fix)"/>
+        <setting id="show_res_fix" type="action" label="[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=resumen_fix)"/>
         <setting id="show_test" type="action" label="[COLOR yellow][B]Test[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_test)"/>
 
         <setting label="Balandro Canales:" type="lsep"/>
@@ -47,17 +55,6 @@
         <setting id="info_brs" type="bool" label="Opciones" default="false"/>
         <setting id="resumen_servidores" type="action" label="[COLOR fuchsia][B]Resumen[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=resumen_servidores)"/>
         <setting id="resumen_pending" type="action" label="[COLOR tan][B]Con Incidencias[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=resumen_pending)"/>
-
-        <setting label="Contacto:" type="lsep"/>
-
-        <setting id="info_cto" type="bool" label="Opciones" default="false"/>
-        <setting id="_foro" type="text" label="[B]Foro [I]www.mimediacenter.info/foro/[/I]  Instalación, Tutoriales, Sugerencias, etc.[/B]" enable="false" visible="eq(-1,true)"/>
-
-        <setting id="_ases" type="text" label="[B]Telegram [I]t.me/balandro_asesor[/I]  Consultas, Dudas, etc.[/B]" enable="false" visible="eq(-2,true)"/>
-        <setting id="_ases_news" type="text" label="[B]Usuarios Telegram pueden Añadir Miembros[/B]" enable="false" visible="eq(-3,true)"/>
-
-        <setting id="_team" type="text" label="[B]Desarrollo [I]t.me/balandro_team[/I][/B]" enable="false" visible="eq(-4,true)"/>
-        <setting id="_team_news" type="text" label="[B]Incorporaciones Desarrollo con Enlace de Invitación[/B]" enable="false" visible="eq(-5,true)"/>
 
         <setting label="Preferencias Actuales:" type="lsep"/>
 
@@ -83,6 +80,7 @@
         <setting id="channels_charges_movies" type="bool" label="Presentar Sin Notificar Todas las [COLOR deepskyblue][B]Películas[/B][/COLOR] en las listas especiales" default="true" visible="eq(-3,true)"/>
         <setting id="channels_seasons" type="bool" label="Notificar cuando [COLOR tan][B]No existan Temporadas ó tan solo haya Una[/B][/COLOR]" default="true" visible="eq(-4,true)"/>
         <setting id="channels_charges" type="bool" label="Presentar Sin Notificar Todos los [COLOR darkcyan][B]Episodios[/B][/COLOR] en cada Temporada" default="true" visible="eq(-5,true)"/>
+        <setting id="channels_especiales" type="bool" label="No Presentar la [COLOR tan][B]Temporada 0 [COLOR goldenrod](Especiales)[/B][/COLOR]" default="true" visible="eq(-6,true)"/>
 
         <setting label="Notificaciones al Reproducir:" type="lsep"/>
 
@@ -170,14 +168,15 @@
         <setting id="show_channels_list" type="action" label="[COLOR gold][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list)"/>
         <setting id="channels_suggesteds" type="action" label="[COLOR aquamarine][B]Sugeridos[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_suggesteds)"/>
         <setting id="search_no_searchables" type="action" label="Canales que [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_no_searchables)"/>
-        <setting id="show_help_bloqueos1" type="action" label="¿ Qué hacer si su Operadora [COLOR yellowgreen][B]Bloquea[/B][/COLOR] algún Canal ?" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
-        <setting id="show_help_resto1" type="action" label="¿ Qué significa el Aviso [COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR] ?" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
-        <setting id="show_help_notices" type="action" label="Canales con [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_notice)"/>
-        <setting id="channels_with_proxies" type="action" label="Canales que pueden necesitar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
-        <setting id="channels_with_proxies_memorized" type="action" label="Canales con [COLOR darkcyan][B]Proxies Memorizados[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies_memorized)"/>
-        <setting id="show_help_cryptos" type="action" label="Canales que requieren [COLOR darksalmon][B]Descifrar Enlaces[/B][/COLOR]" visible="eq(-13,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_crypto)"/>
-        <setting id="show_channels_list_temporaries" type="action" label="[COLOR cyan][B][B]Temporalmente[/B][/COLOR] inactivos" visible="eq(-14,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_temporaries)"/>
-        <setting id="show_channels_list_inactives" type="action" label="[COLOR coral][B]Inactivos[/B][/COLOR]" visible="eq(-15,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_inactives)"/>
+        <setting id="show_help_tests" type="action" label="Métodos para [COLOR darkorange][B]Efectuar el Test Web[/B][/COLOR] de un canal" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tests)"/>
+        <setting id="show_help_bloqueos1" type="action" label="¿ Qué hacer si su Operadora [COLOR yellowgreen][B]Bloquea[/B][/COLOR] algún Canal ?" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bloqueos)"/>
+        <setting id="show_help_resto1" type="action" label="¿ Qué significa el Aviso [COLOR red][B]CloudFlare[/COLOR][COLOR orangered] Protection[/B][/COLOR] ?" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
+        <setting id="show_help_notices" type="action" label="Canales con [COLOR green][B]Aviso[/COLOR][COLOR red] CloudFlare [COLOR orangered]Protection[/B][/COLOR]" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_notice)"/>
+        <setting id="channels_with_proxies" type="action" label="Canales que pueden necesitar [COLOR red][B]Proxies[/B][/COLOR]" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies)"/>
+        <setting id="channels_with_proxies_memorized" type="action" label="Canales con [COLOR darkcyan][B]Proxies Memorizados[/B][/COLOR]" visible="eq(-13,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_proxies_memorized)"/>
+        <setting id="show_help_cryptos" type="action" label="Canales que requieren [COLOR darksalmon][B]Descifrar Enlaces[/B][/COLOR]" visible="eq(-14,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_with_crypto)"/>
+        <setting id="show_channels_list_temporaries" type="action" label="[COLOR cyan][B][B]Temporalmente[/B][/COLOR] inactivos" visible="eq(-15,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_temporaries)"/>
+        <setting id="show_channels_list_inactives" type="action" label="[COLOR coral][B]Inactivos[/B][/COLOR]" visible="eq(-16,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_channels_list_inactives)"/>
 
         <setting label="Canales con Cuenta:" type="lsep"/>
 
@@ -190,12 +189,8 @@
 
         <setting id="pcac_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_help_hdfull" type="action" label="Aviso [COLOR yellow]HdFull[/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_hdfull)"/>
-        <setting id="show_help_playdede" type="action" label="Aviso [COLOR yellow]PlayDede[/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede)"/>
 
-		<setting id="ch_playdede_media_center" type="action" label="Aviso [COLOR yellow]PlayDede[/COLOR] [COLOR violet][B]Ubicación[/B][/COLOR] Media Center" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_media_center)"/>
-		<setting id="ch_playdede_bloqueo" type="action" label="Aviso [COLOR yellow]PlayDede[/COLOR] [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_bloqueo)"/>
-
-        <setting id="show_help_resto2" type="action" label="Posible Aviso en Otros [COLOR darkorange][B]Canales[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
+        <setting id="show_help_resto2" type="action" label="Posible Aviso en Otros [COLOR darkorange][B]Canales[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_resto)"/>
 
         <setting label="Presentación Canales:" type="lsep"/>
 
@@ -241,6 +236,7 @@
         <setting id="channels_charges_movies" type="bool" label="Presentar Sin Notificar Todas las [COLOR deepskyblue][B]Películas[/B][/COLOR] en las listas especiales" default="true" visible="eq(-2,true)"/>
         <setting id="channels_seasons" type="bool" label="Notificar cuando [COLOR tan][B]No existan Temporadas ó tan solo haya Una[/B][/COLOR]" default="true" visible="eq(-3,true)"/>
         <setting id="channels_charges" type="bool" label="Presentar Sin Notificar Todos los [COLOR darkcyan][B]Episodios[/B][/COLOR] en cada Temporada" default="true" visible="eq(-4,true)"/>
+        <setting id="channels_especiales" type="bool" label="No Presentar la [COLOR tan][B]Temporada 0 [COLOR goldenrod](Especiales)[/B][/COLOR]" default="true" visible="eq(-5,true)"/>
     </category>
 
     <category label="Parental">
@@ -255,21 +251,26 @@
         <setting id="xxx_password" type="action" label="[COLOR yellow][B]Establecer[/B][/COLOR] PIN parental" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=adults_password)"/>
         <setting id="show_pin" type="action" label="[COLOR springgreen][B]Ver[/B][/COLOR] PIN Parental" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_pin_parental)"/>
         <setting id="xxx_password_del" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] PIN parental" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=adults_password_del)"/>
-		<setting id="adults_password" type="text" label="Clave pin parental" default="" option="hidden" enable="eq(-4,false)" visible="eq(-4,true)"/>
+		<setting id="adults_password" type="text" label="[COLOR white][B]Clave Pin Parental[/B][/COLOR]" default="" option="hidden" enable="eq(-4,false)" visible="eq(-4,true)"/>
 
         <setting label="Presentar Canales de Animes:" type="lsep"/>
 
         <setting id="cpan_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="channels_only_anime" type="action" label="Canales que pueden tener contenido de [COLOR springgreen][B]Animes[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_animes)"/>
-        <setting id="channels_exclusively_anime" type="action" label="Canales que tienen contenido [COLOR springgreen][B]Exclusivamente de Animes[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_animes)"/>
-        <setting id="descartar_anime" type="bool" label="[COLOR goldenrod][B]Descartar[/B][/COLOR] canales exclusivos de [COLOR springgreen][B]Animes[/B][/COLOR] en las listas de canales" default="false" visible="eq(-3,true)"/>
+        <setting id="animes_password" type="bool" label="[COLOR cyan][B]Solicitar[/B][/COLOR] PIN parental en los canales exclusivos de [COLOR springgreen][B]Animes[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
+        <setting id="channels_only_anime" type="action" label="Canales que Pueden tener contenido de [COLOR springgreen][B]Animes[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_animes)"/>
+        <setting id="channels_exclusively_anime" type="action" label="Canales que tienen contenido [COLOR springgreen][B]Exclusivamente de Animes[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_animes)"/>
+        <setting id="descartar_anime" type="bool" label="[COLOR goldenrod][B]Descartar[/B][/COLOR] canales exclusivos de [COLOR springgreen][B]Animes[/B][/COLOR] en las listas de canales" default="false" visible="eq(-4,true)"/>
 
-        <setting label="Presentar Canales de Adultos y Listas/Géneros para Adultos:" type="lsep"/>
+        <setting label="Presentar Canales de Adultos:" type="lsep"/>
 
         <setting id="cadu_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="channels_only_adults" type="action" label="Canales que pueden tener contenido para [COLOR orange][B]Adultos[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_adults)"/>
-        <setting id="channels_exclusively_adults" type="action" label="Canales que tienen contenido [COLOR orange][B]Exclusivamente para Adultos[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_adults)"/>
-        <setting id="descartar_xxx" type="bool" label="[COLOR goldenrod][B]Descartar[/B][/COLOR] canales exclusivos de [COLOR orange][B]Adultos y Listas/Géneros[/B][/COLOR] con ese contenido" default="false" visible="eq(-3,true)"/>
+        <setting id="channels_exclusively_adults" type="action" label="Canales que tienen contenido [COLOR orange][B]Exclusivamente para Adultos[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_exclusively_adults)"/>
+
+        <setting label="Presentar Canales con Listas/Géneros para Adultos:" type="lsep"/>
+
+        <setting id="cadx_opc" type="bool" label="Opciones" default="false"/>
+        <setting id="channels_only_adults" type="action" label="Canales que Pueden tener contenido para [COLOR orange][B]Adultos[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=channels_only_adults)"/>
+        <setting id="descartar_xxx" type="bool" label="[COLOR goldenrod][B]Descartar[/B][/COLOR] canales con [COLOR orange][B]Listas/Géneros para Adultos[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
     </category>
 
     <category label="Dominios">
@@ -294,7 +295,6 @@
         <setting id="opc_cinecalidadla" type="action" label="[COLOR gold]CineCalidadLa[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cinecalidadla)"/>
         <setting id="opc_cinecalidadlol" type="action" label="[COLOR gold]CineCalidadLol[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cinecalidadlol)"/>
         <setting id="opc_cuevana2" type="action" label="[COLOR gold]Cuevana2[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana2)"/>
-        <setting id="opc_cuevana2esp" type="action" label="[COLOR gold]Cuevana2Esp[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana2esp)"/>
         <setting id="opc_cuevana3pro" type="action" label="[COLOR gold]Cuevana3Pro[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_cuevana3pro)"/>
 
         <setting id="opc_divxtotal" type="action" label="[COLOR gold]DixTotal[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_divxtotal)"/>
@@ -309,12 +309,10 @@
         <setting id="opc_elifilms" type="action" label="[COLOR gold]EliFilms[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elifilms)"/>
         <setting id="opc_elitetorrent" type="action" label="[COLOR gold]EliteTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elitetorrent)"/>
         <setting id="opc_elitetorrentnz" type="action" label="[COLOR gold]EliteTorrentNz[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_elitetorrentnz)"/>
-        <setting id="opc_ennovelas_tv" type="action" label="[COLOR gold]EnNovelasTv[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_ennovelastv)"/>
+        <setting id="opc_ennovelastv" type="action" label="[COLOR gold]EnNovelasTv[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_ennovelastv)"/>
         <setting id="opc_entrepeliculasyseries" type="action" label="[COLOR gold]EntrePeliculasySeries[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_entrepeliculasyseries)"/>
 
         <setting id="opc_gnula" type="action" label="[COLOR gold]Gnula[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_gnula)"/>
-        <setting id="opc_gnula24" type="action" label="[COLOR gold]Gnula24[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_gnula24)"/>
-        <setting id="opc_gnula24h" type="action" label="[COLOR gold]Gnula24H[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_gnula24h)"/>
         <setting id="opc_grantorrent" type="action" label="[COLOR gold]GranTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_grantorrent)"/>
 
 		<setting id="ac_hdfull" type="bool" label="[COLOR gold][B]HdFull[/B][/COLOR]" default="false"/>
@@ -324,38 +322,22 @@
         <setting id="last_domain_hdfull" type="action" label=" [COLOR goldenrod][B]Asociar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B] dominioshdfull.com[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_hdfull)"/>
 		<setting id="ch_hdfull_dominio" type="action" label=" [COLOR darkorange][B]Informar ó Modificar[/B][/COLOR] el dominio" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_hdfull)"/>
 
-        <setting id="opc_henaojara" type="action" label="[COLOR gold]HenaOjara[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_henaojara)"/>
         <setting id="opc_homecine" type="action" label="[COLOR gold]HomeCine[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_homecine)"/>
 
         <setting id="opc_mejortorrentapp" type="action" label="[COLOR gold]MejorTorrentApp[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_mejortorrentapp)"/>
-        <setting id="opc_mejortorrentnz" type="action" label="[COLOR gold]MejorTorrentNz[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_mejortorrentnz)"/>
         <setting id="opc_mitorrent" type="action" label="[COLOR gold]MiTorrent[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_mitorrent)"/>
 
         <setting id="opc_peliculaspro" type="action" label="[COLOR gold]PeliculasPro[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_peliculaspro)"/>
         <setting id="opc_pelisforte" type="action" label="[COLOR gold]PelisForte[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisforte)"/>
         <setting id="opc_pelismart" type="action" label="[COLOR gold]PelisMart[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelismart)"/>
         <setting id="opc_pelipanda" type="action" label="[COLOR gold]PelisPanda[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelispanda)"/>
-        <setting id="opc_pelispediaws" type="action" label="[COLOR gold]PelisPediaWs[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelispediaws)"/>
-        <setting id="opc_pelisplushd" type="action" label="[COLOR gold]PelisPlusHd[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushd)"/>
         <setting id="opc_pelisplushdlat" type="action" label="[COLOR gold]PelisPlusHdLat[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushdlat)"/>
         <setting id="opc_pelisplushdnz" type="action" label="[COLOR gold]PelisPlusHdNz[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushdnz)"/>
 
-        <setting id="opc_pgratishd" type="action" label="[COLOR gold]PGratisHd[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pgratishd)"/>
-
-		<setting id="ac_playdede" type="bool" label="[COLOR gold][B]PlayDede[/B][/COLOR]" default="false"/>
-        <setting id="show_help1_playdede" type="action" label=" Aviso" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede)"/>
-		<setting id="ch_playdede_media_center1" type="action" label=" Aviso [COLOR violet][B]Ubicación[/B][/COLOR] Media Center" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_media_center)"/>
-		<setting id="ch_playdede_bloqueo1" type="action" label=" Aviso [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_bloqueo)"/>
-		<setting id="ch_playdede_test1" type="action" label=" [COLOR yellow][B]Test[/B][/COLOR] Canal" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_playdede)"/>
-        <setting id="last_domain_playdede" type="action" label=" [COLOR goldenrod][B]Comprobar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B]privacidad.me/@playdede[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_playdede)"/>
-		<setting id="ch_playdede_dominio" type="action" label=" [COLOR darkorange][B]Informar ó Modificar[/B][/COLOR] el dominio" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=manto_domain_playdede)"/>
-
         <setting id="opc_poseidonhd2" type="action" label="[COLOR gold]PoseidonHd2[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_poseidonhd2)"/>
 
-        <setting id="opc_series24" type="action" label="[COLOR gold]Series24[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_series24)"/>
         <setting id="opc_serieskao" type="action" label="[COLOR gold]SeriesKao[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_serieskao)"/>
         <setting id="opc_seriespapayato" type="action" label="[COLOR gold]SeriesPapayaTo[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_seriespapayato)"/>
-        <setting id="opc_seriesplus" type="action" label="[COLOR gold]SeriesPlus[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_seriesplus)"/>
         <setting id="opc_srnovelas" type="action" label="[COLOR gold]SrNovelas[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_srnovelas)"/>
         <setting id="opc_subtorrents" type="action" label="[COLOR gold]SubTorrents[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_subtorrents)"/>
 
@@ -381,21 +363,8 @@
         <setting id="last_domain_hdfull1" type="action" label=" [COLOR goldenrod][B]Asociar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B] dominioshdfull.com[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_hdfull)"/>
         <setting id="show_credenciales_hdfull" type="action" label=" Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_hdfull)"/>
         <setting id="del_credenciales_hdfull" type="action" label=" [COLOR red][B]Eliminar[/B][/COLOR] Credenciales" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=del_datos_hdfull)"/>
-		<setting id="channel_hdfull_hdfull_username" type="text" label=" [COLOR cyan][B]HdFull Credencial Usuario[/B][/COLOR]" enable="eq(-8,false)" visible="eq(-8,true)" default=""/>
-		<setting id="channel_hdfull_hdfull_password" type="text" label=" [COLOR cyan][B]HdFull Credencial Contraseña[/B][/COLOR]" option="hidden" enable="eq(-9,false)" visible="eq(-9,true)" default=""/>
-
-        <setting label="Cuenta Canal PlayDede:" type="lsep"/>
-
-		<setting id="ac2_playdede" type="bool" label="Acciones" default="false"/>
-        <setting id="show_help2_playdede" type="action" label=" Aviso" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede)"/>
-		<setting id="ch_playdede_media_center2" type="action" label=" Aviso [COLOR violet][B]Ubicación[/B][/COLOR] Media Center" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_media_center)"/>
-		<setting id="ch_playdede_bloqueo2" type="action" label=" Aviso [COLOR yellowgreen][B]Bloqueo[/B][/COLOR] Operadoras" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_playdede_bloqueo)"/>
-		<setting id="ch_playdede_test2" type="action" label=" [COLOR yellow][B]Test[/B][/COLOR] Canal" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=test_domain_playdede)"/>
-        <setting id="last_domain2_playdede" type="action" label=" [COLOR goldenrod][B]Asociar[/B][/COLOR] el Último Dominio Vigente [COLOR dodgerblue][B] privacidad.me/@playdede[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=last_domain_playdede)"/>
-        <setting id="show_credenciales_playdede" type="action" label=" Test [COLOR cyan][B]Login[/B][/COLOR] Credenciales" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuctext&action=_credenciales_playdede)"/>
-        <setting id="del_credenciales_playdede" type="action" label=" [COLOR red][B]Eliminar[/B][/COLOR] Credenciales" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=domains&action=del_datos_playdede)"/>
-		<setting id="channel_playdede_playdede_username" type="text" label=" [COLOR cyan][B]PlayDede Credencial Usuario[/B][/COLOR]" enable="eq(-8,false)" visible="eq(-8,true)" default=""/>
-		<setting id="channel_playdede_playdede_password" type="text" label=" [COLOR cyan][B]PlayDede Credencial Contraseña[/B][/COLOR]" option="hidden" enable="eq(-9,false)" visible="eq(-9,true)" default=""/>
+		<setting id="channel_hdfull_hdfull_username" type="text" label=" [COLOR white][B]HdFull Credencial Usuario[/B][/COLOR]" enable="eq(-8,false)" visible="eq(-8,true)" default=""/>
+		<setting id="channel_hdfull_hdfull_password" type="text" label=" [COLOR white][B]HdFull Credencial Contraseña[/B][/COLOR]" option="hidden" enable="eq(-9,false)" visible="eq(-9,true)" default=""/>
     </category>
 
     <category label="Play">
@@ -404,7 +373,7 @@
         <setting id="play_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_play_parameters1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_play_parameters)"/>
         <setting id="show_help_audios1" type="action" label="Información [COLOR yellow][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_audios)"/>
-        <setting id="show_install_players" type="action" label="Add-Ons y Repositorios Externos Players [COLOR limegreen][B]Instalados[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_help_players)"/>
+        <setting id="show_install_players" type="action" label="Add-Ons y Repositorios Externos [COLOR fuchsia][B]Players [COLOR limegreen]Instalados[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_help_players)"/>
         <setting id="show_servers_list" type="action" label="Servidores que están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/>
         <setting id="show_server_report1" type="action" label="Reportar [COLOR gold][B]Reproducción de lista abortada[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_server_report)"/>
         <setting id="show_not_play1" type="action" label="[COLOR yellowgreen][B]Qué No está Contemplado en Balandro[/B][/COLOR] (Play Servidores)" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_play)"/>
@@ -428,8 +397,11 @@
         <setting id="show_help_gamovideo" type="action" label="Aviso [COLOR darkorange][B]Gamovideo[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_gamovideo)"/>
         <setting id="show_help_mega" type="action" label="Aviso [COLOR darkorange][B]Mega[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_mega)"/>
         <setting id="show_help_uptobox" type="action" label="Aviso [COLOR darkorange][B]Uptobox[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_uptobox)"/>
-        <setting id="show_help_vias" type="action" label="Aviso [COLOR darkorange][B]Youtube[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_youtube)"/>
-        <setting id="show_help_vias2" type="action" label="Aviso [COLOR darkorange][B]ResolveUrl[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_resolve)"/>
+        <setting id="show_help_vidmoly" type="action" label="Aviso [COLOR darkorange][B]Vidmoly[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vidmoly)"/>
+        <setting id="show_help_voe" type="action" label="Aviso [COLOR darkorange][B]Voe[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_voe)"/>
+        <setting id="show_help_waaw" type="action" label="Aviso [COLOR darkorange][B]Waaw[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_waaw)"/>
+        <setting id="show_help_vias2" type="action" label="Aviso [COLOR darkorange][B]ResolveUrl[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_resolve)"/>
+        <setting id="show_help_vias" type="action" label="Aviso [COLOR darkorange][B]Youtube[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_vias_youtube)"/>
 
         <setting label="Servidores con Vías Alternativas y Adicionales:" type="lsep"/>
 
@@ -445,7 +417,7 @@
         <setting id="autoplay_max_links" type="labelenum" label="Número máximo de enlaces para intentar el auto play" values="3|5|10|15|20|25|30" default="10" visible="eq(-2,true)"/>
         <setting id="autoplay_one_link" type="bool" label="Si solo hay [COLOR gold][B]Un enlace[/B][/COLOR] para reproducir efectuar Auto play" default="true" visible="eq(-3,true)"/>
         <setting id="show_servers_list1" type="action" label="Servidores que están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/> 
-        <setting id="autoplay_channels_discarded" label="Canales [COLOR goldenrod][B]Sin Auto Play[/B][/COLOR] (Nombre de cada Canal separados por coma)" type="text" default="" visible="eq(-5,true)"/>
+        <setting id="autoplay_channels_discarded" label="Canales [COLOR goldenrod][B]Sin Auto Play[/B][/COLOR] (cada Canal separado por coma)" type="text" default="" visible="eq(-5,true)"/>
 
         <setting label="Ordenar y/ó Filtrar por Idioma:" type="lsep"/>
 
@@ -457,15 +429,15 @@
         <setting label="Ordenar por Calidad:" type="lsep"/>
 
         <setting id="pcal_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="servers_sort_quality" type="enum" label="En cada Idioma ordenar los enlaces según" values="Orden de la Web|Calidad Desc|Calidad Asc" default="0" visible="eq(-1,true)"/>
+        <setting id="servers_sort_quality" type="enum" label="En cada Idioma ordenar los enlaces por" values="Orden Web|Calidad Alta|Calidad Baja" default="0" visible="eq(-1,true)"/>
 
         <setting label="Filtrar Servidores:" type="lsep"/>
 
         <setting id="pfil_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_servers_list2" type="action" label="Servidores que están [COLOR darkorange][B]Disponibles[/B][/COLOR] (Activos)" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_servers_list)"/> 
-        <setting id="servers_preferred" label="Servidores [COLOR darkorange][B]Preferidos[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-2,true)"/>
-        <setting id="servers_unfavored" label="Servidores como [COLOR gold][B]Última opción[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-3,true)"/>
-        <setting id="servers_discarded" label="Servidores [COLOR cyan][B]Descartados[/B][/COLOR] (Nombre de cada Servidos separados por coma)" type="text" default="" visible="eq(-4,true)"/>
+        <setting id="servers_preferred" label="Servidores [COLOR darkorange][B]Preferidos[/B][/COLOR] (cada Servidor separado por coma)" type="text" default="" visible="eq(-2,true)"/>
+        <setting id="servers_unfavored" label="Servidores como [COLOR gold][B]Última opción[/B][/COLOR] (cada Servidor separado por coma)" type="text" default="" visible="eq(-3,true)"/>
+        <setting id="servers_discarded" label="Servidores [COLOR cyan][B]Descartados[/B][/COLOR] (cada Servidor separado por coma)" type="text" default="" visible="eq(-4,true)"/>
 
         <setting label="Notificaciones:" type="lsep"/>
 
@@ -475,7 +447,9 @@
         <setting label="Diálogos al Acceder:" type="lsep"/>
 
         <setting id="pesp_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="tracking_weberror_dialog" type="bool" label="Si la web da error, mostrar diálogo para [COLOR yellow][B]Búsquedas[/B][/COLOR] Alternativas" default="true" visible="eq(-1,true)"/>
+        <setting id="sin_enlaces_dialog" type="bool" label="[COLOR palegreen][B]Sin Enlaces Disponibles[/B][/COLOR], mostrar diálogo para [COLOR yellow][B]Buscar[/B][/COLOR] en los Canales" default="true" visible="eq(-1,true)"/>
+
+        <setting id="tracking_weberror_dialog" type="bool" label="[COLOR wheat][B]Preferidos[/B][/COLOR] si la [COLOR red][B]Web da Error[/B][/COLOR], mostrar diálogo para [COLOR yellow][B]Búsquedas[/B][/COLOR] Alternativas" default="true" visible="eq(-2,true)"/>
     </category>
 
     <category label="Proxies">
@@ -503,7 +477,7 @@
         <setting id="proxies_recommended" type="bool" label="Solo tener en cuenta en las Búsquedas los Proveedores [COLOR lime][B]Recomendados[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
         <setting id="proxies_search_extended" type="bool" label="Tratar Primero en las Búsquedas los Proveedores de la [COLOR aqua][B]Lista Ampliada[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
         <setting id="show_help_providers3" type="action" label="Qué Proveedores de Proxies están [COLOR goldenrod][B]Disponibles[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_providers)"/>
-        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (Nombre de cada Proveedor separados por coma)" type="text" default="" visible="eq(-5,true)"/>
+        <setting id="providers_preferred" label="Tratar [COLOR springgreen][B]Solo[/B][/COLOR] los Proveedores [COLOR wheat][B]Preferidos[/B][/COLOR] (cada Proveedor separado por coma)" type="text" default="" visible="eq(-5,true)"/>
 
         <setting label="Canales:" type="lsep"/>
 
@@ -528,13 +502,13 @@
 
         <setting id="proxp_vias" type="bool" label="Opciones" default="false"/>
         <setting id="proxies_vias" type="bool" label="Gestionar [COLOR yellow][B]Vías alternativas[/B][/COLOR] si no se obtubieron suficientes proxies a analizar" default="false" visible="eq(-1,true)"/>
-        <setting id="proxies_tplus" type="labelenum" label="Seleccionar código de la Via Alternativa (requiere activar la [COLOR yellow][B]Gestión[/B][/COLOR])" values="0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61" default="32" visible="eq(-2,true)"/>
-        <setting id="proxies_show_vias" type="action" label="Información Lista [COLOR aqua][B]Vías alternativas[/B][/COLOR] de Proveedores de proxies" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=proxies_show_vias)"/>
+        <setting id="proxies_tplus" type="labelenum" label="Seleccionar código de la Via Alternativa (requiere activar la [COLOR yellow][B]Gestión[/B][/COLOR])" values="0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30|31|32|33|34|35|36|37|38|39|40|41|42|43|44|45|46|47|48|49|50|51|52|53|54|55|56|57|58|59|60|61|62" default="32" visible="eq(-2,true)"/>
+        <setting id="proxies_show_vias" type="action" label="Lista [COLOR aqua][B]Vías alternativas[/B][/COLOR] de Proveedores de proxies" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=proxies_show_vias)"/>
 
         <setting label="Solicitudes al Procesar:" type="lsep"/>
 
         <setting id="prvxs_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="proxies_proces" type="bool" label="Confirmar [COLOR gold][B]Proceso[/B][/COLOR] si existen COLOR darkcyan][B]Proxies Memorizados[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
+        <setting id="proxies_proces" type="bool" label="Confirmar [COLOR gold][B]Proceso[/B][/COLOR] si existen [COLOR darkcyan][B]Proxies Memorizados[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
         <setting id="proxies_tipos" type="bool" label="Solicitar el tipo de Anonimidad" default="false" visible="eq(-2,true)"/>
         <setting id="proxies_paises" type="bool" label="Solicitar el País" default="false" visible="eq(-3,true)"/>
         <setting id="proxies_maximo" type="bool" label="No solicitar y forzar el Valor máximo de los proxies a analizar" default="true" visible="eq(-4,true)"/>
@@ -543,10 +517,13 @@
 
         <setting id="prvxb_opc" type="bool" label="Opciones" default="false"/>
         <setting id="proxies_list" type="bool" label="Habilitar la selección de su [COLOR yellow][B]Lista Personalizada[/B][/COLOR] (Lista-proxies.txt)" default="false" visible="eq(-1,true)"/>
-        <setting id="path_yourlist" type="text" label="[B]Ubicación por defecto [I].../addon_data.../plugin.video.balandro[/B][/I]" enable="false" visible="eq(-2,true)"/>
-        <setting id="proxies_yourlist" type="action" label="Información [COLOR goldenrod][B]Uso del fichero[/B][/COLOR] Personalizado" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_yourlist)"/>
-        <setting id="proxies_yourlist" type="action" label="[COLOR chocolate][B]Visualizar[/B][/COLOR] su fichero Personalizado" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_yourlist)"/>
-        <setting id="manto_yourlist" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero Personalizado" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_yourlist)"/>
+
+        <setting id="path_yourlist" type="text" label="[COLOR white][B]Ubicación por Defecto:[/B][/COLOR]" enable="false" visible="eq(-2,true)"/>
+        <setting id="path_yourlist1" type="text" label="Ruta: [COLOR white][B][I].../addon_data.../plugin.video.balandro[/I][/B][/COLOR]" enable="false" visible="eq(-3,true)"/>
+
+        <setting id="proxies_yourlist" type="action" label="Información [COLOR goldenrod][B]Uso del fichero[/B][/COLOR] Personalizado" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_yourlist)"/>
+        <setting id="proxies_yourlist" type="action" label="[COLOR chocolate][B]Visualizar[/B][/COLOR] su fichero Personalizado" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_yourlist)"/>
+        <setting id="manto_yourlist" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero Personalizado" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_yourlist)"/>
     </category>
 
     <category label="Torrents">
@@ -585,13 +562,16 @@
         <setting id="show_help_audios2" type="action" label="Información [COLOR yellowgreen][B]Idiomas[/COLOR] [COLOR mediumaquamarine](Audios en los Vídeos)[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_audios)"/>
         <setting id="show_help_tmbdblist" type="action" label="Información [COLOR violet][B]búsquedas y Listas en TMDB[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=tmdblists&action=show_help)"/>
         <setting id="show_help_filmaffinitylists" type="action" label="Información [COLOR violet][B]búsquedas y Listas en Filmaffinity[/B][/COLOR]" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=filmaffinitylists&action=show_help)"/>
+        <setting id="show_help_bucle" type="action" label="Las Búsquedas hacen [COLOR yellow][B]Bucle [COLOR yellowgreen](piden de nuevo el texto a buscar)[/COLOR][/B]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_bucle)"/>
 
         <setting label="Proceso General:" type="lsep"/>
 
         <setting id="bus_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="search_show_last" type="bool" label="Recordar Último Texto buscado" default="true" visible="eq(-1,true)"/>
-        <setting id="manto_textos" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los Textos Memorizados" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_textos)"/>
-        <setting id="search_limit_by_channel" type="labelenum" label="Cuantos [COLOR cyan][B]Resultados[/B][/COLOR] se previsualizarán por canal" values="1|2|3|4|5|6|7|8|9|10" default="2" visible="eq(-3,true)"/>
+        <setting id="search_youtube" type="bool" label="Añadir la opción de búsquedas en [COLOR darksalmon][B]YouTube[/B][/COLOR]" default="true" visible="eq(-1,true)"/>
+        <setting id="search_trailers" type="bool" label="Añadir la opción de búsquedas en [COLOR darkgoldenrod][B]Tráilers[/B][/COLOR]" default="false" visible="eq(-2,true)"/>
+        <setting id="search_show_last" type="bool" label="Recordar Último Texto buscado" default="true" visible="eq(-3,true)"/>
+        <setting id="manto_textos" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los Textos Memorizados" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_textos)"/>
+        <setting id="search_limit_by_channel" type="labelenum" label="Cuantos [COLOR cyan][B]Resultados[/B][/COLOR] se previsualizarán por canal" values="1|2|3|4|5|6|7|8|9|10" default="2" visible="eq(-5,true)"/>
 
         <setting label="Proceso Canales:" type="lsep"/>
 
@@ -733,6 +713,12 @@
         <setting id="tracking_viewmode_tvshows" type="enum" label="[COLOR hotpink][B]Series[/B][/COLOR]" values="No fijar|Lista|Cartel|Mays.|Muro de información|Lista amplia|Muro|Fanart" default="0" visible="eq(-2,true)"/>
         <setting id="tracking_viewmode_seasons" type="enum" label="[COLOR tan][B]Temporadas[/B][/COLOR]" values="No fijar|Lista|Cartel|Mays.|Muro de información|Lista amplia|Muro|Fanart" default="0" visible="eq(-3,true)"/>
         <setting id="tracking_viewmode_episodes" type="enum" label="[COLOR aqua][B]Episodios[/B][/COLOR]" values="No fijar|Lista|Cartel|Mays.|Muro de información|Lista amplia|Muro|Fanart" default="0" visible="eq(-4,true)"/>
+
+        <setting label="Diálogos al Acceder:" type="lsep"/>
+
+        <setting id="prsp_opc" type="bool" label="Opciones" default="false"/>
+        <setting id="tracking_weberror_dialog1" type="bool" label="[COLOR wheat][B]Preferidos[/B][/COLOR] si la [COLOR red][B]Web da Error[/B][/COLOR], mostrar diálogo para [COLOR yellow][B]Búsquedas[/B][/COLOR] Alternativas" default="true" visible="eq(-1,true)"/>
+
     </category>
 
     <category label="Descargas">
@@ -772,7 +758,7 @@
 
         <setting id="fix_opc" type="bool" label="Opciones" default="false"/>
         <setting id="show_last_fix1" type="action" label="Información [COLOR aqua][B]Último[/B][/COLOR] Fix" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_last_fix)"/>
-        <setting id="show_res_fix1" type="action" label="[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=resumen_fix)"/>
+        <setting id="show_res_fix1" type="action" label="[COLOR darkcyan][B]Resumen Fix[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=resumen_fix)"/>
         <setting id="addon_update_atstart" type="bool" label="Comprobar actualizaciones Fix al [COLOR yellow][B]Iniciar[/B][/COLOR] su Media Center" default="true" visible="eq(-3,true)"/>
         <setting id="addon_update_verbose" type="bool" label="Presentar Resumen de la Actualización Fix" default="false" visible="eq(-4,true)"/>
         <setting id="addon_update_domains" type="bool" label="Presentar los [COLOR cyan][B]Últimos Cambios Dominios[/B][/COLOR] al actualizar el Fix" default="false" visible="eq(-5,true)"/>
@@ -781,65 +767,70 @@
     </category>
 
     <category label="Visual">
+        <setting label="Información Visual:" type="lsep"/>
+
+        <setting id="info_vis" type="bool" label="Opciones" default="false"/>
+        <setting id="show_vis" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_vis)"/>
+
         <setting label="Colores para los Nombres de los Canales:" type="lsep"/>
 
         <setting id="nom_opc" type="bool" label="Opciones" default="false"/>
         <setting id="channels_list_prefe_color" type="labelenum" label="Color para los canales marcados como [COLOR gold][B]Preferidos[/B][/COLOR]"
-                 values="[COLOR gold]gold[/COLOR]|[COLOR mediumaquamarine]mediumaquamarine[/COLOR]|[COLOR coral]coral[/COLOR]|[COLOR chartreuse]chartreuse[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR tomato]tomato[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR lime]lime[/COLOR]|[COLOR aqua]aqua[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR yellowgreen]yellowgreen[/COLOR]|[COLOR whitesmoke]whitesmoke[/COLOR]|[COLOR turquoise]turquoise[/COLOR]"
+                 values="[COLOR gold]gold[/COLOR]|[COLOR mediumaquamarine]mediumaquamarine[/COLOR]|[COLOR coral]coral[/COLOR]|[COLOR chartreuse]chartreuse[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR tomato]tomato[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR lime]lime[/COLOR]|[COLOR aqua]aqua[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR yellowgreen]yellowgreen[/COLOR]|[COLOR whitesmoke]whitesmoke[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR gold]gold[/COLOR]" visible="eq(-1,true)"/>
 
         <setting id="channels_list_proxies_color" type="labelenum" label="Color para los canales con [COLOR red][B]Proxies[/B][/COLOR] Informados"
-                 values="[COLOR gold]gold[/COLOR]|[COLOR mediumaquamarine]mediumaquamarine[/COLOR]|[COLOR coral]coral[/COLOR]|[COLOR chartreuse]chartreuse[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR tomato]tomato[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR lime]lime[/COLOR]|[COLOR aqua]aqua[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR yellowgreen]yellowgreen[/COLOR]|[COLOR whitesmoke]whitesmoke[/COLOR]|[COLOR turquoise]turquoise[/COLOR]"
+                 values="[COLOR gold]gold[/COLOR]|[COLOR mediumaquamarine]mediumaquamarine[/COLOR]|[COLOR coral]coral[/COLOR]|[COLOR chartreuse]chartreuse[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR tomato]tomato[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR lime]lime[/COLOR]|[COLOR aqua]aqua[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR yellowgreen]yellowgreen[/COLOR]|[COLOR whitesmoke]whitesmoke[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR red]red[/COLOR]" visible="eq(-2,true)"/>
 
         <setting id="channels_list_inactive_color" type="labelenum" label="Color para los canales [COLOR gray][B]Desactivados[/B][/COLOR]"
-                 values="[COLOR gold]gold[/COLOR]|[COLOR mediumaquamarine]mediumaquamarine[/COLOR]|[COLOR coral]coral[/COLOR]|[COLOR chartreuse]chartreuse[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR tomato]tomato[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR lime]lime[/COLOR]|[COLOR aqua]aqua[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR yellowgreen]yellowgreen[/COLOR]|[COLOR whitesmoke]whitesmoke[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR gray]gray[/COLOR]"
+                 values="[COLOR gold]gold[/COLOR]|[COLOR mediumaquamarine]mediumaquamarine[/COLOR]|[COLOR coral]coral[/COLOR]|[COLOR chartreuse]chartreuse[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR tomato]tomato[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR lime]lime[/COLOR]|[COLOR aqua]aqua[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR yellowgreen]yellowgreen[/COLOR]|[COLOR whitesmoke]whitesmoke[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR gray]gray[/COLOR]" visible="eq(-3,true)"/>
 
         <setting label="Colores para las Notificaciones:" type="lsep"/>
 
         <setting id="not_opc" type="bool" label="Opciones" default="false"/>
         <setting id="notification_alert_color" type="labelenum" label="Color para [COLOR red][B]Alertas[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR red]red[/COLOR]" visible="eq(-1,true)"/>
 
         <setting id="notification_infor_color" type="labelenum" label="Color para [COLOR pink][B]Informaciones[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR pink]pink[/COLOR]" visible="eq(-2,true)"/>
 
         <setting id="notification_adver_color" type="labelenum" label="Color para [COLOR violet][B]Advertencias[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR violet]violet[/COLOR]" visible="eq(-3,true)"/>
 
         <setting id="notification_avis_color" type="labelenum" label="Color para [COLOR yellow][B]Avisos[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR yellow]yellow[/COLOR]" visible="eq(-4,true)"/>
 
         <setting id="notification_exec_color" type="labelenum" label="Color para el resultado de [COLOR cyan][B]Ejecuciones[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR plum]plum[/COLOR]|[COLOR greenyellow]greenyellow[/COLOR]|[COLOR tan]tan[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR darksalmon]darksalmon[/COLOR]|[COLOR darkcyan]darkcyan[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR cyan]cyan[/COLOR]" visible="eq(-5,true)"/>
 
         <setting label="Colores para los Menús Contextuales:" type="lsep"/>
 
         <setting id="ctex_opc" type="bool" label="Opciones" default="false"/>
         <setting id="context_tracking_color" type="labelenum" label="Color para Guardar Enlaces en [COLOR wheat][B]Preferidos[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR blue]blue[/COLOR]" visible="eq(-1,true)"/>
 
         <setting id="context_search_exact_color" type="labelenum" label="Color para Buscar [COLOR gold][B]Referencia Exacta[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR gold]gold[/COLOR]" visible="eq(-2,true)"/>
 
         <setting id="context_search_similar_color" type="labelenum" label="Color para Buscar [COLOR yellow][B]Referencia Parecida[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR yellow]yellow[/COLOR]" visible="eq(-3,true)"/>
 
         <setting id="context_download_color" type="labelenum" label="Color para [COLOR seagreen][B]Descargar Vídeo[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR orange]orange[/COLOR]" visible="eq(-4,true)"/>
 
-        <setting id="context_trailer_color" type="labelenum" label="Color para Buscar el [COLOR darkgoldenrod][B]Tráiler[/B][/COLOR]"
-                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]"
+        <setting id="context_trailer_color" type="labelenum" label="Color para Buscar [COLOR darkgoldenrod][B]Tráiler[/B][/COLOR]"
+                 values="[COLOR blue]blue[/COLOR]|[COLOR olivedrab]olivedrab[/COLOR]|[COLOR chocolate]chocolate[/COLOR]|[COLOR moccasin]moccasin[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR pink]pink[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR red]red[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR green]green[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR violet]violet[/COLOR]|[COLOR teal]teal[/COLOR]|[COLOR dodgerblue]dodgerblue[/COLOR]|[COLOR powderblue]powderblue[/COLOR]|[COLOR khaki]khaki[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR pink]pink[/COLOR]" visible="eq(-5,true)"/>
 
         <setting label="Colores para los Títulos de Películas/Series en las listas de canales:" type="lsep"/>
@@ -849,23 +840,23 @@
         <setting id="list_info_order" type="enum" label="Preferencias para Mostrar los [COLOR red][B]Idiomas[/B][/COLOR] y/ó [COLOR limegreen][B]Calidades[/B][/COLOR]" values="Ninguno|Idiomas|Calidades|Idiomas y calidades|Calidades e idiomas" default="3" visible="eq(-2,true)"/>
 
         <setting id="list_movie_color" type="labelenum" label="Color para [COLOR deepskyblue][B]Películas[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR white]white[/COLOR]" visible="eq(-3,true)"/>
 
         <setting id="list_tvshow_color" type="labelenum" label="Color para [COLOR hotpink][B]Series[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR white]white[/COLOR]" visible="eq(-4,true)"/>
 
         <setting id="list_year_color" type="labelenum" label="Color para el [COLOR gray][B]Año[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR gray]gray[/COLOR]" visible="eq(-5,true)"/>
 
         <setting id="list_languages_color" type="labelenum" label="Color para los [COLOR red][B]Idiomas[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR red]red[/COLOR]" visible="eq(-6,true)"/>
 
         <setting id="list_qualities_color" type="labelenum" label="Color para las [COLOR limegreen][B]Calidades[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR sienna]sienna[/COLOR]|[COLOR indianred]indianred[/COLOR]|[COLOR bisque]bisque[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR gray]gray[/COLOR]|[COLOR springgreen]springgreen[/COLOR]|[COLOR steelblue]steelblue[/COLOR]|[COLOR slateblue]slateblue[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR limegreen]limegreen[/COLOR]" visible="eq(-7,true)"/>
 
         <setting label="Colores para las Listas de Servidores:" type="lsep"/>
@@ -874,27 +865,32 @@
         <setting id="colorear_enlaces_play" type="bool" label="Asignar color en los enlaces a servidores" default="true" visible="eq(-1,true)"/>
 
         <setting id="play_server_color" type="labelenum" label="Color para el [COLOR gold][B]Servidor[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR gold]gold[/COLOR]" visible="eq(-2,true)"/>
 
         <setting id="play_quality_color" type="labelenum" label="Color para la [COLOR limegreen][B]Calidad[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR limegreen]limegreen[/COLOR]" visible="eq(-3,true)"/>
 
         <setting id="play_language_color" type="labelenum" label="Color para el [COLOR red][B]Idioma[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR red]red[/COLOR]" visible="eq(-4,true)"/>
 
         <setting id="play_age_color" type="labelenum" label="Color para la [COLOR deepskyblue][B]Antiguedad y/ó fecha[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR deepskyblue]deepskyblue[/COLOR]" visible="eq(-5,true)"/>
 
         <setting id="play_other_color" type="labelenum" label="Color para [COLOR white][B]Otros datos[/B][/COLOR]"
-                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]"
+                 values="[COLOR white]white[/COLOR]|[COLOR fuchsia]fuchsia[/COLOR]|[COLOR seagreen]seagreen[/COLOR]|[COLOR cyan]cyan[/COLOR]|[COLOR deepskyblue]deepskyblue[/COLOR]|[COLOR firebrick]firebrick[/COLOR]|[COLOR gold]gold[/COLOR]|[COLOR goldenrod]goldenrod[/COLOR]|[COLOR hotpink]hotpink[/COLOR]|[COLOR limegreen]limegreen[/COLOR]|[COLOR orange]orange[/COLOR]|[COLOR orchid]orchid[/COLOR]|[COLOR red]red[/COLOR]|[COLOR salmon]salmon[/COLOR]|[COLOR yellow]yellow[/COLOR]|[COLOR crimson]crimson[/COLOR]|[COLOR darkorange]darkorange[/COLOR]|[COLOR turquoise]turquoise[/COLOR]|[COLOR aquamarine]aquamarine[/COLOR]|[COLOR magenta]magenta[/COLOR]|[COLOR thistle]thistle[/COLOR]|[COLOR paleturquoise]paleturquoise[/COLOR]|[COLOR darkviolet]darkviolet[/COLOR]|[COLOR darkgray]darkgray[/COLOR]|[COLOR darkred]darkred[/COLOR]|[COLOR purple]purple[/COLOR]|[COLOR palegoldenrod]palegoldenrod[/COLOR]|[COLOR palegreen]palegreen[/COLOR]|[COLOR palevioletred]palevioletred[/COLOR]"
                  default="[COLOR white]white[/COLOR]" visible="eq(-6,true)"/>
     </category>
 
     <category label="TMDB">
+        <setting label="Información Tmdb:" type="lsep"/>
+
+        <setting id="info_tmdb" type="bool" label="Opciones" default="false"/>
+        <setting id="show_tmdb" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_tmdb)"/>
+
         <setting label="Mantenimiento Caché de Tmdb:" type="lsep"/>
 
         <setting id="tmdbm_opc" type="bool" label="Opciones" default="false"/>
@@ -905,15 +901,21 @@
 
         <setting id="tmdbm_uso" type="bool" label="Opciones" default="false"/>
         <setting id="tmdb_cache" type="bool" label="Usar la Caché TMDB (Mejora las búsquedas Recurrentes)" default="true" visible="eq(-1,true)"/>
-        <setting id="tmdb_cache_expire" type="enum" label="Cuando Renovar la Caché de TMDB" values="cada 1 día|cada 7 días|cada 15 días|cada 30 días|No" default="4" visible="eq(-2,true)"/>
+        <setting id="tmdb_cache_expire" type="enum" label="Cuando Renovar la Caché de TMDB" values="cada día|cada 7 días|cada 15 días|cada 30 días|Nunca" default="4" visible="eq(-2,true)"/>
 
         <setting label="Obtención Información Películas/Series en TheMovieDB:" type="lsep"/>
 
         <setting id="tmdb_opc" type="bool" label="Opciones" default="false"/>
+        <setting id="tmdb_threads" type="labelenum" label="Número de Búsquedas Simultáneas (puede causar Inestabilidad)" values="5|10|15|20|25|30" default="20" visible="eq(-1,true)"/>
+        <setting id="tmdb_plus_info" type="bool" label="Localizar información Extendida (Duración, Actores, etc.) Aumenta el tiempo de búsqueda" default="false" visible="eq(-2,true)"/>
+
+        <setting label="Proceso:" type="lsep"/>
+
+        <setting id="tmdb_pro" type="bool" label="Opciones" default="false"/>
         <setting id="tmdb_disabled" type="bool" label="[COLOR goldenrod][B]Desactivar[/B][/COLOR] Accesos en las Listas a TMDB" default="false" visible="eq(-1,true)"/>
-        <setting id="tmdb_langs" type="enum" label="[COLOR yellow][B]Idioma[/B][/COLOR] de búsqueda en TMDB" values="Español|Latino|Inglés|Italiano|Portugués|Francés|Alemán" default="0" visible="eq(-2,true)"/>
-        <setting id="tmdb_threads" type="labelenum" label="Número de Búsquedas Simultáneas (puede causar Inestabilidad)" values="5|10|15|20|25|30" default="20" visible="eq(-3,true)"/>
-        <setting id="tmdb_plus_info" type="bool" label="Localizar información Extendida (Duración, Actores, etc.) Aumenta el tiempo de búsqueda" default="false" visible="eq(-4,true)"/>
+        <setting id="sqlite_enabled" type="bool" label="[COLOR cyan][B]Activar[/B][/COLOR] Gestión Fichero [COLOR chocolate][B]Tmdb Sqlite[/B][/COLOR]" default="true" visible="eq(-2,true)"/>
+        <setting id="tmdb_langs" type="enum" label="[COLOR yellow][B]Idioma[/B][/COLOR] de búsqueda en TMDB" values=
+        "Español|Latino|Inglés|Italiano|Portugués|Francés|Aleman" default="0" visible="eq(-3,true)"/>
     </category>
 
     <category label="Sistema">
@@ -921,32 +923,34 @@
 
         <setting id="info_sis" type="bool" label="Opciones" default="false"/>
         <setting id="show_help_miscelanea1" type="action" label="[COLOR goldenrod][B]Miscelanéa[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_miscelanea)"/>
-        <setting id="show_latest_domains2" type="action" label="[COLOR yellow][B]Últimos Cambios Dominios[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_latest_domains)"/>
-        <setting id="show_sistema1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_sistema)"/>
-        <setting id="show_help_clean1" type="action" label="[COLOR olive][B]Limpiezas[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_clean)"/>
+        <setting id="show_help_clean1" type="action" label="[COLOR olive][B]Limpiezas[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_clean)"/>
+        <setting id="show_latest_domains2" type="action" label="[COLOR yellow][B]Últimos Cambios Dominios[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=show_latest_domains)"/>
+        <setting id="show_sistema1" type="action" label="Información sobre sus [COLOR aqua][B]Preferencias[/B][/COLOR] Actuales" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_sistema)"/>
         <setting id="show_help_addons1" type="action" label="[COLOR gold][B]Add-Ons[/B][/COLOR] (Gestión desde Balandro)" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=show_help_addons)"/>
         <setting id="show_submnu_all_addons" type="action" label="[COLOR limegreen][B]Add-Ons Instalados[/B][/COLOR]" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=submnu_all_addons)"/>
         <setting id="show_help_addons_datos1" type="action" label="[COLOR greenyellow][B]Add-Ons Instalados con Datos[/B][/COLOR]" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=submnu_resto_addons)"/>
+        <setting id="addons_comunes1" type="action" label="[COLOR palegreen][B]Add-Ons Especiales Comunes[/B][/COLOR]" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=addons_especiales)"/>
 
         <setting label="Mantenimiento Media Center:" type="lsep"/>
 
         <setting id="mc_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="check_repo" type="bool" label="[COLOR chocolate][B]Comprobar[/B][/COLOR] si 'Balandro Repo' existe en su Media Center (si se Desactiva, deberá Re-iniciar)" default="true" visible="eq(-1,true)"/>
-        <setting id="show_advs" type="action" label="[COLOR yellow][B]Visualizar[/B][/COLOR] su fichero [COLOR goldenrod][B]Advanced Settings[/B][/COLOR] de su Media Center" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_advs)"/>
-        <setting id="manto_advs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero [COLOR goldenrod][B]Advanced Settings[/B][/COLOR] de su Media Center" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_advs)"/>
-        <setting id="show_favs" type="action" label="[COLOR yellow][B]Visualizar[/B][/COLOR] su fichero [COLOR gold][B]Favourites Settings[/B][/COLOR] de su Media Center" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_favs)"/>
-        <setting id="manto_favs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero [COLOR gold][B]Favourites Settings[/B][/COLOR] de su Media Center" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_favs)"/>
-        <setting id="show_pcfs" type="action" label="[COLOR yellow][B]Visualizar[/B][/COLOR] su fichero [COLOR chocolate][B]PlayerCoreFactory Settings[/B][/COLOR] de su Media Center" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_pcfs)"/>
-        <setting id="manto_pcfs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero [COLOR chocolate][B]PlayerCoreFactory Settings[/B][/COLOR] de su Media Center" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_pcfs)"/>
-        <setting id="manto_caches" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los ficheros de la [COLOR pink][B]Caché[/B][/COLOR] de su Media Center" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_caches)"/>
-        <setting id="manto_thumbs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros de [COLOR tomato][B]Thumbnails[/B][/COLOR] de su Media Center" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_thumbs)"/>
-        <setting id="manto_addons_packages" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros de [COLOR yellow][B]Addons Packages[/B][/COLOR] de su Media Center" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_addons_packages)"/>
-        <setting id="manto_addons_temp" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros de [COLOR yellowgreen][B]Addons Temp[/B][/COLOR] de su Media Center" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_addons_temp)"/>
+        <setting id="show_help_clean2" type="action" label="[COLOR olive][B]Limpiezas[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_clean)"/>
+        <setting id="check_repo" type="bool" label="[COLOR chocolate][B]Comprobar[/B][/COLOR] existencia [COLOR aqua][B]Balandro Repo[/B][/COLOR] (si se Desactiva, deberá Re-iniciar)" default="true" visible="eq(-2,true)"/>
+        <setting id="show_advs" type="action" label="[COLOR yellow][B]Visualizar[/B][/COLOR] su fichero [COLOR goldenrod][B]Advanced Settings[/B][/COLOR] de su Media Center" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_advs)"/>
+        <setting id="manto_advs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero [COLOR goldenrod][B]Advanced Settings[/B][/COLOR] de su Media Center" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_advs)"/>
+        <setting id="show_favs" type="action" label="[COLOR yellow][B]Visualizar[/B][/COLOR] su fichero [COLOR gold][B]Favourites Settings[/B][/COLOR] de su Media Center" visible="eq(-5,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_favs)"/>
+        <setting id="manto_favs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero [COLOR gold][B]Favourites Settings[/B][/COLOR] de su Media Center" visible="eq(-6,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_favs)"/>
+        <setting id="show_pcfs" type="action" label="[COLOR yellow][B]Visualizar[/B][/COLOR] su fichero [COLOR chocolate][B]PlayerCoreFactory Settings[/B][/COLOR] de su Media Center" visible="eq(-7,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_pcfs)"/>
+        <setting id="manto_pcfs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero [COLOR chocolate][B]PlayerCoreFactory Settings[/B][/COLOR] de su Media Center" visible="eq(-8,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_pcfs)"/>
+        <setting id="manto_caches" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] los ficheros de la [COLOR pink][B]Caché[/B][/COLOR] de su Media Center" visible="eq(-9,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_caches)"/>
+        <setting id="manto_thumbs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros de [COLOR tomato][B]Thumbnails[/B][/COLOR] de su Media Center" visible="eq(-10,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_thumbs)"/>
+        <setting id="manto_addons_packages" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros de [COLOR yellow][B]Addons Packages[/B][/COLOR] de su Media Center" visible="eq(-11,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_addons_packages)"/>
+        <setting id="manto_addons_temp" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros de [COLOR yellowgreen][B]Addons Temp[/B][/COLOR] de su Media Center" visible="eq(-12,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_addons_temp)"/>
 
         <setting label="Mantenimiento Balandro:" type="lsep"/>
 
         <setting id="manto_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="manto_params" type="action" label="[COLOR goldenrod][B]Restablecer[/B][/COLOR] los 'Parámetros Internos' a sus Valores por Defecto" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_params)"/>
+        <setting id="manto_params" type="action" label="[COLOR goldenrod][B]Restablecer[/B][/COLOR] los [COLOR violet][B]Ajustes[/B][/COLOR] a sus Valores por Defecto" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_params)"/>
         <setting id="manto_temporales" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros [COLOR gold][B]Temporales[/B][/COLOR]" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_temporales)"/>
         <setting id="manto_logs" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] Todos los ficheros [COLOR darkcyan][B]Logs[/B][/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_logs)"/>
         <setting id="manto_cookies" type="action" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero de [COLOR yellowgreen][B]Cookies[/B][/COLOR]" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=manto_cookies)"/>
@@ -967,7 +971,7 @@
         <setting id="erase_cookies" type="bool" label="[COLOR red][B]Eliminar[/B][/COLOR] su fichero de [COLOR yellowgreen][B]Cookies[/B][/COLOR] al [COLOR goldenrod][B]Iniciar[/B][/COLOR] su Media Center" default="false" visible="eq(-1,true)"/>
         <setting id="ver_stable_chrome" type="bool" label="[COLOR darkorange][B]Obtener y Usar[/B][/COLOR] la versión más Reciente/Estable de Chrome/Chromium" default="true" visible="eq(-2,true)"/>
 
-        <setting id="notification_d_ok" type="bool" label="Confirmar con el Botón pulsar 'OK' en ciertas [COLOR violet][B]Notificaciones[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
+        <setting id="notification_d_ok" type="bool" label="Confirmar con el [COLOR goldenrod][B]Botón pulsar OK[/B][/COLOR] en ciertas [COLOR violet][B]Notificaciones[/B][/COLOR]" default="false" visible="eq(-3,true)"/>
         <setting id="notification_beep" type="bool" label="Emitir un [COLOR springgreen][B]Sonido[/B][/COLOR] al mostrar Avisos/Notificaciones" default="false" visible="eq(-4,true)"/>
 
         <setting label="Tiempos de Espera:" type="lsep"/>
@@ -996,13 +1000,16 @@
 
         <setting id="show_help_miscelanea2" type="action" label="[COLOR cyan][B]Miscelanéa[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_miscelanea)"/>
 
+        <setting id="show_help_clean3" type="action" label="[COLOR olive][B]Limpiezas[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_clean)"/>
+
         <setting label="Temas Generales:" type="lsep"/>
 
+        <setting id="show_msgfixed1" type="action" label="[COLOR chartreuse][B]Telegram Mensajes Fijados[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_msgfixed)"/>
         <setting id="show_not_contemplated1" type="action" label="[COLOR yellow][B]¿ Qué NO está contemplado/garantizado en Balandro ?[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_not_contemplated)"/>
         <setting id="show_help_faq1" type="action" label="[COLOR tomato][B]Preguntas Frecuentes[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_faq)"/>
         <setting id="show_help_tips" type="action" label="[COLOR goldenrod][B]Trucos y Consejos[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_tips)"/>
         <setting id="show_help_use1" type="action" label="[COLOR darkorange][B]Ejemplos de Uso[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_use)"/>
-        <setting id="show_help_settings" type="action" label="[COLOR chartreuse][B]Notas sobre algunos Parámetros de los Ajustes[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_settings)"/>
+        <setting id="show_help_settings" type="action" label="[COLOR limegreen][B]Notas sobre algunos Parámetros de los Ajustes[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_settings)"/>
 
         <setting id="show_help_centers" type="action" label="[COLOR violet][B]¿ Dónde obtener soporte para su Media Center ?[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_centers)"/>
     </category>
@@ -1040,35 +1047,34 @@
     <category label="Contacto">
         <setting id="show_help_miscelanea4" type="action" label="[COLOR cyan][B]Miscelanéa[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_miscelanea)"/>
 
-        <setting label="Formas de Contacto:" type="lsep"/>
-        <setting id="_foro1" type="text" label="[B]Foro [I]www.mimediacenter.info/foro/[/I]  Instalación, Tutoriales, Sugerencias, etc.[/B]" enable="false" visible="true"/>
-        <setting id="_ases1" type="text" label="[B]Telegram [I]t.me/balandro_asesor[/I]  Consultas, Dudas, etc.[/B]" enable="false" visible="true"/>
-        <setting id="_ases1_news" type="text" label="[B]Usuarios Telegram pueden Añadir Miembros[/B]" enable="false" visible="true"/>
+        <setting id="show_contacto1" type="action" label="[COLOR limegreen][B]Contacto[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_contacto)"/>
 
-        <setting label="Acceso Fuente:" type="lsep"/>
-        <setting id="_fuen1" type="text" label="[B]Fuente [I]repobal.github.io/base/[/I]  Repo, Add-On, Scripts, etc.[/B]" enable="false" visible="true"/>
+        <setting label="Balandro Fuente:" type="lsep"/>
+        <setting id="_fuen1" type="text" label="[COLOR white][B]Fuente: [I]https://repobal.github.io/base/[/I][/B][/COLOR]" enable="false"/>
+        <setting id="_fuen2" type="text" label="[COLOR white][B]Acceso: Repositorio, Add-On y Scripts[/B][/COLOR]" enable="false"/>
     </category>
 
     <category label="Team">
+        <setting id="show_help_miscelanea5" type="action" label="[COLOR moccasin][B]Miscelanéa[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_miscelanea)"/>
+
+        <setting id="show_contacto2" type="action" label="[COLOR limegreen][B]Contacto[/B][/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_contacto)"/>
+
+        <setting label="Activación:" type="lsep"/>
+
+        <setting id="developer_mode" type="bool" label="[COLOR cyan][B]Activar[/B][/COLOR] el Modo de ejecución [COLOR darkorange][B]Desarrollo[/B][/COLOR]" default="false"/>
+
         <setting label="Información Team:" type="lsep"/>
 
-        <setting id="team_opc" type="bool" label="Opciones" default="false"/>
-        <setting id="show_help_miscelanea5" type="action" label="[COLOR moccasin][B]Miscelanéa[/B][/COLOR]" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_miscelanea)"/>
-        <setting id="show_help_notice" type="action" label="[COLOR aqua][B]Comunicado[/B][/COLOR] Oficial de Balandro" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_notice)"/>
-        <setting id="developer_mode" type="bool" label="Activar el Modo de ejecución en [COLOR darkorange][B]Desarrollo[/B][/COLOR]" visible="eq(-3,true)" default="false"/>
-        <setting id="show_dev_notes" type="action" label="Notas para [COLOR goldenrod][B]Developers[/B][/COLOR] (Desarrolladores)" visible="eq(-4,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_dev_notes)"/>
+        <setting id="info_team" type="bool" label="Opciones" default="false"/>
 
-        <setting label="Fuente para Desarrollo:" type="lsep"/>
-        <setting id="_dfon" type="text" label="[B]Código Fuente Desarrollo [I]github.com/repobal/[/I][/B]" enable="false" visible="true"/>
+        <setting id="show_help_notice" type="action" label="[COLOR aqua][B]Comunicado[/B][/COLOR] Oficial de Balandro" visible="eq(-1,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_help_notice)"/>
+        <setting id="show_dev_notes" type="action" label="Notas para [COLOR goldenrod][B]Developers[/B][/COLOR] (Desarrolladores)" visible="eq(-2,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=helper&action=show_dev_notes)"/>
+        <setting id="copy_dev" type="action" label="[COLOR yellowgreen]Obtener Copia del Fihero de [COLOR gold][B]Notas[/B][/COLOR] para desarrolladores[/COLOR]" visible="eq(-3,true)" action="RunPlugin(plugin://plugin.video.balandro/?channel=submnuteam&action=copy_dev)"/>
 
-        <setting label="Balandro Team (Equipo de Desarrollo):" type="lsep"/>
-        <setting id="_team1" type="text" label="[B]Equipo Desarrollo Telegram [I]t.me/balandro_team[/I][/B]" enable="false" visible="true"/>
-        <setting id="_team2" type="text" label="[B]Incorporaciones Contactar para Unirse con Invitación[/B]" enable="false" visible="true"/>
+        <setting label="Balandro Fuente Desarrollo:" type="lsep"/>
+        <setting id="_dfon" type="text" label="[COLOR white][B]Fuente: [I]https://github.com/repobal/[/I][/B][/COLOR]" enable="false"/>
+        <setting id="_dfon0" type="text" label="[COLOR white][B]Acceso: Código Fuente Desarrollo[/B][/COLOR]" enable="false"/>
 
-        <setting label="Contactar para Unirse a Balandro Team:" type="lsep"/>
-        <setting id="_foro2" type="text" label="[B]Foro [I]www.mimediacenter.info/foro/[/I][/B]" enable="false" visible="true"/>
-        <setting id="_ases2" type="text" label="[B]Telegram [I]t.me/balandro_asesor[/I][/B]" enable="false" visible="true"/>
-        <setting id="_ases2_news" type="text" label="[B]Usuarios Telegram pueden Añadir Miembros[/B]" enable="false" visible="true"/>
     </category>
 
 </settings>

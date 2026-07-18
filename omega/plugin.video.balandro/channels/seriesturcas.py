@@ -7,13 +7,19 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://fhd.seriesturcastv.to/'
+host = 'https://tbg.seriesturcastv.to/'
 
 
 perpage = 30
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://fhd.seriesturcastv.to/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     if '/ano/' in url: raise_weberror = False
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
@@ -139,7 +145,6 @@ def list_all(item):
                 buscar_next = False
 
         if buscar_next:
-
             if "<ul class='pagination'>" in data:
                 next_page = scrapertools.find_single_match(data, "<ul class='pagination'>.*?<li class='active'>.*?</a>.*?href='(.*?)'")
 
@@ -154,8 +159,7 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('channels_seasons', default=True):
-        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
 
     item.page = 0
     item.contentType = 'season'
@@ -174,6 +178,9 @@ def episodios(item):
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
+
+    hay_proximo = False
+    if '>Próximo capitulo a estrenarse el' in data: hay_proximo = True
 
     if str(item.languages) == 'Esp' or str(item.languages) == 'Lat':
         if '<span class="statuse"> Subtitulado</span>' in data: item.languages = 'Vose'
@@ -229,6 +236,15 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
+    if hay_proximo:
+        next_cap = scrapertools.find_single_match(data, '>Próximo capitulo a estrenarse el(.*?)<span').strip()
+
+        if next_cap:
+            next_cap = 'Próx. Epis.: ' + next_cap
+            itemlist.append(item.clone( action='', title = next_cap, thumbnail = item.thumbnail, text_color='cyan' ))
+
+            item.perpage = (item.perpage + 1)
+
     for match in matches[item.page * item.perpage:]:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
@@ -275,28 +291,36 @@ def findvideos(item):
 
     ses = 0
 
-    matches = scrapertools.find_multiple_matches(data, '<div id="tab.*?src="(.*?)"')
+    bloque = scrapertools.find_single_match(data, '<div id="player">(.*?)</script></div>')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<div id="tab.*?src="(.*?)"')
+
+    if not matches:
+        bloque = scrapertools.find_single_match(data, 'Descargar<(.*?)</ul>')
+
+        matches = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 
     for url in matches:
+        if not url: continue
+
+        elif url == '#': continue
+
         ses += 1
 
         if 'player1isempty' in url: continue
 
         elif '/fembuki.' in url:continue
-        elif '/esprinahy.' in url: continue
         elif '/argtesa.' in url: continue
-        elif '/aporodiko.' in url: continue
 
         url = url.replace('/netusia.xyz/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         other = ''
 
         if servidor == 'various': other = servertools.corregir_other(url)
+
+        elif '/aporodiko.' in url: other = 'Turboviplay'
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
                               language = item.languages, other = other ))
@@ -316,25 +340,31 @@ def play(item):
     url = item.url
 
     if '/aporodiko.com/' in url:
-        data = do_downloadpage(url)
-
-        url = scrapertools.find_single_match(data, 'data-hash="(.*?)"')
-
-    if '.turboviplay.' in url: url = ''
+        url = url.replace('/aporodiko.com/', '/turboviplay.com/')
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'capitulos/'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

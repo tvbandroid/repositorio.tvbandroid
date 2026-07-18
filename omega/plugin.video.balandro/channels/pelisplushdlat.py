@@ -7,15 +7,17 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://ww3.pelisplushd.to/'
+host = 'https://www.pelisplushd.la/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://pelisplushd.lat/', 'https://www1.pelisplushd.lat/', 'https://www2.pelisplushd.lat/',
-             'https://www.pelisplushd.la/', 'https://ww1.pelisplushd.to/', 'https://www9.pelisplushd.to/',
-             'https://www11.pelisplushd.to/', 'https://www15.pelisplushd.to/', 'https://www16.pelisplushd.to/',
-             'https://www17.pelisplushd.to/', 'https://www18.pelisplushd.to/', 'https://www19.pelisplushd.to/',
-             'https://www20.pelisplushd.to/', 'https://www23.pelisplushd.to/', 'https://www24.pelisplushd.to/']
+             'https://ww1.pelisplushd.to/', 'https://www9.pelisplushd.to/', 'https://www11.pelisplushd.to/',
+             'https://www15.pelisplushd.to/', 'https://www16.pelisplushd.to/', 'https://www17.pelisplushd.to/',
+             'https://www18.pelisplushd.to/', 'https://www19.pelisplushd.to/', 'https://www20.pelisplushd.to/',
+             'https://www23.pelisplushd.to/', 'https://www24.pelisplushd.to/', 'https://ww3.pelisplushd.to/',
+             'https://ww4.pelisplushd.to/', 'https://ww5.pelisplushd.to/', 'https://www25.pelisplushd.to/',
+             'https://www26.pelisplushd.to/']
              
 
 
@@ -345,6 +347,9 @@ def temporadas(item):
     for tempo in temporadas:
         tempo = tempo.replace('Temporada', '').replace('TEMPORADA', '').strip()
 
+        if tempo == '0':
+            if config.get_setting('channels_especiales', default=True): continue
+
         if tempo == '0': hay_season0 = True
 
         nro_tempo = tempo
@@ -357,12 +362,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.pills = ''
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.pills = ''
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         pills = tempo
         if hay_season0: pills = int(tempo) + 1
@@ -462,6 +467,10 @@ def episodios(item):
 
         titulo = str(item.contentSeason) + 'x' + str(episode) + ' ' + title.replace(str(item.contentSeason) + 'x' + str(episode), '')
 
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
         if num_matches > 50:
             tab_epis.append([ord_epis, url, titulo, episode])
         else:
@@ -516,9 +525,6 @@ def findvideos(item):
         if url.startswith('/'): url = host[:-1] + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         link_other = ''
 
@@ -545,9 +551,6 @@ def findvideos(item):
         if url.startswith('/'): url = host[:-1] + url
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         if lng == 'Subtitulado': lang = 'Vose'
         elif lng == 'Español': lang = 'Esp'
@@ -619,18 +622,18 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if not new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
-            if not servidor == 'directo':
-                itemlist.append(item.clone( url = url, server = servidor ))
+            itemlist.append(item.clone( url = url, server = servidor ))
 
-                return itemlist
+            return itemlist
 
         urls = scrapertools.find_multiple_matches(data, "sources:\[{file:.*?\'(.*?)\',label")
 
@@ -640,15 +643,14 @@ def play(item):
                 elif '/plustream.' in url: continue
 
                 servidor = servertools.get_server_from_url(url)
-                servidor = servertools.corregir_servidor(servidor)
 
                 url = servertools.normalize_url(servidor, url)
 
                 if servidor == 'directo':
                     new_server = servertools.corregir_other(url).lower()
-                    if not new_server.startswith("http"): servidor = new_server
-
-                if servidor == 'directo': continue
+                    if new_server.startswith("http"):
+                        if not config.get_setting('developer_mode', default=False): return itemlist
+                    servidor = new_server
 
                 itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -658,13 +660,14 @@ def play(item):
             return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone( url = url, server = servidor ))
 
@@ -735,6 +738,24 @@ def list_search(item):
                     itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'list_search', text_color='coral' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'peliculas/estrenos?page=1'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host + 'series/estrenos?page=1'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

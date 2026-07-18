@@ -220,6 +220,15 @@ def get_playback_intros(item_id):
 
 @timer
 def play_file(play_info):
+    """
+    If a jellycon item is already playing, report it's playback has stopped
+    to the server to preserve accurate tracking
+    """
+    if xbmc.Player().isPlaying():
+        play_data = get_playing_data()
+        if play_data:
+            report_stopped_playback(play_data)
+
     item_id = play_info.get("item_id")
 
     channel_id = None
@@ -728,48 +737,84 @@ def set_list_item_props(item_id, list_item, result, server, extra_props, title):
 
     if item_type == "audio":
 
-        details = {
-            'title': title,
-            'mediatype': mediatype,
-            'artist': "Unknown Artist",
-            'album': "Unknown Album"
-        }
-        artist = result.get("Artists", [])
-        if artist:
-            details['artist'] = artist[0]
+        artists = result.get("Artists", [])
         track = result.get("IndexNumber")
-        if track:
-            details['tracknumber'] = track
         album = result.get("Album")
-        if album:
-            details['album'] = album
-            
-        list_item.setInfo("Music", infoLabels=details)
+
+        if hasattr(list_item, "getMusicInfoTag"):
+            music_tag = list_item.getMusicInfoTag()
+        else:
+            music_tag = False
+
+        if hasattr(music_tag, "setTitle"):
+            music_tag.setTitle(title)
+            music_tag.setMediaType(mediatype)
+            music_tag.setAlbum(album or "Unknown Album")
+            if artists:
+                music_tag.setArtist(artists[0])
+            else:
+                music_tag.setArtist(["Unknown Artist"])
+            if track:
+                music_tag.setTrack(track)
+        else:
+            # Kodi 19
+            details = {
+                'title': title,
+                'mediatype': mediatype,
+                'artist': artists[0] if artists else "Unknown Artist",
+                'album': album or "Unknown Album"
+            }
+            if track:
+                details['tracknumber'] = track
+
+            list_item.setInfo("Music", infoLabels=details)
 
     else:
+        tv_show_name = result.get("SeriesName", "")
+        plot = result.get("Overview", "")
 
-        details = {
-            'title': title,
-            'plot': result.get("Overview"),
-            'mediatype': mediatype
-        }
+        if hasattr(list_item, "getVideoInfoTag"):
+            video_tag = list_item.getVideoInfoTag()
+        else:
+            video_tag = False
 
-        tv_show_name = result.get("SeriesName")
-        if tv_show_name is not None:
+        if hasattr(video_tag, "setTitle"):
+            video_tag.setTitle(title)
+            video_tag.setMediaType(mediatype)
+            video_tag.setPlot(plot)
+            video_tag.setTvShowTitle(tv_show_name)
+
+            if item_type == "episode":
+                episode_number = result.get("IndexNumber", -1)
+                video_tag.setEpisode(episode_number)
+                season_number = result.get("ParentIndexNumber", -1)
+                video_tag.setSeason(season_number)
+            elif item_type == "season":
+                season_number = result.get("IndexNumber", -1)
+                video_tag.setSeason(season_number)
+
+            video_tag.setPlotOutline("jellyfin_id:%s" % (item_id,))
+        else:
+            # Kodi 19
+            details = {
+                'title': title,
+                'mediatype': mediatype
+            }
+            details['plot'] = plot
             details['tvshowtitle'] = tv_show_name
 
-        if item_type == "episode":
-            episode_number = result.get("IndexNumber", -1)
-            details["episode"] = str(episode_number)
-            season_number = result.get("ParentIndexNumber", -1)
-            details["season"] = str(season_number)
-        elif item_type == "season":
-            season_number = result.get("IndexNumber", -1)
-            details["season"] = str(season_number)
+            if item_type == "episode":
+                episode_number = result.get("IndexNumber", -1)
+                details["episode"] = str(episode_number)
+                season_number = result.get("ParentIndexNumber", -1)
+                details["season"] = str(season_number)
+            elif item_type == "season":
+                season_number = result.get("IndexNumber", -1)
+                details["season"] = str(season_number)
 
-        details["plotoutline"] = "jellyfin_id:%s" % (item_id,)
+            details["plotoutline"] = "jellyfin_id:%s" % (item_id,)
 
-        list_item.setInfo("Video", infoLabels=details)
+            list_item.setInfo("Video", infoLabels=details)
 
     return list_item
 
@@ -1096,6 +1141,7 @@ def stop_all_playback():
     clear_entries = []
 
     home_window.clear_property("currently_playing_id")
+    home_window.clear_property("now_playing")
 
     for item in played_information:
         data = played_information.get(item)
@@ -1103,29 +1149,9 @@ def stop_all_playback():
             log.debug("item_data: {0}".format(data))
 
             current_position = data.get("current_position", 0)
-            duration = data.get("duration", 0)
             jellyfin_item_id = data.get("item_id")
-            jellyfin_source_id = data.get("source_id")
-            play_session_id = data.get("play_session_id")
-            livestream_id = data.get('livestream_id')
-
+            report_stopped_playback(data)
             if jellyfin_item_id is not None and current_position >= 0:
-                log.debug("Playback Stopped at: {0}".format(current_position))
-
-                url = "/Sessions/Playing/Stopped"
-                postdata = {
-                    'ItemId': jellyfin_item_id,
-                    'MediaSourceId': jellyfin_source_id,
-                    'PositionTicks': int(current_position * 10000000),
-                    'RunTimeTicks': int(duration * 10000000),
-                    'PlaySessionId': play_session_id
-                }
-
-                # If this is a livestream, include the id in the stopped call
-                if livestream_id:
-                    postdata['LiveStreamId'] = livestream_id
-
-                api.post(url, postdata)
                 data["currently_playing"] = False
 
                 if data.get("play_action_type", "") == "play":
@@ -1135,6 +1161,7 @@ def stop_all_playback():
 
             if data.get('playback_type') == 'Transcode':
                 device_id = get_device_id()
+                play_session_id = data.get("play_session_id")
                 url = "/Videos/ActiveEncodings?DeviceId=%s&playSessionId=%s" % (device_id, play_session_id)
                 api.delete(url)
 
@@ -1152,7 +1179,7 @@ def get_playing_data():
         play_data = json.loads(play_data_string)
     except ValueError:
         # This isn't a JellyCon item
-        return None
+        return {}
 
     played_information_string = home_window.get_property('played_information')
     if played_information_string:
@@ -1173,7 +1200,7 @@ def get_playing_data():
         playing_file = player.getPlayingFile()
     except Exception as e:
         log.error("get_playing_data : getPlayingFile() : {0}".format(e))
-        return None
+        return {}
     log.debug("get_playing_data : getPlayingFile() : {0}".format(playing_file))
     if server in playing_file and item_id is not None:
         play_time = player.getTime()
@@ -1194,16 +1221,6 @@ def get_playing_data():
 
     return {}
 
-def get_jellyfin_playing_item():
-    home_window = HomeWindow()
-    play_data_string = home_window.get_property('now_playing')
-    try:
-        play_data = json.loads(play_data_string)
-    except ValueError:
-        # This isn't a JellyCon item
-        return None
-
-    return play_data.get("item_id")
 
 def get_play_url(media_source, play_session_id, channel_id=None):
     log.debug("get_play_url - media_source: {0}", media_source)
@@ -1287,7 +1304,7 @@ def get_play_url(media_source, play_session_id, channel_id=None):
             "MediaSourceId": item_id,
             "DeviceId": device_id,
             "PlaySessionId": play_session_id,
-            "api_key": user_token,
+            "ApiKey": user_token,
             "SegmentContainer": "ts",
             "VideoCodec": "h264",
             "VideoBitrate": bitrate,
@@ -1359,15 +1376,13 @@ class Service(xbmc.Player):
 
     def onPlayBackStarted(self):
         # Will be called when xbmc starts playing a file
-        stop_all_playback()
-
         if not xbmc.Player().isPlaying():
             log.debug("onPlayBackStarted: not playing file!")
             return
 
         play_data = get_playing_data()
 
-        if play_data is None:
+        if not play_data:
             return
 
         play_data["paused"] = False
@@ -1716,6 +1731,7 @@ def get_item_playback_info(item_id, force_transcode):
 
     return play_info_result
 
+
 def get_media_segments(item_id):
     url = "/MediaSegments/{}".format(item_id)
     result = api.get(url)
@@ -1723,3 +1739,31 @@ def get_media_segments(item_id):
         log.debug("GetMediaSegments : Media segments cloud not be retrieved")
         return None
     return result["Items"]
+
+
+def report_stopped_playback(data):
+    # Send an api message to the server reporting playback has stopped
+    current_position = data.get("current_position", 0)
+    duration = data.get("duration", 0)
+    jellyfin_item_id = data.get("item_id")
+    jellyfin_source_id = data.get("source_id")
+    play_session_id = data.get("play_session_id")
+    livestream_id = data.get('livestream_id')
+
+    if jellyfin_item_id is not None and current_position >= 0:
+        log.debug("Playback Stopped at: {0}".format(current_position))
+
+        url = "/Sessions/Playing/Stopped"
+        postdata = {
+            'ItemId': jellyfin_item_id,
+            'MediaSourceId': jellyfin_source_id,
+            'PositionTicks': int(current_position * 10000000),
+            'RunTimeTicks': int(duration * 10000000),
+            'PlaySessionId': play_session_id
+        }
+
+        # If this is a livestream, include the id in the stopped call
+        if livestream_id:
+            postdata['LiveStreamId'] = livestream_id
+
+        api.post(url, postdata)

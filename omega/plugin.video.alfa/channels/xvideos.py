@@ -146,9 +146,9 @@ def lista(item):
     logger.info()
     itemlist = []
     soup = create_soup(item.url)
-    matches = soup.find_all('div', id=re.compile(r"^video_\d+"))
+    matches = soup.find_all('div', attrs={'data-id': re.compile(r"^\d+")})
     for elem in matches:
-        url = elem.a['href'].replace("THUMBNUM", "")
+        url = elem.a['href'].replace("THUMBNUM", "").replace("//", "/")
         id = elem['data-id']
         if "/search-video/" in url:
             # url = "%svideo%s/a" %(host,id)
@@ -160,7 +160,7 @@ def lista(item):
             # url = "/video%s" %url
         title = elem.find('p', class_='title').a['title']
         thumbnail = elem.img['data-src']
-        thumbnail = thumbnail.replace("THUMBNUM.", "9.")
+        thumbnail = thumbnail.replace("THUMBNUM", "9")
         time = elem.find('span', class_='duration').text.strip()
         quality = elem.find('span', class_='video-hd-mark')
         url = urlparse.urljoin(host,url)
@@ -213,7 +213,7 @@ def listados(item):
         thumbnail = thumbnail.replace("\/", "/")
         # id = scrapertools.find_single_match(url, '/(\d+/[A-z0-9_-]+)')
         id = url.split("/")
-        url = "/video.%s/a" %id[-2].replace('video.','')
+        url = "/video.%sa" %id[-2].replace('video.','')
         url = urlparse.urljoin(host,url)
         plot = ""
         quality = ""

@@ -27,6 +27,7 @@ from platformcode import config
 from platformcode import logger
 from modules import filtertools
 from modules import autoplay
+from modules import renumbertools
 
 DEBUG = False
 BTDIGG = 'btdig'
@@ -68,6 +69,9 @@ LIST_QUALITY_MOVIES_T = LIST_QUALITY_MOVIES
 LIST_QUALITY_MOVIES_A = ['1080p', '720p', 'HD', 'Rip', '2160p', '4K', 'CAM', 'TS']
 LIST_QUALITY_TVSHOW = ['HDTV-720p', 'HDTV', 'WEB-DL 1080p', '4KWebRip']
 SIZE_MATCHES = 5000
+TAG_TVSHOW_RENUMERATE = renumbertools.TAG_TVSHOW_RENUMERATE
+TAG_SEASON_EPISODE = renumbertools.TAG_SEASON_EPISODE
+IS_ASSISTANT_INSTALLED = True if window.getProperty("is_assistant_installed") else False
 
 
 class AlfaChannelHelper:
@@ -124,7 +128,7 @@ class AlfaChannelHelper:
         self.color_setting = unify.colors_file[UNIFY_PRESET]
         self.window = window
         self.Comment = None
-        self.SEARCH_CLEAN = '\¿|\?|\/|\$|\@|\<|\>'
+        self.SEARCH_CLEAN = r'\¿|\?|\/|\$|\@|\<|\>'
 
         self.httptools = httptools
         self.response = self.httptools.build_response(HTTPResponse=True)        # crea estructura vacía de response
@@ -132,7 +136,10 @@ class AlfaChannelHelper:
         self.response_preferred_proxy_ip = ''                                   # IP de ProxySSL reusable, usada en la última descarga de un canal
         self.alfa_domain_web_list = jsontools.load(window.getProperty("alfa_domain_web_list")) \
                                                    if window.getProperty("alfa_domain_web_list") else {}    # Lista de PoxySSL verificados
+        self.alfa_cached_passwords = {}
         self.headers = {}
+        self.print_DEBUG = canonical.get('print_DEBUG', False)
+        self.Plan_B = canonical.get('Plan_B', False)
         
         self.SUCCESS_CODES = self.httptools.SUCCESS_CODES
         self.REDIRECTION_CODES = self.httptools.REDIRECTION_CODES
@@ -164,11 +171,13 @@ class AlfaChannelHelper:
                             self.finds_controls_updated[key_c] = eval('%s' % value_c)
 
             if not self.TEST_ON_AIR and not self.CACHING_DOMAINS and 'host' in self.canonical \
-                                    and 'host_alt' in self.canonical and 'host_black_list' in self.canonical:
+                                    and 'host_alt' in self.canonical and 'host_black_list' in self.canonical \
+                                    and self.canonical.get('update_host_list', True):
                 if self.channel in self.domains_updated and (self.domains_updated[self.channel].get('host_alt') \
                                                              or self.domains_updated[self.channel].get('UPDATE_CANONICAL')):
                     if self.host != self.domains_updated[self.channel].get('host_alt', [''])[0] or self.host != self.canonical['host_alt'][0] \
                                     or self.domains_updated[self.channel].get('host_alt', []) != self.canonical['host_alt'] \
+                                    or self.domains_updated[self.channel].get('host_black_list', []) != self.canonical['host_black_list'] \
                                     or self.domains_updated[self.channel].get('UPDATE_CANONICAL'):
                         self.host = self.canonical['host'] = self.domains_updated[self.channel].get('host_alt', ([self.canonical['host']] \
                                                                                                     if self.canonical['host'] else []) \
@@ -179,16 +188,18 @@ class AlfaChannelHelper:
                             channel.host = self.host
                         self.canonical['host_black_list'] = self.domains_updated[self.channel].get('host_black_list', 
                                                                                  self.canonical['host_black_list'])
-                        if self.canonical['host_alt'][0] not in self.canonical['host_black_list'] \
-                                                         and self.canonical['host_alt'][0] not in self.domains_updated[self.channel]\
-                                                                                                  .get('host_alt', self.canonical['host_alt'])[0]: 
-                            self.canonical['host_black_list'].insert(0, self.canonical['host_alt'][0])
-                        del self.canonical['host_alt'][0]
-                        if self.host not in self.canonical['host_alt']: self.canonical['host_alt'].insert(0, self.host)
+                        for host_alt in self.canonical['host_alt'][:]:
+                            if host_alt not in self.canonical['host_black_list'] \
+                                        and host_alt not in self.domains_updated[self.channel]\
+                                                                .get('host_alt', self.canonical['host_alt']): 
+                                self.canonical['host_black_list'].insert(0, host_alt)
+                                self.canonical['host_alt'].remove(host_alt)
+                        self.canonical['host_alt'] = self.domains_updated[self.channel].get('host_alt', self.canonical['host_alt'])
+                        if self.host not in self.canonical['host_alt'] and self.host not in self.canonical['host_black_list']:
+                            self.canonical['host_alt'].insert(0, self.host)
+                        if self.host in self.canonical['host_black_list'] and self.canonical['host_alt']:
+                            self.host = self.canonical['host'] = self.canonical['host_alt'][0]
                         if len(self.domains_updated[self.channel].get('host_alt', [])) > 1:
-                            for host_alt in self.domains_updated[self.channel]['host_alt']:
-                                if host_alt in self.canonical['host_alt']: continue
-                                self.canonical['host_alt'] += [host_alt]
                             for host_alt in self.canonical['host_alt'][:]:
                                 if host_alt in self.canonical['host_black_list']:
                                     self.canonical['host_alt'].remove(host_alt)
@@ -197,6 +208,8 @@ class AlfaChannelHelper:
                         if 'UPDATE_CANONICAL' in self.domains_updated[self.channel]: del self.domains_updated[self.channel]['UPDATE_CANONICAL']
                         if self.domains_updated: self.canonical.update(self.domains_updated[self.channel])
                         if self.DEBUG: logger.debug('HOST_updated: %s TO %s' % (host, self.canonical))
+                        self.print_DEBUG = self.canonical.get('print_DEBUG', False)
+                        self.Plan_B = self.canonical.get('Plan_B', False)
         except Exception:
             self.domains_updated = {}
             logger.error(traceback.format_exc())
@@ -212,6 +225,26 @@ class AlfaChannelHelper:
         from lib.generictools import js2py_conversion, check_blocked_IP, get_cached_files_
         get_cached_files_('password')
 
+        if "canonical" not in kwargs: kwargs["canonical"] = copy.deepcopy(self.canonical)
+        self.alfa_cached_passwords = jsontools.load(window.getProperty("alfa_cached_passwords") or '{}')
+        if kwargs.get('canonical', {}).get('cf_assistant', True) is not False and IS_ASSISTANT_INSTALLED:
+            kwargs_inter = copy.deepcopy(self.alfa_cached_passwords.get("cookies", {})\
+                                             .get("challenges", {}).get("assistant", {}))
+            kwargs_inter['cf_assistant'] = IS_ASSISTANT_INSTALLED
+            cf_debug = kwargs_inter.get('cf_debug', kwargs.get('canonical', {}).get('cf_debug', config.get_setting('debug_report', default=False)))
+            if kwargs_inter and self.channel not in kwargs_inter.get('c_black_list', []) and kwargs_inter['cf_assistant']:
+                if kwargs.get('canonical', {}).get('cf_assistant', '') == 'force':
+                    kwargs['canonical']['cf_assistant_get_source'] = kwargs.get('canonical', {}).get('cf_assistant_get_source', True)
+                    kwargs['canonical']['cf_removeAllCookies'] = kwargs.get('canonical', {}).get('cf_removeAllCookies', False)
+                    if 'cf_cookie' in kwargs['canonical']: del kwargs['canonical']['cf_cookie']
+                kwargs_inter.update(kwargs.get('canonical', {}))
+                kwargs_inter['cf_debug'] = cf_debug
+                kwargs['canonical'].update(kwargs_inter)
+                if window.getProperty("AH_%s_preferred_proxy_ip" % self.channel):
+                    self.response_preferred_proxy_ip = window.getProperty("AH_%s_preferred_proxy_ip" % self.channel)
+                    kwargs['preferred_proxy_ip'] = self.response_preferred_proxy_ip
+                    kwargs['canonical']['preferred_proxy_ip'] = self.canonical['preferred_proxy_ip'] = self.response_preferred_proxy_ip
+
         if "soup" not in kwargs: kwargs["soup"] = True
         json = kwargs.pop("json", False)
         if "unescape" in kwargs: self.unescape = kwargs.get("unescape", False)
@@ -222,7 +255,6 @@ class AlfaChannelHelper:
                                    and "add_referer" not in kwargs:
             kwargs["add_referer"] = True
         if "ignore_response_code" not in kwargs: kwargs["ignore_response_code"] = True
-        if "canonical" not in kwargs: kwargs["canonical"] = self.canonical
         if "forced_proxy_opt" not in kwargs and "forced_proxy_opt" not in kwargs["canonical"] and self.forced_proxy_opt:
             kwargs["forced_proxy_opt"] = self.forced_proxy_opt
         if "timeout" not in kwargs and "timeout" not in kwargs["canonical"]:
@@ -230,12 +262,13 @@ class AlfaChannelHelper:
         size_js = kwargs.pop('size_js', 10000)
         if 'preferred_proxy_ip' in kwargs or 'preferred_proxy_ip' in kwargs.get('canonical', {}) \
                        or kwargs.get('forced_proxy_ifnot_assistant', '') == 'ProxySSL' \
-                       or kwargs.get('canonical', {}).get('forced_proxy_ifnot_assistant', '') == 'ProxySSL':
+                       or kwargs.get('canonical', {}).get('forced_proxy_ifnot_assistant', '') == 'ProxySSL' \
+                       or window.getProperty("AH_%s_preferred_proxy_ip" % self.channel):
             self.response_preferred_proxy_ip = window.getProperty("AH_%s_preferred_proxy_ip" % self.channel) \
                                                                   if window else self.response_preferred_proxy_ip
-            if 'preferred_proxy_ip' in kwargs and self.response_preferred_proxy_ip:
+            if self.response_preferred_proxy_ip:
                 kwargs['preferred_proxy_ip'] = self.response_preferred_proxy_ip
-            elif kwargs.get('canonical', {}):
+                if "canonical" not in kwargs: kwargs["canonical"] = self.canonical
                 kwargs['canonical']['preferred_proxy_ip'] = self.canonical['preferred_proxy_ip'] = self.response_preferred_proxy_ip
         if self.TEST_ON_AIR and not self.CACHING_DOMAINS:
             if "canonical" in kwargs: del kwargs["canonical"]
@@ -244,10 +277,52 @@ class AlfaChannelHelper:
             self.KWARGS.update(kwargs)
             kwargs = copy.deepcopy(self.KWARGS)
         elif self.CACHING_DOMAINS:
-            kwargs['alfa_s': True]
+            kwargs['alfa_s']: True
 
         #logger.debug('KWARGS: %s' % kwargs)
         response = self.httptools.downloadpage(url, **kwargs)
+
+        self.set_preferred_proxy_ip(response, **kwargs)
+
+        if self.print_DEBUG and response.code not in self.httptools.SUCCESS_CODES + self.REDIRECTION_CODES:
+            try:
+                logger.error(("Host: %s" % response.host, "Url: %s" % response.url, "Proxy: %s" % response.proxy__, "Code: %s" % response.code))
+                logger.error(response.headers)
+                logger.error(response.json or response.soup or str(response.data))
+            except Exception:
+                pass
+
+        if kwargs.get("canonical", {}).get("ch_anubis", True) is not False:
+            challenge_regex = kwargs.get("canonical", {}).get("challenge_regex", [])
+            challenge_regex.extend(self.alfa_cached_passwords.get("cookies", {}).get("challenges", {})\
+                                                             .get("anubis", {}).get("challenge_regex", []))
+            for challenge, regex in challenge_regex:
+                if scrapertools.find_single_match(str(response.data), regex):
+                    req = self.anubis_challenge(url, response, challenge, **kwargs)
+                    response = self.httptools.downloadpage(url, **kwargs)
+                    if response.url and response.url != url and scrapertools.find_single_match(str(response.data), regex):
+                        self.host = self.obtain_domain(url, scheme=True).rstrip('/') + '/'
+                        response.host = self.obtain_domain(response.url, scheme=True).rstrip('/') + '/'
+                        self.doo_url = self.doo_url.replace(self.host, response.host)
+                        self.url = url = url.replace(self.host, response.host)
+                        if "canonical" not in kwargs: kwargs["canonical"] = copy.deepcopy(self.canonical) if not self.TEST_ON_AIR else {}
+                        kwargs["canonical"]["host"] = response.host
+                        if not kwargs.get("canonical", {}).get("host_black_list"): kwargs["canonical"]["host_black_list"] = []
+                        kwargs["canonical"]["host_black_list"].insert(0, self.host)
+                        if not kwargs.get("canonical", {}).get("host_alt"): kwargs["canonical"]["host_alt"] = []
+                        kwargs["canonical"]["host_alt"][0] = kwargs["canonical"]["host"]
+                        if kwargs.get("canonical", {}).get("host_alt_new"):
+                            kwargs["canonical"]["host_alt_new"].insert(0, kwargs["canonical"]["host"])
+                        self.host = response.host
+                        response.proxy__ = ''
+                        req = self.anubis_challenge(url, response, challenge, **kwargs)
+                        response = self.httptools.downloadpage(url, **kwargs)
+                        if response.code in self.httptools.SUCCESS_CODES:
+                            config.set_setting("current_host", self.host, channel=self.channel)
+                            if self.CACHING_DOMAINS:
+                                response.code = 302
+                                response.sucess = False
+                    break
 
         self.TEST_ON_AIR = self.httptools.TEST_ON_AIR
         self.CACHING_DOMAINS = self.httptools.CACHING_DOMAINS
@@ -260,8 +335,11 @@ class AlfaChannelHelper:
                          or 'javascript' in response.headers.get('Content-Type', '')):
                 response = js2py_conversion(response.data, url, resp=response, size=size_js, **kwargs)
 
-        if response.code in self.httptools.NOT_FOUND_CODES:
-            response.data = ''
+        if response.code in self.httptools.NOT_FOUND_CODES \
+                         or (response.code not in self.httptools.SUCCESS_CODES \
+                         and kwargs.get('return_data_on_error', False)):
+            response.content = response.data
+            if not kwargs.get('return_data_on_error', False): response.data = ''
             if kwargs.get("soup", True):
                 response.soup = self.do_soup(response.data, encoding='utf-8')
             elif json:
@@ -297,6 +375,16 @@ class AlfaChannelHelper:
 
         self.response = response
 
+        if kwargs.get('check_blocked_IP', False) or kwargs.get('canonical', {}).get('check_blocked_IP', False):
+            res, self.itemlist = check_blocked_IP(response.data, self.itemlist or kwargs.get('itemlist', []), 
+                                                  url, canonical=self.canonical, verbose=True)
+
+        self.ssl_version = self.httptools.ssl_version
+        self.ssl_context = self.httptools.ssl_context
+
+        return soup
+
+    def set_preferred_proxy_ip(self, response, **kwargs):
         self.alfa_domain_web_list = jsontools.load(window.getProperty("alfa_domain_web_list")) \
                                                    if window.getProperty("alfa_domain_web_list") else {}
         if not self.alfa_domain_web_list.get('croxyproxy.com'):
@@ -306,20 +394,73 @@ class AlfaChannelHelper:
         if self.response_proxy and 'croxyproxy.com' in self.response_proxy: 
             self.response_preferred_proxy_ip = self.response_proxy.split('|')[2] \
                         if response.code in self.httptools.SUCCESS_CODES + self.httptools.REDIRECTION_CODES else ''
-            if 'preferred_proxy_ip' in kwargs:
+            if self.response_preferred_proxy_ip:
                 kwargs['preferred_proxy_ip'] = self.response_preferred_proxy_ip
-            if 'preferred_proxy_ip' in kwargs.get('canonical', {}):
+                if "canonical" not in kwargs: kwargs["canonical"] = copy.deepcopy(self.canonical) if not self.TEST_ON_AIR else {}
                 kwargs['canonical']['preferred_proxy_ip'] = self.canonical['preferred_proxy_ip'] = self.response_preferred_proxy_ip
             if window: window.setProperty("AH_%s_preferred_proxy_ip" % self.channel, str(self.response_preferred_proxy_ip))
 
-        if kwargs.get('check_blocked_IP', False) or kwargs.get('canonical', {}).get('check_blocked_IP', False):
-            res, self.itemlist = check_blocked_IP(response.data, self.itemlist or kwargs.get('itemlist', []), 
-                                                  url, canonical=self.canonical, verbose=True)
+    def anubis_challenge(self, url, response, challenge, **kwargs):
 
-        self.ssl_version = self.httptools.ssl_version
-        self.ssl_context = self.httptools.ssl_context
+        req = response
+        kwargs_inter = copy.deepcopy(self.alfa_cached_passwords.get("cookies", {})\
+                                         .get("challenges", {}).get("anubis", {}))
+        if self.channel in kwargs_inter.get('c_black_list', []):
+            return response
+        if kwargs_inter:
+            cf_debug = kwargs_inter.get('cf_debug', kwargs.get('canonical', {})\
+                                   .get('cf_debug', config.get_setting('debug_report', default=False)))
+            kwargs_inter.update(kwargs.get('canonical', {}))
+            kwargs_inter['cf_debug'] = cf_debug
+            if "canonical" not in kwargs: kwargs["canonical"] = copy.deepcopy(self.canonical) if not self.TEST_ON_AIR else {}
+            kwargs['canonical'].update(kwargs_inter)
+        self.set_preferred_proxy_ip(response, **kwargs)
 
-        return soup
+        try:
+            from lib.unshortenit import bypass_anubis
+
+            kwargs_cha = copy.deepcopy(kwargs.get('canonical', {}))
+            kwargs_cha['timeout'] = kwargs.get('timeout', 20)
+            kwargs_cha['post'] = kwargs.get('post', None)
+            kwargs_cha['challenge'] = challenge
+
+            req = bypass_anubis(url, response, **kwargs_cha)
+            if (req and req.status_code in self.SUCCESS_CODES + self.REDIRECTION_CODES) or self.response_proxy:
+                return req
+        except Exception:
+            logger.error(traceback.format_exc())
+            pass
+
+        if kwargs.get('canonical', {}).get('cf_assistant', True) is not False \
+                   and self.channel not in self.alfa_cached_passwords.get("cookies", {})\
+                           .get("challenges", {}).get("assistant", {}).get('c_black_list', []):
+            import requests
+            from lib.cloudscraper import cf_assistant
+
+            req = requests.Response()
+            req.status_code = 403
+            kwargs_inter = copy.deepcopy(self.alfa_cached_passwords.get("cookies", {})\
+                                             .get("challenges", {}).get("anubis", {}))
+            kwargs_cha = copy.deepcopy(kwargs)
+            if "canonical" not in kwargs: kwargs["canonical"] = copy.deepcopy(self.canonical) if not self.TEST_ON_AIR else {}
+            kwargs_cha['url'] = url
+            kwargs_cha['cf_debug'] = kwargs.get('canonical', {}).get('cf_debug', config.get_setting('debug_report', default=False))
+            kwargs_cha['CF_testing'] = kwargs.get('canonical', {}).get('CF_testing', False)
+            kwargs_cha['clean_objects'] = kwargs.get('canonical', {}).get('clean_objects', False)
+            kwargs_cha['cf_assistant'] = kwargs_cha['canonical']['cf_assistant'] = kwargs_inter.get("cf_assistant", True)
+            kwargs_cha['cf_assistant_get_source'] = kwargs_cha['canonical']['cf_assistant_get_source'] = \
+                                                    kwargs_inter.get("cf_assistant_get_source", False)
+            kwargs_cha['cf_cookie'] = kwargs_cha['canonical']['cf_cookie'] = kwargs_inter.get("cf_cookie", "$HOST|browser-pow-auth")
+            kwargs_cha['cf_removeAllCookies'] = kwargs_cha['canonical']['cf_removeAllCookies'] = kwargs_inter.get("cf_removeAllCookies", False)
+            kwargs_cha['cf_cookies_names'] = kwargs_cha['canonical']['cf_cookies_names'] = \
+                                             kwargs_inter.get("cf_cookies_names", {"browser-pow-auth": False})
+            kwargs_cha['cf_challenges_list'] = kwargs_cha['canonical']['cf_challenges_list'] = \
+                                               kwargs_inter.get("cf_challenges_list", ["anubis_challenge"])
+            kwargs_cha['cf_jscode'] = kwargs_cha['canonical']['cf_jscode'] = kwargs_inter.get("cf_jscode", None)
+
+            req = cf_assistant.get_cl(kwargs_cha, req, cache=True, httptools_obj=self.httptools)
+
+        return req
 
     def list_all(self, item, data='', matches_post=None, postprocess=None, generictools=False, 
                  finds={}, **kwargs):
@@ -923,11 +1064,11 @@ class AlfaChannelHelper:
 
         finds_controls = finds.get('controls', {})
 
-        self.host_torrent = finds_controls.get('host_torrent', self.host_torrent) or self.host
-        host_torrent_referer = finds_controls.get('host_torrent_referer', self.host_torrent)
-        torrent_url_replace = finds_controls.get('torrent_url_replace', [])
-        torrent_headers = finds_controls.get('torrent_headers', {})
-        torrent_kwargs = finds_controls.get('torrent_kwargs', {})
+        self.host_torrent = elem.get('host_torrent', finds_controls.get('host_torrent', self.host_torrent)) or self.host
+        host_torrent_referer = elem.get('host_torrent_referer', finds_controls.get('host_torrent_referer', self.host_torrent))
+        torrent_url_replace = elem.get('torrent_url_replace', finds_controls.get('torrent_url_replace', []))
+        torrent_headers = elem.get('torrent_headers', finds_controls.get('torrent_headers', {}))
+        torrent_kwargs = elem.get('torrent_kwargs', finds_controls.get('torrent_kwargs', {}))
         FOLDER = config.get_setting("folder_movies") if item.contentType == 'movie' else config.get_setting("folder_tvshows")
         size = ''
         blacklist_links = ['enlacito.com']
@@ -1105,6 +1246,28 @@ class AlfaChannelHelper:
         if self.DEBUG: logger.debug('ELEM_OUT: %s' % str(elem)[:SIZE_MATCHES])
         return elem
 
+    def Plan_B_find(self, item, matches):
+
+        try:
+            if PY3:
+                from lib.planb_py3 import e69org
+            else:
+                from lib.planb import e69org
+
+            links = e69org(item.infoLabels)
+            matches_str = str(matches)
+            if links and isinstance(links, list):
+                for y, url, lang, z in links:
+                    if url in matches_str: continue
+                    matches.append({'title': '%s', 'url': url, 'language': lang, 'server': '', 
+                                    'mediatype': item.contentType, 'quality': ''})
+
+            #if self.DEBUG: logger.debug('LINKS: %s' % links)
+        except Exception:
+            logger.error(traceback.format_exc())
+
+        return matches
+    
     def parse_finds_dict(self, soup, finds, year=False, next_page=False, c_type=''):
 
         matches = [] if (not year and not next_page) else '-' if year else ''
@@ -1669,12 +1832,17 @@ class DictionaryAllChannel(AlfaChannelHelper):
 
                 self.next_page_url = next_page_url
 
-            if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s / matches: %s' \
-                                        % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), len(matches)))
+            if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s (%s) / matches: %s' \
+                                        % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), post, len(matches)))
 
             # Buscamos la última página
             if self.last_page == 99999:                                         # Si es el valor inicial, buscamos
                 try:
+                    url_page_control = 'url'
+                    post_alt = post
+                    if finds_controls.get('force_find_last_page') and isinstance(finds_controls['force_find_last_page'], list):
+                        if finds_controls['force_find_last_page'][2] == 'post': 
+                            url_page_control = 'post'
                     self.last_page = int(self.parse_finds_dict(soup, finds_last_page, next_page=True, c_type=item.c_type).lstrip('#'))
                     if finds_controls.get('force_find_last_page') and isinstance(finds_controls['force_find_last_page'], list) \
                                            and isinstance(finds_controls['force_find_last_page'][0], int) \
@@ -1682,19 +1850,27 @@ class DictionaryAllChannel(AlfaChannelHelper):
                         if self.last_page >= finds_controls['force_find_last_page'][0]:
                             url = next_page_url
                             for rgx_org, rgx_des in finds_next_page_rgx:
-                                if not scrapertools.find_single_match(url, rgx_org): continue
-                                url = re.sub(rgx_org, rgx_des % str(finds_controls['force_find_last_page'][1]), 
-                                             url.rstrip('/')).replace('//?', '/?')
+                                if url_page_control == 'url':
+                                    if not scrapertools.find_single_match(url, rgx_org): continue
+                                    url = re.sub(rgx_org, rgx_des % str(finds_controls['force_find_last_page'][1]), 
+                                                 url.rstrip('/')).replace('//?', '/?')
+                                else:
+                                    if not scrapertools.find_single_match(post_alt, rgx_org): continue
+                                    post_alt = re.sub(rgx_org, rgx_des % str(finds_controls['force_find_last_page'][1]), 
+                                                      post_alt.rstrip('/')).replace('//?', '/?')
+                            kwargs['post'] = post_alt
                             soup_last_page = self.create_soup(url, item=item, hide_infobox=True, **kwargs)
+                            kwargs['post'] = post
                             self.last_page = int(self.parse_finds_dict(soup_last_page, finds_last_page, next_page=True, 
-                                                                  c_type=item.c_type).lstrip('#'))
+                                                                       c_type=item.c_type).lstrip('#'))
                     page_factor = float(len(matches)) / float(self.cnt_tot)
                 except Exception:
+                    logger.error(traceback.format_exc())
                     self.last_page = 0
                     last_page_print = int((float(len(matches)) / float(self.cnt_tot)) + 0.999999)
 
-                if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s / matches: %s' \
-                                            % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), len(matches)))
+                if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s (%s) / matches: %s' \
+                                            % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), post, len(matches)))
 
             if item.matches_org is True: item.matches_org = matches[:]
             for elem in matches:
@@ -1840,6 +2016,9 @@ class DictionaryAllChannel(AlfaChannelHelper):
 
                 new_item.context += ['buscar_trailer']
                 if elem.get('context', []): new_item.context.extend(elem['context'])
+                if new_item.contentType == 'tvshow' and self.canonical.get('renumbertools', False) is not None \
+                                                    and 'renumbertools' not in str(new_item.context):
+                    new_item.context = renumbertools.context(new_item)
                 new_item.context = filtertools.context(new_item, self.list_language, self.list_quality_movies \
                                                        if new_item.contentType == 'movie' else self.list_quality_tvshow)
 
@@ -1878,9 +2057,9 @@ class DictionaryAllChannel(AlfaChannelHelper):
             cnt_tot_match += cnt_match                                          # Calcular el num. total de items mostrados
 
         if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / cnt_match: %s / cnt_tot: %s ' \
-                                    '/ page_factor: %s / next_page_url: %s / matches: %s' \
+                                    '/ page_factor: %s / next_page_url: %s (%s) / matches: %s' \
                                     % (str(self.curr_page), str(self.last_page), str(cnt_match), str(self.cnt_tot), 
-                                       str(page_factor), str(next_page_url), len(matches)))
+                                       str(page_factor), str(next_page_url), post, len(matches)))
 
         if itemlist:
             videolab_status = finds_controls.get('videolab_status', True) and modo_grafico and not self.TEST_ON_AIR
@@ -2140,7 +2319,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
 
     def seasons(self, item, data='', action="episodesxseason", matches_post=None, postprocess=None, 
                 seasons_search_post=None, generictools=True, seasons_list={}, finds={}, **kwargs):
-        from lib.generictools import AH_post_tmdb_seasons, AH_find_videolab_status
+        from lib.generictools import AH_post_tmdb_seasons, AH_find_videolab_status, check_alternative_tmdb_id
         from core import tmdb
 
         if not finds: finds = self.finds.copy()
@@ -2153,12 +2332,14 @@ class DictionaryAllChannel(AlfaChannelHelper):
         find_seasons_search_num_rgx = finds.get('seasons_search_num_rgx', '')
         finds_controls = finds.get('controls', {})
         profile = self.profile = finds_controls.get('profile', self.profile)
+        season_TMDB_limit = item.season_TMDB_limit if 'season_TMDB_limit' in item else finds_controls.get('season_TMDB_limit', True)
         itemlist = list()
         matches = list()
         matches_seasons = list()
         soup = {}
         self.response = self.httptools.build_response(HTTPResponse=True)
         if not matches_post and item.matches_post: matches_post = item.matches_post
+        contentSeasonRenumList = []
 
         self.btdigg = finds_controls.get('btdigg', False) and config.get_setting('find_alt_link_option', item.channel, default=False)
         self.btdigg_search = self.btdigg and finds.get('controls', {}).get('btdigg_search', False) \
@@ -2208,7 +2389,8 @@ class DictionaryAllChannel(AlfaChannelHelper):
 
         item.url = self.do_url_replace(item.url, url_replace)
 
-        if item.library_urls or finds_seasons_search:
+        if item.add_videolibrary or item.library_urls or finds_seasons_search:
+            check_alternative_tmdb_id(item, tmdb_check=False)
             config.set_setting('tmdb_cache_read', False)
             tmdb.set_infoLabels_item(item, modo_grafico, idioma_busqueda=idioma_busqueda)
             config.set_setting('tmdb_cache_read', True)
@@ -2278,6 +2460,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
                         matches_seasons = []
 
                 if not matches and matches_seasons and ('profile' in finds_controls or not matches_post):
+                    season_save = 0
                     for elem in matches_seasons:
                         elem_json = {}
 
@@ -2316,6 +2499,9 @@ class DictionaryAllChannel(AlfaChannelHelper):
                                         elem_json['season'] = int(elem_json['season'])
                                     except Exception:
                                         elem_json['season'] = 1
+                                if season_save == elem_json['season']:
+                                    continue
+                                season_save = elem_json['season']
 
                                 if finds.get('season_url'):
                                     elem_json['url'] = finds['season_url'] if str(finds['season_url']) != self.host else item.url
@@ -2369,6 +2555,22 @@ class DictionaryAllChannel(AlfaChannelHelper):
                                              % self.response.soup or self.response.json or self.response.data or seasons_list)
                     return itemlist
 
+        if self.canonical.get('renumbertools', False) is not None:
+            season_episode = renumbertools.get_json_renumerate(item.channel, show=item.contentSerieName, show_lower=True)
+            if season_episode:
+                contentSeasonRenumList = season_episode[:]
+                if not (item.add_videolibrary or item.library_playcounts or item.downloadFilename):
+                    for match in matches:
+                        match['season_renum'] = match['season']
+                    if len(matches) > 0:
+                        for x, season in enumerate(reversed(season_episode)):
+                            if len(season_episode) <= len(matches):
+                                if season[0] == matches[x]['season']: continue
+                            else:
+                                matches.append(matches[-1].copy())
+                            matches[x]['season_renum'] = season[0]
+                    if matches: matches = sorted(matches, key=lambda elem_json: int(elem_json.get('season_renum', 0) or elem_json['season']))
+
         # Si solo hay una temporada y está configurado así, se listan los episodios directamente
         if len(matches) == 1 and no_pile_on_seasons >= 1: 
             self.season_colapse = False
@@ -2384,6 +2586,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
         host_referer = finds_controls.get('host_referer', host) or host_referer
         post = item.post or finds_controls.pop('post', None) or post
         headers = item.headers or finds_controls.get('headers', {}) or headers
+        season_TMDB_limit = item.season_TMDB_limit if 'season_TMDB_limit' in item else finds_controls.get('season_TMDB_limit', True)
         url_replace = self.url_replace = self.finds.get('url_replace', []) or self.url_replace
         url_base64 = finds_controls.get('url_base64', True)
         IDIOMAS_TMDB = finds_controls.get('IDIOMAS_TMDB', {}) or self.IDIOMAS_TMDB
@@ -2406,8 +2609,10 @@ class DictionaryAllChannel(AlfaChannelHelper):
                 if item_temp.infoLabels['number_of_seasons'] and item_temp.infoLabels['number_of_seasons'] > item.infoLabels['number_of_seasons']:
                     item.infoLabels['number_of_seasons'] = item_temp.infoLabels['number_of_seasons']
                 if item.infoLabels['number_of_seasons'] and elem['season'] > item.infoLabels['number_of_seasons']:
-                    logger.error('TEMPORADA ERRONEA: WEB: %s; TMDB: %s' % (elem['season'], item.infoLabels['number_of_seasons']))
-                    if finds_controls.get('season_TMDB_limit', True) and not BTDIGG_URL_SEARCH in item.url: continue
+                    logger.error('TEMPORADA ERRONEA: WEB: %s; TMDB: %s; PERMITIR: %s' \
+                                 % (elem['season'], item.infoLabels['number_of_seasons'], 
+                                    not season_TMDB_limit or BTDIGG_URL_SEARCH in item.url))
+                    if season_TMDB_limit and not BTDIGG_URL_SEARCH in item.url: continue
 
             elem['url'] = elem.get('url', item.url)
             if url_base64: elem['url'] = self.convert_url_base64(elem['url'], self.host, item=item)
@@ -2423,7 +2628,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
                                   url=elem['url'], 
                                   url_tvshow = matches[-1]['url'] if finds_seasons_search else item.url, 
                                   contentSeason=elem['season'], 
-                                  title=('Temporada %s' % elem['season']) if elem['season'] > 0 else 'Especiales',
+                                  title=('Temporada %s' % elem.get('season_renum', elem['season'])) if elem['season'] > 0 else 'Especiales',
                                   contentPlot=elem.get('plot', item.contentPlot), 
                                   thumbnail=elem.get('thumbnail', item.thumbnail), 
                                   contentType='season' if item.contentType != 'movie' else 'movie'
@@ -2474,6 +2679,8 @@ class DictionaryAllChannel(AlfaChannelHelper):
             if 'matches_cached' in elem: new_item.matches_cached = elem['matches_cached'][:]
             if 'episode_list' in elem: new_item.episode_list = elem['episode_list'].copy()
             if elem.get('playcount', 0): new_item.infoLabels['playcount'] = elem['playcount']
+            if elem.get('season_renum'): new_item.contentSeasonRenum = elem['season_renum']
+            new_item.contentSeasonRenumList = contentSeasonRenumList
 
             new_item.url = self.do_url_replace(new_item.url, url_replace)
 
@@ -2516,7 +2723,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
                 idioma_busqueda = idioma_busqueda_VO
 
         if itemlist:
-            itemlist = sorted(itemlist, key=lambda it: int(it.contentSeason))
+            itemlist = sorted(itemlist, key=lambda it: int(it.contentSeasonRenum or it.contentSeason))
             if (item.infoLabels.get('last_season_only', False) and item.add_videolibrary) \
                                 or (modo_ultima_temp and item.library_playcounts):
                 itemlist = [itemlist[-1]]
@@ -2524,16 +2731,25 @@ class DictionaryAllChannel(AlfaChannelHelper):
             find_add_video_to_videolibrary = finds_controls.get('add_video_to_videolibrary', True)
             videolab_status = finds_controls.get('videolab_status', True) and modo_grafico \
                                                                           and not self.TEST_ON_AIR and not self.VIDEOLIBRARY_UPDATE
+
+            if contentSeasonRenumList:
+                for new_item in itemlist:
+                    new_item.contentSeasonRenum_alt = new_item.contentSeason
+                    new_item.contentSeason = new_item.contentSeasonRenum
+
             config.set_setting('tmdb_cache_read', False)
             tmdb.set_infoLabels_itemlist(itemlist, modo_grafico, idioma_busqueda=idioma_busqueda)
             config.set_setting('tmdb_cache_read', True)
-            
+
             for new_item in itemlist:
                 if new_item.broadcast:
                     new_item.contentPlot = '%s\n\n%s' % (new_item.broadcast, new_item.contentPlot)
                     del new_item.broadcast
                 if new_item.infoLabels['next_episode_air_date_custom']:
                     new_item.infoLabels['next_episode_air_date'] = new_item.infoLabels['next_episode_air_date_custom']
+                if new_item.contentSeasonRenum_alt:
+                    new_item.contentSeason = new_item.contentSeasonRenum_alt
+                    del new_item.contentSeasonRenum_alt
 
             # Llamamos al método para el maquillaje de los títulos obtenidos desde TMDB
             if generictools and not (item.add_videolibrary or item.library_playcounts or item.downloadFilename):
@@ -2578,7 +2794,8 @@ class DictionaryAllChannel(AlfaChannelHelper):
 
     def episodes(self, item, data='', action="findvideos", matches_post=None, postprocess=None, 
                  generictools=False, episodes_list={}, finds={}, **kwargs):
-        logger.info('Serie: %s; Season: %s/%s' % (item.season_search or item.contentSerieName, item.contentSeason, 
+        logger.info('Serie: %s; Season: %s/%s' % (item.season_search or item.contentSerieName, 
+                                                  (item.contentSeason, item.contentSeasonRenum, item.contentSeasonRenumList), 
                                                   item.infoLabels['number_of_seasons']))
         from lib.generictools import AH_post_tmdb_episodios, AH_find_videolab_status
         from core import tmdb
@@ -2729,7 +2946,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
 
         AHkwargs['matches'] = matches
         if self.DEBUG: logger.debug('MATCHES (%s/%s): %s' % (len(matches), len(str(matches)), str(matches)[:SIZE_MATCHES]))
-        
+
         for elem in matches:
             infolabels = item.infoLabels.copy()
 
@@ -2750,6 +2967,13 @@ class DictionaryAllChannel(AlfaChannelHelper):
                         break
                 else:
                     infolabels["episode"] = int(scrapertools.find_single_match(str(elem.get('episode', '1')), r'\d+') or '1')
+
+            if self.canonical.get('renumbertools', False) is not None and item.contentSeasonRenumList:
+                infolabels["season"], infolabels["episode"] = renumbertools.numbered_for_trakt(item.channel, item.contentSerieName, 
+                                                                            int(infolabels["season"]), int(infolabels["episode"]),
+                                                                            contentSeasonRenumList=item.contentSeasonRenumList)
+                if item.contentSeasonRenum and item.contentSeasonRenum != infolabels["season"] \
+                                           and item.contentSeasonRenum != item.contentSeason : continue
 
             if isinstance(do_episode_clean, list):
                 for clean_org, clean_des in do_episode_clean:
@@ -2807,6 +3031,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
             if elem.get('next_episode_air_date', ''): new_item.infoLabels['next_episode_air_date_custom']  = elem['next_episode_air_date']
             if elem.get('password', ''): new_item.password = elem['password']
             if 'matches_cached' in elem: new_item.matches_cached = elem['matches_cached'][:]
+            if 'matches_verify' in elem: new_item.matches_verify = elem['matches_verify']
             if BTDIGG_URL_SEARCH in item.url: new_item.btdigg = item.btdigg
             if not new_item.season_search and item.season_search: new_item.season_search = item.season_search
             
@@ -3025,10 +3250,21 @@ class DictionaryAllChannel(AlfaChannelHelper):
                     del item.btdig_in_use
                 if item.url.startswith('magnet') or item.url.endswith('.torrent'):
                     url = item.url = item.url_tvshow
- 
+
+            from core.videolibrarytools import redirect_url                     # Redirigimos urls de item.matches y item.emergency_urls
+            for match in item.matches:
+                if isinstance(match, _dict) and match.get('url'): match['url'] = redirect_url(match['url'], channel=item.channel)
+            if item.emergency_urls and len(item.emergency_urls) > 1 and isinstance(item.emergency_urls[1], list) \
+                                   and len(item.emergency_urls[1]) > 0 and isinstance(item.emergency_urls[1][0], _dict):
+                for match in item.emergency_urls[1]:
+                    if match.get('url'): match['url'] = redirect_url(match['url'], channel=item.channel)
+            if item.emergency_urls and len(item.emergency_urls) > 2 and isinstance(item.emergency_urls[2], list):
+                for x, match in enumerate(item.emergency_urls[2]):
+                    item.emergency_urls[2][x] = redirect_url(match, channel=item.channel)
+
         if data or item.url.startswith('magnet') or item.url.endswith('.torrent') \
                 or (item.matches and item.channel != 'videolibrary' and item.contentChannel != 'videolibrary' \
-                                 and item.from_channel != 'videolibrary') \
+                                 and item.from_channel != 'videolibrary' and not item.matches_verify) \
                 or item.btdig_in_use:
             soup = data
             response = self.response
@@ -3050,13 +3286,20 @@ class DictionaryAllChannel(AlfaChannelHelper):
                 if matches_episodes:
                     matches_epi = matches_post_episodes(item, matches_episodes, **AHkwargs)
                     for epi in matches_epi:
-                        if not epi.get('episode', 0) == item.contentEpisodeNumber: continue
+                        if epi.get('episode', 0) != item.contentEpisodeNumber: continue
+                        if epi.get('url', 'xyz') in str(matches) or epi.get('url', 'xyz') in str(item.matches): continue
+                        if epi.get('matches_verify', False): item.matches_verify = epi['matches_verify']
+                        if epi.get('info', ''): item.info = epi['info']
                         matches.append(epi.copy())
                     if matches:
+                        if item.matches and isinstance(item.matches[0], _dict):
+                            for match in item.matches:
+                                if match.get('url', 'xyz') not in str(matches):
+                                    matches.append(match.copy())
                         item.matches = matches[:]
                     elif isinstance(item.matches[0], _dict):
                         matches = item.matches[:]
-        
+
         langs = langs or self.parse_finds_dict(soup, finds_langs) or self.language
         if not isinstance(langs, list):
             langs = []
@@ -3083,9 +3326,9 @@ class DictionaryAllChannel(AlfaChannelHelper):
 
             matches.append(elem_json.copy())
         
-        if not item.matches or (item.matches and not matches and (item.channel == 'videolibrary' \
-                                                                  or item.contentChannel == 'videolibrary' \
-                                                                  or item.from_channel == 'videolibrary')):
+        if not item.matches or item.matches_verify or (item.matches and not matches and (item.channel == 'videolibrary' \
+                                                                                    or item.contentChannel == 'videolibrary' \
+                                                                                    or item.from_channel == 'videolibrary')):
             matches_findvideos = self.parse_finds_dict(soup, finds_out) if finds_out \
                                  else (self.response.soup or self.response.json or self.response.data)
             if not isinstance(matches_findvideos, (list, _dict)):
@@ -3097,6 +3340,14 @@ class DictionaryAllChannel(AlfaChannelHelper):
                 matches, langs = matches_post(item, matches_findvideos, langs, response, **AHkwargs)
             if not matches_post and not matches and matches_findvideos:
                 matches = matches_findvideos[:]
+            if matches and item.matches:
+                for match in item.matches:
+                    if match.get('url', 'xyz') in str(matches): continue
+                    if match.get('url', '').startswith('magnet') \
+                             and scrapertools.find_single_match(match['url'], r'urn:btih:([\w\d]+)\&') in str(matches):
+                        continue
+                    matches.append(match)
+                item.matches = matches[:]
             if matches and AHkwargs.get('matches'):
                 item.matches = matches[:]
                 del AHkwargs['matches']
@@ -3117,7 +3368,7 @@ class DictionaryAllChannel(AlfaChannelHelper):
         if self.btdigg:
             if AHkwargs.get('matches'): del AHkwargs['matches']
             matches = self.find_btdigg_findvideos(item, item.matches or matches, finds_controls.get('domain_alt', DOMAIN_ALT_URLS), **AHkwargs)
-        
+
         if not matches:
             if item.emergency_urls and not item.videolibray_emergency_urls:     # Hay urls de emergencia?
                 item.armagedon = True                                           # Marcamos la situación como catastrófica 
@@ -3163,6 +3414,10 @@ class DictionaryAllChannel(AlfaChannelHelper):
         #Llamamos al método para crear el título general del vídeo, con toda la información obtenida de TMDB
         if generictools and not item.videolibray_emergency_urls:
             item, itemlist_total = AH_post_tmdb_findvideos(self, item, itemlist_total, **AHkwargs)
+
+        #Si el canal ha marcado la opción de Plan_B, complementamos los enlaces disponibles
+        if self.Plan_B:
+            matches = self.Plan_B_find(item, matches)
 
         for _lang in langs or ['CAST']:
             lang = _lang
@@ -3502,7 +3757,11 @@ class DictionaryAdultChannel(AlfaChannelHelper):
                                     elem_json['thumbnail'] = (elem.img.get('data-thumb_url', '') or elem.img.get('data-original', '') \
                                                              or elem.img.get('data-lazy-src', '') or elem.img.get('data-src', '') \
                                                              or elem.img.get('src', '')) if elem.img else ''
-                                    elem_json['thumbnail'] += "|verifypeer=false"
+                                    if finds_controls.get('verifypeer', False):
+                                        if "http" in str(finds_controls['verifypeer']):
+                                            elem_json['thumbnail'] += "|Referer=%s" % str(finds_controls['verifypeer'])
+                                        else:
+                                            elem_json['thumbnail'] += "|verifypeer=false"
                                     elem_json['stime'] = elem.find(class_='duration').get_text(strip=True) if elem.find(class_='duration') else ''
                                     if not elem_json['stime'] and elem.find(text=lambda text: isinstance(text, self.Comment) \
                                                               and 'duration' in text):
@@ -3655,12 +3914,17 @@ class DictionaryAdultChannel(AlfaChannelHelper):
 
                 self.next_page_url = next_page_url
 
-            if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s / matches: %s' \
-                                        % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), len(matches)))
+            if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s (%s) / matches: %s' \
+                                        % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), post, len(matches)))
 
             # Buscamos la última página
-            if self.last_page == 99999:                                              # Si es el valor inicial, buscamos
+            if self.last_page == 99999:                                         # Si es el valor inicial, buscamos
                 try:
+                    url_page_control = 'url'
+                    post_alt = post
+                    if finds_controls.get('force_find_last_page') and isinstance(finds_controls['force_find_last_page'], list):
+                        if finds_controls['force_find_last_page'][2] == 'post': 
+                            url_page_control = 'post'
                     self.last_page = int(self.parse_finds_dict(soup, finds_last_page, next_page=True, c_type=item.c_type).lstrip('#'))
                     if finds_controls.get('force_find_last_page') and isinstance(finds_controls['force_find_last_page'], list) \
                                            and isinstance(finds_controls['force_find_last_page'][0], int) \
@@ -3668,19 +3932,27 @@ class DictionaryAdultChannel(AlfaChannelHelper):
                         if self.last_page >= finds_controls['force_find_last_page'][0]:
                             url = next_page_url
                             for rgx_org, rgx_des in finds_next_page_rgx:
-                                if not scrapertools.find_single_match(url, rgx_org): continue
-                                url = re.sub(rgx_org, rgx_des % str(finds_controls['force_find_last_page'][1]), 
-                                             url.rstrip('/')).replace('//?', '/?')
+                                if url_page_control == 'url':
+                                    if not scrapertools.find_single_match(url, rgx_org): continue
+                                    url = re.sub(rgx_org, rgx_des % str(finds_controls['force_find_last_page'][1]), 
+                                                 url.rstrip('/')).replace('//?', '/?')
+                                else:
+                                    if not scrapertools.find_single_match(post_alt, rgx_org): continue
+                                    post_alt = re.sub(rgx_org, rgx_des % str(finds_controls['force_find_last_page'][1]), 
+                                                      post_alt.rstrip('/')).replace('//?', '/?')
+                            kwargs['post'] = post_alt
                             soup_last_page = self.create_soup(url, item=item, hide_infobox=True, **kwargs)
+                            kwargs['post'] = post
                             self.last_page = int(self.parse_finds_dict(soup_last_page, finds_last_page, next_page=True, 
-                                                                  c_type=item.c_type).lstrip('#'))
+                                                                       c_type=item.c_type).lstrip('#'))
                     page_factor = float(len(matches)) / float(self.cnt_tot)
                 except Exception:
+                    logger.error(traceback.format_exc())
                     self.last_page = 0
                     last_page_print = int((float(len(matches)) / float(self.cnt_tot)) + 0.999999)
 
-                if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s / matches: %s' \
-                                            % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), len(matches)))
+                if self.DEBUG: logger.debug('curr_page: %s / last_page: %s / page_factor: %s / next_page_url: %s (%s) / matches: %s' \
+                                            % (str(self.curr_page), str(self.last_page), str(page_factor), str(next_page_url), post, len(matches)))
 
             if item.matches_org is True: item.matches_org = matches[:]
             for elem in matches:
@@ -4620,6 +4892,7 @@ class DooPlay(AlfaChannelHelper):
         self.season_colapse = True
         self.unescape = False
         self.alfa_domain_web_list = {}
+        self.alfa_cached_passwords = {}
         self.headers = {}
         self.unescape = False
         self.response_preferred_proxy_ip = ''
@@ -4639,6 +4912,8 @@ class DooPlay(AlfaChannelHelper):
         self.VIDEOLIBRARY_UPDATE = self.httptools.VIDEOLIBRARY_UPDATE
         self.KWARGS = copy.deepcopy(KWARGS)
         self.domains_updated = jsontools.load(window.getProperty("alfa_domains_updated") or '{}')
+        self.print_DEBUG = canonical.get('print_DEBUG', False)
+        self.Plan_B = canonical.get('Plan_B', False)
 
 
     def list_all_matches(self, item, matches_int, **AHkwargs):
@@ -4751,6 +5026,7 @@ class DooPlay(AlfaChannelHelper):
         matches = []
         finds = self.finds
         self.doo_url = "%swp-admin/admin-ajax.php" % self.host
+        pattern_url = r'(?i)src="([^"]+)"'
 
         for elem in matches_int:
             elem_json = {}
@@ -4768,6 +5044,8 @@ class DooPlay(AlfaChannelHelper):
             if response.json:
                 if self.DEBUG: logger.debug('MATCHES_JSON %s' % (str(response.json)))
                 elem_json['url'] = response.json.get("embed_url", "")
+                if scrapertools.find_single_match(elem_json['url'], pattern_url):
+                    elem_json['url'] = scrapertools.find_single_match(elem_json['url'], pattern_url)
                 if 'base64,' in elem_json['url']: 
                     #elem_json['url'] = base64.b64decode(scrapertools.find_single_match(elem_json['url'], 'base64,([^"]+)"')).decode('utf-8')
                     continue
@@ -4775,7 +5053,8 @@ class DooPlay(AlfaChannelHelper):
                 elem_json['title'] = '%s'
 
                 if not elem_json['url'] or "youtube" in elem_json['url'] or "waaw" in elem_json['url'] \
-                                        or "jetload" in elem_json['url']:
+                                        or "jetload" in elem_json['url'] or "rumble" in elem_json['url'] \
+                                        or not elem_json['url'].startswith('http'):
                     continue
 
                 if finds['controls']['get_lang']: 

@@ -90,9 +90,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_todotorrents', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='todotorrents', folder=False, text_color='chartreuse' ))
@@ -104,7 +104,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'todotorrents', thumbnail=config.get_thumb('todotorrents') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'todotorrents' ))
 
     platformtools.itemlist_refresh()
 
@@ -364,6 +366,8 @@ def list_last(item):
     except: return itemlist
 
     for url, title in matches:
+        title = title.replace('&#039;', "'")
+
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
             elif "[" in title: titulo = title.split("[")[0]
@@ -578,8 +582,6 @@ def play(item):
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
 
-            url_base64 = url_base64.replace('/todotorrents.net/', '/ec1-eu-TodoTorrents-compute-1.cdnbeta.in/')
-
             if url_base64.startswith('magnet:'):
                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
@@ -632,7 +634,7 @@ def list_search(item):
         sufijo = ''
         if item.search_type == 'all': 
             sufijo = contentType
-            if sufijo == "documentary": sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+            if sufijo == "documentary": sufijo = '[COLOR cyan]Documental[/COLOR]'
 
         if contentType == 'tvshow':
             SerieName = corregir_SerieName(title)
@@ -702,6 +704,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
 
 
 def search(item, texto):

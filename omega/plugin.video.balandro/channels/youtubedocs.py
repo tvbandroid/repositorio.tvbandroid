@@ -2,7 +2,7 @@
 
 import xbmc
 
-from platformcode import logger
+from platformcode import logger, config
 from core.item import Item
 from core import httptools, scrapertools
 
@@ -16,13 +16,13 @@ def mainlist(item):
 
     # ~ itemlist.append(item.clone( title = 'Buscar documental ...', action = 'search', search_type = 'documentary', text_color='cyan' ))
 
+    itemlist.append(item.clone( channel='youtubetrailers', action='search', title= '[B][COLOR yellow]Buscar[/COLOR] Youtube[/B] ...', thumbnail=config.get_thumb('youtube'), text_color='darksalmon', search_special = 'youtube', search_type = 'all' ))
+
     itemlist.append(item.clone( title = 'Academia Play', action = 'list_tubes', url = host + 'watch?v=99cd_dCl3pc&list=UULFv05qOuJ6Igbe-EyQibJgwQ'))
 
     itemlist.append(item.clone( title = 'Daniel Geohistoria', action = 'list_tubes', url = host + 'watch?v=XkpmWi9foUU&list=UULPGNk1YgQf8zeFX7uP04O_uw'))
 
     itemlist.append(item.clone( title = 'Dmax', action = 'list_tubes', url = host + 'watch?v=4mx89Gc-elY&list=PLXUXqAIy6K4-IAeAQp4PcP8xJHzfJu_jL'))
-
-    itemlist.append(item.clone( title = 'Documanía Historia', action = 'list_tubes', url = host + 'watch?v=fANdEzBMlWs&list=UUv7ZxMpxzixEAi5mR_eDqHw'))
 
     itemlist.append(item.clone( title = 'Documental Z', action = 'list_tubes', url = host + 'watch?v=WX-FJ25QILI&list=UULFV5OEc-nA4Ge5tOLUPWosaQ'))
 
@@ -33,6 +33,8 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Dw', action = 'list_tubes', url = host + 'watch?v=KQa4APEXnsQ&list=UULFQ1GpKa15ulyoQuxz7H4rng'))
 
     itemlist.append(item.clone( title = 'Explora Planet', action = 'list_tubes', url = host + 'watch?v=YfaCxrEaz9E&list=UULFwRvBitYM27PF-Yz2LSfABA'))
+
+    itemlist.append(item.clone( title = 'Gran Misterio', action = 'list_tubes', url = host + 'watch?v=8fz92RfijrA&list=PL64vL0ABVyDhWJPIWUfrjopSaR-TUqmoF'))
 
     itemlist.append(item.clone( title = 'Historias Vivas', action = 'list_tubes', url = host + 'watch?v=F7EJdtHtF2c&list=UULPAx8AK17j6BKqdQefiHWGag'))
 

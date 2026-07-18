@@ -8,12 +8,11 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; _dict = dict
 
 from lib import AlfaChannelHelper
-if not PY3: _dict = dict; from AlfaChannelHelper import dict
-from AlfaChannelHelper import DictionaryAllChannel
-from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
-
-from modules import renumbertools
+if not PY3: _dict = dict; from lib.AlfaChannelHelper import dict
+from lib.AlfaChannelHelper import DictionaryAllChannel
+from lib.AlfaChannelHelper import re, traceback, base64
+from lib.AlfaChannelHelper import Item, scrapertools, get_thumb, config, logger, filtertools, autoplay, renumbertools
+from core import httptools
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_ANIME
 list_language = list(set(IDIOMAS.values()))
@@ -26,15 +25,15 @@ forced_proxy_opt = 'ProxySSL'
 canonical = {
              'channel': 'henaojara', 
              'host': config.get_setting("current_host", 'henaojara', default=''), 
-             'host_alt': ['https://www.henaojara.com/'], 
-             'host_black_list': [], 
+             'host_alt': ['https://henaojara.com/'], 
+             'host_black_list': ['https://www.henaojara.com/'], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': True
              }
-host = canonical['host'] or canonical['host_alt'][0]
+host = 'https://henaojara.com/'
 
 timeout = 15
-kwargs = {}
+kwargs = {'error_check': False, 'ignore_response_code': True, 'follow_redirects': False, 'soup': True}
 debug = config.get_setting('debug_report', default=False)
 movie_path = 'ver/category/pelicula/'
 tv_path = 'ver/category/categorias/'
@@ -99,10 +98,10 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title='Últimos Animes', url=host, action='list_all',
                          thumbnail=get_thumb('newest', auto=True), c_type='series'))
 
-    itemlist.append(Item(channel=item.channel, title='Series', url=host + 'animeonline/category/categorias/', action='list_all',
+    itemlist.append(Item(channel=item.channel, title='Series', url=host + 'view/category/categorias/', action='list_all',
                          thumbnail=get_thumb('anime', auto=True), c_type='series'))
 
-    itemlist.append(Item(channel=item.channel, title='Películas', url=host + 'animeonline/category/pelicula/', action='list_all',
+    itemlist.append(Item(channel=item.channel, title='Películas', url=host + 'view/category/pelicula/', action='list_all',
                          thumbnail=get_thumb('movies', auto=True), c_type='peliculas'))
 
     itemlist.append(Item(channel=item.channel, title='Categorías',  action='section', url=host, 
@@ -111,7 +110,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Buscar...", action="search", url=host,
                          thumbnail=get_thumb("search", auto=True)))
 
-    itemlist = renumbertools.show_option(item.channel, itemlist)
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
 
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
@@ -122,8 +121,10 @@ def mainlist(item):
 
 def section(item):
     logger.info()
+    
+    data = httptools.downloadpage(item.url, **kwargs).soup
 
-    return AlfaChannel.section(item, **kwargs)
+    return AlfaChannel.section(item, data=data, **kwargs)
 
 
 def list_all(item):
@@ -134,8 +135,10 @@ def list_all(item):
     if item.c_type == 'episodios':
         findS['find'] = dict([('find', [{'tag': ['ul'], 'class': ['MovieList Rows BX B06 C04 E03 NoLmtxt Episodes']}]), 
                               ('find_all', [{'tag': ['li']}])])
-
-    return AlfaChannel.list_all(item, matches_post=list_all_matches, generictools=True, finds=findS, **kwargs)
+    
+    data = httptools.downloadpage(item.url, **kwargs).soup
+    
+    return AlfaChannel.list_all(item, data=data, matches_post=list_all_matches, generictools=True, finds=findS, **kwargs)
 
 
 def list_all_matches(item, matches_int, **AHkwargs):
@@ -217,8 +220,7 @@ def list_all_matches(item, matches_int, **AHkwargs):
             if elem.find("div", class_=["Description"]): 
                 elem_json['plot'] = elem.find("div", class_=["Description"]).p.get_text(strip=True)
 
-            elem_json['context'] = renumbertools.context(item)
-            elem_json['context'].extend(autoplay.context)
+            elem_json['context'] = autoplay.context
 
         except Exception:
             logger.error(elem)
@@ -234,8 +236,10 @@ def list_all_matches(item, matches_int, **AHkwargs):
 
 def seasons(item):
     logger.info()
+    
+    data = httptools.downloadpage(item.url, **kwargs).soup
 
-    return AlfaChannel.seasons(item, **kwargs)
+    return AlfaChannel.seasons(item, data=data, **kwargs)
 
 
 def episodios(item):
@@ -253,12 +257,16 @@ def episodios(item):
 
 def episodesxseason(item, **AHkwargs):
     logger.info()
-
+    
+    data = httptools.downloadpage(item.url, **kwargs).soup
+    
+    custom_kwargs = kwargs.copy()
+    custom_kwargs['soup'] = data
+    
     """ Aquí le decimos a qué función tienen que saltar para las películas de un solo vídeo """
     kwargs['matches_post_get_video_options'] = findvideos
-    soup = AHkwargs.get('soup', '')
 
-    return AlfaChannel.episodes(item, data=soup, matches_post=episodesxseason_matches, **kwargs)
+    return AlfaChannel.episodes(item, data=data, matches_post=episodesxseason_matches, **custom_kwargs)
 
 
 def episodesxseason_matches(item, matches_int, **AHkwargs):
@@ -266,12 +274,15 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
 
     matches = []
     findS = AHkwargs.get('finds', finds)
-    soup = AHkwargs.get('soup', {})
+    soup = AHkwargs.get('kwargs', {}).get('soup', {})
     
     # Asi lee los datos correctos de TMDB
     titleSeason = item.contentSeason
     if matches_int and titleSeason == 1:
         titleSeason = get_title_season(item.url, soup)
+    
+    nextChapterDateRegex = r'(?i)\s*-\s*Proximo\s*Capitulo\:?\s*(\d+-[A-Za-z]+-\d+)'
+    nextChapterDate = ''
 
     for elem in matches_int:
         elem_json = {}
@@ -283,13 +294,11 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
             elem_json['title'] = info.a.get_text(strip=True)
             episode = int(elem.find("span", class_="Num").get_text(strip=True) or 1)
 
-            elem_json['season'], elem_json['episode'] = renumbertools.numbered_for_trakt(item.channel, 
-                                                        item.contentSerieName, titleSeason, episode)
+            elem_json['season'] = titleSeason
+            elem_json['episode'] = episode
 
-            nextChapterDateRegex = r'(?i)\s*-\s*Proximo\s*Capitulo\:?\s*(\d+-[A-Za-z]+-\d+)'
             if re.search(nextChapterDateRegex, elem_json['title']):
                 nextChapterDate = scrapertools.find_single_match(elem_json['title'], nextChapterDateRegex)
-                elem_json['next_episode_air_date'] = nextChapterDate
 
             try:
                 elem_json['thumbnail'] = elem.find(["noscript", "span"]).find("img").get("src", "")
@@ -305,16 +314,23 @@ def episodesxseason_matches(item, matches_int, **AHkwargs):
             continue
 
         matches.append(elem_json.copy())
+        
+    if nextChapterDate:
+        for item in matches:
+            item['next_episode_air_date'] = nextChapterDate
 
     return matches
 
 
 def findvideos(item, **AHkwargs):
     logger.info()
+    
+    data = httptools.downloadpage(item.url, **kwargs).soup
+    
 
     kwargs['matches_post_episodes'] = episodesxseason_matches
 
-    return AlfaChannel.get_video_options(item, item.url, data='', matches_post=findvideos_matches, 
+    return AlfaChannel.get_video_options(item, item.url, data=data, matches_post=findvideos_matches, 
                                          verify_links=False, findvideos_proc=True, **kwargs)
 
 
@@ -340,8 +356,6 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
         matches.append(elem_json.copy())
 
     for elem in matches_int:
-        # logger.error(elem)
-
         try:
             content = elem.get_text(strip=True)
             if content != '':
@@ -350,10 +364,11 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
                 elem = elem.iframe
 
             url = elem.get('src', '')
+            
             if url == "" or not url.startswith('http'):
                 continue
 
-            iframeData = AlfaChannel.create_soup(url, hide_infobox=True, **kwargs)
+            iframeData = httptools.downloadpage(url, hide_infobox=True, **kwargs).soup
             if not iframeData:
                 continue
 
@@ -500,23 +515,5 @@ def multiplayer_findvideos(url):
     kwargs["canonical"]["proxy_web"] = False
     kwargs["headers"]["Referer"] = host
 
-    # url = url.replace('embed.php', 'player.php')
-
-    # if '?' in url:
-        # path, queryString = url.split('?', 1)
-        # if '&' in queryString:
-            # queries_in = queryString.split('&')
-            # queries_out = []
-            # for query in queries_in:
-                # if '=' in query:
-                    # key, val = query.split('=')
-                    # val = val+'ionA#as9ng849fg'
-                    # val = base64.b64encode(val.encode("utf-8")).decode('utf8')
-                    # queries_out.append('{}={}'.format(key, val))
-            # queryString = '&'.join(queries_out)
-        # url = '{}?{}'.format(path, queryString)
-        # logger.error(url)
-
-    data = AlfaChannel.create_soup(url, **kwargs)
-    # logger.error(data.data)
-    return scrapertools.find_multiple_matches(data.data, r'loadVideo\(\'\s*([^\']+)\'\)')
+    data = httptools.downloadpage(url, hide_infobox=True, **kwargs)
+    return scrapertools.find_multiple_matches(data.data, r'playVideo\(&quot;\s*(.+?)\s*&quot;\)')

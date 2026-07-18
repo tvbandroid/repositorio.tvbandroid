@@ -32,6 +32,16 @@ def mainlist_animes(item):
     logger.info()
     itemlist = []
 
+    if config.get_setting('descartar_anime', default=False): return
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista/anime-tv/', search_type = 'tvshow' ))
@@ -67,6 +77,23 @@ def list_all(item):
 
         if not url or not title: continue
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         SerieName = corregir_SerieName(title)
@@ -74,7 +101,7 @@ def list_all(item):
         title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
 
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, page = 0,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
+                                    contentType = 'tvshow', contentSerieName = SerieName, contentSeason = season, infoLabels={'year': '-'} ))
 
         if len(itemlist) >= perpage: break
 
@@ -116,6 +143,23 @@ def last_epis(item):
 
         if not url or not title: continue
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+            else:
+               season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+               if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+               if not season: season = 1
+
         thumb = scrapertools.find_single_match(match, '<img src="(.*?)"')
 
         SerieName = corregir_SerieName(title)
@@ -131,7 +175,7 @@ def last_epis(item):
         if url:
             itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb, page = 0,
                                         contentSerieName = SerieName, contentType = 'episode',
-                                        contentSeason = 1, contentEpisodeNumber=epis, infoLabels={'year':'-'} ))
+                                        contentSeason = season, contentEpisodeNumber=epis, infoLabels={'year':'-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -204,15 +248,36 @@ def episodios(item):
 
         title = title.strip()
 
+        if item.contentSeason: season = item.contentSeason
+        else:
+            season = 1
+
+            if 'Season' in title:
+                if '2nd' in title: season = 2
+                elif '3rd' in title: season = 3
+                elif '4th' in title: season = 4
+                elif '5th' in title: season = 5
+                elif '6th' in title: season = 6
+                elif '7th' in title: season = 7
+                elif '8th' in title: season = 8
+                elif '9th' in title: season = 9
+                else:
+                   season = scrapertools.find_single_match(title, 'Season(.*?)Capítulo').strip()
+                   if not season : season = scrapertools.find_single_match(title, 'Season(.*?)$').strip()
+
+                   if not season: season = 1
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
+
         epis = scrapertools.find_single_match(title, 'Capítulo(.*?)$').strip()
         if not epis: epis = scrapertools.find_single_match(title, 'Capitulo(.*?)$').strip()
 
         if not epis: epis = i
 
-        titulo = '1x' + str(epis) + ' ' + title.replace('Capítulo ' + str(epis), '').replace('Capitulo ' + str(epis), '').strip()
+        titulo = str(season) + 'x' + str(epis) + ' ' + title.replace('Capítulo ' + str(epis), '').replace('Capitulo ' + str(epis), '').strip()
 
         itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
-                                    contentType = 'episode', contentSeason = 1, contentEpisodeNumber = epis ))
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
             break
@@ -229,6 +294,14 @@ def episodios(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
@@ -260,16 +333,19 @@ def findvideos(item):
             if url.startswith('https://player.ojearanime.com/'): url = url.replace('/player.ojearanime.com/', '/waaw.to/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
-            link_other = ''
-            if servidor == 'various': link_other = servertools.corregir_other(url)
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                      language = lang, other = link_other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                      language = lang, other = other, force_input = force_input ))
 
     if blk_sub:
         matches = scrapertools.find_multiple_matches(str(blk_sub), "'(.*?)'")
@@ -284,16 +360,19 @@ def findvideos(item):
             if url.startswith('https://player.ojearanime.com/'): url = url.replace('/player.ojearanime.com/', '/waaw.to/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
-            link_other = ''
-            if servidor == 'various': link_other = servertools.corregir_other(url)
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                      language = lang, other = link_other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                      language = lang, other = other, force_input = force_input ))
 
     if blk_esp:
         matches = scrapertools.find_multiple_matches(str(blk_esp), "'(.*?)'")
@@ -308,16 +387,19 @@ def findvideos(item):
             if url.startswith('https://player.ojearanime.com/'): url = url.replace('/player.ojearanime.com/', '/waaw.to/')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
-            link_other = ''
-            if servidor == 'various': link_other = servertools.corregir_other(url)
+            other = ''
+            if servidor == 'various': other = servertools.corregir_other(url)
+
+            force_input = ''
+
+            if other == 'Lulustream': force_input = True
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, 
-                                      language = lang, other = link_other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url,
+                                      language = lang, other = other, force_input = force_input ))
 
     if not itemlist:
         if not ses == 0:
@@ -349,8 +431,22 @@ def list_search(item):
 
         SerieName = corregir_SerieName(title)
 
+        season = 1
+
+        if 'Season' in title:
+            if '2nd' in title: season = 2
+            elif '3rd' in title: season = 3
+            elif '4th' in title: season = 4
+            elif '5th' in title: season = 5
+            elif '6th' in title: season = 6
+            elif '7th' in title: season = 7
+            elif '8th' in title: season = 8
+            elif '9th' in title: season = 9
+
+        title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]')
+
         itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, page = 0,
-                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year':'-'} ))
+                                    contentType = 'tvshow', contentSeason = season, contentSerieName = SerieName, infoLabels={'year':'-'} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -380,6 +476,24 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'lista/nuevos-animes/'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
 
 
 def search(item, texto):

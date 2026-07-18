@@ -517,7 +517,7 @@ msgstr "Procesador, Memoria y Vídeo"
 
 msgctxt "#31101"
 msgid "items"
-msgstr ""
+msgstr "Elementos"
 
 msgctxt "#31102"
 msgid "min"

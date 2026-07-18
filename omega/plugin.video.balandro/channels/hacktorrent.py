@@ -4,12 +4,12 @@ import re
 
 from platformcode import logger, config, platformtools
 from core.item import Item
-from core import httptools, scrapertools, tmdb
+from core import httptools, scrapertools, servertools, tmdb
 
 from lib import decrypters
 
 
-host = 'https://hacktorrent.to/'
+host = 'https://hacktorrent.cc/'
 
 
 per_page = '20'
@@ -21,7 +21,7 @@ rut_animes = host + 'wp-json/wpreact/v1/animes?posts_per_page=' + per_page
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    ant_hosts = ['https://hacktorrent.men/']
+    ant_hosts = ['https://hacktorrent.men/', 'https://hacktorrent.to/']
 
     for ant in ant_hosts:
         url = url.replace(ant, host)
@@ -138,7 +138,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8217;', "'")
+        title = title.replace('&#8217;', "'").replace('&amp;', '&')
 
         thumb = scrapertools.find_single_match(match, '"featured":"(.*?)"')
 
@@ -157,7 +157,7 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
-            if '/series?' in item.url:
+            if '/series?' in item.url or '/serie/':
                 ref = host + 'serie/' + url + '/'
 
                 url = host + 'wp-json/wpreact/v1/serie/' + url + '/related/'
@@ -212,27 +212,34 @@ def temporadas(item):
 
     tot_temps = 0
 
-    for tempo in temporadas:
-        tempo = tempo.strip()
+    for ntempo in temporadas:
+        ntempo = ntempo.strip()
 
-        if tempo in seasons:
-            continue
-
-        if not tempo in seasons:
-            seasons.append(tempo)
+        if not ("'" + ntempo + "'") in str(seasons):
+            seasons.append(ntempo)
             tot_temps += 1
+
+    if tot_temps == 0: return itemlist
+
+    first_time = True
+
+    for tempo in seasons:
+        tempo = tempo.strip()
 
         title = 'Temporada ' + tempo
 
-        if tot_temps == 1:
-            if config.get_setting('channels_seasons', default=True):
-                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+        if first_time:
+            if tot_temps == 1:
+                if config.get_setting('channels_seasons', default=True):
+                    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                    item.page = 0
+                    item.contentType = 'season'
+                    item.contentSeason = tempo
+                    itemlist = episodios(item)
+                    return itemlist
+
+                first_time = False
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -251,7 +258,7 @@ def episodios(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('"season":' + str(item.contentSeason) + ',"episode":(.*?),"quality":"(.*?)",.*?"size":"(.*?)",.*?"download_link":"(.*?)",.*?"language":"(.*?)"', re.DOTALL).findall(str(data))
+    matches = re.compile('"season":' + str(item.contentSeason) + '(.*?)},', re.DOTALL).findall(str(data))
 
     if item.page == 0 and item.perpage == 50:
         sum_parts = len(matches)
@@ -298,7 +305,19 @@ def episodios(item):
                     item.perpage = sum_parts
                 else: item.perpage = 50
 
-    for epis, qlty, size, link, lang in matches[item.page * item.perpage:]:
+    tot_epis = len(matches)
+
+    for match in matches[item.page * item.perpage:]:
+        link = scrapertools.find_single_match(match, '"download_link":"(.*?)"')
+        if not link: link = scrapertools.find_single_match(match, '"url":"(.*?)"')
+
+        if not link: continue
+
+        epis = scrapertools.find_single_match(match, '"episode":(.*?),')
+
+        lang = scrapertools.find_single_match(match, '"language":"(.*?)"')
+        if not lang: lang = scrapertools.find_single_match(match, '"lang":"(.*?)"')
+
         lang = clean_title(lang)
 
         lang = lang.replace('\\/', '/')
@@ -312,11 +331,28 @@ def episodios(item):
         elif 'Subtitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
 
+        qlty = scrapertools.find_single_match(match, '"quality":"(.*?)"')
+
+        size = scrapertools.find_single_match(match, '"size":"(.*?)"')
+
         link = link.replace('\\/', '/')
+
+        sort = 'A' + epis
+
+        if tot_epis > 10:
+            if len(epis) <= 1: sort = 'A0' + epis
+
+            if len(epis) <= 1: epis = '0' + epis
 
         titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
-        itemlist.append(item.clone( action='findvideos', url=link, title=titulo, language=lang, quality=qlty, size=size,
+        titulo = titulo + ' ' + str(qlty) + ' ' + str(size)
+
+        if not '/acortalink.' in link:
+            titulo = '[COLOR blue][B][I]Streaming[/I][/B][/COLOR]  ' + titulo
+            sort = 'B' + epis
+
+        itemlist.append(item.clone( action='findvideos', url=link, title=titulo, language=lang, quality=qlty, size=size, sort = sort,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
 
         if len(itemlist) >= item.perpage:
@@ -326,7 +362,10 @@ def episodios(item):
 
     if itemlist:
         if len(matches) > ((item.page + 1) * item.perpage):
-            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage, text_color='coral' ))
+            itemlist.append(item.clone( title = "Siguientes ...", action = "episodios", page = item.page + 1, perpage = item.perpage,
+                            sort = 'C1000000', text_color='coral' ))
+
+    return sorted(itemlist, key=lambda it: it.sort)
 
     return itemlist
 
@@ -336,8 +375,12 @@ def findvideos(item):
     itemlist = []
 
     if item.contentType == 'episode':
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = 'torrent',
-                              language = item.language, quality = item.quality, other = item.size ))
+        servidor = 'torrent'
+
+        if not '/acortalink.' in item.url: servidor = ''
+
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = item.url, server = servidor,
+                                  language = item.language, quality = item.quality, other = item.size ))
 
         return itemlist
 
@@ -358,8 +401,11 @@ def findvideos(item):
 
         elif 'Castellano' in lang: lang = 'Esp'
         elif 'Latino' in lang: lang = 'Lat'
+
         elif 'Subtitulado' in lang: lang = 'Vose'
         elif 'Version Original' in lang: lang = 'VO'
+
+        elif 'ingles' in lang.lower(): lang = 'Ing'
 
         link = link.replace('\\/', '/')
 
@@ -375,14 +421,27 @@ def play(item):
 
     url = item.url
 
-    host_torrent = host[:-1]
-    url_base64 = decrypters.decode_url_base64(url, host_torrent)
+    if item.server == 'torrent':
+        host_torrent = host[:-1]
+        url_base64 = decrypters.decode_url_base64(url, host_torrent)
 
-    if url_base64.startswith('magnet:'):
-        itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+        if url_base64.startswith('magnet:'):
+            itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
 
-    elif url_base64.endswith(".torrent"):
-        itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+        elif url_base64.endswith(".torrent"):
+           itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
+    else:
+        servidor = servertools.get_server_from_url(url)
+
+        url = servertools.normalize_url(servidor, url)
+
+        if servidor == 'directo':
+            new_server = servertools.corregir_other(url).lower()
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
+
+        itemlist.append(item.clone( url = url, server = servidor ))
 
     return itemlist
 

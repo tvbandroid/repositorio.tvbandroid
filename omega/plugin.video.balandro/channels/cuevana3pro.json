@@ -9,9 +9,9 @@
   "search_types": ["all", "movie", "tvshow"],
 
   "categories": ["movie", "tvshow"],
-  "language": ["lat", "cast", "vose"],
+  "language": ["cast", "lat", "vose"],
 
-  "clusters": ["crypto", "notice", "current", "kids", "docs", "vos"],
+  "clusters": ["crypto", "suggested", "notice", "current", "rankings", "years", "kids", "docs", "vos", "anime", "dorama"],
 
-  "notes": "Películas y Series. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Películas por géneros. Series por Géneros. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
 }

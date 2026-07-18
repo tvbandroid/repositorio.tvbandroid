@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # --------------------------------------------------------
-# Conector streamwish By Alfa development Group
+# Conector streamwish By Alfa Development Group
 # --------------------------------------------------------
 
 import sys
@@ -25,24 +25,31 @@ def test_video_exists(page_url):
     global data
     logger.info("(page_url='%s')" % page_url)
     
+    if sys.version_info >= (3,):
+        from lib import alfaresolver_py3 as revolver
+    else:
+        from lib import alfaresolver as revolver
+    
     if "|Referer" in page_url or "|referer" in page_url:
         page_url, referer = page_url.split("|")
         referer = referer.replace('Referer=', '').replace('referer=', '')
         kwargs['headers'] = {'Referer': referer}
     
-    # page_url = httptools.downloadpage(page_url, follow_redirects=False).headers["location"]
-    
-    response = httptools.downloadpage(page_url, **kwargs)
+    response = httptools.downloadpage(revolver.wishmeluck(page_url), **kwargs)
     data = response.data
-    
-    if response.code == 404 or "no longer available" in data or "Not Found" in data: 
+    if response.code == 404: 
+        response = httptools.downloadpage(revolver.wishmeluck(page_url), **kwargs)
+    if "no longer available" in data or "Not Found" in data: 
         return False, "[streamwish] El archivo no existe o ha sido borrado"
+    if "restricted for this domain" in data:
+        return False, "[streamwish] El archivo esta restringido en tu pais"
     return True, ""
 
 
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
     logger.info("url=" + page_url)
     video_urls = []
+    
     try:
         pack = scrapertools.find_single_match(data, 'p,a,c,k,e,d.*?</script>')
         unpacked = jsunpack.unpack(pack)
@@ -50,20 +57,15 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         # m3u8_source = scrapertools.find_single_match(unpacked, '\{(?:file|"hls\d+"):"([^"]+)"\}')
         m3u8_source = scrapertools.find_single_match(unpacked, '(?:file|"hls2"):"([^"]+)"') ##evitar "hls4"
         
-        if "master.m3u8" in m3u8_source:
-            datos = httptools.downloadpage(m3u8_source).data
-            if sys.version_info[0] >= 3 and isinstance(datos, bytes):
-                datos = "".join(chr(x) for x in bytes(datos))
-            
-            if datos:
-                matches_m3u8 = re.compile('#EXT-X-STREAM-INF.*?RESOLUTION=\d+x(\d*)[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
-                ##matches_m3u8 = re.compile('#EXT-X-STREAM-INF\:[^\n]*\n([^\n]*)\n', re.DOTALL).findall(datos)
-                for quality, url in matches_m3u8:
-                    url =urlparse.urljoin(m3u8_source,url)
-                    video_urls.append(["[streamwish] %sp" % quality, url])
-        else:
-            video_urls.append(["[streamwish]", m3u8_source])
-
+        subtitles = ''
+        vttreg = re.compile('file:"([^"]+)",label:')
+        subs = vttreg.findall(unpacked)
+        if subs:
+            for sub in subs:
+                subtitles += sub + "\n"
+        
+        video_urls.append(["[streamwish] .m3u8", m3u8_source, 0, subtitles])
+    
     except Exception as e:
         logger.error(e)
         unpacked = data

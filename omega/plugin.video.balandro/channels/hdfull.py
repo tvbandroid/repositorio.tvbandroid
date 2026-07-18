@@ -5,13 +5,6 @@ import sys
 PY3 = sys.version_info[0] >= 3
 if PY3: unicode = str
 
-import re, base64, xbmcgui
-
-from platformcode import config, logger, platformtools
-from core.item import Item
-from core import httptools, scrapertools, jsontools, servertools, tmdb
-
-
 LINUX = False
 BR = False
 BR2 = False
@@ -44,20 +37,25 @@ except:
    except: pass
 
 
+import re, base64, xbmcgui
+
+from platformcode import config, logger, platformtools
+from core.item import Item
+from core import httptools, scrapertools, jsontools, servertools, tmdb
+
+
 # ~ webs para comprobar dominio vigente en actions pero pueden requerir proxies
 # ~ webs  0)-'https://dominioshdfull.com/'  1)-'https://new.hdfull.one/'
 
 
 dominios = [
-         'https://hdfull.blog/',
          'https://hdfull.today/',
-         'https://hd-full.biz/',
+         'https://hdfull.love/',
          'https://hdfull.sbs/',
 
-         'https://hdfull.help/',
-         'https://hdfull.cv/',
+         'https://www3.hdfull.one/',
+         'https://www2.hdfull.one/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
          'https://hdfull.one/',
@@ -68,9 +66,10 @@ dominios = [
 
 
 domains_cloudflare = [
+         'https://www3.hdfull.one/',
+         'https://www2.hdfull.one/',
          'https://hdfull.cv/',
          'https://hdfull.monster/',
-         'https://hdfull.cfd/',
          'https://hdfull.tel/',
          'https://hdfull.buzz/',
          'https://hdfull.one/',
@@ -93,8 +92,9 @@ ant_hosts = ['https://hdfull.sh/', 'https://hdfull.im/', 'https://hdfull.in/',
              'https://hd-full.im/', 'https://hd-full.one/', 'https://hdfull.link/',
              'https://hd-full.co/', 'https://hd-full.lol/', 'https://hdfull.quest/',
              'https://hd-full.info/', 'https://hd-full.sbs/', 'https://hd-full.life/',
-             'https://hd-full.fit/', 'https://hd-full.me/', 'https://hd-full.vip/'
-             ]
+             'https://hd-full.fit/', 'https://hd-full.me/', 'https://hd-full.vip/',
+             'https://hdfull.blog/', 'https://hdfull.cfd/', 'https://hdfull.help/',
+             'https://hd-full.biz/']
 
 
 
@@ -199,23 +199,6 @@ def do_make_login_logout(url, post=None):
             data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
         else:
             data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
-
-                if not url.startswith(domain):
-                    data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('hdfull', url, post=post, raise_weberror=False).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, raise_weberror=False).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -472,23 +455,6 @@ def do_downloadpage(url, post=None, referer=None):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
 
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, domain.replace('https://', '')[:-1])
-
-                if not url.startswith(domain):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('hdfull', url, post=post, headers=headers, raise_weberror=False).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=False).data
-            except:
-                pass
-
     if '<title>Just a moment...</title>' in data:
         if not 'buscar' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
@@ -606,6 +572,8 @@ def mainlist(item):
 
         itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all', text_color = 'yellow' ))
 
+        itemlist.append(item.clone( title = 'Buscar lista ...', action = 'search', target_action = 'top', search_type = 'all', search_pop = 'pop', text_color = 'greenyellow' ))
+
         itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis', text_color = 'deepskyblue' ))
         itemlist.append(item.clone( title = 'Series', action = 'mainlist_series', text_color = 'hotpink' ))
 
@@ -662,8 +630,10 @@ def mainlist_pelis(item):
         itemlist.append(item.clone( action='list_all', title='Más valoradas', url = dominio + 'peliculas/imdb_rating', search_type = 'movie' ))
 
         itemlist.append(item.clone( action='list_all', title='Por fecha', url = dominio + 'peliculas/date', search_type = 'movie' ))
-        itemlist.append(item.clone( action='list_all', title='Por alfabético', url = dominio + 'peliculas/abc', search_type = 'movie' ))
+
         itemlist.append(item.clone( action='generos', title='Por género', search_type = 'movie' ))
+
+        itemlist.append(item.clone( action='list_all', title='Por alfabético', url = dominio + 'peliculas/abc', search_type = 'movie' ))
 
     return itemlist
 
@@ -715,9 +685,9 @@ def mainlist_series(item):
         itemlist.append(item.clone( action='list_episodes', title=' - [COLOR yellowgreen]Últimos[/COLOR]', opcion = 'latest', search_type = 'tvshow' ))
         itemlist.append(item.clone( action='list_episodes', title=' - Actualizados', opcion = 'updated', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( action='series_abc', title='Por letra (A - Z)', search_type = 'tvshow' ))
-
         itemlist.append(item.clone( action='generos', title='Por género', search_type = 'tvshow' ))
+
+        itemlist.append(item.clone( action='series_abc', title='Por letra (A - Z)', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -855,12 +825,16 @@ def list_all(item):
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
+            sufijo = '' if item.search_type == 'movie' else 'movie'
+
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
                                         contentType='movie', contentTitle=title, infoLabels={'year': '-'} ))
 
         if tipo == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
+
+            sufijo = '' if item.search_type == 'tvshow' else 'tvshow'
 
             itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, languages=', '.join(languages), fmt_sufijo=sufijo,
                                         contentType='tvshow', contentSerieName=title, referer=item.url, infoLabels={'year': '-'} ))
@@ -1019,19 +993,22 @@ def temporadas(item):
         titulo = title
         if retitle != title: titulo += ' - ' + retitle
 
+        if '- Especiales' in titulo:
+            if config.get_setting('channels_especiales', default=True): continue
+
         if len(matches) == 1:
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.referer = item.url
-            item.url = url
-            item.thumbnail = thumb
-            item.sid = sid
-            item.contentType = 'season'
-            item.contentSeason = numtempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.referer = item.url
+                item.url = url
+                item.thumbnail = thumb
+                item.sid = sid
+                item.contentType = 'season'
+                item.contentSeason = numtempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', url = url, title = titulo, thumbnail = thumb, sid = sid, referer = item.url, page = 0,
                                     contentType = 'season', contentSeason = numtempo, text_color = 'tan' ))
@@ -1059,7 +1036,8 @@ def temporadas(item):
                         url = last_url + '/temporada-' + str(last_tempo)
                         title = 'Temporada ' + str(last_tempo)
 
-                        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, page = 0, sid = sid, referer = item.url,
+                        itemlist.append(item.clone( action = 'episodios', url = url, title = title, thumbnail = thumb, page = 0,
+                                                    sid = sid, referer = item.url,
                                                     contentType = 'season', contentSeason = last_tempo, infoLabels={'year': any}, text_color = 'tan' ))
                 except:
                     pass
@@ -1144,8 +1122,16 @@ def episodios(item):
                 else: item.perpage = 50
 
     for epi in data[item.page * item.perpage:]:
-        tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] else epi['title']['en'] if 'en' in epi['title'] and epi['title']['en'] else ''
+        if epi['title'] is None: tit = ''
+        else:
+           tit = epi['title']['es'] if 'es' in epi['title'] and epi['title']['es'] else epi['title']['en'] if 'en' in epi['title'] and epi['title']['en'] else ''
+
         if not tit: tit = epi['show']['title']['es'] if 'es' in epi['show']['title'] and epi['show']['title']['es'] != '' else epi['show']['title']['en'] if 'en' in epi['show']['title'] else ''
+
+        if 'episodie' in tit.lower() or 'episodio' in tit.lower() or 'capítulo' in tit.lower() or 'capitulo' in tit.lower():
+            tit = tit + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+        elif tit.lower() == 'tba':
+            tit = tit + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         titulo = '%sx%s %s' % (epi['season'], epi['episode'], tit)
 
@@ -1153,7 +1139,12 @@ def episodios(item):
         if langs: titulo += ' [COLOR %s]%s[/COLOR]' % (color_lang, ', '.join(langs))
 
         thumb = dominio + 'tthumb/220x124/' + epi['thumbnail']
+
         url = item.url + '/episodio-' + epi['episode']
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb,
                                     contentType = 'episode', contentSeason = epi['season'], contentEpisodeNumber = epi['episode'] ))
@@ -1171,7 +1162,7 @@ def episodios(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['CAM', 'cam', 'TS', 'ts', 'DVDSCR', 'dvdscr', 'DVDRIP', 'dvdrip', 'HDTV', 'hdtv', 'RHDTV', 'rhdtv', 'HD720', 'hd720', 'HD1080', 'hd1080']
+    orden = ['CAM', 'cam', 'TS', 'ts', 'DVDSCR', 'dvdscr', 'DVDRIP', 'dvdrip', 'HDTV', 'hdtv', 'RHDTV', 'rhdtv', 'HD720', 'hd720', 'HD1080', 'hd1080', '4K', '4k']
     if txt not in orden: return 0
 
     else: return orden.index(txt) + 1
@@ -1277,7 +1268,7 @@ def findvideos(item):
         ses += 1
 
         if embed == 'd':
-            if not 'uptobox' in url: continue
+            if not 'uptobox' in url: continue 
 
         if not PY3: calidad = unicode(calidad, 'utf8').upper().encode('utf8')
 
@@ -1439,6 +1430,7 @@ def list_listas(item):
         itemlist.append(item.clone( action = 'list_all', title = title, url = url, page = 0, text_color = text_color ))
 
     if itemlist:
+
         if not '&search=' in post:
             next_start = (item.page * perpage)
             next_page = item.page + 1
@@ -1535,6 +1527,41 @@ def show_credenciales(item):
     password = config.get_setting('hdfull_password', 'hdfull', default='')
 
     platformtools.dialog_ok(config.__addon_name + ' HdFull - Credenciales', 'Domain.:   [COLOR cyan][B]' + domain + '[/B][/COLOR]', 'User......:   [COLOR yellow][B]' + username, '[/B][/COLOR]Pass.....:   [COLOR yellow][B]' + password + '[/B][/COLOR]')
+
+
+def _news(item):
+    logger.info()
+
+    dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
+
+    if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
+
+    item.url = dominio + 'peliculas-estreno'
+    item.search_type = 'movie'
+
+    return list_all(item)
+
+
+def _lasts(item):
+    logger.info()
+
+    dominio = config.get_setting('dominio', 'hdfull', default=dominios[0])
+
+    if not config.get_setting('dominio', 'hdfull'): config.set_setting('dominio', dominio, 'hdfull')
+
+    item.url = dominio + 'series/date'
+    item.search_type = 'tvshow'
+
+    return list_all(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.opcion = 'premiere'
+    item.search_type = 'tvshow'
+
+    return list_episodes(item)
 
 
 def search(item, texto):

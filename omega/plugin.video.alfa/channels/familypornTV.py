@@ -3,6 +3,7 @@
 # -*- Created for Alfa-addon -*-
 # -*- By the Alfa Develop Group -*-
 
+
 import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; _dict = dict
@@ -20,6 +21,12 @@ list_quality_tvshow = []
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS_A
 forced_proxy_opt = 'ProxySSL'
+
+######      No muestr fotos hay que cambiar x216 x217 
+######      RES fotos  https://familyporn.tv/contents/videos_screenshots/60000/60916/289x217/1.jpg
+                    # elem_json['thumbnail'] = re.sub(r"\d+x\d+/\d+.jpg", "preview.jpg",thumbnail)
+                    
+                    ################ KTP falla por el PROXY
 
 canonical = {
              'channel': 'familypornTV', 
@@ -57,11 +64,11 @@ finds = {'find':  dict([('find', [{'tag': ['div'], 'id': ['list_videos_videos_li
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
          'profile_labels': {
-                            'list_all_thumbnail': {'find': [{'tag': ['img'], '@ARG': 'data-webp'}]}, 
-                            'list_all_canal': dict([('find', [{'tag': ['a'], 'class': ['site']}]),
-                                                    ('get_text', [{'tag': '', 'strip': True}])]), # FALTA incluir en AH External Labels
-                            'section_cantidad': dict([('find', [{'tag': ['span', 'div'], 'class': ['videos', 'thumb_string']}]),
-                                                      ('get_text', [{'tag': '', 'strip': True, '@TEXT': '(\d+)'}])])
+                            # 'list_all_thumbnail': {'find': [{'tag': ['img'], '@ARG': 'data-webp'}]}, 
+                            # 'list_all_canal': dict([('find', [{'tag': ['a'], 'class': ['site']}]),
+                                                    # ('get_text', [{'tag': '', 'strip': True}])]), # FALTA incluir en AH External Labels
+                            # 'section_cantidad': dict([('find', [{'tag': ['span', 'div'], 'class': ['videos', 'thumb_string']}]),
+                                                      # ('get_text', [{'tag': '', 'strip': True, '@TEXT': '(\d+)'}])])
                             },
          'controls': {'url_base64': False, 'cnt_tot': 24, 'reverse': False, 'profile': 'default'},  ##'jump_page': True, ##Con last_page  aparecerá una línea por encima de la de control de página, permitiéndote saltar a la página que quieras
          'timeout': timeout}
@@ -102,8 +109,8 @@ def list_all(item):
     findS['next_page'] = {}
     item.last_page = 9999
     
-    return AlfaChannel.list_all(item, finds=findS, **kwargs)
-    # return AlfaChannel.list_all(item, finds=findS, matches_post=list_all_matches, **kwargs)
+    # return AlfaChannel.list_all(item, finds=findS, **kwargs)
+    return AlfaChannel.list_all(item, finds=findS, matches_post=list_all_matches, **kwargs)
 
 
 def list_all_matches(item, matches_int, **AHkwargs):
@@ -111,8 +118,6 @@ def list_all_matches(item, matches_int, **AHkwargs):
     matches = []
     findS = AHkwargs.get('finds', finds)
        
-
-    logger.debug(matches_int[0])
 
     for elem in matches_int:
         elem_json = {}
@@ -123,10 +128,10 @@ def list_all_matches(item, matches_int, **AHkwargs):
             if not elem_json['title']:
                 elem_json['title'] = elem.img.get('alt', '')
             
-            elem_json['thumbnail'] = elem.img.get('data-thumb_url', '') or elem.img.get('data-original', '') \
+            thumbnail = elem.img.get('data-webp', '') or elem.img.get('data-original', '') \
                                      or elem.img.get('data-src', '') \
                                      or elem.img.get('src', '')
-            elem_json['thumbnail'] = elem_json['thumbnail'].replace('x216', 'x217')## ESTA LINEA OBLIGA list_all_matches
+            elem_json['thumbnail'] = re.sub(r"\d+x\d+/\d+.jpg", "preview.jpg",thumbnail)
             elem_json['stime'] = elem.find(class_='duration').get_text(strip=True) if elem.find(class_='duration') else ''
             if elem.find('span', class_=['hd-thumbnail', 'is-hd']):
                 elem_json['quality'] = elem.find('span', class_=['hd-thumbnail', 'is-hd']).get_text(strip=True)

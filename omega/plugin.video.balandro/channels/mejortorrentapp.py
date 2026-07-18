@@ -13,7 +13,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www32.mejortorrent.eu'
+host = 'https://www43.mejortorrent.eu'
 
 
 # ~ por si viene de enlaces guardados
@@ -27,7 +27,11 @@ ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://ww
              'https://www20.mejortorrent.zip', 'https://www21.mejortorrent.zip', 'https://www22.mejortorrent.zip',
              'https://www23.mejortorrent.zip', 'https://www24.mejortorrent.zip', 'https://www25.mejortorrent.zip',
              'https://www26.mejortorrent.eu', 'https://www27.mejortorrent.eu', 'https://www28.mejortorrent.eu',
-             'https://www29.mejortorrent.eu', 'https://www30.mejortorrent.eu', 'https://www31.mejortorrent.eu']
+             'https://www29.mejortorrent.eu', 'https://www30.mejortorrent.eu', 'https://www31.mejortorrent.eu',
+             'https://www32.mejortorrent.eu', 'https://www33.mejortorrent.eu','https://www34.mejortorrent.eu',
+             'https://www35.mejortorrent.eu', 'https://www36.mejortorrent.eu', 'https://www37.mejortorrent.eu',
+             'https://www38.mejortorrent.eu', 'https://www39.mejortorrent.eu', 'https://www40.mejortorrent.eu',
+             'https://www41.mejortorrent.eu', 'https://www42.mejortorrent.eu']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -94,7 +98,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '/busqueda?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MejorTorrentApp', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MejorTorrentApp', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -102,6 +106,11 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage_proxy('mejortorrentapp', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if not '/busqueda?q=' in url:
+        if '<title>Just a moment...</title>' in data:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+            return ''
 
     return data
 
@@ -115,9 +124,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_mejortorrentapp', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='mejortorrentapp', folder=False, text_color='chartreuse' ))
@@ -129,7 +138,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'mejortorrentapp', thumbnail=config.get_thumb('mejortorrentapp') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'mejortorrentapp' ))
 
     platformtools.itemlist_refresh()
 
@@ -403,6 +414,8 @@ def list_list(item):
 
         if not url or not title: continue
 
+        title = title.replace('&#039;', "'")
+
         qlty = scrapertools.find_single_match(match, '<strong>(.*?)</strong>')
 
         qlty = qlty.replace ('(', '').replace (')', '').strip()
@@ -649,6 +662,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + '/public/torrents/'
+    item.search_type = 'movie'
+
+    return list_list(item)
 
 
 def search(item, texto):

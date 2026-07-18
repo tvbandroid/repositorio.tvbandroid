@@ -10,23 +10,48 @@ from core import httptools
 from core import urlparse
 from bs4 import BeautifulSoup
 from modules import autoplay
+from lib.alfa_assistant import is_alfa_installed
+
+forced_proxy_opt = 'ProxySSL'
+
 
 IDIOMAS = {'vo': 'VO'}
 list_language = list(IDIOMAS.values())
 list_quality = []
 list_servers = ['vidlox']
 
+##          https://watchxxxfree.com/
+
+####          Just a moment...     FUNCIONA CON WARP
+cf_assistant = "force" if is_alfa_installed() else False
+# cf_assistant = True if is_alfa_installed() else False
+forced_proxy_opt = None if cf_assistant else 'ProxySSL'
+cf_debug = True
+
+timeout = 15
+
 canonical = {
              'channel': 'xxxfreeinhd', 
              'host': config.get_setting("current_host", 'xxxfreeinhd', default=''), 
              'host_alt': ["https://xxxfree.watch/"], 
              'host_black_list': [], 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
-             'CF': False, 'CF_test': False, 'alfa_s': True
+             # 'set_tls': None, 'set_tls_min': False, 'retries_cloudflare': 7, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             # 'cf_assistant': False, 'CF_stat': True, 
+             # 'CF': False, 'CF_test': False, 'alfa_s': True
+             
+             # 'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
+             # 'CF': False, 'CF_test': False, 'alfa_s': True
+             
+             'set_tls': True, 'set_tls_min': True, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': cf_assistant, 
+             'cf_assistant_ua': True, 'cf_assistant_get_source': True if cf_assistant == 'force' else False, 
+             'cf_no_blacklist': True, 'cf_removeAllCookies': False if cf_assistant == 'force' else True,
+             'cf_challenge': True, 'cf_returnkey': 'url', 'cf_partial': True, 'cf_debug': cf_debug, 
+             'cf_cookies_names': {'cf_clearance': False},
+             'CF_if_assistant': True if cf_assistant is True else False, 'retries_cloudflare': -1, 
+             'CF_stat': True if cf_assistant is True else False, 'session_verify': True, 
+             'CF': False, 'CF_test': False, 'alfa_s': True, 'renumbertools': False
             }
 host = canonical['host'] or canonical['host_alt'][0]
-
-# netu
 
 
 def mainlist(item):
@@ -37,6 +62,7 @@ def mainlist(item):
 
     itemlist.append(item.clone(title="Nuevos" , action="lista", url=host + "?filter=latest"))
     itemlist.append(item.clone(title="Mas vistos" , action="lista", url=host + "?filter=most-viewed"))
+    itemlist.append(item.clone(title="Mas valorado" , action="lista", url=host + "?filter=popular"))
     itemlist.append(item.clone(title="Mas largo" , action="lista", url=host + "?filter=longest"))
     itemlist.append(item.clone(title="Categorias" , action="categorias", url=host + "categories/"))
     itemlist.append(item.clone(title="Buscar", action="search"))
@@ -67,7 +93,10 @@ def categorias(item):
     for elem in matches:
         url = elem.a['href']
         title = elem.a['title']
-        thumbnail = elem.img['src']
+        if elem.img.get('src', ''):
+            thumbnail = elem.img['src']
+        else:
+            thumbnail = elem.img['data-src']
         plot = ""
         itemlist.append(Item(channel=item.channel, action="lista", title=title, url=url,
                              fanart=thumbnail, thumbnail=thumbnail , plot=plot) )
@@ -81,9 +110,9 @@ def categorias(item):
 def create_soup(url, referer=None, unescape=False):
     logger.info()
     if referer:
-        data = httptools.downloadpage(url, headers={'Referer': referer}, canonical=canonical).data
+        data = httptools.downloadpage(url, headers={'Referer': referer}, timeout=timeout, canonical=canonical).data
     else:
-        data = httptools.downloadpage(url, canonical=canonical).data
+        data = httptools.downloadpage(url, timeout=timeout, canonical=canonical).data
     if unescape:
         data = scrapertools.unescape(data)
     soup = BeautifulSoup(data, "html5lib", from_encoding="utf-8")
@@ -94,11 +123,17 @@ def lista(item):
     logger.info()
     itemlist = []
     soup = create_soup(item.url)
-    matches = soup.find_all('article')
+    logger.debug(soup)
+    matches = soup.find('div', class_='videos-list').find_all('article')
     for elem in matches:
         url = elem.a['href']
         title = elem.a['title']
-        thumbnail = elem.img['data-src']
+        if not elem.img:
+            thumbnail = ""
+        elif elem.img.get('src', ''):
+            thumbnail = elem.img['src']
+        if "svg" in thumbnail:
+            thumbnail = elem.img['data-lazy-src']
         plot = ""
         itemlist.append(Item(channel=item.channel, action="findvideos", title=title, contentTitle=title, url=url,
                              fanart=thumbnail, thumbnail=thumbnail , plot=plot) )
@@ -113,11 +148,16 @@ def lista(item):
 def findvideos(item):
     logger.info()
     itemlist = []
+    frames = []
     soup = create_soup(item.url).find('div', class_='responsive-player')
     matches = soup.find_all('iframe')
     for elem in matches:
         url = elem['src']
-        itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
+        if "about:" in url:
+            url =  elem['data-lazy-src']
+        if not url in frames:
+            frames.append(url)
+            itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     autoplay.start(itemlist, item)
     return itemlist

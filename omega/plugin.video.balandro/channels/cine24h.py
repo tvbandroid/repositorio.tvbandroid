@@ -10,7 +10,7 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://cine24h.online/'
 
 
-perpage = 33
+perpage = 30
 
 
 def item_configurar_proxies(item):
@@ -59,7 +59,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if host in url:
         if hay_proxies: timeout = config.get_setting('channels_repeat', default=30)
 
-    if '&years%5B%5D=' in url: raise_weberror = False
+    if '/release/' in url: raise_weberror = False
 
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
@@ -71,7 +71,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cine24H', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('Cine24H', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -145,7 +145,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -193,7 +193,7 @@ def anios(item):
     current_year = int(datetime.today().year)
 
     for x in range(current_year, 1939, -1):
-        url = host + '?s=trfilter&trfilter=1&years%5B%5D=' + str(x)
+        url = host + 'release/' + str(x)
 
         itemlist.append(item.clone( title=str(x), url=url, action='list_all', text_color = 'deepskyblue' ))
 
@@ -264,9 +264,6 @@ def list_all(item):
         if len(itemlist) >= perpage: break
 
     tmdb.set_infoLabels(itemlist)
-
-    if num_matches < perpage: return itemlist
-
     buscar_next = True
     if num_matches > perpage:
         hasta = (item.page * perpage) + perpage
@@ -302,11 +299,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -379,9 +376,13 @@ def episodios(item):
     for epis, url, thumb, title in matches[item.page * item.perpage:]:
         if not 'http' in thumb: thumb = 'https:' + thumb
 
-        title = str(item.contentSeason) + 'x' + str(epis) + ' ' + title
+        titulo = str(item.contentSeason) + 'x' + str(epis) + ' ' + title.replace(str(item.contentSeason) + 'x' + str(epis), '')
 
-        itemlist.append(item.clone( action='findvideos', url = url, title = title, thumbnail=thumb,
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        itemlist.append(item.clone( action='findvideos', url = url, title = titulo, thumbnail=thumb,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber=epis ))
 
         if len(itemlist) >= item.perpage:
@@ -454,9 +455,8 @@ def findvideos(item):
     for match in matches:
         ses += 1
 
-        if not '/redirect-to/' in match: continue
-
-        url = scrapertools.find_single_match(match, 'redirect=(.*?)$')
+        if '/redirect-to/' in match: url = scrapertools.find_single_match(match, 'redirect=(.*?)$')
+        else: url = match
 
         if url:
             if not 'http' in url: continue
@@ -464,7 +464,6 @@ def findvideos(item):
             if '/fembed.' in url: continue
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = item.languages ))
 
@@ -492,6 +491,7 @@ def play(item):
 
         if new_url:
            if new_url == 'null': return itemlist
+           elif new_url == 'https://filemoon.sx/e/': return itemlist
 
            url = new_url
 
@@ -507,13 +507,14 @@ def play(item):
 
         if url:
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
 
             url = servertools.normalize_url(servidor, url)
 
             if servidor == 'directo':
                 new_server = servertools.corregir_other(url).lower()
-                if new_server.startswith("http"): servidor = new_server
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
             itemlist.append(item.clone( url=url, server=servidor ))
 

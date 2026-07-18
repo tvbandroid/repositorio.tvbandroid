@@ -65,6 +65,7 @@ def series(item):
 
     for url, title in matches[item.page * perpage:]:
         url = host + url
+
         title = title.split("<")[0].capitalize()
 
         itemlist.append(item.clone( action='list_series', url=url, title=title, infoLabels = {'year': '-'}, text_color='moccasin' ))
@@ -134,9 +135,7 @@ def list_all(item):
 
         title = title.replace('&#8230;', '').replace('&#8211;', '')
 
-        thumb = scrapertools.find_single_match(article, 'itemprop="image".*?srcset"(.*?).jpg')
-
-        if thumb: thumb = thumb + '.jpg'
+        thumb = scrapertools.find_single_match(article, '<img width=.*?src="(.*?)"')
 
         plot = scrapertools.htmlclean(scrapertools.find_single_match(article, '<p>(.*?)</p>'))
 
@@ -221,13 +220,33 @@ def findvideos(item):
             i += 1
             other = str(i)
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
         if not 'http' in url: url = 'https:' + url
 
+        servidor = servertools.get_server_from_url(url)
+
+        url = url.replace('/www.youtube-nocookie.com/', '/www.youtube.com/')
+
         if servidor and servidor != 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server=servidor, title = '', url = url, language = 'Esp', other = other ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server=servidor, url=url, language = 'Esp', other = other ))
+
+    if not itemlist:
+        matches = scrapertools.find_multiple_matches(data, '<strong>Watch:</strong>(.*?)</p>')
+
+        for url in matches:
+            ses += 1
+
+            url = url.strip()
+
+            if not 'http' in url: url = 'https:' + url
+
+            if not '.youtube.' in url: continue
+ 
+            other = ''
+            if num_matches > 1:
+                i += 1
+                other = str(i)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server='youtube', url=url, language = 'Esp', other = other ))
 
     if not itemlist:
         if not ses == 0:

@@ -1,10 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
 
-import sys
-
-PY3 = False
-if sys.version_info[0] >= 3: PY3 = True
-
 import re
 
 from platformcode import config, logger, platformtools
@@ -12,43 +7,11 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
-host = 'https://peliculaspro.org/'
+host = 'https://pelispro.net/'
 
 
 # ~ por si viene de enlaces guardados
-ant_hosts = ['https://peliculaspro.net/']
+ant_hosts = ['https://peliculaspro.net/', 'https://peliculaspro.org/']
 
 
 domain = config.get_setting('dominio', 'peliculaspro', default='')
@@ -113,7 +76,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PeliculasPro', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('PeliculasPro', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -121,23 +84,6 @@ def do_downloadpage(url, post=None, headers=None):
                     data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('peliculaspro', url, post=post, headers=headers, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
-            except:
-                pass
 
     if '<title>Just a moment...</title>' in data:
         if not '?s=' in url:
@@ -199,13 +145,15 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( action='acciones', title= '[B]Acciones[/B] [COLOR plum](si no hay resultados)[/COLOR]', text_color='goldenrod' ))
 
-    itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
+    itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie', text_color = 'deepskyblue' ))
 
-    itemlist.append(item.clone ( title = 'Catálogo', action = 'list_all', url = host + 'peliculas', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas', search_type = 'movie' ))
 
-    itemlist.append(item.clone ( title = 'Estrenos', action = 'list_all', url = host + 'category/estrenos', search_type = 'movie', text_color='cyan' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'estrenos?type=movies', search_type = 'movie', text_color='cyan' ))
 
-    itemlist.append(item.clone ( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+
+    itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
 
@@ -219,6 +167,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host + 'estrenos?type=series', search_type = 'tvshow', text_color = 'moccasin' ))
 
     return itemlist
 
@@ -237,6 +187,21 @@ def generos(item):
         if title == 'Estrenos': continue
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, text_color = 'deepskyblue' ))
+
+    return itemlist
+
+
+def anios(item):
+    logger.info()
+    itemlist = []
+
+    from datetime import datetime
+    current_year = int(datetime.today().year)
+
+    for x in range(current_year, 1939, -1):
+        url = host + 'release/' + str(x)
+
+        itemlist.append(item.clone( title = str(x), url = url, action = 'list_all', text_color = 'deepskyblue' ))
 
     return itemlist
 
@@ -324,12 +289,12 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.dpost = dpost
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.dpost = dpost
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, dpost = dpost, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -426,12 +391,8 @@ def findvideos(item):
 
     ses = 0
 
-    i = 0
-
     for opt, url in matches:
         ses += 1
-
-        i += 1
 
         srv, lang = scrapertools.find_single_match(data, 'href="#options-' + str(opt)+ '">.*?<span class="server">(.*?)-(.*?)</span>')
 
@@ -443,38 +404,81 @@ def findvideos(item):
         idioma = IDIOMAS.get(lang, lang)
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
 
         if servidor:
             if srv.startswith("sb"): continue
+
             elif srv == 'vanfem': continue
             elif srv == 'freepelis': continue
+            elif srv == 'streamcrypt': continue
+            elif srv == 'filekeeper': continue
 
             elif srv == 'streamz': servidor = srv
             elif srv == 'doods': servidor = 'doodstream'
             elif srv == 'streamtape' or srv == 'stapadblockuser': servidor = 'streamtape'
             elif srv == 'netu' or srv == 'hqq': servidor = 'waaw'
-            elif srv == 'd0o0d' or srv == 'do0od' or srv == 'd0000d' or srv == 'd000d' or srv == 'dood': servidor = 'doodstream'
+            elif srv == 'd0o0d' or srv == 'do0od' or srv == 'd0000d' or srv == 'd000d' or srv == 'dood' or srv == 'playmogo' : servidor = 'doodstream'
             elif srv == 'vidoza': servidor = 'vidoza'
             elif srv == 'pelisfree': servidor = 'waaw'
+            elif srv == 'voe': servidor = 'voe'
 
-            elif srv == 'streamcrypt': other = srv + ' ' + str(i)
+            elif srv =='vimeus':
+                new_url = url
+
+                new_url = new_url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+                new_url = new_url.replace('amp;#038;', '&').replace('#038;', '&').replace('amp;', '&')
+
+                datan = do_downloadpage(new_url)
+
+                urlv = scrapertools.find_single_match(datan, '<iframe.*?src="(.*?)"')
+
+                urlv = urlv.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
+                urlv = urlv.replace('amp;#038;', '&').replace('#038;', '&').replace('amp;', '&')
+
+                if urlv:
+                    datav = do_downloadpage(urlv, headers = {'Referer': host})
+
+                    embed = scrapertools.find_single_match(datav, '"embeds":(.*?)</script>')
+
+                    links = scrapertools.find_multiple_matches(embed, '"url":"(.*?)"')
+
+                    for link in links:
+                        ses += 1
+
+                        url = link
+
+                        servidor = servertools.get_server_from_url(url)
+
+                        if servidor == 'directo': continue
+
+                        other = ''
+
+                        if servidor == 'various': other = servertools.corregir_other(url)
+                        elif servidor == 'zures': other = servertools.corregir_zures(url)
+
+                        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                                              language = idioma, other = other ))
+
+                    continue
 
             else:
                 if servidor == srv: srv = ''
 
                 elif servidor == 'directo': other = servertools.corregir_other(srv)
-                elif servidor == 'various': other = servertools.corregir_other(srv)
 
-                else: other = srv + ' ' + str(i)
+                elif servidor == 'various': other = servertools.corregir_other(srv)
+                elif servidor == 'zures': other = servertools.corregir_zures(srv)
+
+                else: other = srv
 
                 if 'li>' in idioma:
                     idioma = ''
                     other = ''
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = idioma, other = other ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                              language = idioma, other = other ))
 
     # ~ downloads
     bloque = scrapertools.find_single_match(data, '<table>(.*?)</table>')
@@ -487,9 +491,12 @@ def findvideos(item):
         srv = srv.lower().strip()
 
         if srv == '1fichier': continue
+        elif srv == 'filekeeper': continue
+
         elif srv == 'ver en': continue
         elif srv == 'drop': continue
         elif srv == 'bit': continue
+        elif srv == 'g2tji-my': continue
 
         idioma = IDIOMAS.get(lang, lang)
 
@@ -506,7 +513,7 @@ def findvideos(item):
                other = ''
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url,
-                              language = idioma, quality = qlty, other = other ))
+                              language = idioma, quality = qlty, other = other, age = 'D' ))
 
     if not itemlist:
         if not ses == 0:
@@ -520,6 +527,8 @@ def play(item):
     logger.info()
     itemlist = []
 
+    # ~ 14/11/24 Vidoza  No es pot resoldre redirecciona a otro /?trhide=
+
     domain_memo = config.get_setting('dominio', 'peliculaspro', default='')
 
     if domain_memo: host_player = domain_memo
@@ -532,17 +541,18 @@ def play(item):
 
     if url.startswith(host_player):
         if '/?trhide=' in url or '/?trdownload=' in url:
-            url = ''
-
             headers = {'Referer': item.url}
 
+            hay_proxies = False
+            if config.get_setting('channel_peliculaspro_proxies', default=''): hay_proxies = True
+
             try:
-                if config.get_setting('channel_peliculaspro_proxies', default=''):
+                if hay_proxies:
                     url = httptools.downloadpage_proxy('peliculaspro', item.url, headers=headers, follow_redirects=False).headers['location']
                 else:
                     url = httptools.downloadpage(item.url, headers=headers, follow_redirects=False).headers['location']
             except:
-                pass
+                url = ''
 
         else:
             data = do_downloadpage(item.url)
@@ -550,10 +560,13 @@ def play(item):
             url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
             if '/?trhide=' in url or '/?trdownload=' in url:
+                hay_proxies = False
+                if config.get_setting('channel_peliculaspro_proxies', default=''): hay_proxies = True
+
                 headers = {'Referer': item.url}
 
                 try:
-                    if config.get_setting('channel_peliculaspro_proxies', default=''):
+                    if hay_proxies:
                         url = httptools.downloadpage_proxy('peliculaspro', url, headers=headers, follow_redirects=False).headers['location']
                     else:
                         url = httptools.downloadpage(url, headers=headers, follow_redirects=False).headers['location']
@@ -574,35 +587,35 @@ def play(item):
 
             if not url: url = scrapertools.find_single_match(data, '<a class="fake-player-container" href="(.*?)"')
 
-    elif url.startswith('https://streamcrypt.net/'):
-        url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
-
-        if url:
-            url = url.replace('?id=', '?p=2&id=')
-            url = httptools.downloadpage(url, follow_redirects=False).headers.get('location', '')
-        else:
-            data = do_downloadpage(url)
-            url = scrapertools.find_single_match(data, "window.open.*?'(.*?)'")
-
-    if '/peliculaspro.' in url: url = ''
-
-    elif url == '/blank.html': url = ''
-
     if url:
-        if url.startswith('https://pelisfree.site/'): url = url.replace('/pelisfree.site/', '/waaw.to/')
+        if '/peliculaspro.' in url or '/blank.html' in url or '/vimeus.' in url:
+            return 'Servidor [COLOR goldenrod]No Soportado[/COLOR]'
+
+        if url.startswith('https://pelisfree.site/'):
+            url = url.replace('/pelisfree.site/', '/waaw.to/')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'estrenos?type=movies'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

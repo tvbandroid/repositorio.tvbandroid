@@ -6,7 +6,7 @@ PY3 = False
 if sys.version_info[0] >= 3: PY3 = True
 
 
-import re, os
+import re, os, base64
 
 from platformcode import logger, config, platformtools
 from core.item import Item
@@ -15,7 +15,7 @@ from core import httptools, scrapertools, tmdb
 from lib import decrypters
 
 
-host = 'https://www1.divxtotal.lol/'
+host = 'https://divxtotal.foo/'
 
 
 # ~ por si viene de enlaces guardados
@@ -24,7 +24,7 @@ ant_hosts = ['https://www.divxtotal.re/', 'https://www.divxtotal.ac/', 'https://
              'https://www.divxtotal.pl/', 'https://www.divxtotal.wf/', 'https://www.divxtotal.win/',
              'https://www1.divxtotal.zip/', 'https://www2.divxtotal.zip/', 'https://www2.divxtotal.mov/',
              'https://www3.divxtotal.mov/', 'https://www4.divxtotal.mov/', 'https://www5.divxtotal.mov/',
-             'https://divxtotal.io/']
+             'https://divxtotal.io/', 'https://www1.divxtotal.lol/', 'https://www3.divxtotal.lol/']
 
 
 domain = config.get_setting('dominio', 'divxtotal', default='')
@@ -85,7 +85,7 @@ def do_downloadpage(url, post=None, headers=None):
 
         if not data:
             if not '?s=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DivxTotal', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('DivxTotal', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -169,7 +169,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series-6/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Últimas', action = 'list_all', url = host, group = 'lasts', search_type = 'tvshow', text_color='cyan' ))
 
@@ -181,7 +181,7 @@ def calidades(item):
     itemlist = []
 
     itemlist.append(item.clone( title = 'En DVDR', action = 'list_all', url = host + 'peliculas-dvdr/', search_type = 'movie', text_color = 'moccasin' ))
-    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas-hd-5/', search_type = 'movie', text_color = 'moccasin' ))
+    itemlist.append(item.clone( title = 'En HD', action = 'list_all', url = host + 'peliculas-hd/', search_type = 'movie', text_color = 'moccasin' ))
     itemlist.append(item.clone( title = 'En 3D', action = 'list_all', url = host + 'peliculas-3-d/', search_type = 'movie', text_color = 'moccasin' ))
 
     return itemlist
@@ -202,6 +202,8 @@ def generos(item):
 
         if config.get_setting('descartar_anime', default=False):
             if title == 'Anime': continue
+
+        if url.startswith('?'): url = host[:-1] + url
 
         itemlist.append(item.clone( action='list_all', title=title, url=url, text_color = 'deepskyblue' ))
 
@@ -227,7 +229,8 @@ def list_all(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr>(.*?)</tr>')
     if not matches:
-        if item.search_type == 'tvshow': matches = scrapertools.find_multiple_matches(bloque, '<div class="col-lg-3 col-md-3 col-md-4 col-xs-6">(.*?)</div>')
+        if item.search_type == 'tvshow':
+             matches = scrapertools.find_multiple_matches(bloque, '<div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 serie-card">(.*?)</div>')
 
     if not matches:
         if item.group == 'lasts': matches = scrapertools.find_multiple_matches(bloque, '<div class="row">(.*?)</div></div>')
@@ -309,10 +312,10 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -429,34 +432,60 @@ def play(item):
     itemlist = []
 
     if item.other == 'Directo':
-        item.url = host + 'download_tt.php?u=' + item.url
+        new_url = host + 'download_tt.php?u=' + item.url
 
-        if item.url.endswith('.torrent'):
+        if new_url.endswith('.torrent'):
             if config.get_setting('proxies', item.channel, default=''):
                 if PY3:
                     from core import requeststools
-                    data = requeststools.read(item.url, 'divxtotal')
+                    data = requeststools.read(new_url, 'divxtotal')
                 else:
-                    data = do_downloadpage(item.url)
+                    data = do_downloadpage(new_url)
+
+                if str(data) == "b''":
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
 
                 if data:
-                    try:
-                       if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
-                           return 'Archivo [COLOR red]No encontrado[/COLOR]'
-                       elif '<p>Por causas ajenas a ' in str(data):
-                           if not config.get_setting('proxies', item.channel, default=''):
-                               return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+                    if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                        return 'Archivo [COLOR red]No encontrado[/COLOR]'
+                    elif '<p>Por causas ajenas a ' in str(data):
+                        if not config.get_setting('proxies', item.channel, default=''):
+                            return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
 
-                           return 'Archivo [COLOR red]bloqueado[/COLOR]'
-                    except:
-                       pass
+                        return 'Archivo [COLOR red]bloqueado[/COLOR]'
 
                     file_local = os.path.join(config.get_data_path(), "temp.torrent")
                     with open(file_local, 'wb') as f: f.write(data); f.close()
 
                     itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+
         else:
-            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+            new_url = base64.b64decode(item.url).decode("utf-8")
+
+            if PY3:
+                from core import requeststools
+                data = requeststools.read(new_url, 'divxtotal')
+            else:
+                data = do_downloadpage(new_url)
+
+            if str(data) == "b''":
+                return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+            if data:
+                if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                    return 'Archivo [COLOR red]No encontrado[/COLOR]'
+                elif '<p>Por causas ajenas a ' in str(data):
+                    if not config.get_setting('proxies', item.channel, default=''):
+                       return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
+                    return 'Archivo [COLOR red]bloqueado[/COLOR]'
+                else:
+                    return 'Archivo [COLOR red]Inexistente[/COLOR]'
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
 
         return itemlist
 
@@ -467,24 +496,23 @@ def play(item):
         if url_base64.endswith('.torrent'): item.url = url_base64
 
     if item.url.endswith('.torrent'):
-        if config.get_setting('proxies', item.channel, default=''):
-            if PY3:
-                from core import requeststools
-                data = requeststools.read(item.url, 'divxtotal')
-            else:
-                data = do_downloadpage(item.url)
+        if PY3:
+            from core import requeststools
+            data = requeststools.read(item.url, 'divxtotal')
+        else:
+            data = do_downloadpage(item.url)
 
-            if data:
-                try:
-                   if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
-                       return 'Archivo [COLOR red]No encontrado[/COLOR]'
-                   elif '<p>Por causas ajenas a ' in str(data):
-                       if not config.get_setting('proxies', item.channel, default=''):
-                           return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+        if str(data) == "b''":
+            return 'Archivo [COLOR red]Inexistente[/COLOR]'
 
-                       return 'Archivo [COLOR red]bloqueado[/COLOR]'
-                except:
-                   pass
+        if data:
+            if 'Página no encontrada</title>' in str(data) or 'no encontrada</title>' in str(data) or '<h1>403 Forbidden</h1>' in str(data):
+                return 'Archivo [COLOR red]No encontrado[/COLOR]'
+            elif '<p>Por causas ajenas a ' in str(data):
+                if not config.get_setting('proxies', item.channel, default=''):
+                    return 'Archivo [COLOR red]bloqueado[/COLOR] [COLOR yellow]Configure proxies a usar ...[/COLOR]'
+
+                return 'Archivo [COLOR red]bloqueado[/COLOR]'
 
             file_local = os.path.join(config.get_data_path(), "temp.torrent")
             with open(file_local, 'wb') as f: f.write(data); f.close()
@@ -494,6 +522,16 @@ def play(item):
             itemlist.append(item.clone( url = item.url, server = 'torrent' ))
 
     return itemlist
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host
+    item.group = 'lasts'
+    item.search_type = 'movie'
+
+    return list_all(item)
 
 
 def search(item, texto):

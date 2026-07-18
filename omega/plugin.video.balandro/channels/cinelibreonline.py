@@ -10,6 +10,8 @@ from core import httptools, scrapertools, tmdb, servertools
 host = 'https://www.cinelibreonline.com/'
 
 
+# ~ 1/1/24  Los Generos NO se Incluyen en generos.py
+
 results = 14
 
 perpage = 20
@@ -327,7 +329,6 @@ def findvideos(item):
 
     if '/youtu' in item.url or '/www.youtube' in item.url:
         servidor = servertools.get_server_from_url(item.url)
-        servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = item.url ))
         return itemlist
@@ -367,7 +368,6 @@ def findvideos(item):
         else: lang = '?'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
 
@@ -388,6 +388,8 @@ def play(item):
     if '/playlist?list=' in url:
         return 'YouTube Play List [COLOR goldenrod]No Soportada[/COLOR]'
 
+    if url.startswith('https://www.youtube.com/embed/'): url = url.replace('/embed/', '/watch?v=')
+
     if item.server == 'directo':
         data = do_downloadpage(url)
 
@@ -396,15 +398,16 @@ def play(item):
 
     if url:
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
             if '.wikipedia.' in url or '.wikimedia.' in url: pass
             else:
-               new_server = servertools.corregir_other(url).lower()
-               if new_server.startswith("http"): servidor = new_server
+                new_server = servertools.corregir_other(url).lower()
+                if new_server.startswith("http"):
+                    if not config.get_setting('developer_mode', default=False): return itemlist
+                servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

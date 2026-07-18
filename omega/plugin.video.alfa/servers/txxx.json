@@ -4,15 +4,19 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(?:video|)((?:txxx|hclips|pornhits|abxxx).com/(?:video|videos|embed)/[0-9]+)",
+        "pattern": "(?:video|)((?:txxx|hclips|pornhits).com/(?:video|videos|embed)/[0-9]+)",
         "url": "https://\\1/a/"
       },
       {
-        "pattern": "https://(?:www.|)((?:privatehomeclips|hdzog|hotmovs|tubepornclassic|upornia|videoupornia|vjav|voyeurhit).(:?com|tube)/embed/[0-9]+)",
+        "pattern": "((?:abxxx|abbdsm|abebony|abjav|abmilf|abtranny|abgay).(?:com|tube)/(?:video|videos|embed)/[0-9]+)",
+        "url": "https://\\1/a/"
+      },
+      {
+        "pattern": "https://(?:www.|)((?:privatehomeclips|hdzog|videohdzog|hotmovs|tubepornclassic|upornia|videoupornia|vjav|voyeurhit).(:?com|tube)/embed/[0-9]+)",
         "url": "https://\\1"
       },
       {
-        "pattern": "https://(?:www.|)((?:privatehomeclips|hdzog|hotmovs|tubepornclassic|upornia|videoupornia|vjav|voyeurhit|onlyporn|pornl|abjav).(?:com|tube)/video(?:s|)/[0-9]+/[A-z0-9-]+/)",
+        "pattern": "https://(?:www.|)((?:privatehomeclips|hdzog|videohdzog|hotmovs|tubepornclassic|upornia|videoupornia|vjav|voyeurhit|onlyporn|pornl|abjav|fujav|fujpxy|fuxxx|fupxy|pornuse).(?:com|tube)/video(?:s|)/[0-9]+/[A-z0-9-]+/)",
         "url": "https://\\1"
       },
       {
@@ -24,11 +28,19 @@
         "url": "https://tubepornclassic.com/videos/\\1/a/"
       },
       {
-        "pattern": "(https://(?:desiporn|inporn|manysex|pornzog|xmilf|see|shemalez|thegay).(?:com|tube|xxx)/(:?\\w{2}/|)embed/[0-9]+)",
+        "pattern": "(https://(?:desiporn|inporn|manysex|videomanysex|pornzog|xmilf|see|shemalez|thegay|desi-porntube|videopornl|senzuri|videoshemalez|videotubepornclassic|videothegay).(?:com|tube|xxx)/(:?\\w{2}/|)embed/[0-9]+)",
         "url": "\\1"
       },
       {
-        "pattern": "(https://(?:desiporn|inporn|porntop|manysex|pornzog|xmilf|see|shemalez|thegay|blackporn).(?:com|tube|xxx)/(:?\\w{2}/|)video(?:s|)/[0-9]+/[A-z0-9-]+/)",
+        "pattern": "https://(?:xshemale|videoxshemale).(?:com|tube|xxx)/embed/([0-9]+)",
+        "url": "https://xshemale.tube/embed/\\1"
+      },
+      {
+        "pattern": "https://(?:ooxxx|videooxxx).(?:com|tube|xxx)/embed/([0-9]+)",
+        "url": "https://ooxxx.com/embed/\\1"
+      },
+      {
+        "pattern": "(https://(?:desiporn|inporn|porntop|manysex|videomanysex|pornzog|xmilf|vid-xm|see|shemalez|thegay|blackporn).(?:com|tube|xxx)/(:?\\w{2}/|)video(?:s|)/[0-9]+/[A-z0-9-]+/)",
         "url": "\\1"
       },
       {

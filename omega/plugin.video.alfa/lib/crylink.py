@@ -1,13 +1,16 @@
+# coding=utf-8
 import base64
 import patch
 
+patch.unfix_path()
 try:
-    patch.unfix_path()
     from Cryptodome.Cipher import AES
-    patch.fix_path()
 except Exception:
-    from Crypto.Cipher import AES
-
+    try:
+        from Crypto.Cipher import AES
+    except ImportError:
+        AES = object()
+patch.fix_path()
 
 def crylink(b64decode, encode):
     """
@@ -15,7 +18,7 @@ def crylink(b64decode, encode):
     """
     try:
         encrypt = base64.b64decode(b64decode)
-        _len = encode.encode("utf-8")
+        _len = encode.encode("utf-8") if not isinstance(encode, bytes) else encode
         if len(_len) not in (16, 24, 32): _len = (_len + b"\x00" * 32)[:32]
         return _pkcs7_unpad(AES.new(_len, AES.MODE_CBC, encrypt[:16]).decrypt(encrypt[16:]), AES.block_size).decode('utf-8')
     except Exception: return None

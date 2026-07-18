@@ -1,8 +1,9 @@
-version: '0.9.1'
+version: '1.0.2'
 changelog: |-
   Bug Fixes
   ---------
-  + Implement proper keepalives for websocket (#401) @mcarlton00
+  + Accurately report playback on back-to-back plays (#447) @mcarlton00
+  + intro-skipper: fix skip dialog showing after clicking (#440) @pwNBait
 dependencies:
   py2:
     - addon: 'xbmc.python'

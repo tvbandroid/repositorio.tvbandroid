@@ -19,7 +19,7 @@ from platformcode import platformtools
 from core import jsontools
 from core import scrapertools
 from core.item import Item
-from lib.alfa_assistant import execute_binary_from_alfa_assistant, open_alfa_assistant
+from lib.alfa_assistant import execute_binary_from_alfa_assistant, open_alfa_assistant, is_alfa_installed
 
 try:
     monitor = xbmc.Monitor()
@@ -172,7 +172,7 @@ def init():
         # Borrar contenido de carpeta de Torents y de Subtitles
         videolibrary_path = config.get_videolibrary_path()
         if scrapertools.find_single_match(
-            videolibrary_path, "(^\w+:\/\/)"
+            videolibrary_path, r"(^\w+:\/\/)"
         ):  # Si es una conexión REMOTA, usamos userdata local
             videolibrary_path = config.get_data_path()
         filetools.rmdirtree(
@@ -277,12 +277,26 @@ def marshal_check():
     import platform
 
     try:
+        if not filetools.exists(ADDON_CUSTOMCODE_JSON):
+            if not filetools.exists(CUSTOM_CODE_DIR):
+                create_folder_structure(CUSTOM_CODE_DIR)
+            for root, folders, files in filetools.walk(CUSTOM_CODE_DIR):
+                for file in files:
+                    input_file = filetools.join(root, file)
+                    output_file = input_file.replace(
+                        CUSTOM_CODE_DIR, ADDON_PATH
+                    )
+                    filetools.copy(input_file, output_file, silent=True)
+    except Exception:
+        logger.error(traceback.format_exc(1))
+
+    try:
         python_ver = platform.python_version().split(".")
         if len(python_ver) == 3:
             python_ver = "_%s_%s" % (str(python_ver[0]), str(python_ver[1]).zfill(2))
         else:
             python_ver = "_0_00"
-        marshal_modules = ["lib/alfaresolver_py3", "core/proxytools_py3"]
+        marshal_modules = ["lib/alfaresolver_py3", "core/proxytools_py3", "lib/planb_py3"]
         for module in marshal_modules:
             path = filetools.join(ADDON_PATH, filetools.dirname(module))
             path_list = sorted(filetools.listdir(path))
@@ -459,9 +473,9 @@ def verify_script_alfa_update_helper(silent=True, emergency=False, github_url=""
     if updated:
         ADDON_VERSION_NUM = ADDON_VERSION.split(".")
         ADDON_VERSION_NUM = (
-            int(scrapertools.find_single_match(ADDON_VERSION_NUM[0], "(\d+)")),
-            int(scrapertools.find_single_match(ADDON_VERSION_NUM[1], "(\d+)")),
-            int(scrapertools.find_single_match(ADDON_VERSION_NUM[2], "(\d+)")),
+            int(scrapertools.find_single_match(ADDON_VERSION_NUM[0], r"(\d+)")),
+            int(scrapertools.find_single_match(ADDON_VERSION_NUM[1], r"(\d+)")),
+            int(scrapertools.find_single_match(ADDON_VERSION_NUM[2], r"(\d+)")),
         )
         new_version_num = new_version.split(".")
         new_version_num = (
@@ -828,6 +842,7 @@ def update_external_addon(addon_name):
                 addon_path = ""
 
             # Hay modificaciones en Alfa? Las copiamos al addon, incuidas las carpetas de migración a PY3
+            # TODO: Borrar esto, pero revisar qué add-ons lo requieren y entonces borrarlo
             if filetools.exists(alfa_addon_updates) and filetools.exists(addon_path):
                 for root, folders, files in filetools.walk(alfa_addon_updates_mig):
                     if (
@@ -1013,7 +1028,7 @@ def update_unrar():
                             device = "%s - v.%s" % (
                                 device,
                                 scrapertools.find_single_match(
-                                    output_cmd, "(?i)unrar\s*(.*?)\s*Copyright"
+                                    output_cmd, r"(?i)unrar\s*(.*?)\s*Copyright"
                                 )
                                 or "Unknown",
                             )
@@ -1027,7 +1042,7 @@ def update_unrar():
                             device = "%s - v.%s" % (
                                 device,
                                 scrapertools.find_single_match(
-                                    output_cmd, "(?i)unrar\s*(.*?)\s*Copyright"
+                                    output_cmd, r"(?i)unrar\s*(.*?)\s*Copyright"
                                 )
                                 or "Assistant",
                             )
@@ -1461,7 +1476,7 @@ def clean_videolibrary_unused_channels():
                             if ".json" in ff or ".torrent" in ff.lower():
                                 if (
                                     scrapertools.find_single_match(
-                                        ff, "\[([^\]]+)\]"
+                                        ff, r"\[([^\]]+)\]"
                                     ) not in show_list
                                 ):
                                     logger.info("Borrando archivo: %s" % ff, force=True)
@@ -1753,7 +1768,10 @@ def set_updated_domains():
         window = xbmcgui.Window(10000) or None
 
         alfa_domains_updated = get_cached_files("domains") or {}
-        window.setProperty("alfa_domains_updated", jsontools.dump(alfa_domains_updated))
+        if window: window.setProperty("alfa_domains_updated", jsontools.dump(alfa_domains_updated))
+
+        if window and is_alfa_installed():
+            window.setProperty("is_assistant_installed", "True")
 
     except Exception:
         logger.error(traceback.format_exc())
@@ -1782,7 +1800,7 @@ def set_season_holidays():
         country = base64.b64decode(config.get_setting("proxy_zip", default="")).decode(
             "utf-8"
         )
-        country = scrapertools.find_single_match(country, "Country:\s*(\w+)")
+        country = scrapertools.find_single_match(country, r"Country:\s*(\w+)")
         if not country:
             country = "*"
 

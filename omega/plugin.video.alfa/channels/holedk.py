@@ -14,6 +14,9 @@ from bs4 import BeautifulSoup
 list_servers = ["directo", "fembed", "mixdrop", "doodstream", "clipwatching", "cloudvideo"]
 list_quality = []
 
+        #NETU  CloudflareChallengeError: Detected a Cloudflare version 2 Captcha challenge
+
+
 canonical = {
              'channel': 'holedk', 
              'host': config.get_setting("current_host", 'holedk', default=''), 
@@ -23,8 +26,6 @@ canonical = {
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
-
-        #NETU  CloudflareChallengeError: Detected a Cloudflare version 2 Captcha challenge
 
 def mainlist(item):
     logger.info()
@@ -102,7 +103,9 @@ def lista(item):
         if "videos" in item.url:
             plot = ""
         else:
-            plot = elem.find('div', class_='info').text.strip()
+            plot = elem.find('div', class_='sinopsis')
+            if plot:
+                plot = plot.text.strip()
         itemlist.append(Item(channel=item.channel, action="findvideos", title=title, url=url, thumbnail=thumbnail,
                                plot=plot, fanart=thumbnail, contentTitle=title ))
     next_page = soup.find('span', class_='current')
@@ -140,8 +143,17 @@ def findvideos(item):
         elif "mix" in ser:
             url = "https://mixdrop.is/e/%s" % id
             itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
+        elif "lulu" in ser:
+            url = "https://lulustream.com/e/%s" % id
+            itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
         elif "ntu" in ser:
+            url = "https://hqq.to/e/%s" % id
+            itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
+        elif "kra" in ser:
             continue
+            # https://github.com/tha23rd/py-kraken/blob/main/pykraken/kraken.py
+            # url = "https://krakenfiles.com/embed-video/%s" % id
+            # itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.title, url=url))
         else:
             platformtools.dialog_ok("Server Nuevo", "Server nuevo en este canal [%s]" %ser)
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())

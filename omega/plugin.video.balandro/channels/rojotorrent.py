@@ -59,27 +59,17 @@ def do_downloadpage(url, post=None, headers=None):
         else:
             data = httptools.downloadpage(url, post=post, headers=headers).data
 
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        try:
-            from lib import balandroresolver
-            ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-            if ck_name and ck_value:
-                httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('rojotorrent', url, post=post, headers=headers).data
-                    else:
-                       data = httptools.downloadpage(url, post=post, headers=headers).data
-        except:
-            pass
-
-    if '<title>Just a moment...</title>' in data:
-        if not 'buscar/' in url:
+    if not '/buscar/' in url:
+        if '<title>Just a moment...</title>' in data:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
-        return ''
+            return ''
+
+        elif '>Dominio Actual<' in data:
+            if config.get_setting('channels_re_charges', default=True):
+               platformtools.dialog_ok(config.__addon_name + ' - RojoTorrent', '[COLOR red][B]Boot[/COLOR][COLOR orangered] Protection [/COLOR][COLOR plum]Private[/B][/COLOR]', '[COLOR cyan][B]Intentélo desde su Canal Principal.[/B][/COLOR]', 'Cual es su Canal Principal en [B][COLOR turquoise]Acciones[/COLOR] [COLOR plum](si no hay resultados)[/B][/COLOR]')
+            else:
+                platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]Boot[COLOR orangered] Protection [COLOR plum]Private[/B][/COLOR]')
+            return ''
 
     return data
 
@@ -93,7 +83,9 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
-    itemlist.append(Item( channel='helper', action='show_help_rojotorrent', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal', thumbnail=config.get_thumb('rojotorrent') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_rojotorrent', title='[COLOR aquamarine][B]Aviso[/COLOR] [COLOR green]Información[/B][/COLOR] canal' ))
+
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
 
     platformtools.itemlist_refresh()
 
@@ -353,6 +345,8 @@ def list_last(item):
     except: return itemlist
 
     for url, title in matches:
+        title = title.replace('&#039;', "'")
+
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
             elif "[" in title: titulo = title.split("[")[0]
@@ -573,7 +567,7 @@ def list_search(item):
         if item.search_type == 'all': 
             sufijo = contentType
             if sufijo == "documentary":
-                sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+                sufijo = '[COLOR cyan]Documental[/COLOR]'
 
         if contentType == 'tvshow':
             SerieName = corregir_SerieName(title)
@@ -643,6 +637,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
 
 
 def search(item, texto):

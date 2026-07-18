@@ -1,33 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
-if sys.version_info[0] >= 3:
-    PY2 = False
-    PY3 = True
-
-    unicode = str
-
-    from urllib.parse import quote, urlencode, urlparse
-    from urllib.response import addinfourl
-    from http.cookiejar import MozillaCookieJar, Cookie
-    from urllib.request import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler
-
-    from urllib.error import HTTPError
-
-else:
-    PY2 = True
-    PY3 = False
-
-    from urllib import quote, urlencode, addinfourl
-    from urlparse import urlparse
-    from cookielib import MozillaCookieJar, Cookie
-    from urllib2 import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler, HTTPError
-
-
-import ssl
-ssl._create_default_https_context = ssl._create_unverified_context
-
 import os, re, inspect, gzip, time, random
 
 from io import BytesIO
@@ -39,6 +11,31 @@ from platformcode.config import WebErrorException
 try: from core.cloudflare import Cloudflare
 except: pass
 
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
+
+
+if config.get_setting('PY3', default=''):
+    PY3 = True
+    PY2 = False
+
+    unicode = str
+
+    from urllib.parse import quote, urlencode, urlparse
+    from urllib.response import addinfourl
+    from http.cookiejar import MozillaCookieJar, Cookie
+    from urllib.request import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler
+
+    from urllib.error import HTTPError
+else:
+    PY2 = True
+    PY3 = False
+
+    from urllib import quote, urlencode, addinfourl
+    from urlparse import urlparse
+    from cookielib import MozillaCookieJar, Cookie
+    from urllib2 import HTTPHandler, HTTPCookieProcessor, ProxyHandler, build_opener, Request, HTTPRedirectHandler, HTTPError
+
 
 __addon_name = config.__addon_name
 __version = config.get_addon_version()
@@ -49,9 +46,9 @@ cj = MozillaCookieJar()
 ficherocookies = os.path.join(config.get_data_path(), "cookies.dat")
 
 
-# ~ 4/6/25
-# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.7151.56 Safari/537.36"
-useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.7151.69 Safari/537.36"
+# ~ 10/7/26
+# ~ useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.47 Safari/537.36"
+useragent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.115 Safari/537.36"
 
 
 ver_stable_chrome = config.get_setting("ver_stable_chrome", default=True)
@@ -236,8 +233,9 @@ def downloadpage_proxy(canal,
            col = '[B][COLOR %s]' % color_exec
            txt =  col + txt + '[/B][/COLOR]'
 
-        avisar = True
-        if config.get_setting('sin_resp') == 'no': avisar = False
+        # ~ Search
+        avisar = False
+        if config.get_setting('sin_resp') == 'si': avisar = True
 
         if avisar:
            el_canal = ('Sin respuesta en [B][COLOR %s]') % color_alert
@@ -319,6 +317,14 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     """
 
     response = {}
+
+    if not 'http' in url:
+        if not url.startswith == 'magnet:':
+            if config.get_setting('developer_team'):
+                platformtools.dialog_ok(config.__addon_name + ' - HttpTools', '[B][COLOR palegreen]Revisar Url Incompleta[/COLOR][/B]', url)
+
+            response["data"] = ""
+            return type('HTTPResponse', (), response)
 
     # ~ Si existe el fichero en la caché y no ha caducado, se devuelve su contenido sin hacer ninguna petición
     if use_cache:
@@ -728,9 +734,16 @@ def get_cookies_from_headers(headers):
 
 
 def get_cookie(url, name, follow_redirects=False):
-    if follow_redirects:
+    try:
         import requests
+        existe_script = True
+    except:
+        existe_script = False
 
+    if not existe_script:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Falta script.module.requests[/COLOR][/B]' % color_alert)
+
+    if follow_redirects:
         try:
             headers = requests.head(url, headers=default_headers).headers
             url = headers['location']

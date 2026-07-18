@@ -28,9 +28,9 @@ def test_video_exists(page_url):
                          # 'Sec-Fetch-Site': 'cross-site',
                          # 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:137.0) Gecko/20100101 Firefox/137.0'
                         }
-    data = httptools.downloadpage(url, **kwargs).json
-    
-    if data.get('message', ''):
+    response = httptools.downloadpage(url, **kwargs)
+    data = response.json
+    if response.code == 522 or data.get('message', ''):
         return False, "[bestb] El fichero no existe o ha sido borrado"
     return True, ""
 
@@ -42,7 +42,8 @@ def get_video_url(page_url, video_password):
     # data = httptools.downloadpage(page_url, **kwargs).json
     
     m3u8_source = data['streaming_url'].replace("//master.m3u8", "/master.m3u8")
-    
+    # m3u8_source = scrapertools.find_single_match(data, 'streaming_url:"([^"]+)"')
+    # logger.debug(m3u8_source)
     kwargs['headers'] = {
                          'Referer': ref,
                          'Origin': ref
@@ -66,4 +67,5 @@ def get_video_url(page_url, video_password):
                 video_urls.append(['[bestb] %s' % quality, url])
     else:
         video_urls.append(["[bestb]", m3u8_source])
-    return video_urls[::-1]
+    video_urls.sort(key=lambda item: int( re.sub("\D", "", item[0])))
+    return video_urls#[::-1]

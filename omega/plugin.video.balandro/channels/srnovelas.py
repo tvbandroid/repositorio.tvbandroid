@@ -13,37 +13,6 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
 
 host = 'https://srnovelas.com/'
 
@@ -113,9 +82,9 @@ def do_downloadpage(url, post=None, headers=None):
             data = httptools.downloadpage(url, post=post, headers=headers).data
 
         if not data:
-            if not '?s=' in url:
+            if not '/?s=' in url:
                 if not '/temp/ajax/iframe.php?id=' in url:
-                    if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SrNovelas', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                    if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('SrNovelas', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                     timeout = config.get_setting('channels_repeat', default=30)
 
@@ -124,25 +93,8 @@ def do_downloadpage(url, post=None, headers=None):
                     else:
                         data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('srnovelas', url, post=post, headers=headers).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers).data
-            except:
-                pass
-
     if '<title>Just a moment...</title>' in data:
-        if not '?s=' in url:
+        if not '/?s=' in url:
             platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
         return ''
 
@@ -213,6 +165,8 @@ def paises(item):
     itemlist.append(item.clone( title = 'México', action = 'list_all', url = host + 'novelas-mexicanas/', text_color='hotpink' ))
     itemlist.append(item.clone( title = 'Turquía', action = 'list_all', url = host + 'novelas-turcas/', text_color='hotpink' ))
 
+    itemlist.append(item.clone( title = 'Vix', action = 'list_all', url = host + 'category/novelas-vix/', text_color='pink' ))
+
     return itemlist
 
 
@@ -223,42 +177,29 @@ def last_epis(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="grid-item item-(.*?)/div></a></div>')
+    bloque = scrapertools.find_single_match(data, '>El Señor de los Cielos<(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<h2>(.*?)</h2>')
+        title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
-        SerieName = scrapertools.find_single_match(match, 'alt="(.*?)"')
-        if not SerieName:
-            SerieName = scrapertools.find_single_match(match, '<h2>(.*?)Capitulo')
-            SerieName = SerieName.replace('Final', '').strip()
+        title = title.capitalize()
 
-        season = 1
+        SerieName = title
 
-        epis = scrapertools.find_single_match(match, '<h2>.*?Capitulo(.*?)</h2>')
-        epis = epis.replace('Final', '').strip()
+        SerieName = SerieName.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').replace (' capitulos', '').strip()
 
-        if not epis: epis = 1
-
-        titulo = str(season) + 'x' + str(epis) + ' ' + SerieName
-
-        itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo, thumbnail = thumb, infoLabels={'year': '-'},
-                                    contentSerieName = SerieName, contentType = 'episode', contentSeason = season, contentEpisodeNumber = epis ))
+        itemlist.append(item.clone( action = 'temporadas', url = url, title = title, thumbnail = thumb,
+                                    contentType = 'tvshow', contentSerieName = SerieName, infoLabels={'year': '-'} ))
 
     tmdb.set_infoLabels(itemlist)
-
-    if itemlist:
-        next_url = scrapertools.find_single_match(data, 'class="page-numbers current">.*?href="(.*?)"')
-
-        if next_url:
-            if '/page/' in next_url:
-                itemlist.append(item.clone( title = 'Siguientes ...', url = next_url, action = 'last_epis', text_color = 'coral' ))
 
     return itemlist
 
@@ -286,7 +227,9 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "").strip()
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
         title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
         title = title.replace('&amp;', '&')
 
@@ -348,8 +291,7 @@ def temporadas(item):
     seasons = scrapertools.find_multiple_matches(data, '<span class="su-spoiler-icon">.*?Temporada(.*?)</div>')
 
     if not seasons:
-        if config.get_setting('channels_seasons', default=True):
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
 
         item.page = 0
         item.contentType = 'season'
@@ -358,19 +300,21 @@ def temporadas(item):
         return itemlist
 
     for title in seasons:
-        tempo = title.strip()
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
 
-        title = 'Temporada ' + title.strip()
+        tempo = title
+
+        title = 'Temporada ' + title
 
         if len(seasons) == 1:
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = tempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = tempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = tempo, text_color = 'tan' ))
 
@@ -512,7 +456,6 @@ def findvideos(item):
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         other = ''
 
@@ -568,9 +511,6 @@ def findvideos(item):
             url = url.replace('&amp;', '&')
 
             servidor = servertools.get_server_from_url(url)
-            servidor = servertools.corregir_servidor(servidor)
-
-            url = servertools.normalize_url(servidor, url)
 
             other = ''
             if servidor == 'various': other = servertools.corregir_other(url)
@@ -616,14 +556,12 @@ def findvideos(item):
                u_link = u_link.replace('&amp;', '&')
 
                servidor = servertools.get_server_from_url(u_link)
-               servidor = servertools.corregir_servidor(servidor)
-
-               u_link = servertools.normalize_url(servidor, u_link)
 
                other = ''
                if servidor == 'various': other = servertools.corregir_other(u_link)
 
-               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor, language = lang, other = other ))
+               itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = u_link, server = servidor,
+                                     language = lang, other = other ))
 
            i += 1
 
@@ -649,9 +587,6 @@ def findvideos(item):
         url = url.replace('&amp;', '&')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
-
-        url = servertools.normalize_url(servidor, url)
 
         other = ''
         if servidor == 'various': other = servertools.corregir_other(url)
@@ -680,11 +615,12 @@ def play(item):
         url = url.replace('/Smoothpre.', '/smoothpre.')
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 
@@ -715,9 +651,21 @@ def list_search(item):
 
         if not url or not title: continue
 
+        title = title.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        title = title.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
+        title = title.replace('&#8216;', "").replace('&#8217;', "").strip()
+        title = title.replace('&amp;', '&')
+
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 
         name = scrapertools.find_single_match(article, ' alt="(.*?)"')
+
+        name = name.replace(' vix', '').replace (' ViX', '').replace (' televisa', '').strip()
+
+        name = name.replace('&#8211;', "").replace('&#8220;', "").replace('&#8221;', "")
+        name = name.replace('&#8216;', "").replace('&#8217;', "").strip()
+        name = name.replace('&amp;', '&')
 
         SerieName = name
 
@@ -755,6 +703,15 @@ def list_search(item):
                 itemlist.append(item.clone( title = "Siguientes ...", action = "list_search", url = next_page, text_color='coral' ))
 
     return itemlist
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return last_epis(item)
 
 
 def search(item, texto):

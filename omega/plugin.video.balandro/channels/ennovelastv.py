@@ -10,14 +10,14 @@ from core import httptools, scrapertools, servertools, tmdb
 # ~ pelis No hay 24/12/2023
 
 
-host = 'https://enn.ennovelas-tv.com/'
+host = 'https://l.ennovelas-tv.com/'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://c.ennovelas-tv.com/', 'https://d.ennovelas-tv.com/', 'https://e.ennovelas-tv.com/',
              'https://f.ennovelas-tv.com/', 'https://g.ennovelas-tv.com/', 'https://h.ennovelas-tv.com/',
              'https://i.ennovelas-tv.com/', 'https://j.ennovelas-tv.com/', 'https://k.ennovelas-tv.com/',
-             'https://novelashd.ennovelas-tv.com/', 'https://novelass.ennovelas-tv.com/']
+             'https://novelashd.ennovelas-tv.com/', 'https://novelass.ennovelas-tv.com/', 'https://enn.ennovelas-tv.com/']
 
 
 domain = config.get_setting('dominio', 'ennovelastv', default='')
@@ -362,8 +362,7 @@ def temporadas(item):
             if not epis: epis = re.compile('<a class="epNum"(.*?)</a>', re.DOTALL).findall(bloque)
 
             if epis:
-                if config.get_setting('channels_seasons', default=True):
-                    platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), '[COLOR tan]Sin temporadas[/COLOR]')
 
                 item.page = 0
                 item.contentType = 'season'
@@ -382,11 +381,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = numtempo
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = numtempo
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = numtempo, text_color='tan' ))
 
@@ -742,19 +741,42 @@ def play(item):
 
     url = item.url
 
+    if '/argtesa.' in url:
+         return 'Servidor [COLOR tan]No soportado[/COLOR]'
+
     if url:
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         url = servertools.normalize_url(servidor, url)
 
         itemlist.append(item.clone( url=url, server=servidor ))
 
     return itemlist
+
+
+def _lasts(item):
+    logger.info()
+
+    item.url = host
+    item.search_type = 'tvshow'
+
+    return list_last(item)
+
+
+def _epis(item):
+    logger.info()
+
+    item.url = host + 'episodes11/'
+    item.search_type = 'tvshow'
+
+    return list_epis(item)
 
 
 def search(item, texto):

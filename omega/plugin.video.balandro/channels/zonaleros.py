@@ -12,39 +12,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-LINUX = False
-BR = False
-BR2 = False
-
-if PY3:
-    try:
-       import xbmc
-       if xbmc.getCondVisibility("system.platform.Linux.RaspberryPi") or xbmc.getCondVisibility("System.Platform.Linux"): LINUX = True
-    except: pass
-
-try:
-   if LINUX:
-       try:
-          from lib import balandroresolver2 as balandroresolver
-          BR2 = True
-       except: pass
-   else:
-       if PY3:
-           from lib import balandroresolver
-           BR = true
-       else:
-          try:
-             from lib import balandroresolver2 as balandroresolver
-             BR2 = True
-          except: pass
-except:
-   try:
-      from lib import balandroresolver2 as balandroresolver
-      BR2 = True
-   except: pass
-
-
-host = 'https://www.zona-leros.com/'
+host = 'https://zona-leros.com/'
 
 
 def item_configurar_proxies(item):
@@ -80,6 +48,12 @@ def configurar_proxies(item):
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://www.zona-leros.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     hay_proxies = False
     if config.get_setting('channel_zonaleros_proxies', default=''): hay_proxies = True
 
@@ -99,7 +73,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
         if not data:
             if not 'search?q=' in url:
-                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('ZonaLeros', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('ZonaLeros', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
 
                 timeout = config.get_setting('channels_repeat', default=30)
 
@@ -107,23 +81,6 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
                     data = httptools.downloadpage_proxy('zonaleros', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-
-    if '<title>You are being redirected...</title>' in data or '<title>Just a moment...</title>' in data:
-        if BR or BR2:
-            try:
-                ck_name, ck_value = balandroresolver.get_sucuri_cookie(data)
-                if ck_name and ck_value:
-                    httptools.save_cookie(ck_name, ck_value, host.replace('https://', '')[:-1])
-
-                if not url.startswith(host):
-                    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                else:
-                    if hay_proxies:
-                        data = httptools.downloadpage_proxy('zonaleros', url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-                    else:
-                        data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
-            except:
-               pass
 
     if '<title>Just a moment...</title>' in data:
         if not 'search?q=' in url:
@@ -315,11 +272,11 @@ def temporadas(item):
             if config.get_setting('channels_seasons', default=True):
                 platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
 
-            item.page = 0
-            item.contentType = 'season'
-            item.contentSeason = nro_season
-            itemlist = episodios(item)
-            return itemlist
+                item.page = 0
+                item.contentType = 'season'
+                item.contentSeason = nro_season
+                itemlist = episodios(item)
+                return itemlist
 
         itemlist.append(item.clone( action = 'episodios', title = title, page = 0, contentType = 'season', contentSeason = nro_season, text_color='tan' ))
 
@@ -394,9 +351,13 @@ def episodios(item):
 
         title = title.replace('temporada', '[COLOR tan]Temp.[/COLOR]')
 
-        title = title.replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
-
         titulo = str(item.contentSeason) + 'x' + nro_epi + ' ' + title
+
+        titulo = titulo.replace('Episode', '[COLOR goldenrod]Epis.[/COLOR]').replace('episode', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Episodio', '[COLOR goldenrod]Epis.[/COLOR]').replace('episodio', '[COLOR goldenrod]Epis.[/COLOR]')
+        titulo = titulo.replace('Capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capítulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('Capitulo', '[COLOR goldenrod]Epis.[/COLOR]').replace('capitulo', '[COLOR goldenrod]Epis.[/COLOR]')
+
+        if 'Epis.' in titulo: titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
 
         itemlist.append(item.clone( action = 'findvideos', url = url, title = titulo,
                                     contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = nro_epi ))
@@ -434,9 +395,13 @@ def findvideos(item):
             link = scrapertools.find_multiple_matches(str(datar), 'video="' + srv + '".*?<iframe src="(.*?)"')
 
             if link:
+                if ' - ' in title: title = title.split(" - ")[0]
+
                 title = title.lower().strip()
 
-                if title == 'dropapk': continue
+                if not title: continue
+
+                elif title == 'dropapk': continue
                 elif title == '1fichier': continue
                 elif title == 'onedrive': continue
                 elif title == 'free' or title == 'freehd': continue
@@ -458,7 +423,8 @@ def findvideos(item):
                     if title == 'hd1' or title == 'hd2': other = title
                     else: other = srv.capitalize()
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Lat', other = other ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link,
+                                      language = 'Lat', other = other ))
 
         # ~ Downloads de Series
         block = scrapertools.find_single_match(data, '<th>DESCARGAR</th>(.*?)</table>')
@@ -466,15 +432,19 @@ def findvideos(item):
         downs = scrapertools.find_multiple_matches(block, '<tr>(.*?)</tr>')
 
         for down in downs:
+            if not 'http' in down: continue
+
             ses += 1
 
             srv = scrapertools.find_single_match(down, '<td>(.*?)</td>')
 
+            if ' - ' in srv: srv = srv.split(" - ")[0]
+
             srv = srv.lower().strip()
 
-            if not 'http' in down: continue
+            if not srv: continue
 
-            if srv == 'dropapk': continue
+            elif srv == 'dropapk': continue
             elif srv == '1fichier': continue
             elif srv == 'onedrive': continue
             elif srv == 'free' or srv == 'freehd': continue
@@ -523,9 +493,13 @@ def findvideos(item):
                 url = scrapertools.find_single_match(str(datar), ';video.*?="' + _id + '".*?src="(.*?)"')
 
                 if url:
+                    if ' - ' in srv: srv = srv.split(" - ")[0]
+
                     srv = srv.lower().strip()
 
-                    if srv == 'dropapk': continue
+                    if not srv: continue
+
+                    elif srv == 'dropapk': continue
                     elif srv == '1fichier': continue
                     elif srv == 'onedrive': continue
                     elif srv == 'free' or srv == 'freehd': continue
@@ -544,10 +518,11 @@ def findvideos(item):
 
                     other = ''
                     if servidor == 'various':
-                        if srv == 'hd1' or title == 'hd2': other = srv
+                        if srv == 'hd1' or srv == 'hd2': other = srv
                         else: other = srv.capitalize()
 
-                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty, language = 'Lat', other = other ))
+                    itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url,
+                                          quality = qlty, language = 'Lat', other = other ))
 
     # ~ Downloads de Pelis tienen recaptcha
 
@@ -609,13 +584,14 @@ def play(item):
             return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         if servidor == 'zplayer': url = url + '|' + host
 

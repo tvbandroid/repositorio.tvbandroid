@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import os, xbmc, xbmcgui
+import os, xbmc, xbmcgui, xbmcaddon
 
 from platformcode import config, logger, platformtools
 from core.item import Item
 from core import channeltools, scrapertools, filetools, jsontools
 
 
-color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
+fanart = os.path.join(config.get_runtime_path(), 'fanart.jpg')
+
+
 color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
 color_list_inactive = config.get_setting('channels_list_inactive_color', default='gray')
 
@@ -16,6 +18,9 @@ color_infor = config.get_setting('notification_infor_color', default='pink')
 color_adver = config.get_setting('notification_adver_color', default='violet')
 color_avis = config.get_setting('notification_avis_color', default='yellow')
 color_exec = config.get_setting('notification_exec_color', default='cyan')
+
+descartar_xxx = config.get_setting('descartar_xxx', default=False)
+descartar_anime = config.get_setting('descartar_anime', default=False)
 
 cfg_search_excluded_movies = 'search_excludes_movies'
 cfg_search_excluded_tvshows = 'search_excludes_tvshows'
@@ -35,6 +40,59 @@ channels_search_excluded_all = config.get_setting(cfg_search_excluded_all, defau
 cfg_search_included = 'search_included_all'
 
 channels_search_included = config.get_setting(cfg_search_included, default='')
+
+
+srv_pending = ''
+con_incidencias = ''
+no_accesibles = ''
+con_problemas = ''
+
+try:
+    with open(os.path.join(config.get_runtime_path(), 'dominios.txt'), 'r') as f: txt_status=f.read(); f.close()
+except:
+    try: txt_status = open(os.path.join(config.get_runtime_path(), 'dominios.txt'), encoding="utf8").read()
+    except: txt_status = ''
+
+if txt_status:
+    # ~ Pending
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION SERVIDORES(.*?)SITUACION CANALES')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR orchid]' in match: srv_pending += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Incidencias
+    bloque = scrapertools.find_single_match(txt_status, 'SITUACION CANALES(.*?)CANALES TEMPORALMENTE DES-ACTIVADOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_incidencias += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ No Accesibles
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES PROBABLEMENTE NO ACCESIBLES(.*?)ULTIMOS CAMBIOS DE DOMINIOS')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: no_accesibles += '[B' + match + '/I][/B][/COLOR][CR]'
+
+    # ~ Con Problemas
+    bloque = scrapertools.find_single_match(txt_status, 'CANALES CON PROBLEMAS(.*?)$')
+
+    matches = scrapertools.find_multiple_matches(bloque, "[B](.*?)[/B]")
+
+    for match in matches:
+        match = match.strip()
+
+        if '[COLOR moccasin]' in match: con_problemas += '[B' + match + '/I][/B][/COLOR][CR]'
 
 
 def mainlist(item):
@@ -101,10 +159,10 @@ def mainlist2(item):
 
     itemlist.append(item.clone( action='', title= '[COLOR greenyellow][B]EFECTUAR Búsquedas [COLOR gold](solo en determinados canales)[/B][/COLOR]', folder=False ))
 
-    itemlist.append(item.clone( action = 'channels_excluded', title='Pulsar para acceder a la Lista de Canales', extra = 'included', folder = False, text_color='cyan' ))
+    itemlist.append(item.clone( action = 'channels_excluded', title='Pulsar para acceder a la Lista de Canales', extra = 'included', folder = False, text_color='cyan', fanart=fanart ))
 
     if channels_search_included:
-        itemlist.append(item.clone( title = '[COLOR coral][B]Anular Todos los canales[COLOR greenyellow][B] para efectuar las búsquedas[/B][/COLOR]', action = 'channels_excluded_del', extra = 'included', folder = False, text_color='yellow' ))
+        itemlist.append(item.clone( title = '[COLOR coral][B]Anular Todos los canales[COLOR greenyellow][B] para efectuar las búsquedas[/B][/COLOR]', action = 'channels_excluded_del', fanart=fanart, extra = 'included', folder = False, text_color='yellow' ))
 
     platformtools.itemlist_refresh()
 
@@ -138,10 +196,6 @@ def del_no_searchables(item):
 def only_animes(item):
     logger.info()
 
-    descartar_anime = config.get_setting('descartar_anime', default=False)
-
-    if descartar_anime: return
-
     cabecera = 'Canales con contenido de Animes'
     if item.exclusively_animes: cabecera = 'Canales con contenido Exclusivamente de Animes'
 
@@ -161,18 +215,22 @@ def only_animes(item):
 
         if item.exclusively_animes:
             if not 'exclusivamente al anime' in ch['notes']: continue
+        else:
+            if 'exclusivamente al anime' in ch['notes']: continue
+            elif 'anime' in ch['clusters']:
+                 if descartar_anime: continue
 
-        if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-        elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if ch['status'] == 1: info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
+        elif ch['status'] == -1: info += '[B][COLOR %s][I]Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -188,15 +246,15 @@ def only_animes(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
         channel_thumb = ch['thumbnail']
@@ -214,10 +272,6 @@ def only_animes(item):
 
 def only_adults(item):
     logger.info()
-
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return
 
     cabecera = 'Canales con contenido para Adultos'
     if item.exclusively_adults: cabecera = 'Canales con contenido Exclusivamente para Adultos'
@@ -238,20 +292,24 @@ def only_adults(item):
 
         if item.exclusively_adults:
             if not '+18' in ch['notes']: continue
+        else:
+            if '+18' in ch['notes']: continue
+            elif 'adults' in ch['clusters']:
+                if descartar_xxx: continue
 
-        if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-        elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if ch['status'] == 1: info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
+        elif ch['status'] == -1: info += '[B][COLOR %s][I]Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
-        if '+18' in ch['notes']: info = info + '[B][COLOR pink] %s [/B][/COLOR]' % '+18'
+        if '+18' in ch['notes']: info += '[B][COLOR pink] %s [/B][/COLOR]' % '+18'
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -261,15 +319,15 @@ def only_adults(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
         channel_thumb = ch['thumbnail']
@@ -316,6 +374,8 @@ def with_proxies(item):
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales con proxies a Configurar[/B][/COLOR]' % color_adver)
         return
 
+    i = 0
+
     for ch in ch_list:
         if not 'proxies' in ch['notes'].lower(): continue
 
@@ -341,29 +401,31 @@ def with_proxies(item):
 
         info = ''
 
-        if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-        elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        i =+ 1
+
+        if ch['status'] == 1: info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
+        elif ch['status'] == -1: info += '[B][COLOR %s][I]Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
 
         if config.get_setting(cfg_proxies_channel, default=''):
-            info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+            info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
             if config.get_setting(cfg_proxytools_provider, default=''):
-                info = info + ' [COLOR goldenrod][B]' + config.get_setting(cfg_proxytools_provider).capitalize() + '[/B][/COLOR] '
+                info += ' [COLOR goldenrod][B]' + config.get_setting(cfg_proxytools_provider).capitalize() + '[/B][/COLOR] '
         else:
-            if config.get_setting(cfg_proxytools_max_channel, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
-            elif config.get_setting(cfg_proxytools_provider, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+            if config.get_setting(cfg_proxytools_max_channel, default=''): info += '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+            elif config.get_setting(cfg_proxytools_provider, default=''): info += '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
             else:
-               if not config.get_setting(cfg_proxytools_max_channel, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
-               elif not config.get_setting(cfg_proxytools_provider, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+               if not config.get_setting(cfg_proxytools_max_channel, default=''): info += '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+               elif not config.get_setting(cfg_proxytools_provider, default=''): info += '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
                else:
-                  info = info + '[COLOR firebrick][B] Quizás use proxies [/B][/COLOR]'
+                  info += '[COLOR firebrick][B] Quizás use proxies [/B][/COLOR]'
 
-        if no_proxies: info = info + '[COLOR white][B] EXCLUIDO Buscar [/B][/COLOR]'
+        if no_proxies: info += '[COLOR white][B] EXCLUIDO Buscar [/B][/COLOR]'
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -376,15 +438,15 @@ def with_proxies(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
         channel_thumb = ch['thumbnail']
@@ -392,6 +454,13 @@ def with_proxies(item):
         opciones_channels.append(platformtools.listitem_to_select('[COLOR yellow]' + channel_name + '[/COLOR]', info, channel_thumb))
 
         canales_proxies.append((ch['name'], info, ch['notes']))
+
+    if i == 0:
+        if item.memo_proxies:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales con proxies memorizados[/B][/COLOR]' % color_adver)
+        else:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales con proxies a Configurar[/B][/COLOR]' % color_adver)
+        return
 
     ret = platformtools.dialog_select(cabecera, opciones_channels, useDetails=True)
 
@@ -445,30 +514,30 @@ def no_actives(item):
 
         info = ''
 
-        if not item.no_searchables: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if not item.no_searchables: info += '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
         else:
             if not config.get_setting('mnu_adultos', default=True):
                 if '+18' in ch['notes']: continue
 
             if 'adults' in ch['clusters']:
-                if config.get_setting('descartar_xxx', default=False): continue
-                info = info + '[COLOR darkorange][B] +18 [/B][/COLOR]'
+                if descartar_xxx: continue
+                info += '[COLOR darkorange][B] +18 [/B][/COLOR]'
             elif 'anime' in ch['clusters']:
                 if 'dedicada exclusivamente al anime' in ch['notes']:
-                    if config.get_setting('descartar_anime', default=False): continue
-                    info = info + '[COLOR springgreen][B] Animes [/B][/COLOR]'
+                    if descartar_anime: continue
+                    info += '[COLOR springgreen][B] Animes [/B][/COLOR]'
             elif 'dorama' in ch['clusters']:
                 if 'dedicada exclusivamente al dorama' in ch['notes']:
                     if not config.get_setting('mnu_doramas', default=True): continue
-                    info = info + '[COLOR firebrick][B] Doramas [/B][/COLOR]'
+                    info += '[COLOR firebrick][B] Doramas [/B][/COLOR]'
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
 
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -485,15 +554,15 @@ def no_actives(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
         channel_thumb = ch['thumbnail']
@@ -548,17 +617,17 @@ def only_prefered(item):
 
         info = ''
 
-        info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
+        info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange ] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange ] %s [/B][/COLOR]' % dominio
 
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
-        elif config.get_setting(cfg_proxytools_provider, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
-        elif config.get_setting(cfg_proxytools_max_channel, default=''): info = info + '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        elif config.get_setting(cfg_proxytools_provider, default=''): info += '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
+        elif config.get_setting(cfg_proxytools_max_channel, default=''): info += '[COLOR yellowgreen][B] Sin proxies [/B][/COLOR]'
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -571,15 +640,15 @@ def only_prefered(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
         channel_thumb = ch['thumbnail']
@@ -618,17 +687,17 @@ def only_torrents(item):
 
         info = ''
 
-        if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-        elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if ch['status'] == 1: info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
+        elif ch['status'] == -1: info += '[B][COLOR %s][I]Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -641,15 +710,15 @@ def only_torrents(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
         channel_thumb = ch['thumbnail']
@@ -668,7 +737,7 @@ def only_torrents(item):
 def channels_status(item):
     logger.info()
 
-    if item.des_rea: cabecera = 'Desactivar ó Re-activar'
+    if item.des_rea: cabecera = 'Desactivar ó Re-Activar'
     else: cabecera = 'Marcar ó Des-marcar Preferidos'
 
     filtros = {}
@@ -685,22 +754,22 @@ def channels_status(item):
 
         info = ''
 
-        if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-        elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if ch['status'] == 1: info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
+        elif ch['status'] == -1: info += '[B][COLOR %s][I]Desactivado [/I][/B][/COLOR]' % color_list_inactive
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
-        if '+18' in ch['notes']: info = info + '[COLOR orange][B] Adultos [/B][/COLOR]'
-        elif 'anime' in ch['clusters']: info = info + '[COLOR springgreen][B] Anime [/B][/COLOR]'
-        elif 'torrents' in ch['clusters']: info = info + '[COLOR blue][B] Torrents [/B][/COLOR]'
-        elif 'dorama' in ch['clusters']: info = info + '[COLOR firebrick][B] Doramas [/B][/COLOR]'
+        if '+18' in ch['notes']: info += '[COLOR orange][B] Adultos [/B][/COLOR]'
+        elif 'anime' in ch['clusters']: info += '[COLOR springgreen][B] Anime [/B][/COLOR]'
+        elif 'torrents' in ch['clusters']: info += '[COLOR blue][B] Torrents [/B][/COLOR]'
+        elif 'dorama' in ch['clusters']: info += '[COLOR firebrick][B] Doramas [/B][/COLOR]'
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -715,15 +784,15 @@ def channels_status(item):
 
         if '+18' in ch['notes']: tipos = str(tipos).replace('[COLOR deepskyblue]Películas[/COLOR]', '[COLOR teal]Vídeos[/COLOR]')
 
-        if info: info = info + '  '
-        info = info + '[B]' + tipos + '[/B]'
+        if info: info += '  '
+        info += '[B]' + tipos + '[/B]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'Vo').replace('vos', 'Vos')
 
-        if info: info = info + '  '
-        info = info + '[COLOR coral]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR coral]' + idiomas + '[/COLOR]'
 
         it = xbmcgui.ListItem(ch['name'], info)
         it.setArt({'thumb': ch['thumbnail']})
@@ -902,25 +971,25 @@ def channels_excluded(item):
 
         info = ''
 
+        if ch['status'] == 1: info += '[B][COLOR wheat][I]Preferido [/I][/B][/COLOR]'
+        elif ch['status'] == -1: info += '[B][COLOR %s][I]Desactivado [/I][/B][/COLOR]' % color_list_inactive
+
         if channels_search:
             channels_preselct = str(channels_search).replace('[', '').replace(']', ',')
 
             if item.extra == 'included': tex_ch = '[COLOR yellow][B]INCLUIDO [/B][/COLOR]'
-            else: tex_ch = '[COLOR violet][B]EXCLUIDO [/B][/COLOR]'
+            else: tex_ch = '[COLOR violet][B] EXCLUIDO [/B][/COLOR]'
 
-            if ("'" + ch['id'] + "'") in str(channels_preselct): info = info + tex_ch
-
-        if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-        elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+            if ("'" + ch['id'] + "'") in str(channels_preselct): info += tex_ch
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -933,15 +1002,15 @@ def channels_excluded(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         it = xbmcgui.ListItem(ch['name'], info)
         it.setArt({'thumb': ch['thumbnail']})
@@ -1180,47 +1249,86 @@ def show_servers_list(item):
         except: 
            notes = ''
 
-        if item.tipo == 'sinsoporte':
+        if txt_status:
+            if srv_pending:
+                srv_incid = dict_server['name']
+
+                if srv_incid in str(srv_pending):
+                    incidencia = ''
+
+                    incids = scrapertools.find_multiple_matches(str(srv_pending), '[COLOR orchid](.*?)[/B][/COLOR]')
+
+                    for incid in incids:
+                         if not ' ' + srv_incid + ' ' in str(incid): continue
+
+                         incidencia = incid
+                         break
+
+                    if incidencia:
+                        info += '[COLOR tan][B]Incidencia [/B][/COLOR]'
+
+        if item.tipo == 'activos':
+            if "out of service" in notes.lower(): continue
+        elif item.tipo == 'sinsoporte':
             if not "requiere" in notes.lower(): continue
         elif item.tipo == 'outservice':
             if not "out of service" in notes.lower(): continue
         elif item.tipo == 'alternativos':
             if not "alternative" in notes.lower(): continue
+            if "out of service" in notes.lower(): continue
 
             add_on = scrapertools.find_single_match(notes.lower(), 'vía:(.*?)$').strip().lower()
             if ' (' in add_on: add_on = scrapertools.find_single_match(add_on, '(.*?) ').strip().lower()
 
-            if xbmc.getCondVisibility('System.HasAddon("%s")' % add_on): exists_addon = ' [COLOR tan][B] Instalada [/B]'
-            else: exists_addon = ' [COLOR red][B] No instalada [/B]'
+            if xbmc.getCondVisibility('System.HasAddon("%s")' % add_on):
+                try:
+                    cod_version = xbmcaddon.Addon(add_on).getAddonInfo("version").strip()
+                except:
+                    cod_version = ''
 
-            info = info + exists_addon
+                if not cod_version: exists_addon = '[COLOR gray][B]Desactivado[/B]'
+                else: exists_addon = '[COLOR tan][B] Vía Instalada[/B]'
+
+            else: exists_addon = '[COLOR red][B] Vía No Instalada[/B]'
+
+            info += exists_addon
 
         if dict_server['active'] == False:
             if item.tipo == 'activos': continue
 
-            info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
+            info += '[COLOR coral][B] Inactivo [/B][/COLOR]'
 
         if servers_preferred:
             if dict_server['id'] in servers_preferred_list:
-                if info: info = info + '  '
-                info = info + '[COLOR cyan][B] Preferido [/B][/COLOR]'
+                if info: info += '  '
+                info += '[COLOR cyan][B] Preferido [/B][/COLOR]'
 
         if servers_unfavored:
             if dict_server['id'] in servers_unfavored:
-                if info: info = info + '  '
-                info = info + '[COLOR chartreuse][B] como Última opción [/B][/COLOR]'
+                if info: info += '  '
+                info += '[COLOR chartreuse][B] como Última opción [/B][/COLOR]'
 
         if servers_discarded:
             if dict_server['id'] in servers_discarded_list:
-                if info: info = info + '  '
-                info = info + '[COLOR indianred][B] Descartado [/B][/COLOR]'
+                if info: info += '  '
+                info += '[COLOR indianred][B] Descartado [/B][/COLOR]'
 
         if notes:
             notes = notes.replace('Out of Service', '[COLOR red][B]Fuera de Servicio[/B][/COLOR]')
-            if info: info = info + '  '
-            info = info + '[COLOR mediumaquamarine]' + notes + '[/COLOR]'
+            if info: info += '  '
+            info += '[COLOR mediumaquamarine]' + notes + '[/COLOR]'
 
         server_name = dict_server['name']
+
+        if dict_server['active'] == False:
+            if notes:
+                if "requiere" in notes.lower(): server_name = '[COLOR red]' + server_name + '[/COLOR]'
+                else: server_name = '[COLOR darkred]' + server_name + '[/COLOR]'
+        else:
+            if notes:
+                if "requiere" in notes.lower(): server_name = '[COLOR red]' + server_name + '[/COLOR]'
+                elif 'Fuera de Servicio' in notes: server_name = '[COLOR darkviolet]' + server_name + '[/COLOR]'
+
         server_thumb = thumb
 
         opciones_servers.append(platformtools.listitem_to_select('[COLOR yellow]' + server_name + '[/COLOR]', info, server_thumb))
@@ -1320,40 +1428,61 @@ def show_channels_list(item):
             if not 'crypto' in ch['clusters']: continue
         elif item.onlyone:
             if not 'onlyone' in ch['clusters']: continue
+        elif item.streaminytorrent:
+            if not 'Canal con enlaces Streaming y Torrent' in ch['notes']: continue
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
-        if 'register' in ch['clusters']: info = info + '[COLOR fuchsia][B] Cuenta [/B][/COLOR]'
+        if con_incidencias:
+           if ch['name'] in str(con_incidencias): info += '[I][B][COLOR tan] Incidencia [/COLOR][/I][/B]'
+
+        if no_accesibles:
+           if ch['name'] in str(no_accesibles): info += '[I][B][COLOR indianred] No Accesible [/COLOR][/I][/B]'
+
+        if con_problemas:
+           if ch['name'] in str(con_problemas):
+               hay_problemas = str(con_problemas).replace('[B][COLOR moccasin]', 'CHANNEL').replace('[COLOR lime]', '/CHANNEL')
+               channels_con_problemas = scrapertools.find_multiple_matches(hay_problemas, "CHANNEL(.*?)/CHANNEL")
+
+               for channel_con_problema in channels_con_problemas:
+                    channel_con_problema = channel_con_problema.strip()
+
+                    if not channel_con_problema == ch['name']: continue
+
+                    info += '[I][B][COLOR tomato] Con Problema [/COLOR][/I][/B]'
+                    break
 
         if ch['active'] == False:
-            if 'temporary' in ch['clusters']: info = info + '[COLOR pink][B] Temporalmente Inactivo [/B][/COLOR]'
+            if 'temporary' in ch['clusters']: info += '[COLOR pink][B] Temporalmente Inactivo [/B][/COLOR]'
             else:
-               info = info + '[COLOR red][B] Inactivo [/B][/COLOR]'
-               if 'web anulada' in ch['notes'].lower(): info = info + '[COLOR goldenrod][B] Anulado[/B][/COLOR]'
-               elif 'web cerrada' in ch['notes'].lower(): info = info + '[COLOR gold][B] Cerrado[/B][/COLOR]'
-               elif 'canal privado' in ch['notes'].lower(): info = info + '[COLOR grey][B] Privado[/B][/COLOR]'
+               info += '[COLOR coral][B] Inactivo [/B][/COLOR]'
+               if 'web anulada' in ch['notes'].lower(): info += '[COLOR goldenrod][B] Anulado[/B][/COLOR]'
+               elif 'web cerrada' in ch['notes'].lower(): info += '[COLOR gold][B] Cerrado[/B][/COLOR]'
+               elif 'canal privado' in ch['notes'].lower(): info += '[COLOR grey][B] Privado[/B][/COLOR]'
 
-        elif ch['searchable'] == False: info = info + '[COLOR coral][B] No búsquedas [/B][/COLOR]'
+        elif ch['searchable'] == False: info += '[COLOR coral][B] No búsquedas [/B][/COLOR]'
         elif channels_search:
             if no_proxies:
                 if 'proxies' in ch['notes'].lower():
                     if config.get_setting(cfg_proxies_channel, default=''):
-                        if no_channels: info = info + '[COLOR moccasin][B] Descartado Proxies [/B][/COLOR]'
+                        if no_channels: info += '[COLOR moccasin][B] Descartado Proxies [/B][/COLOR]'
 
-            if ch['id'] in channels_search: info = info + '[COLOR coral][B] No búsquedas [/B][/COLOR]'
+            if ch['id'] in channels_search: info += '[COLOR coral][B] No búsquedas [/B][/COLOR]'
 
         cfg_searchable_channel = 'channel_' + ch['id'] + '_no_searchable'
 
-        if config.get_setting(cfg_searchable_channel, default=False): info = info + '[COLOR violet][B] Descartado búsquedas [/B][/COLOR]'
+        if config.get_setting(cfg_searchable_channel, default=False): info += '[COLOR violet][B] Descartado búsquedas [/B][/COLOR]'
 
-        if ch['status'] == 1: info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
-        elif ch['status'] == -1: info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if ch['status'] == 1: info += '[B][COLOR wheat][I] Preferido [/I][/B][/COLOR]'
+        elif ch['status'] == -1: info += '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+
+        if 'register' in ch['clusters']: info += '[COLOR fuchsia][B] Cuenta [/B][/COLOR]'
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
             if dominio:
                 dominio = dominio.replace('https://', '').replace('/', '')
-                info = info + '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
+                info += '[B][COLOR darkorange] %s [/B][/COLOR]' % dominio
         else:
             if 'current' in ch['clusters']:
                 vigente = config.get_setting('channel_' + ch['id'] + '_dominio', default='')
@@ -1362,14 +1491,14 @@ def show_channels_list(item):
 
                 if vigente:
                     vigente = vigente.replace('https://', '').replace('/', '')
-                    info = info + '[B][COLOR green] %s [/B][/COLOR]' % vigente
+                    info += '[B][COLOR green] %s [/B][/COLOR]' % vigente
 
-        if 'problematic' in ch['clusters']: info = info + '[B][I][COLOR darkgoldenrod] Problemático [/I][/B][/COLOR]'
-        if 'clons' in ch['clusters']: info = info + '[B][I][COLOR violet] Principal [/I][/B][/COLOR]'
-        if 'clone' in ch['clusters']: info = info + '[B][I][COLOR turquoise] Clon [/I][/B][/COLOR]'
-        if 'notice' in ch['clusters']: info = info + '[B][COLOR orange] Aviso [/B][/COLOR]'
+        if 'problematic' in ch['clusters']: info += '[B][I][COLOR darkgoldenrod] Problemático [/I][/B][/COLOR]'
+        if 'clons' in ch['clusters']: info += '[B][I][COLOR violet] Principal [/I][/B][/COLOR]'
+        if 'clone' in ch['clusters']: info += '[B][I][COLOR turquoise] Clon [/I][/B][/COLOR]'
+        if 'notice' in ch['clusters']: info += '[B][COLOR orange] Aviso [/B][/COLOR]'
 
-        if config.get_setting(cfg_proxies_channel, default=''): info = info + '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
+        if config.get_setting(cfg_proxies_channel, default=''): info += '[B][COLOR %s] Proxies [/B][/COLOR]' % color_list_proxies
 
         tipos = ch['search_types']
         tipos = str(tipos).replace('[', '').replace(']', '').replace("'", '')
@@ -1378,10 +1507,10 @@ def show_channels_list(item):
             if '+18' in ch['notes']: continue
 
         if 'adults' in ch['clusters']:
-             if config.get_setting('descartar_xxx', default=False): continue
+             if descartar_xxx: continue
         elif 'anime' in ch['clusters']:
              if 'dedicada exclusivamente al anime' in ch['notes']:
-                 if config.get_setting('descartar_anime', default=False): continue
+                 if descartar_anime: continue
         elif 'dorama' in ch['clusters']:
              if 'dedicada exclusivamente al dorama' in ch['notes']:
                  if not config.get_setting('mnu_doramas', default=True): continue
@@ -1394,17 +1523,21 @@ def show_channels_list(item):
         else:
             tipos = str(tipos).replace('movie', '[COLOR deepskyblue]Películas[/COLOR]').replace('tvshow', '[COLOR hotpink]Series[/COLOR]').replace('documentary', '[COLOR cyan]Documentales[/COLOR]').replace('all,', '').strip()
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumspringgreen][B]' + tipos + '[/B][/COLOR]'
 
         idiomas = ch['language']
         idiomas = str(idiomas).replace('[', '').replace(']', '').replace("'", '')
         idiomas = str(idiomas).replace('cast', 'Esp').replace('lat', 'Lat').replace('vose', 'Vose').replace('vo', 'VO')
 
-        if info: info = info + '  '
-        info = info + '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
+        if info: info += '  '
+        info += '[COLOR mediumaquamarine]' + idiomas + '[/COLOR]'
 
         channel_name = ch['name']
+
+        if 'web anulada' in ch['notes'].lower(): channel_name = '[COLOR darkred]' + channel_name + '[/COLOR]'
+        elif 'web cerrada' in ch['notes'].lower(): channel_name = '[COLOR darkviolet]' + channel_name + '[/COLOR]'
+
         channel_thumb = ch['thumbnail']
 
         opciones_channels.append(platformtools.listitem_to_select('[COLOR yellow]' + channel_name + '[/COLOR]', info, channel_thumb))
@@ -1438,6 +1571,8 @@ def show_channels_list(item):
         elif item.notices == True: cabecera = 'Canales con [COLOR yellow]Aviso CloudFlare Protection[/COLOR]'
         elif item.cryptos == True: cabecera = 'Canales que requieren [COLOR yellow]Descifrar Enlaces[/COLOR]'
         elif item.onlyone == True: cabecera = 'Canales con [COLOR yellow]Un Único Servidor[/COLOR]'
+        elif item.streaminytorrent == True: cabecera = 'Canales con enlaces [COLOR yellow]Streaming y Torrent[/COLOR]'
+
         else: cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR] (segun sus Ajustes)'
 
     ret = platformtools.dialog_select(cabecera, opciones_channels, useDetails=True)
@@ -1474,7 +1609,13 @@ def show_clients_torrent(item):
         client_id = str(client['id'])
 
         if xbmc.getCondVisibility('System.HasAddon("%s")' % client['id']):
-            if cliente_torrent.lower() in client['id']: exists_torrent = ' [COLOR yellow][B] Instalado[COLOR greenyellow] Asignado[/B]'
+            try:
+                cod_version = xbmcaddon.Addon(client_id).getAddonInfo("version").strip()
+            except:
+                cod_version = ''
+
+            if not cod_version: exists_torrent = ' [COLOR gray][B]Desactivado[/B]'
+            elif cliente_torrent.lower() in client['id']: exists_torrent = ' [COLOR yellow][B] Instalado[COLOR greenyellow] Asignado[/B]'
             else: exists_torrent = ' [COLOR yellow][B] Instalado [/B]'
         else: exists_torrent = ' [COLOR red][B] No instalado [/B]'
 
@@ -1542,6 +1683,12 @@ def search_new_proxies(canal_0, canal_1, canal_2, item):
     return False
 
 def tests_channels(canal_0, canal_1, canal_2):
+    if 'Puede requerir el uso de proxies en función del país/operadora desde el que se accede' in canal_2:
+        if 'Proxies' in canal_1:
+            canal_2 = canal_2.replace('Puede requerir el uso de proxies en función del país/operadora desde el que se accede', '[COLOR red][B]Puede requerir el uso de proxies en función del país/operadora desde el que se accede[/B][/COLOR]')
+        else:
+            canal_2 = canal_2.replace('Puede requerir el uso de proxies en función del país/operadora desde el que se accede', '[COLOR indianred][B]Puede requerir el uso de proxies en función del país/operadora desde el que se accede[/B][/COLOR]')
+
     if platformtools.dialog_yesno(canal_0 + '[COLOR yellow] Test Canal[/COLOR]', '[COLOR cyan][B]¿ Desea Efectuar el Test Web del Canal ?[/B][/COLOR]', canal_1, canal_2):
         from modules import tester
 

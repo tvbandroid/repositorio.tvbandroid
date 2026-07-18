@@ -39,5 +39,5 @@
     }
   ],
   "thumbnail": "https://cachew.camsoda.com/assets/img/camsoda-logo-160x50.png",
-  "force_inputstream": "ffmpegdirect"
+  "force_inputstream": "adaptive"
 }

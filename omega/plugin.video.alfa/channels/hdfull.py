@@ -11,11 +11,10 @@ from lib import AlfaChannelHelper
 if not PY3: _dict = dict; from AlfaChannelHelper import dict
 from AlfaChannelHelper import DictionaryAllChannel
 from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
-from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay, renumbertools
 
 import ast
 from platformcode.platformtools import dialog_notification, dialog_ok, itemlist_refresh, itemlist_update, show_channel_settings
-from lib.alfa_assistant import is_alfa_installed
 
 IDIOMAS = AlfaChannelHelper.IDIOMAS_T
 list_language = list(set(IDIOMAS.values()))
@@ -24,8 +23,9 @@ list_quality_tvshow = AlfaChannelHelper.LIST_QUALITY_TVSHOW
 list_quality = list_quality_movies + list_quality_tvshow
 list_servers = AlfaChannelHelper.LIST_SERVERS
 
-cf_assistant = True if is_alfa_installed() else False
+cf_assistant = True if AlfaChannelHelper.IS_ASSISTANT_INSTALLED else False
 forced_proxy_opt = None
+forced_proxy_opt_alt = 'ProxySSL'
 debug = config.get_setting('debug_report', default=False)
 
 # https://dominioshdfull.com/
@@ -33,11 +33,12 @@ debug = config.get_setting('debug_report', default=False)
 canonical = {
              'channel': 'hdfull', 
              'host': config.get_setting("current_host", 'hdfull', default=''), 
-             "host_alt": ["https://hdfull.sbs/", "https://hdfull.today/", "https://hdfull.help/", "https://hd-full.biz/", 
-                          "https://hdfull.cfd/", "https://hdfull.org/"], 
-             "host_alt_main": 2, 
+             "host_alt": ["https://hdfull.today/", "https://hdfull.sbs/", "https://hdfull.love/", 
+                          "https://www3.hdfull.one/", "https://hdfull.org/"], 
+             "host_alt_main": 3, 
              "host_verification": '%slogin', 
-             "host_black_list": ["https://hdfull.one/", "https://hdfull.blog/", 
+             "host_black_list": ["https://hdfull.one/", "https://hd-full.biz/", "https://hdfull.cfd/",
+                                 "https://www2.hdfull.one/", "https://hdfull.help/", "https://hdfull.cv/", "https://hdfull.blog/",
 
                                  "https://hd-full.me/", 
                                  "https://hd-full.fit/", "https://hd-full.info/", "https://hd-full.life/", 
@@ -54,22 +55,15 @@ canonical = {
                                  "https://new.hdfull.one/", "https://hdfull.top/", "https://hdfull.bz/"],
              'pattern': r'<meta\s*property="og:url"\s*content="([^"]+)"', 
              "canonical_no_check_list": [],
-             'set_tls': True, 'set_tls_min': False, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': cf_assistant, 
-             'cf_assistant_ua': True, 'cf_assistant_get_source': True if cf_assistant == 'force' else False, 
-             'cf_no_blacklist': True, 'cf_removeAllCookies': False if cf_assistant == 'force' else True,
-             'cf_challenge': 1, 'cf_returnkey': 'url', 'cf_partial': True, 'cf_debug': debug, 
-             'cf_cookie': '$HOST|cf_clearance' if cf_assistant is True else None, 'cf_jscode': None, 
-             'cf_cookies_names': {'cf_clearance': False if cf_assistant is True else True},
-             'CF_if_assistant': True if cf_assistant is True else False, 'retries_cloudflare': -1, 
-             'CF_stat': True if cf_assistant is True else False, 
-             'CF': False, 'CF_test': True, 'alfa_s': True
+             'set_tls': True, 'set_tls_min': False, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             'retries_cloudflare': -1 if cf_assistant else 1, 
+             'retry_alt': False, 'CF_proxy_alt': False, 'canonical_check': False, 
+             'CF': False, 'CF_test': True, 'alfa_s': True, 'renumbertools': False,
+             'data_js': '', 'domains_test': 0, 'Plan_B': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
-host_main = canonical['host_alt'][canonical.get('host_alt_main', 0)]
-host_save = host
 host_thumb = 'https://hdfullcdn.cc/'
 _silence = config.get_setting('silence_mode', channel=canonical['channel'])
-if host in canonical['canonical_no_check_list']: canonical['canonical_check'] = False
 
 timeout = (5, 20)
 kwargs = {}
@@ -125,6 +119,14 @@ AlfaChannel = DictionaryAllChannel(host, movie_path=movie_path, tv_path=tv_path,
                                    idiomas=IDIOMAS, language=language, list_language=list_language, list_servers=list_servers, 
                                    list_quality_movies=list_quality_movies, list_quality_tvshow=list_quality_tvshow, 
                                    channel=canonical['channel'], actualizar_titulos=True, url_replace=url_replace, debug=debug)
+if canonical.get('host_alt_main', 0) > len(canonical['host_alt']) - 1: canonical['host_alt_main'] = 0
+host_main = canonical['host_alt'][canonical.get('host_alt_main', 0)]
+host_save = host
+if host in canonical['canonical_no_check_list']: canonical['canonical_check'] = False
+domains_test = canonical['domains_test']
+forced_proxy_opt = canonical.get('forced_proxy_ifnot_assistant', None)
+retry_alt = canonical.get('retry_alt', False)
+debug = debug or canonical.get('print_DEBUG', False)
 
 
 """ CACHING HDFULL PARAMETERS """
@@ -152,7 +154,7 @@ if not user_ or not pass_:
 credentials_req = True
 js_url = AlfaChannel.urljoin(host, "templates/hdfull/js/jquery.hdfull.view.min.js")
 data_js_url = AlfaChannel.urljoin(host, "js/providers.js")
-patron_sid = r"<input\s*type=['|\"]hidden['|\"]\s*name=['|\"]__csrf_magic['|\"]\s*value=\"([^\"]+)\"\s*.*>"
+patron_sid = r"<input\s*(?:type=['|\"]hidden['|\"]\s*)?name=['|\"]__csrf_magic['|\"]\s*(?:type=['|\"]hidden['|\"]\s*)?value=\"([^\"]+)\"\s*.*>"
 timer = AlfaChannel.finds['controls']['timer']
 
 try:
@@ -208,7 +210,7 @@ def mainlist(item):
 
     just_logout = window.getProperty("AH_hdfull_just_logout") or config.get_setting("just_logout", channel=canonical['channel'])
     verify_credentials(force_login=False if just_logout else 'timer')
-    if debug: logger.debug('just_logout: %s, account: %s, sid: %s, user_status: %s' % (just_logout, account, sid, user_status))
+    if debug: logger.info('just_logout: %s, account: %s, sid: %s, user_status: %s' % (just_logout, account, sid, user_status), force=True)
     if just_logout:
         just_logout = ''
         if window: window.setProperty("AH_hdfull_just_logout", str(just_logout))
@@ -255,6 +257,8 @@ def mainlist(item):
                              title="[COLOR steelblue][B]Desloguearse[/B][/COLOR]",
                              plot="Para cambiar de usuario", thumbnail=get_thumb("back.png")))
 
+    itemlist = renumbertools.show_option(item.channel, itemlist, status=canonical.get('renumbertools', False))
+
     itemlist = filtertools.show_option(itemlist, item.channel, list_language, list_quality_tvshow, list_quality_movies)
 
     autoplay.show_option(item.channel, itemlist)
@@ -281,12 +285,14 @@ def sub_menu_peliculas(item):
 
     itemlist.append(Item(channel=item.channel, action="list_all", title=" - [COLOR paleturquoise]Películas Estreno[/COLOR]",
                          url=AlfaChannel.urljoin(host, "peliculas-estreno"), plot=item.plot, 
-                         extra='estreno' if window and window.getProperty("AH_hdfull_preferred_proxy_ip") else 'fichas', 
+                         #extra='estreno' if window and window.getProperty("AH_hdfull_preferred_proxy_ip") else 'fichas', 
+                         extra='fichas', 
                          thumbnail=get_thumb('premieres', auto=True), c_type=item.c_type))
 
     itemlist.append(Item(channel=item.channel, action="list_all",  title=" - [COLOR paleturquoise]Películas Actualizadas[/COLOR]",
                          url=AlfaChannel.urljoin(host, "peliculas-actualizadas"), plot=item.plot, 
-                         extra='actualizadas' if window and window.getProperty("AH_hdfull_preferred_proxy_ip") else 'fichas',
+                         #extra='actualizadas' if window and window.getProperty("AH_hdfull_preferred_proxy_ip") else 'fichas',
+                         extra='fichas',
                          thumbnail=get_thumb('updated', auto=True), c_type=item.c_type))
 
     itemlist.append(Item(channel=item.channel, action="section", extra="Género", title=" - [COLOR paleturquoise]Películas por Género[/COLOR]",
@@ -671,7 +677,8 @@ def list_all_matches(item, matches_int, **AHkwargs):
             if str_:
                 elem_json['plot_extend'] += str_.replace('[COLOR blue](Visto)[/COLOR]', '')
                 elem_json['playcount'] = 1 if 'Visto' in str_ else 0
-            if item.extra not in ['listas_res', 'estreno', 'actualizadas']: elem_json = add_context(elem_json, str_)
+            if item.extra not in ['listas_res', 'estreno', 'actualizadas']:
+                elem_json = add_context(elem_json, str_)
 
         except Exception:
             logger.error(elem)
@@ -918,7 +925,7 @@ def findvideos_matches(item, matches_int, langs, response, **AHkwargs):
     except Exception:
         pass
 
-    provs = alfaresolver.jhexdecode(data_js)
+    provs = jsontools.load(base64.b64decode(canonical.get('data_js', '')).decode('utf-8') or {}) or alfaresolver.jhexdecode(data_js)
     matches_int = jsontools.load(alfaresolver.obfs(AlfaChannel.response.data, js_data))
 
     ## Carga estados: items usuario en titulo (visto, pendiente, etc).  Reset si viene de Videoteca
@@ -1040,9 +1047,9 @@ def search(item, texto, **AHkwargs):
 def verify_credentials(force_login=True, force_check=True):
     global credentials_req, user_, pass_
     
-    if debug: logger.debug('SID: %s; Account: %s; just_logout: %s; force_login: %s; force_check: %s; credentials: %s; credentials_req: %s' \
-                            % (True if sid else False, account, just_logout, force_login, force_check, 
-                               True if user_ and pass_ else False, credentials_req))
+    if debug: logger.info('SID: %s; Account: %s; just_logout: %s; force_login: %s; force_check: %s; credentials: %s; credentials_req: %s' \
+                           % (True if sid else False, account, just_logout, force_login, force_check, 
+                              True if user_ and pass_ else False, credentials_req), force=True)
 
     credentials = True if user_ and pass_ else False
     if not credentials:
@@ -1137,7 +1144,7 @@ def check_login_age(force_check=True):
     time_left = -0.0 if not login_age else (login_age - time_now)
 
     if time_left <= 0.0:
-        logger.debug('Login TIMED OUT: %s m. / %s m.' % (timer, round(time_left/60, 2)))
+        logger.info('Login TIMED OUT: %s m. / %s m.' % (timer, round(time_left/60, 2)), force=True)
         force_login_next()
         login(force_check=force_check)
     else:
@@ -1266,10 +1273,11 @@ def agrupa_datos(url, post=None, referer=True, soup=False, json=False, force_che
     if isinstance(referer, str):
         headers.update({'Referer': referer})
     if len(canonical['host_alt']) > 1:
-        url = verify_domain_alt(url, post=post, headers=headers, soup=False, json=False, alfa_s=alfa_s or hide_infobox)
+        url = verify_domain_alt(url, post=post, headers=headers, soup=False, json=False, alfa_s=not canonical.get('print_DEBUG', False))
 
-    page = AlfaChannel.create_soup(url, post=post, headers=headers, ignore_response_code=True, timeout=timeout, 
-                                   soup=False, json=False, canonical=canonical, hide_infobox=hide_infobox, alfa_s=alfa_s)
+    page = AlfaChannel.create_soup(url, post=post, headers=headers, ignore_response_code=True, timeout=timeout, retry_alt=retry_alt, 
+                                   soup=False, json=False, canonical=canonical, hide_infobox=hide_infobox, 
+                                   alfa_s=not canonical.get('print_DEBUG', False) or alfa_s or hide_infobox)
 
     if page.sucess and page.host and host_save not in page.host:
         force_login_next()
@@ -1324,19 +1332,25 @@ def verify_domain_alt(url, post=None, headers={}, soup=False, json=False, alfa_s
         url_rest = url.replace(host_alt, '')
         canonical_alt = canonical.copy()
 
-        for host_alt in canonical['host_alt']:
+        for x, host_alt in enumerate(canonical['host_alt']):
             canonical_alt['host'] = host_alt
             canonical_alt['host_alt'] = [host_alt]
+            canonical_alt['proxy_retries'] = 1 if x < canonical.get('host_alt_main', 3) else 0
+            canonical_alt['retries_cloudflare'] = 0 if x < canonical.get('host_alt_main', 3) else -1
+            canonical_alt['canonical_check'] = True if x < canonical.get('host_alt_main', 3) else False
+            canonical_alt['forced_proxy_ifnot_assistant'] = forced_proxy_opt_alt if x < canonical.get('host_alt_main', 3) else None
+            retry_alt_alt = True if x < canonical.get('host_alt_main', 3) else False
             headers['Referer'] = host_alt
             page = AlfaChannel.create_soup(host_alt + url_rest, post=post, headers=headers, ignore_response_code=True, timeout=timeout, 
-                                           soup=soup, json=json, canonical=canonical_alt, alfa_s=alfa_s, proxy_retries=0, retries_cloudflare=0,
-                                           canonical_check=False)
-            if page.sucess:
+                                           retry_alt=retry_alt_alt, soup=soup, json=json, canonical=canonical_alt, alfa_s=alfa_s)
+            if page.sucess and scrapertools.find_single_match(page.data, r'og\:site_name"\s*content="HDFull'):
                 url = host_alt + url_rest
-                break
-            logger.debug('Host dropped: %s - Code: %s' % (host_alt, page.code))
+                canonical['preferred_proxy_ip'] = canonical_alt.pop('preferred_proxy_ip', '')
+                if not domains_test: break
+            logger.info('Host dropped: %s - Code: %s' % (host_alt, page.code), force=True)
+            if domains_test > 0 and x >= domains_test: break
         window.setProperty("AH_hdfull_domain", host_alt)
-        logger.debug('New Host: %s - Code: %s' % (host_alt, page.code))
+        logger.info('New Host: %s - Code: %s' % (host_alt, page.code), force=True)
 
     elif window and window.getProperty("AH_hdfull_domain"):
         host_alt = window.getProperty("AH_hdfull_domain")
@@ -1349,7 +1363,7 @@ def verify_domain_alt(url, post=None, headers={}, soup=False, json=False, alfa_s
             canonical['host_alt'].remove(host_alt_)
         if config.get_setting("current_host", canonical['channel'], default='') != host:
             config.set_setting("current_host", host, canonical['channel'])
-        
+
     return url
     
 
@@ -1458,7 +1472,7 @@ def set_status__(item):
 
     data = agrupa_datos(AlfaChannel.urljoin(host, path), post=post, hide_infobox=True)
     check_user_status(reset=True)
-    if debug: logger.debug('Post: %s; Title: %s' % (post, title % agreg))
+    if debug: logger.info('Post: %s; Title: %s' % (post, title % agreg), force=True)
 
     screen_refresh()
 
@@ -1486,7 +1500,7 @@ def get_status(status, elem, mediatype=''):
         mediatype = elem.contentType or mediatype
         season = elem.contentSeason or 0
 
-    if debug: logger.debug('info: %s; list_info: %s; mediatype: %s' % (info, list_info, mediatype))
+    if debug: logger.info('info: %s; list_info: %s; mediatype: %s' % (info, list_info, mediatype), force=True)
     if not status or not account or not mediatype or (not info and not list_info):
         return ""
     
@@ -1538,10 +1552,10 @@ def get_status(status, elem, mediatype=''):
                 if season_list:
                     if isinstance(elem, _dict):
                         elem['episode_list'] = {season: season_list.rstrip(',')}
-                        if debug: logger.debug("elem['episode_list']: %s; %s" % (elem['episode_list'], visto))
+                        if debug: logger.info("elem['episode_list']: %s; %s" % (elem['episode_list'], visto), force=True)
                     else:
                         elem.episode_list = {season: season_list.rstrip(',')}
-                        if debug: logger.debug("elem.episode_list: %s; %s" % (elem.episode_list, visto))
+                        if debug: logger.info("elem.episode_list: %s; %s" % (elem.episode_list, visto), force=True)
                     str2 = state[visto]
                     str2 = " [COLOR %s](%s)[/COLOR]" % ('orange' if 'Siguiendo' in str2 else 'blue', str2)
             

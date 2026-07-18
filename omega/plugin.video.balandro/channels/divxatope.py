@@ -58,6 +58,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -332,6 +334,8 @@ def list_last(item):
     except: return itemlist
 
     for url, title in matches:
+        title = title.replace('&#039;', "'")
+
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
             elif "[" in title: titulo = title.split("[")[0]
@@ -478,12 +482,14 @@ def findvideos(item):
 
         patron = '<div class="text-center">.*?'
         patron += "href='([^']+)'.*?download>Descargar</a>"
+
         url = scrapertools.find_single_match(data, patron)
 
         if not url:
             if item.contentType == 'documentary' or item.contentExtra == 'documentary':
                 patron = '<b class="bold">Formato:</b>.*?'
                 patron += "href='([^']+)'.*?download>Descargar</a>"
+
                 url = scrapertools.find_single_match(data, patron)
 
         if url:
@@ -506,7 +512,8 @@ def findvideos(item):
               if '/ttlinks.live/' in url: other = 'ttlinks'
               else: other = 'Torrent'
 
-           itemlist.append(Item( channel = item.channel, action = 'play', title = '', language = lang, quality = qlty, url = url, server = servidor, other = other ))
+           itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = servidor,
+                                 language = lang, quality = qlty, other = other ))
 
     return itemlist
 
@@ -547,8 +554,6 @@ def play(item):
         if item.server == 'directo':
             host_torrent = host[:-1]
             url_base64 = decrypters.decode_url_base64(item.url, host_torrent)
-
-            url_base64 = url_base64.replace('/divxatope.net/', '/ec1-eu-DivxaTope-compute-1.cdnbeta.in/')
 
             if url_base64.startswith('magnet:'):
                itemlist.append(item.clone( url = url_base64, server = 'torrent' ))
@@ -602,7 +607,7 @@ def list_search(item):
         sufijo = ''
         if item.search_type == 'all': 
             sufijo = contentType
-            if sufijo == "documentary": sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+            if sufijo == "documentary": sufijo = '[COLOR cyan]Documental[/COLOR]'
 
         if contentType == 'tvshow':
             if not item.search_type == 'all':
@@ -675,6 +680,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
 
 
 def search(item, texto):

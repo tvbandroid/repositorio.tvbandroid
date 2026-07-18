@@ -28,12 +28,13 @@ canonical = {
              'host': config.get_setting("current_host", 'eroticage', default=''), 
              'host_alt': ["https://www.eroticage.net/"], 
              'host_black_list': [], 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
+             'set_tls': None, 'set_tls_min': False, 'retries_cloudflare': 5, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 
+             'cf_assistant': False, 'CF_stat': True, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
 
-timeout = 5
+timeout = 45
 kwargs = {}
 debug = config.get_setting('debug_report', default=False)
 movie_path = ''
@@ -164,7 +165,7 @@ def play(item):
         # url = matches.source['src']
     # else:
         # url = matches.iframe['src']
-    url = soup.find('meta', itemprop='embedURL')['content']
+    url = soup.find('meta', itemprop=re.compile(r"(?:embedURL|contentURL)"))['content']
     if "play.php" in url:
         vid = url.split('?vid=')[-1]
         post_url = url.split('play.php')[0]
@@ -173,8 +174,10 @@ def play(item):
         from core import httptools
         data = httptools.downloadpage(post_url, post=post).json
         url = data['source'][0]['file']
-    else:
-        url = url
+    # else:
+        # url = url
+    if ".m3u" in url:
+        url += "|Referer=%s" %AlfaChannel.host
     if not "meta" in url:
         itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.contentTitle, url=url, plot=item.plot ))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())

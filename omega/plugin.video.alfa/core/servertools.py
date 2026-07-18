@@ -7,7 +7,6 @@ from __future__ import division
 from __future__ import absolute_import
 import sys
 from builtins import range
-from past.utils import old_div
 
 import re
 import codecs
@@ -26,7 +25,7 @@ PY3 = sys.version_info >= (3,)
 IGNORE_NULL_LABELS = []
 dict_servers_parameters = {}
 proxy_channel_bloqued = {}
-patron_domain = '(?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?([\w|\-\d]+\.(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+))(?:\/|\?|$)'
+patron_domain = r'(?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?([\w|\-\d]+\.(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+\.?)?(?:[\w|\-\d]+))(?:\/|\?|$)'
 
 
 def find_video_items(item=None, data=None):
@@ -233,10 +232,20 @@ def parse_hls(video_urls, server):
         if 'm3u8' not in url:
             return video_urls
         
-        data = httptools.downloadpage(url, headers=headers).data
-        patron = r'#EXT-X-STREAM-INF.*?RESOLUTION=(\d+x\d+).*?\s(http.*?)\s'
+        try:
+            data = httptools.downloadpage(url, headers=headers).data
+        except Exception as e:
+            logger.error(e)
+            return video_urls
+        
         if not isinstance(data, str):
             data = codecs.decode(data, "utf-8")
+        
+        if '#EXT-X-MEDIA:TYPE=AUDIO' in data \
+        or '#EXT-X-MEDIA:TYPE=SUBTITLES' in data:
+            return video_urls
+        
+        patron = r'#EXT-X-STREAM-INF.*?RESOLUTION=(\d+x\d+).*?\s(http.*?)\s'
         matches = scrapertools.find_multiple_matches(data, patron)
 
         if len(matches) > 1:
@@ -366,7 +375,7 @@ def resolve_video_urls_for_playing(server, url, video_password="", muestra_dialo
 
             # Muestra el progreso
             if muestra_dialogo:
-                progreso.update((old_div(100, len(opciones))) * opciones.index(opcion), config.get_localized_string(70180) % server_name)
+                progreso.update(((100 // len(opciones))) * opciones.index(opcion), config.get_localized_string(70180) % server_name)
             
             
             # Modo free
@@ -586,7 +595,7 @@ def get_server_setting(name, server, default=None):
 
         Devuelve el valor del parametro 'name' en la configuracion propia del servidor 'server'.
 
-        Busca en la ruta \addon_data\plugin.video.addon\settings_servers el archivo server_data.json y lee
+        Busca en la ruta /addon_data/plugin.video.addon/settings_servers el archivo server_data.json y lee
         el valor del parametro 'name'. Si el archivo server_data.json no existe busca en la carpeta servers el archivo 
         server.json y crea un archivo server_data.json antes de retornar el valor solicitado. Si el parametro 'name'
         tampoco existe en el el archivo server.json se devuelve el parametro default.

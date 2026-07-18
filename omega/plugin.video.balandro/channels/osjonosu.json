@@ -1,0 +1,17 @@
+{
+  "id": "osjonosu",
+  "name": "OsjoNosu",
+  "thumbnail": "osjonosu.jpg",
+
+  "active": false,
+
+  "searchable": true,
+  "search_types": ["all", "movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["cast"],
+
+  "clusters": ["onlyone", "years", "infantil", "lists", "kids", "docs"],
+
+  "notes": "Web CERRADA. Películas por géneros. Series por Géneros."
+}

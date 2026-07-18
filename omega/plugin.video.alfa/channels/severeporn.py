@@ -93,7 +93,72 @@ def section(item):
 def list_all(item):
     logger.info()
     
-    return AlfaChannel.list_all(item, **kwargs)
+    # return AlfaChannel.list_all(item, **kwargs)
+    return AlfaChannel.list_all(item, matches_post=list_all_matches, **kwargs)
+
+
+def list_all_matches(item, matches_int, **AHkwargs):
+    logger.info()
+    matches = []
+    
+    findS = AHkwargs.get('finds', finds)
+    
+    for elem in matches_int:
+        
+        elem_json = {}
+        
+        try:
+            
+            elem_json['url'] = elem.a.get('href', '')
+            elem_json['title'] = elem.a.get('title', '') \
+                                 or elem.find(class_='title').get_text(strip=True) if elem.find(class_='title') else ''
+            if not elem_json['title']:
+                elem_json['title'] = elem.img.get('alt', '')
+            
+            elem_json['thumbnail'] = elem.img.get('data-thumb_url', '') or elem.img.get('data-original', '') \
+                                     or elem.img.get('data-src', '') \
+                                     or elem.img.get('src', '')
+                                     
+            elem_json['thumbnail'] = re.sub(r'\d+x\d+/\d+', 'preview', elem_json['thumbnail'])
+            
+            elem_json['stime'] = elem.find(class_='duration').get_text(strip=True) if elem.find(class_='duration') else ''
+            if not elem_json['stime'] and elem.find(string=re.compile('^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$')):
+                elem_json['stime'] = elem.find(string=re.compile('^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$'))
+            if elem.find('span', class_=['hd-thumbnail', 'is-hd']):
+                elem_json['quality'] = elem.find('span', class_=['hd-thumbnail', 'is-hd']).get_text(strip=True)
+            if elem.find('span', class_=['hd-thumbnail', 'is-hd', 'video_quality']):
+                elem_json['quality'] = elem.find('span', class_=['hd-thumbnail', 'is-hd', 'video_quality']).get_text(strip=True)
+            elem_json['stime'] = elem_json['stime'].replace(elem_json['quality'], '')
+            elem_json['premium'] = elem.find('i', class_='premiumIcon') \
+                                     or elem.find('span', class_=['ico-private', 'premium-video-icon']) or ''
+
+            if elem.find('div', class_='videoDetailsBlock') \
+                                     and elem.find('div', class_='videoDetailsBlock').find('span', class_='views'):
+                elem_json['views'] = elem.find('div', class_='videoDetailsBlock')\
+                                    .find('span', class_='views').get_text('|', strip=True).split('|')[0]
+            # elif elem.find('div', class_='views'):
+                # elem_json['views'] = elem.find('div', class_='views').get_text(strip=True) 
+            elif elem.find('span', class_='video_count'):
+                elem_json['views'] = elem.find('span', class_='video_count').get_text(strip=True)
+            
+            
+            if elem.find('a',class_='video_channel'):
+                elem_json['canal'] = elem.find('a',class_='video_channel').get_text(strip=True)
+            pornstars = elem.find_all('li', class_="pstar")
+            if pornstars:
+                for x, value in enumerate(pornstars):
+                    pornstars[x] = value.get_text(strip=True)
+                elem_json['star'] = ' & '.join(pornstars)
+            
+        except:
+            logger.error(elem)
+            logger.error(traceback.format_exc())
+            continue
+        
+        if not elem_json['url']: continue
+        matches.append(elem_json.copy())
+    
+    return matches
 
 
 def findvideos(item):

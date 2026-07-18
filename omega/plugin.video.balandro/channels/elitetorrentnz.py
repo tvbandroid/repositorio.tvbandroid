@@ -44,9 +44,9 @@ def acciones(item):
     if domain_memo: url = domain_memo
     else: url = host
 
-    itemlist.append(Item( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
+    itemlist.append(item.clone( channel='actions', action='show_latest_domains', title='[COLOR moccasin][B]Últimos Cambios de Dominios[/B][/COLOR]', thumbnail=config.get_thumb('pencil') ))
 
-    itemlist.append(Item( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
+    itemlist.append(item.clone( channel='helper', action='show_help_domains', title='[B]Información Dominios[/B]', thumbnail=config.get_thumb('help'), text_color='green' ))
 
     itemlist.append(item.clone( channel='domains', action='test_domain_elitetorrentnz', title='Test Web del canal [COLOR yellow][B] ' + url + '[/B][/COLOR]',
                                 from_channel='elitetorrentnz', folder=False, text_color='chartreuse' ))
@@ -56,7 +56,9 @@ def acciones(item):
 
     itemlist.append(item.clone( channel='domains', action='manto_domain_elitetorrentnz', title=title, desde_el_canal = True, folder=False, text_color='darkorange' ))
 
-    itemlist.append(Item( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'elitetorrentnz', thumbnail=config.get_thumb('elitetorrentnz') ))
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
+    itemlist.append(item.clone( channel='actions', action='show_old_domains', title='[COLOR coral][B]Historial Dominios[/B][/COLOR]', channel_id = 'elitetorrentnz' ))
 
     platformtools.itemlist_refresh()
 
@@ -116,10 +118,10 @@ def idiomas(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/espanol/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/espanol-latino-1/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'idioma/ingles/', text_color='moccasin' ))
-    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/vose/', text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Castellano', action = 'list_all', url = host + 'idioma/espanol/', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_all', url = host + 'idioma/espanol-latino-1/', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Inglés', action = 'list_all', url = host + 'idioma/ingles/', text_color='deepskyblue' ))
+    itemlist.append(item.clone( title = 'Subtitulado', action = 'list_all', url = host + 'idioma/vose/', text_color='deepskyblue' ))
 
     return itemlist
 
@@ -144,7 +146,7 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    bloque = scrapertools.find_single_match(data, '<ul id="cab-categorias">(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '<ul id=cab-categorias>(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?title=.*?">(.*?)</a>')
 
@@ -180,7 +182,7 @@ def list_all(item):
     if '/?s=' in item.url:
         if '<h1>No se han encontrado resultados para' in data: return itemlist
 
-    matches = scrapertools.find_multiple_matches(data, '<div class="imagen"(.*?)<div class="meta">')
+    matches = scrapertools.find_multiple_matches(data, '<div class=imagen(.*?)</li>')
 
     i = 0
 
@@ -311,7 +313,7 @@ def findvideos(item):
 
     data = do_downloadpage(item.url)
 
-    bloque = scrapertools.find_single_match(data, '<div class="enlace_descarga"(.*?)</center>')
+    bloque = scrapertools.find_single_match(data, '<div class=ficha_descarga_opciones>(.*?)</center>')
 
     links = scrapertools.find_multiple_matches(bloque, '<a href="(.*?)"')
 

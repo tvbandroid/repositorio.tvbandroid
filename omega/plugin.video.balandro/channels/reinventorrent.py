@@ -71,6 +71,8 @@ def acciones(item):
 
     itemlist.append(item_configurar_proxies(item))
 
+    itemlist.append(item.clone( channel='helper', action='show_help_prales', title='[B]Cual es su canal Principal[/B]', pral = True, text_color='turquoise' ))
+
     platformtools.itemlist_refresh()
 
     return itemlist
@@ -329,6 +331,8 @@ def list_last(item):
     except: return itemlist
 
     for url, title in matches:
+        title = title.replace('&#039;', "'")
+
         if item.search_type== 'movie':
             if "(" in title: titulo = title.split("(")[0]
             elif "[" in title: titulo = title.split("[")[0]
@@ -549,7 +553,7 @@ def list_search(item):
         if item.search_type == 'all': 
             sufijo = contentType
             if sufijo == "documentary":
-                sufijo = '[COLOR yellowgreen](documental)[/COLOR]'
+                sufijo = '[COLOR cyan]Documental[/COLOR]'
 
         if contentType == 'tvshow':
             if not item.search_type == 'all':
@@ -622,6 +626,15 @@ def corregir_SerieName(SerieName):
     SerieName = SerieName.strip()
 
     return SerieName
+
+
+def _news(item):
+    logger.info()
+
+    item.url = host + 'ultimos'
+    item.search_type = 'movie'
+
+    return list_last(item)
 
 
 def search(item, texto):

@@ -28,9 +28,13 @@ def mainlist_animes(item):
 
     if config.get_setting('descartar_anime', default=False): return
 
-    if config.get_setting('adults_password'):
-        from modules import actions
-        if actions.adults_password(item) == False: return
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
 
     itemlist.append(item.clone( title = 'Buscar anime ...', action = 'search', search_type = 'tvshow', text_color='springgreen' ))
 
@@ -111,23 +115,26 @@ def temporadas(item):
     logger.info()
     itemlist = []
 
-    if config.get_setting('channels_seasons', default=True):
-        if not '[COLOR tan]Temp.[/COLOR]' in item.title:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
+    if not '[COLOR tan]Temp.[/COLOR]' in item.title:
+        platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'sin [COLOR tan]Temporadas[/COLOR]')
 
     item.page = 0
     item.contentType = 'season'
 
-    item.contentSeason = 1
+    season = scrapertools.find_single_match(item.url, '-season-(.*?)/')
 
-    if '2nd' in item.title: item.contentSeason = 2
-    if '3rd' in item.title: item.contentSeason = 3
-    if '4th' in item.title: item.contentSeason = 4
-    if '5th' in item.title: item.contentSeason = 5
-    if '6th' in item.title: item.contentSeason = 6
-    if '7th' in item.title: item.contentSeason = 7
-    if '8th' in item.title: item.contentSeason = 8
-    if '9th' in item.title: item.contentSeason = 9
+    if season: item.contentSeason = season
+    else:
+        item.contentSeason = 1
+
+        if '2nd' in item.title: item.contentSeason = 2
+        elif '3rd' in item.title: item.contentSeason = 3
+        elif '4th' in item.title: item.contentSeason = 4
+        elif '5th' in item.title: item.contentSeason = 5
+        elif '6th' in item.title: item.contentSeason = 6
+        elif '7th' in item.title: item.contentSeason = 7
+        elif '8th' in item.title: item.contentSeason = 8
+        elif '9th' in item.title: item.contentSeason = 9
 
     itemlist = episodios(item)
 
@@ -204,6 +211,8 @@ def episodios(item):
 
         titulo = '%sx%s %s' % (str(item.contentSeason), str(epis), title)
 
+        titulo = titulo + ' ' + item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'")
+
         if url:
             itemlist.append(item.clone( action='findvideos', url = url, title = titulo,
                                         contentType = 'episode', contentSeason = item.contentSeason, contentEpisodeNumber = epis ))
@@ -224,6 +233,14 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
+    if not config.get_setting('ses_pin'):
+        if config.get_setting('animes_password'):
+            if config.get_setting('adults_password'):
+                from modules import actions
+                if actions.adults_password(item) == False: return
+
+        config.set_setting('ses_pin', True)
+
     data = do_downloadpage(item.url)
 
     embed = scrapertools.find_single_match(data, '<div class="player-embed".*?<iframe src="(.*?)"')
@@ -236,7 +253,6 @@ def findvideos(item):
         url = embed
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
@@ -257,7 +273,6 @@ def findvideos(item):
         ses += 1
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
@@ -288,13 +303,14 @@ def play(item):
             return 'Servidor [COLOR red]Fuera de Servicio[/COLOR]'
 
         servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()
-            if new_server.startswith("http"): servidor = new_server
+            if new_server.startswith("http"):
+                if not config.get_setting('developer_mode', default=False): return itemlist
+            servidor = new_server
 
         itemlist.append(item.clone(url = url, server = servidor))
 

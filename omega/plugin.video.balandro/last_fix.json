@@ -1,90 +1,68 @@
 {
-    "addon_version": "4.0.17",
+    "addon_version": "4.0.30",
     "files": {
         "channels": [
-            "animemix",
-            "animeonline",
-            "animesenlatino",
-            "animeyt",
-            "asialive",
-            "cineplay",
-            "cinequinqui",
-            "cuevana3pro",
-            "documentaleson",
-            "dontorrents",
-            "dontorrentsin",
-            "doramasmp4dev",
-            "doramasyt",
-            "ennovelastv",
-            "entrepeliculasyseries",
-            "estrenosdoramases",
-            "filmoves",
-            "frozenlayer",
+            "animeav1",
+            "animeflv",
+            "animeflvone",
+            "animejara",
+            "animejl",
+            "detodo",
+            "documentalesonline",
+            "doramaexpress",
+            "dpeliculas",
             "gnula",
-            "gnula24",
-            "gnula24h",
-            "henaojara",
+            "hdcinema",
             "henaojaran",
-            "kissasian",
-            "legalmentegratis",
-            "mega1link",
+            "lamovie",
             "megaserie",
-            "mejortorrentapp",
-            "pelis28re",
-            "pelisgratishd",
-            "pelisplushdlat",
-            "pelisplushdnz",
-            "pelisxd",
-            "pelisyseries",
-            "pgratishd",
-            "ppeliculas",
-            "pplus",
-            "series24",
-            "serieses",
-            "serieskao",
-            "seriesplus",
-            "sololatino",
-            "telenovela",
-            "tgx",
-            "trailers",
-            "verflix",
-            "zoowomaniacos"
+            "monoschinos",
+            "mundodonghua",
+            "mundodonghuaxyz",
+            "pasateatorrent",
+            "peliculasonline",
+            "pelisforte",
+            "repelishd",
+            "retrotv",
+            "tioanime",
+            "tiodonghua",
+            "topdocumentaryfilms",
+            "tubeonline",
+            "villaanimex",
+            "xmoviesforyou",
+            "yandispoiler"
         ],
         "core": [
             "httptools",
             "requeststools",
             "servertools"
         ],
-        "lib": [
-            "decrypters"
-        ],
         "modules": [
             "actions",
-            "filters",
             "generos",
-            "groups",
             "helper",
-            "mainmenu",
-            "search",
-            "submnuctext",
-            "submnuteam",
-            "tester"
+            "novelty",
+            "youtubetrailers"
         ],
         "platformcode": [
             "platformtools"
-        ],
-        "resources": [
-            "settings"
         ],
         "root dir": [
             "dominios",
             "version"
         ],
         "servers": [
+            "dailymotion",
+            "kinoger",
+            "mediafire",
+            "mixdrop",
+            "streamtape",
             "various",
+            "yourupload",
+            "youtube",
             "zures"
         ]
     },
-    "fix_version": 5,
-    "hash": "81a34374d9307825615200d17e2a7e4a"
+    "fix_version": 6,
+    "hash": "07741f2dbad682d0d2e5f2b4f113eddc"
 }

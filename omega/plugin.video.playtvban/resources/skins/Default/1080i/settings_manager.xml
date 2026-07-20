@@ -857,6 +857,15 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.media_open_action_movie),0)</visible>
+                          <property name="setting_label">Omitir Películas en Curso</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.media_open_action_skip_inprogress_movie)]</property>
+                          <property name="setting_description">Seleccione esta opción y se omitirá la acción Abrir películas (Extras / Conjunto de películas) para las películas en curso, reanudando la reproducción directamente. Las opciones Extras y Conjunto de películas permanecerán disponibles en el menú contextual..</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=media_open_action_skip_inprogress_movie)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
                           <property name="setting_label">Series</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.media_open_action_tvshow_name)]</property>

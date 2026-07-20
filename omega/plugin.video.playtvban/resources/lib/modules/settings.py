@@ -51,13 +51,13 @@ def tmdblist_user_active():
 	return get_setting('playtvban.tmdb.account_id', 'empty_setting') not in (None, 'empty_setting', '')
 
 def results_format():
-	results_window_numbers_dict = {'List': 2000, 'Rows': 2001, 'WideList': 2002}
-	window_format = str(get_setting('playtvban.results.list_format', 'List'))
+	results_window_numbers_dict = {'Lista': (2000, 'list'), 'Filas': (2001, 'rows'), 'Lista Ancha': (2002, 'widelist')}
+	window_format = str(get_setting('playtvban.results.list_format', 'Lista'))
 	if not window_format in results_window_numbers_dict:
-		window_format = 'List'
+		window_format = 'Lista'
 		set_setting('results.list_format', window_format)
-	window_number = results_window_numbers_dict[window_format]
-	return window_format.lower(), window_number
+	window_number, internal_code = results_window_numbers_dict[window_format]
+	return internal_code, window_number
 
 def store_resolved_to_cloud(debrid_service, pack):
 	setting_value = int(get_setting('playtvban.store_resolved_to_cloud.%s' % debrid_service.lower(), '0'))
@@ -400,11 +400,6 @@ def nextep_pipeline_headroom(play_type, scraper_time, still_watching_due=False):
 		headroom = max(headroom, NEXTEP_AUTOSCRAPE_MIN_HEADROOM_SEC)
 	return headroom
 
-def random_continual_still_watching_enabled():
-	if not autoplay_next_episode(): return False
-	if int(get_setting('redlight.autoplay_watching_check', '3')) == 0: return False
-	return get_setting('redlight.autoplay_random_continual_watching_check', 'true') == 'true'
-
 def auto_nextep_settings(play_type):
 	play_type = 'autoplay' if play_type == 'autoplay_nextep' else 'autoscrape'
 	window_percentage = 100 - int(get_setting('playtvban.%s_next_window_percentage' % play_type, '95'))
@@ -584,7 +579,7 @@ def tv_progress_location():
 
 def check_prescrape_sources(scraper, media_type):
 	"""Prescrape only when Check Before Full Search is enabled for that provider."""
-	if scraper in ('easynews', 'aiostreams', 'rd_cloud', 'pm_cloud', 'ad_cloud', 'oc_cloud', 'tb_cloud'):
+	if scraper in ('easynews', 'aiostreams', 'nzb', 'rd_cloud', 'pm_cloud', 'ad_cloud', 'oc_cloud', 'tb_cloud'):
 		return get_setting('playtvban.check.%s' % scraper) == 'true'
 	if scraper == 'folders':
 		return get_setting('playtvban.check.folders') == 'true'
@@ -745,6 +740,43 @@ def append_external_scraper_settings_cm(cm_append, build_url_fn):
 	cm_append(['external_scraper_settings', ('[B]%s[/B]' % external_scraper_settings_tools_label(),
 		'RunPlugin(%s)' % build_url_fn({'mode': 'open_external_scraper_settings'}))])
 
+def append_cm_if_enabled(cm_append, cm_sort_order, key, label, command):
+	# Opt-in shortcuts must gate on enabled membership — stock menus show every cm_append.
+	if key not in (cm_sort_order or {}): return
+	cm_append([key, (label, command)])
+
+def append_list_shortcut_context_menus(cm_append, build_url_fn, cm_sort_order, media_type, tmdb_id, imdb_id, tvdb_id, title, poster):
+	# Catalog lists every service; live CM only appends shortcuts for authorised accounts.
+	base = {'tmdb_id': tmdb_id, 'imdb_id': imdb_id, 'tvdb_id': tvdb_id or 'None', 'media_type': media_type, 'title': title, 'icon': poster}
+	if mdblist_user_active():
+		append_cm_if_enabled(cm_append, cm_sort_order, 'mdblist_watchlist', '[B]Lista de Seguimiento de MDBList[/B]',
+			'RunPlugin(%s)' % build_url_fn(dict(base, mode='mdblist_watchlist_shortcut_choice')))
+		append_cm_if_enabled(cm_append, cm_sort_order, 'mdblist_library', '[B]Biblioteca de MDBList[/B]',
+			'RunPlugin(%s)' % build_url_fn(dict(base, mode='mdblist_library_shortcut_choice')))
+	if simkl_user_active():
+		append_cm_if_enabled(cm_append, cm_sort_order, 'simkl_plantowatch', '[B]Simkl Por Ver[/B]',
+			'RunPlugin(%s)' % build_url_fn(dict(base, mode='simkl_plantowatch_shortcut_choice')))
+	if trakt_user_active():
+		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_watchlist', '[B]Lista de Seguimiento de Trakt[/B]',
+			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_watchlist_shortcut_choice')))
+		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_collection', '[B]Colección de Trakt[/B]',
+			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_collection_shortcut_choice')))
+	if tmdblist_user_active():
+		tmdb_media = 'movie' if media_type == 'movie' else 'tv'
+		append_cm_if_enabled(cm_append, cm_sort_order, 'tmdb_watchlist', '[B]Lista de Seguimiento de TMDb[/B]',
+			'RunPlugin(%s)' % build_url_fn({'mode': 'tmdb_watchlist_shortcut_choice', 'media_type': tmdb_media, 'tmdb_id': tmdb_id, 'title': title, 'icon': poster}))
+		append_cm_if_enabled(cm_append, cm_sort_order, 'tmdb_favorites', '[B]Favoritos de TMDb[/B]',
+			'RunPlugin(%s)' % build_url_fn({'mode': 'tmdb_favorites_shortcut_choice', 'media_type': tmdb_media, 'tmdb_id': tmdb_id, 'title': title, 'icon': poster}))
+
+def append_source_shortcut_context_menus(cm_append, build_url_fn, cm_sort_order, media_type, meta, season='', episode='', playcount='0'):
+	params = {'media_type': media_type, 'meta': meta, 'playcount': playcount}
+	if media_type == 'episode':
+		params.update({'season': season, 'episode': episode})
+	append_cm_if_enabled(cm_append, cm_sort_order, 'select_source', '[B]Seleccionar Fuente[/B]',
+		'RunPlugin(%s)' % build_url_fn(dict(params, mode='select_source_choice')))
+	append_cm_if_enabled(cm_append, cm_sort_order, 'rescrape_select_source', '[B]Rebuscar y Seleccionar Fuente[/B]',
+		'RunPlugin(%s)' % build_url_fn(dict(params, mode='rescrape_select_source_choice')))
+
 def external_scraper_run_mode():
 	return str(get_setting('playtvban.external_scraper.run_mode', '1'))
 
@@ -863,7 +895,7 @@ def provider_sort_ranks():
 	fo_priority = int(get_setting('playtvban.folders.priority', '6'))
 	aio_priority = int(get_setting('playtvban.aio.priority', '7'))
 	en_priority = int(get_setting('playtvban.en.priority', '7'))
-	nzb_priority = int(get_setting('redlight.nzb.priority', '7'))
+	nzb_priority = int(get_setting('playtvban.nzb.priority', '7'))
 	rd_priority = int(get_setting('playtvban.rd.priority', '8'))
 	ad_priority = int(get_setting('playtvban.ad.priority', '9'))
 	pm_priority = int(get_setting('playtvban.pm.priority', '10'))
@@ -886,13 +918,13 @@ def scraping_settings():
 	if highlight_type == 2:
 		highlight = get_setting('playtvban.scraper_single_highlight', 'FF008EB2')
 		return {'highlight_type': 1, '4k': highlight, '1080p': highlight, '720p': highlight, 'sd': highlight}
-	easynews_highlight, aiostreams_highlight, debrid_cloud_highlight, folders_highlight = '', '', '', ''
+	easynews_highlight, aiostreams_highlight, nzb_highlight, debrid_cloud_highlight, folders_highlight = '', '', '', '', ''
 	rd_highlight, pm_highlight, ad_highlight, oc_highlight, tb_highlight = '', '', '', '', ''
 	highlight_4K, highlight_1080P, highlight_720P, highlight_SD = '', '', '', ''
 	if highlight_type == 0:
 		easynews_highlight = get_setting('playtvban.provider.easynews_highlight', 'FF00B3B2')
 		aiostreams_highlight = get_setting('playtvban.provider.aiostreams_highlight', 'FF00D4FF')
-		nzb_highlight = get_setting('redlight.provider.nzb_highlight', 'FFD4A017')
+		nzb_highlight = get_setting('playtvban.provider.nzb_highlight', 'FFD4A017')
 		debrid_cloud_highlight = get_setting('playtvban.provider.debrid_cloud_highlight', 'FF7A01CC')
 		folders_highlight = get_setting('playtvban.provider.folders_highlight', 'FFB36B00')
 		rd_highlight = get_setting('playtvban.provider.rd_highlight', 'FF3C9900')
@@ -938,6 +970,25 @@ def widget_hide_watched():
 def calendar_sort_order():
 	return int(get_setting('playtvban.trakt.calendar_sort_order', '0'))
 
+def calendar_date_label_options():
+	# (strftime format, use_words, include_date). Hyphen formats match picker labels.
+	# Words modes: Today/Tomorrow/weekday within ~1 week; format used outside that window.
+	# 0/7/8 Words / date | 1-3 date only | 4-6 Day + date (word and date together)
+	date_only = {3: '%Y-%m-%d', 1: '%m-%d-%Y', 2: '%d-%m-%Y'}
+	day_plus = {6: '%Y-%m-%d', 4: '%m-%d-%Y', 5: '%d-%m-%Y'}
+	words_far = {0: '%Y-%m-%d', 7: '%m-%d-%Y', 8: '%d-%m-%Y'}
+	try: choice = int(get_setting('playtvban.trakt.calendar_date_labels', '0'))
+	except (TypeError, ValueError): choice = 0
+	if choice in date_only: return date_only[choice], False, False
+	if choice in day_plus: return day_plus[choice], True, True
+	return words_far.get(choice, '%Y-%m-%d'), True, False
+
+def calendar_date_format():
+	# None when word labels are used (words-only or Day + date); strftime string for date-only.
+	fmt, use_words, _ = calendar_date_label_options()
+	if use_words: return None
+	return fmt
+
 def ignore_articles():
 	return get_setting('playtvban.ignore_articles', 'false') == 'true'
 
@@ -949,6 +1000,12 @@ def date_offset():
 
 def media_open_action(media_type):
 	return int(get_setting('playtvban.media_open_action_%s' % media_type, '0'))
+
+def media_open_action_skip_inprogress_movie():
+	return get_setting('playtvban.media_open_action_skip_inprogress_movie', 'false') == 'true'
+
+def media_open_action_skip_inprogress_tvshow():
+	return get_setting('playtvban.media_open_action_skip_inprogress_tvshow', 'false') == 'true'
 
 def _resolve_watched_provider():
 	ind = int(get_setting('playtvban.watched_indicators', '0'))

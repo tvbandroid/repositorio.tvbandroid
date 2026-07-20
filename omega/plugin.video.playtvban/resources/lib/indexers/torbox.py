@@ -24,10 +24,14 @@ def tb_cloud():
 				folder_id = item.get('id')
 				if folder_id is None:
 					continue
-				label_type = {'torrent': 'TORRENT', 'usenet': 'USENET', 'webdl': 'WEB DL'}.get(media_type, 'CARPETA')
-				display = '%02d | [B]%s[/B] | [I]%s [/I]' % (count, label_type, clean_file_name(normalize(item.get('name') or '')).upper())
+				label_type = {'torrent': 'TORRENT', 'usenet': 'USENET', 'webdl': 'WEB DL'}.get(media_type, 'FOLDER')
+				airlocked = TorBox.item_is_airlocked(item)
+				lock_tag = ' | [B]AIRLOCK[/B]' if airlocked else ''
+				display = '%02d | [B]%s[/B]%s | [I]%s [/I]' % (count, label_type, lock_tag, clean_file_name(normalize(item.get('name') or '')).upper())
 				url_params = {'mode': 'torbox.browse_tb_cloud', 'folder_id': folder_id, 'media_type': media_type}
+				airlock_params = {'mode': 'torbox.airlock', 'folder_id': folder_id, 'media_type': media_type}
 				delete_params = {'mode': 'torbox.delete', 'folder_id': folder_id, 'media_type': media_type}
+				cm_append(('[B]Quitar de Airlock[/B]' if airlocked else '[B]Añadir a Airlock[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(airlock_params)))
 				cm_append(('[B]Eliminar Carpeta[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
 				url = kodi_utils.build_url(url_params)
 				listitem = kodi_utils.make_listitem()
@@ -40,13 +44,10 @@ def tb_cloud():
 				pass
 	icon, fanart = kodi_utils.get_icon('torbox'), kodi_utils.get_addon_fanart()
 	handle = int(sys.argv[1])
-	busy = False
 	try:
-		force_fresh = not TorBox.peek_ui_cloud_folders()
-		if force_fresh:
-			busy = True
-			kodi_utils.show_busy_dialog()
-		data = TorBox.load_ui_cloud_folders(refresh=force_fresh)
+		# Always refresh so Airlock labels / CM options match live TorBox status.
+		kodi_utils.show_busy_dialog()
+		data = TorBox.load_ui_cloud_folders(refresh=True)
 		folders, errors = data['folders'], data['errors']
 		if errors:
 			msg = 'TorBox: %s' % errors[0]
@@ -55,15 +56,14 @@ def tb_cloud():
 			kodi_utils.notification(msg, 4000)
 		folders.sort(key=lambda k: str(k.get('updated_at') or ''), reverse=True)
 		kodi_utils.add_items(handle, list(_builder()))
-		kodi_utils.set_content(handle, 'files')
+		kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 		kodi_utils.end_directory(handle, cacheToDisc=False)
-		kodi_utils.set_view_mode('view.premium')
+		kodi_utils.set_view_mode('view.premium', kodi_utils.MENU_FOLDER_CONTENT)
 	except Exception as e:
 		kodi_utils.notification('TorBox: %s' % str(e), 4000)
 		kodi_utils.end_directory(handle)
 	finally:
-		if busy:
-			kodi_utils.hide_busy_dialog()
+		kodi_utils.hide_busy_dialog()
 
 
 def tb_history():
@@ -88,8 +88,12 @@ def tb_history():
 				name = clean_file_name(normalize(item.get('name', 'Unknown'))).upper()
 				progress = _progress(item)
 				finished = bool(item.get('download_finished'))
-				display = '%02d | %d%% | [B]%s[/B] | [I]%s [/I]' % (count, progress, type_label, name)
+				airlocked = TorBox.item_is_airlocked(item)
+				lock_tag = ' | [B]AIRLOCK[/B]' if airlocked else ''
+				display = '%02d | %d%% | [B]%s[/B]%s | [I]%s [/I]' % (count, progress, type_label, lock_tag, name)
+				airlock_params = {'mode': 'torbox.airlock', 'folder_id': item['id'], 'media_type': media_type}
 				delete_params = {'mode': 'torbox.delete', 'folder_id': item['id'], 'media_type': media_type}
+				cm_append(('[B]Quitar de Airlock[/B]' if airlocked else '[B]Añadir a Airlock[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(airlock_params)))
 				cm_append(('[B]Eliminar[/B]', 'RunPlugin(%s)' % kodi_utils.build_url(delete_params)))
 				if finished:
 					url_params = {'mode': 'torbox.browse_tb_cloud', 'folder_id': item['id'], 'media_type': media_type}
@@ -124,12 +128,12 @@ def tb_history():
 		if errors:
 			kodi_utils.notification('TorBox: %s' % errors[0], 4000)
 		else:
-			kodi_utils.notification('TorBox: No hay transferencias en el historial', 2500)
+			kodi_utils.notification('TorBox: Sin transferencias en el historial', 2500)
 	handle = int(sys.argv[1])
 	kodi_utils.add_items(handle, list(_builder()))
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.end_directory(handle, cacheToDisc=False)
-	kodi_utils.set_view_mode('view.premium')
+	kodi_utils.set_view_mode('view.premium', kodi_utils.MENU_FOLDER_CONTENT)
 
 
 def browse_tb_cloud(folder_id, media_type):
@@ -165,7 +169,7 @@ def browse_tb_cloud(folder_id, media_type):
 					continue
 				name = clean_file_name(short_name).upper()
 				size_gb = float(int(item.get('size') or 0)) / 1073741824
-				display = '%02d | [B]ARCHIVO[/B] | %.2f GB | [I]%s [/I]' % (count, size_gb, name)
+				display = '%02d | [B]FILE[/B] | %.2f GB | [I]%s [/I]' % (count, size_gb, name)
 				url_link = '%d,%d' % (int(folder_id), int(file_id))
 				url_params = {
 					'mode': 'torbox.resolve_tb', 'play': 'true', 'url': url_link,
@@ -188,9 +192,9 @@ def browse_tb_cloud(folder_id, media_type):
 				pass
 
 	kodi_utils.add_items(handle, list(_builder()))
-	kodi_utils.set_content(handle, 'files')
+	kodi_utils.set_content(handle, kodi_utils.MENU_FOLDER_CONTENT)
 	kodi_utils.end_directory(handle, cacheToDisc=False)
-	kodi_utils.set_view_mode('view.premium')
+	kodi_utils.set_view_mode('view.premium', kodi_utils.MENU_FOLDER_CONTENT)
 
 
 def tb_delete(folder_id, media_type):
@@ -202,6 +206,25 @@ def tb_delete(folder_id, media_type):
 		return kodi_utils.notification('TorBox: %s' % _api_error_text(result, 'Error al eliminar'), 4000)
 	TorBox.clear_cache()
 	kodi_utils.notification('TorBox: Eliminado', 2500)
+	kodi_utils.execute_builtin('Container.Refresh')
+
+
+def tb_airlock(folder_id, media_type, airlocked=None):
+	# Re-check TorBox live so Add/Remove matches current Airlock state, not a stale list row.
+	kodi_utils.show_busy_dialog()
+	lock, result = None, None
+	try:
+		current = TorBox.get_airlocked_status(media_type, folder_id)
+		if current is None:
+			return kodi_utils.notification('TorBox: No se pudo comprobar el estado de Airlock', 4000)
+		lock = not current
+		result = TorBox.set_airlocked(media_type, folder_id, lock)
+	finally:
+		kodi_utils.hide_busy_dialog()
+	if not result or not result.get('success'):
+		return kodi_utils.notification('TorBox: %s' % _api_error_text(result, 'Error al añadir a Airlock' if lock else 'Error al quitar de Airlock'), 4000)
+	TorBox.clear_cache()
+	kodi_utils.notification('TorBox: Añadido a Airlock' if lock else 'TorBox: Quitado de Airlock', 2500)
 	kodi_utils.execute_builtin('Container.Refresh')
 
 
@@ -248,7 +271,7 @@ def resolve_tb(params):
 	finally:
 		kodi_utils.hide_busy_dialog()
 	if not resolved_link:
-		kodi_utils.ok_dialog(heading='TorBox', text='No se pudo resolver este enlace de la nube. Puede haber caducado o ya no estar disponible.')
+		kodi_utils.ok_dialog(heading='TorBox', text='No se pudo resolver este enlace en la nube. Puede que haya expirado o ya no esté disponible.')
 		return None
 	if params.get('play', 'false') != 'true':
 		return resolved_link
@@ -256,10 +279,10 @@ def resolve_tb(params):
 
 
 def tb_send_webdl():
-	url = kodi_utils.kodi_dialog().input('Pegue la URL para enviar a TorBox WebDL:').strip()
+	url = kodi_utils.kodi_dialog().input('Pega la URL para enviar a TorBox WebDL:').strip()
 	if not url: return
 	if not (url.startswith('http://') or url.startswith('https://') or url.startswith('magnet:')):
-		return kodi_utils.ok_dialog(text='URL no válida. Debe comenzar por http://, https:// o magnet:')
+		return kodi_utils.ok_dialog(text='URL no válida. Debe empezar con http://, https:// o magnet:')
 	kodi_utils.show_busy_dialog()
 	try:
 		if url.startswith('magnet:'):
@@ -283,7 +306,7 @@ def tb_send_webdl():
 def tb_account_info():
 	try:
 		kodi_utils.show_busy_dialog()
-		plans = {0: 'Plan Free', 1: 'Plan Essential', 2: 'Plan Pro', 3: 'Plan Standard'}
+		plans = {0: 'Plan Gratuito', 1: 'Plan Esencial', 2: 'Plan Pro', 3: 'Plan Estándar'}
 		account_info = TorBox.account_info()
 		if not account_info or not account_info.get('success'):
 			kodi_utils.hide_busy_dialog()

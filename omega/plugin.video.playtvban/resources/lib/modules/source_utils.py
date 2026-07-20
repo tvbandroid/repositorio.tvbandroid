@@ -34,17 +34,52 @@ def audio_filter_choices():
 ('DTS', 'DTS'), ('DTS-HD MASTER AUDIO', 'DTS-HD MA'), ('DTS-X', 'DTS-X'), ('DTS-HD', 'DTS-HD'), ('AAC', 'AAC'), ('OPUS', 'OPUS'), ('MP3', 'MP3'),
 ('8CH AUDIO', '8CH'), ('7CH AUDIO', '7CH'), ('6CH AUDIO', '6CH'), ('2CH AUDIO', '2CH'))
 
+def audio_lang_choices():
+	# Alphabetical by display name (Sort To Top / filter menu order).
+	return (
+('ENGLISH AUDIO', 'ENG', ('.eng.', '.english.')),
+('FRENCH AUDIO', 'FRE', ('.fre.', '.french.', '.fra.', '.vff.', '.vfq.', '.truefrench.')),
+('GERMAN AUDIO', 'GER', ('.ger.', '.german.', '.deu.')),
+('HINDI AUDIO', 'HIN', ('.hin.', '.hindi.')),
+('ITALIAN AUDIO', 'ITA', ('.ita.', '.italian.')),
+('JAPANESE AUDIO', 'JPN', ('.jpn.', '.japanese.', '.jap.')),
+('KOREAN AUDIO', 'KOR', ('.kor.', '.korean.')),
+('PORTUGUESE AUDIO', 'POR', ('.por.', '.portuguese.', '.dublado.')),
+('RUSSIAN AUDIO', 'RUS', ('.rus.', '.russian.')),
+('SPANISH AUDIO', 'SPA', ('.spa.', '.spanish.', '.esp.', '.castellano.', '.latino.')))
+
+ENG_OR_UNTAGGED_FILTER = ('ENGLISH OR UNTAGGED', 'ENG-OR-UNTAGGED')
+
+def foreign_audio_lang_tags():
+	return frozenset(tag for _, tag, _ in audio_lang_choices() if tag != 'ENG')
+
+def matches_english_or_untagged(tags):
+	# ENG tag, or no other audio-language tag (plain English rips are usually untagged).
+	tag_set = set()
+	for tag in tags or ():
+		cleaned = str(tag).replace('[B]', '').replace('[/B]', '').strip()
+		if cleaned: tag_set.add(cleaned)
+	if 'ENG' in tag_set: return True
+	return not tag_set.intersection(foreign_audio_lang_tags())
+
+def audio_lang_filter_entries():
+	entries = []
+	for name, tag, _ in audio_lang_choices():
+		entries.append((name, tag))
+		if tag == 'ENG': entries.append(ENG_OR_UNTAGGED_FILTER)
+	return tuple(entries)
+
 def source_filters():
 	return (
 ('PACK', 'PACK'), ('DOLBY VISION', '[B]D/VISION[/B]'), ('HIGH DYNAMIC RANGE (HDR)', '[B]HDR[/B]'), ('IMAX', 'IMAX'), ('HYBRID', '[B]HYBRID[/B]'), ('AV1', '[B]AV1[/B]'),
-('HEVC (X265)', '[B]HEVC[/B]'), ('REMUX', 'REMUX'), ('BLURAY', 'BLURAY'), ('IA ENHANCED/UPSCALED', '[B]IA ENHANCED/UPSCALED[/B]'), ('SDR', 'SDR'), ('3D', '[B]3D[/B]'),
+('HEVC (X265)', '[B]HEVC[/B]'), ('REMUX', 'REMUX'), ('BLURAY', 'BLURAY'), ('AI ENHANCED/UPSCALED', '[B]AI ENHANCED/UPSCALED[/B]'), ('SDR', 'SDR'), ('3D', '[B]3D[/B]'),
 ('DOLBY ATMOS', 'ATMOS'), ('DOLBY TRUEHD', 'TRUEHD'), ('DOLBY DIGITAL EX', 'DD-EX'), ('DOLBY DIGITAL PLUS', 'DD+'), ('DOLBY DIGITAL', 'DD'),
 ('DTS-HD MASTER AUDIO', 'DTS-HD MA'), ('DTS-X', 'DTS-X'), ('DTS-HD', 'DTS-HD'), ('DTS', 'DTS'), ('AAC', 'AAC'), ('OPUS', 'OPUS'), ('MP3', 'MP3'), ('8CH AUDIO', '8CH'),
-('7CH AUDIO', '7CH'), ('6CH AUDIO', '6CH'), ('2CH AUDIO', '2CH'), ('DVD SOURCE', 'DVD'), ('FUENTE WEB', 'WEB'), ('MULTIPLE IDIOMAS', 'MULTI-LENG'),
-('SUBTITULOS', 'SUBS'))
+('7CH AUDIO', '7CH'), ('6CH AUDIO', '6CH'), ('2CH AUDIO', '2CH'), ('DVD SOURCE', 'DVD'), ('WEB SOURCE', 'WEB'),
+('SUBTITLES', 'SUBS'), ('MULTIPLE LANGUAGES', 'MULTI-LANG')) + audio_lang_filter_entries()
 
 def include_exclude_filters():
-	return {'hevc': 'HEVC', '3d': '3D', 'hdr': 'HDR', 'dv': 'D/VISION', 'av1': 'AV1', 'enhanced_upscaled': 'IA ENHANCED/UPSCALED', 'hybrid': 'HYBRID'}
+	return {'hevc': 'HEVC', '3d': '3D', 'hdr': 'HDR', 'dv': 'D/VISION', 'av1': 'AV1', 'enhanced_upscaled': 'AI ENHANCED/UPSCALED', 'hybrid': 'HYBRID'}
 
 def get_aliases_titles(aliases):
 	try: result = [i['title'] for i in aliases]
@@ -87,7 +122,7 @@ def pack_enable_check(meta, season, episode):
 def clear_scrapers_cache(silent=False):
 	from caches.base_cache import clear_cache
 	for item in ('internal_scrapers', 'external_scrapers'): clear_cache(item, silent=True)
-	if not silent: notification('Correcto')
+	if not silent: notification('Éxito')
 
 def supported_video_extensions():
 	supported_video_extensions = supported_media().split('|')
@@ -407,6 +442,12 @@ def get_info(title):
 		info_append('AVI')
 	elif any(i in title for i in ('.mkv', 'matroska')):
 		info_append('MKV')
+	# audio language tags: subtitle-adjacent codes (eng.subs, subs.eng) are subtitles, not audio
+	lang_title = re.sub(r'\.(subs?|subbed)\.([a-z]{2,12})\.', '.', title)
+	lang_title = re.sub(r'\.([a-z]{2,12})\.(subs?|subbed)\.', '.', lang_title)
+	for _, lang_tag, lang_patterns in audio_lang_choices():
+		if any(i in lang_title for i in lang_patterns):
+			info_append(lang_tag)
 	if any(i in title for i in ('hindi.eng', 'ara.eng', 'ces.eng', 'chi.eng', 'cze.eng', 'dan.eng', 'dut.eng', 'ell.eng', 'esl.eng', 'esp.eng', 'fin.eng', 'fra.eng',
 		'fre.eng', 'frn.eng', 'gai.eng', 'ger.eng', 'gle.eng', 'gre.eng', 'gtm.eng', 'heb.eng', 'hin.eng', 'hun.eng', 'ind.eng', 'iri.eng', 'ita.eng', 'jap.eng',
 		'jpn.eng', 'kor.eng', 'lat.eng', 'lebb.eng', 'lit.eng', 'nor.eng', 'pol.eng', 'por.eng', 'rus.eng', 'som.eng', 'spa.eng', 'sve.eng', 'swe.eng', 'tha.eng',

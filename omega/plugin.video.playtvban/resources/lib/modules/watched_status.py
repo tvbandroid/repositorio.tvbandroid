@@ -383,7 +383,7 @@ def mark_tvshow(params):
 
 def mark_season(params):
 	season = int(params.get('season'))
-	if season == 0: return notification('Failed')
+	if season == 0: return notification('Fallido')
 	insert_list = []
 	insert_append = insert_list.append
 	action, title, tmdb_id = params.get('action'), params.get('title'), params.get('tmdb_id')
@@ -418,7 +418,7 @@ def mark_season(params):
 
 def mark_episode(params):
 	season, episode, title = int(params.get('season')), int(params.get('episode')), params.get('title')
-	if season == 0: return notification('Failed')
+	if season == 0: return notification('Fallido')
 	action, media_type = params.get('action'), 'episode'
 	refresh, from_playback = params.get('refresh', 'true') == 'true', params.get('from_playback', 'false') == 'true'
 	if from_playback: refresh = False
@@ -623,6 +623,17 @@ def get_in_progress_tvshows(dummy_arg, page_no):
 	if settings.lists_sort_order('progress') == 0: results = sort_for_article(results, 'title', settings.ignore_articles())
 	else: results = sorted(results, key=lambda x: x['last_played'], reverse=True)
 	return results
+
+def get_in_progress_tvshow_ids(watched_db=None):
+	"""TMDb IDs for shows that have at least one in-progress episode resume bookmark."""
+	if not watched_db: watched_db = get_database()
+	try:
+		rows = watched_db.execute(
+			'SELECT DISTINCT media_id FROM progress WHERE db_type = ? AND CAST(resume_point AS FLOAT) > 1',
+			('episode',)).fetchall()
+		return set(str(i[0]) for i in rows if i[0] not in (None, ''))
+	except:
+		return set()
 
 def get_in_progress_episodes():
 	watched_indicators = settings.watched_indicators()

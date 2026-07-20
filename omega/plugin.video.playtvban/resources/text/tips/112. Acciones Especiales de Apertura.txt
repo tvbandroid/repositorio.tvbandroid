@@ -1,0 +1,5 @@
+En Configuración > Funciones > Acciones especiales de apertura, hay una opción para que Play TVBan abra las ventanas "Extras" y/o "Conjunto de películas" al seleccionar una película, y la ventana "Extras" al seleccionar una serie.
+
+La opción "Omitir en películas en curso" hace que Play TVBan omita esta acción de apertura para las películas en curso y reanude la reproducción directamente. Las opciones "Extras" y "Conjunto de películas" permanecen disponibles en el menú contextual.
+
+La opción "Omitir en series en curso" hace lo mismo con las series cuando la acción de apertura es "Extras": si la serie tiene un episodio en curso (un punto de reanudación), Play TVBan abre las temporadas/episodios en lugar de "Extras". Esto solo se aplica a los episodios en curso; una serie vista parcialmente sin un marcador de reanudación no se ve afectada. La opción "Extras" permanece disponible en el menú contextual.

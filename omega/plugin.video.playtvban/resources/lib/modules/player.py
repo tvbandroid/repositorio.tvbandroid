@@ -414,7 +414,7 @@ class PlayTVBanPlayer(xbmc.Player):
 				if fresh_start:
 					self.playback_percent = 0.0
 					try:
-						info_tag.setFilenameAndPath('%s S%02dE%02d %s' % (
+						info_tag.setFilenameAndPath('%s T%02dE%02d %s' % (
 							self.title or '', int(self.season), int(self.episode), (self.playing_filename or '')[:120]))
 					except:
 						info_tag.setFilenameAndPath(self.url)
@@ -637,8 +637,7 @@ class PlayTVBanPlayer(xbmc.Player):
 		else: play_type = 'autoscrape_nextep'
 		nextep_settings = st.auto_nextep_settings(play_type)
 		pop_at, _timing_source = self._pop_window_seconds(nextep_settings, self.total_time)
-		include_still_watching = st.random_continual_still_watching_enabled()
-		self.random_continual_start_prep = self._start_prep_seconds(nextep_settings, pop_at, play_type, include_still_watching)
+		self.random_continual_start_prep = self._start_prep_seconds(nextep_settings, pop_at, play_type, include_still_watching=False)
 
 	def _should_prep_random_continual(self):
 		if getattr(self, 'random_continual_triggered', False): return False

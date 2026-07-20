@@ -77,6 +77,14 @@ class TorBoxAPI:
 			return self._safe_json(response)
 		except Exception: return None
 
+	def _put(self, url, params=None, json=None, data=None, timeout=30):
+		if self.token in ('empty_setting', '', None): return None
+		try:
+			headers = {'Authorization': 'Bearer %s' % self.token}
+			response = session.put(base_url + url, params=params, json=json, data=data, headers=headers, timeout=timeout)
+			return self._safe_json(response)
+		except Exception: return None
+
 	def add_headers_to_url(self, url):
 		return url + '|' + urlencode({
 			'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -137,7 +145,7 @@ class TorBoxAPI:
 		type_labels = {'torrent': 'TORRENT', 'usenet': 'USENET', 'webdl': 'WEB DL'}
 		mylist_results = self.mylist_items_all(fresh=True)
 		for media_type, type_label in type_labels.items():
-			err, items = mylist_results.get(media_type, ('Unknown type', []))
+			err, items = mylist_results.get(media_type, ('Tipo desconocido', []))
 			if err:
 				errors.append('%s: %s' % (type_label, err))
 				continue
@@ -167,13 +175,13 @@ class TorBoxAPI:
 		paths = {'torrent': 'torrents/mylist', 'usenet': 'usenet/mylist', 'webdl': 'webdl/mylist'}
 		path = paths.get(media_type)
 		if not path:
-			return 'Unknown type', []
+			return 'Tipo desconocido', []
 		params = {'bypass_cache': True} if fresh else {}
 		response = self._get(path, data=params, timeout=timeout)
 		if not response or not isinstance(response, dict):
-			return 'Invalid response', []
+			return 'Respuesta no válida', []
 		if not response.get('success'):
-			err = response.get('detail') or response.get('error') or 'Request failed'
+			err = response.get('detail') or response.get('error') or 'Solicitud fallida'
 			return str(err) if not isinstance(err, (list, dict)) else str(err), []
 		data = response.get('data') or []
 		if isinstance(data, dict):
@@ -352,13 +360,13 @@ class TorBoxAPI:
 				label = title or item.get('name') or item.get('filename') or 'Torrent'
 				label = clean_file_name(normalize(label))[:80]
 				self.clear_cache()
-				notification('TorBox: Ready in Cloud — %s' % label, 6000)
+				notification('TorBox: Listo en la Nube — %s' % label, 6000)
 				return
 			status = str(item.get('status', '')).lower()
 			if status in ('error', 'failed') or 'stalled' in status:
-				notification('TorBox: Transfer failed — %s' % (title or item.get('status') or 'Error'), 5000)
+				notification('TorBox: Transferencia fallida — %s' % (title or item.get('status') or 'Error'), 5000)
 				return
-		notification('TorBox: Still downloading — check TorBox History', 4500)
+		notification('TorBox: Todavía descargando — consulta el Historial de TorBox', 4500)
 
 	def usenet_info(self, request_id=''):
 		return self._get('usenet/mylist', data={'id': request_id})
@@ -379,6 +387,30 @@ class TorBoxAPI:
 	def delete_webdl(self, request_id=''):
 		data = {'webdl_id': _to_int(request_id), 'operation': 'delete'}
 		return self._post('webdl/controlwebdownload', json=data)
+
+	# ----------- AIRLOCK (edit) -----------
+	# Minimal body only — edit endpoints can overwrite name/tags if sent.
+	@staticmethod
+	def item_is_airlocked(item):
+		value = (item or {}).get('airlocked')
+		return value in (True, 1, '1', 'true', 'True')
+
+	def get_airlocked_status(self, media_type, request_id, timeout=15):
+		"""Live mylist lookup (bypass_cache) for current Airlock state."""
+		response = self.mylist_folder(request_id, media_type, fresh=True, timeout=timeout)
+		item = self._torrent_item_from_info(response)
+		if item is None:
+			return None
+		return self.item_is_airlocked(item)
+
+	def set_airlocked(self, media_type, request_id, airlocked):
+		request_id = _to_int(request_id)
+		airlocked = bool(airlocked)
+		if media_type == 'torrent':
+			return self._put('torrents/edittorrent', json={'torrent_id': request_id, 'airlocked': airlocked})
+		if media_type == 'webdl':
+			return self._put('webdl/editwebdownload', json={'webdl_id': request_id, 'airlocked': airlocked})
+		return self._put('usenet/editusenetdownload', json={'usenet_id': request_id, 'airlocked': airlocked})
 
 	# ----------- UNRESTRICT (request download URL) -----------
 	@staticmethod
@@ -875,8 +907,8 @@ class TorBoxAPI:
 		auth_url = _device_auth_url(app_name, user_code)
 		qr_code = make_qrcode(auth_url) or ''
 		copy2clip(auth_url)
-		p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visite: [B]torbox.app/oauth/device[/B][CR]E introduzca este Código: [B]%s[/B]' % user_code
-		content = 'Escanee el Código QR%s[CR]' % p_dialog_insert
+		p_dialog_insert = '[CR]Full link copied to clipboard[CR]OR visit: [B]torbox.app/oauth/device[/B][CR]AND Enter this Code: [B]%s[/B]' % user_code
+		content = 'Por favor, escanea el código QR%s[CR]' % p_dialog_insert
 		progressDialog = progress_dialog('Autorizar TorBox', qr_code)
 		progressDialog.update(content, 0)
 		sleep_interval = int(data.get('interval') or 5)
@@ -920,13 +952,13 @@ class TorBoxAPI:
 		except Exception:
 			set_setting('tb.token', 'empty_setting')
 			set_setting('tb.enabled', 'false')
-			ok_dialog(heading='TorBox', text='La autorización ha fallado.')
+			ok_dialog(heading='TorBox', text='Autorización fallida.')
 
 	def revoke(self):
 		if not confirm_dialog(): return
 		set_setting('tb.token', 'empty_setting')
 		set_setting('tb.enabled', 'false')
-		notification('Autorización de TorBox restablecida', 3000)
+		notification('Autorización de TorBox Restablecida', 3000)
 
 	def clear_cache(self, clear_hashes=True):
 		try:

@@ -47,6 +47,7 @@ def build_episode_list(params):
 				cm_append(['options', ('[B]Opciones[/B]', 'RunPlugin(%s)' % options_params)])
 				cm_append(['playback_options', ('[B]Opciones de reproducción[/B]', 'RunPlugin(%s)' % playback_options_params)])
 				settings.append_external_scraper_settings_cm(cm_append, build_url)
+				settings.append_external_scraper_settings_cm(cm_append, build_url)
 				if not unaired and not season_special:
 					if playcount:
 						cm_append(['mark_watched', ('[B]Marcar como no visto[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_unwatched',
@@ -220,8 +221,12 @@ def build_single_episode(list_type, params={}):
 				else: highlight_start, highlight_end = '', ''
 				display = '%s%s%s%s%s%s' % (display_premiered, title_str, highlight_start, seas_ep, ep_name, highlight_end)
 			elif list_type_compare == 'trakt_calendar':
-				if episode_date: display_premiered = make_day(current_date, episode_date)
-				else: display_premiered = 'UNKNOWN'
+				if not episode_date:
+					display_premiered = 'UNKNOWN'
+				else:
+					display_premiered = make_day(
+						current_date, episode_date, calendar_date_strftime,
+						use_words=calendar_use_words, include_date=calendar_include_date)
 				display = '[%s] %s%s%s' % (display_premiered, title_str, seas_ep, ep_name)
 			else: display = '%s%s%s' % (title_str, seas_ep, ep_name)
 			if no_spoilers and not playcount: thumb, plot = show_landscape or show_fanart, tvshow_plot or '* Hidden to Prevent Spoilers *'
@@ -242,9 +247,10 @@ def build_single_episode(list_type, params={}):
 			cm_append(['options', ('[B]Opciones[/B]', 'RunPlugin(%s)' % options_params)])
 			cm_append(['playback_options', ('[B]Opciones de Reproducción[/B]', 'RunPlugin(%s)' % \
 						build_url({'mode': 'playback_choice', 'media_type': 'episode', 'meta': tmdb_id, 'season': season, 'episode': episode, 'episode_id': episode_id}))])
+			settings.append_source_shortcut_context_menus(cm_append, build_url, cm_sort_order, 'episode', tmdb_id, season, episode, playcount)
 			settings.append_external_scraper_settings_cm(cm_append, build_url)
 			cm_append(['browse_seasons', ('[B]Explorar Temporadas[/B]', window_command % build_url({'mode': 'build_season_list', 'tmdb_id': tmdb_id}))])
-			cm_append(['browse_episodes', ('[B]Explorar EPISODIOS[/B]', window_command % build_url({'mode': 'build_episode_list', 'tmdb_id': tmdb_id, 'season': season}))])
+			cm_append(['browse_episodes', ('[B]Explorar Episodios[/B]', window_command % build_url({'mode': 'build_episode_list', 'tmdb_id': tmdb_id, 'season': season}))])
 			if not unaired:
 				if playcount:
 					cm_append(['mark_watched', ('[B]Marcar No Visto[/B]', 'RunPlugin(%s)' % build_url({'mode': 'watched_status.mark_episode', 'action': 'mark_as_unwatched',
@@ -306,8 +312,12 @@ def build_single_episode(list_type, params={}):
 	watched_indicators = settings.watched_indicators()
 	if list_type == 'episode.trakt':
 		display_format = settings.calendar_display_format(is_external)
+		calendar_date_strftime, calendar_use_words, calendar_include_date = settings.calendar_date_label_options()
+		calendar_date_format = None if calendar_use_words else calendar_date_strftime
 	else:
 		display_format = settings.single_ep_display_format(is_external)
+		calendar_date_strftime, calendar_use_words, calendar_include_date = '%Y-%m-%d', True, False
+		calendar_date_format = None
 	current_date, current_time, adjust_hours = get_datetime(), get_current_timestamp(), settings.date_offset()
 	unwatched_info = settings.single_ep_unwatched_episodes()
 	hide_watched = is_external and settings.widget_hide_watched() and list_type != 'episode.recently_watched'

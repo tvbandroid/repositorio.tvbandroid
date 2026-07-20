@@ -52,11 +52,15 @@ def extras_items():
 def context_menu_items():
 	return [
 	{'name': 'Extras', 'value': 'extras'}, {'name': 'Opciones', 'value': 'options'}, {'name': 'Opciones de Reproducción', 'value': 'playback_options'},
+	{'name': 'Seleccionar Fuente', 'value': 'select_source'}, {'name': 'Rebuscar y Seleccionar Fuente', 'value': 'rescrape_select_source'},
 	{'name': 'Ajustes de Scraper Externo', 'value': 'external_scraper_settings'},
 	{'name': 'Explorar Colección de Películas', 'value': 'browse_movie_set'}, {'name': 'Explorar Temporadas de la Serie', 'value': 'browse_seasons'},
 	{'name': 'Explorar Episodios de la Temporada', 'value': 'browse_episodes'}, {'name': 'Explorar Recomendados', 'value': 'recommended'}, {'name': 'Explorar Relacionados', 'value': 'related'},
 	{'name': 'Explorar Más Como Esto', 'value': 'more_like_this'}, {'name': 'Explorar Similares', 'value': 'similar'}, {'name': 'En Listas de Trakt', 'value': 'in_trakt_list'},
-	{'name': 'Gestor de MDBList', 'value': 'mdblist_manager'}, {'name': 'Gestor de Listas de Simkl', 'value': 'simkl_manager'}, {'name': 'Gestor de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Gestor de Listas de TMDb', 'value': 'tmdb_manager'},
+	{'name': 'Gestor de MDBList', 'value': 'mdblist_manager'}, {'name': 'Lista de Seguimiento de MDBList', 'value': 'mdblist_watchlist'}, {'name': 'Biblioteca de MDBList', 'value': 'mdblist_library'},
+	{'name': 'Gestor de Listas de Simkl', 'value': 'simkl_manager'}, {'name': 'Simkl Por Ver', 'value': 'simkl_plantowatch'},
+	{'name': 'Gestor de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Lista de Seguimiento de Trakt', 'value': 'trakt_watchlist'}, {'name': 'Colección de Trakt', 'value': 'trakt_collection'},
+	{'name': 'Gestor de Listas de TMDb', 'value': 'tmdb_manager'}, {'name': 'Lista de Seguimiento de TMDb', 'value': 'tmdb_watchlist'}, {'name': 'Favoritos de TMDb', 'value': 'tmdb_favorites'},
 	{'name': 'Gestor de Listas Personales', 'value': 'personal_manager'}, {'name': 'Gestor de Favoritos', 'value': 'favorites_manager'}, {'name': 'Marcar Visto/No Visto', 'value': 'mark_watched'},
 	{'name': 'Desmarcar Episodio Visto Anterior', 'value': 'unmark_previous_episode'}, {'name': 'Salir de la Lista', 'value': 'exit'}, {'name': 'Actualizar Widgets', 'value': 'refresh'},
 	{'name': 'Recargar Widgets', 'value': 'reload'}]
@@ -226,10 +230,10 @@ def addon_fanart():
 		or 'special://home/addons/plugin.video.playtvban/resources/media/fanart.jpg'
 	)
 
-MEDIA_GITHUB_USER = 'tvbandroid'
-MEDIA_GITHUB_REPO = 'tvbandroid.github.io'
-MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/%s/%s/master/tvband/packages/media' % (MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO)
-LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/tvbandroid/tvbandroid.github.io/tree/master/tvband/packages/media'
+MEDIA_GITHUB_USER = 'The-Red-Wizard'
+MEDIA_GITHUB_REPO = 'TheRedWizard.github.io'
+MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/%s/%s/main/packages/media' % (MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO)
+LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/TheRedWizard/TheRedWizard.github.io/main/packages/media'
 # Estuary WideList row icons use ListItem.Icon only for Container.Content() — not files.
 MENU_FOLDER_CONTENT = ''
 
@@ -274,7 +278,7 @@ def build_url(url_params):
 
 # Keep `random` / `shuffle` on folder URLs — stripping `random` broke Random Trakt Public (All)
 # and any other list-of-lists parent that only passed random=true (shuffle alone was the workaround).
-_FOLDER_URL_SKIP = frozenset(('iconImage', 'random_support', 'random', 'name', 'isFolder'))
+_FOLDER_URL_SKIP = frozenset(('iconImage', 'random_support', 'name', 'isFolder'))
 _FOLDER_URL_KEEP_NAME_MODES = frozenset(('navigator.build_shortcut_folder_contents',))
 
 def _folder_url_keep_name(mode):
@@ -1095,9 +1099,9 @@ def player_check(mode, params):
 		from modules.sources import Sources
 		Sources().playback_prep(params)
 	elif mode == 'playback.video':
-		from modules.player import RedLightPlayer
-		RedLightPlayer().run(params.get('url', None), params.get('obj', None))
-	else: ok_dialog('Reproducción Externa Detectada', 'Playback through external addons is not supported')
+		from modules.player import PlayTVBanPlayer
+		PlayTVBanPlayer().run(params.get('url', None), params.get('obj', None))
+	else: ok_dialog('Reproducción Externa Detectada', 'La reproducción a través de addons externos no es compatible')
 
 def external_playback_check(params):
 	return True

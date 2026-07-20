@@ -10,7 +10,7 @@ from caches.settings_cache import get_setting
 from scrapers import external, folders
 from modules import debrid, kodi_utils, settings, metadata, watched_status
 from modules.player import PlayTVBanPlayer
-from modules.source_utils import get_cache_expiry, make_alias_dict, include_exclude_filters, get_file_info, release_info_format
+from modules.source_utils import get_cache_expiry, make_alias_dict, include_exclude_filters, get_file_info, release_info_format, audio_lang_choices, matches_english_or_untagged
 from modules.utils import clean_file_name, string_to_float, safe_string, remove_accents, get_datetime, append_module_to_syspath, manual_function_import
 # logger = kodi_utils.logger
 
@@ -387,10 +387,7 @@ class Sources():
 		if self.background and self.play_type in ('autoplay_nextep', 'autoscrape_nextep', 'random_continual'):
 			self._log_nextep_scrape_started()
 			self._prefetch_nextep_segment_data()
-		if self.background and self.play_type == 'random_continual' and not self.nextep_settings:
-			# Continual random reuses Autoplay Next Episode's "Check Still Watching After X".
-			self.nextep_settings = {'watching_check': settings.auto_nextep_settings('autoplay_nextep')['watching_check']}
-		if self.background and (self.autoplay_nextep or self.play_type == 'random_continual') and self.nextep_settings and not getattr(self, '_nextep_alert_handled', False):
+		if self.background and self.autoplay_nextep and self.nextep_settings and not getattr(self, '_nextep_alert_handled', False):
 			if not self.still_watching_check():
 				self._decline_nextep_prep('still watching')
 				kodi_utils.notification('Cancelar Reproducción Automática', icon=self.meta.get('poster'))
@@ -463,7 +460,7 @@ class Sources():
 				return
 			if kodi_utils.get_property(PROP_SOURCES_BUSY) == 'true' and not allow_concurrent:
 				if not self.background:
-					kodi_utils.notification('La búsqueda de fuentes ya está en ejecución.', 2500)
+					kodi_utils.notification('Búsqueda de fuentes ya en curso.', 2500)
 				return
 			self._scrape_user_cancelled = False
 			self._sources_busy_owner = str(id(self))
@@ -717,7 +714,9 @@ class Sources():
 	def _normalize_pref_tag(self, tag):
 		key = (tag or '').lower().replace('[b]', '').replace('[/b]', '').strip()
 		if key in self.filter_keys: return self.filter_keys[key]
-		aliases = {'d/vision': 'D/VISION', 'dolby vision': 'D/VISION', 'hdr': 'HDR', 'high dynamic range (hdr)': 'HDR', 'dolby atmos': 'ATMOS', 'atmos': 'ATMOS', 'hevc (x265)': 'HEVC', 'hevc': 'HEVC'}
+		aliases = {'d/vision': 'D/VISION', 'dolby vision': 'D/VISION', 'hdr': 'HDR', 'high dynamic range (hdr)': 'HDR', 'dolby atmos': 'ATMOS', 'atmos': 'ATMOS', 'hevc (x265)': 'HEVC', 'hevc': 'HEVC',
+					'english or untagged': 'ENG-OR-UNTAGGED', 'eng-or-untagged': 'ENG-OR-UNTAGGED'}
+		aliases.update({name.lower(): lang_tag for name, lang_tag, _ in audio_lang_choices()})
 		return aliases.get(key, tag)
 
 	def _parse_extra_info_tags(self, extra_info):
@@ -768,10 +767,12 @@ class Sources():
 		return 'SDR' in self._all_extra_info_tags(item)
 
 	def _pref_tag_in_result(self, tag, item):
+		normalized = self._normalize_pref_tag(tag)
+		if normalized == 'ENG-OR-UNTAGGED':
+			return matches_english_or_untagged(self._parse_extra_info_tags(self._all_extra_info_tags(item)))
 		if self._pref_tag_in_extra_info(tag, item.get('extraInfo', '')): return True
 		if self._pref_tag_in_extra_info(tag, self._all_extra_info_tags(item)): return True
 		if self._explicit_sdr_release(item): return False
-		normalized = self._normalize_pref_tag(tag)
 		blob = self._normalized_title_blob(item)
 		if normalized == 'D/VISION' and any(x in blob for x in ('dolby vision', 'dolbyvision', ' dovi ', ' dv ', 'dovi', 'profile 8', 'profile8')): return True
 		if normalized == 'ATMOS' and ('atmos' in blob or ('ddp' in blob and 'atmos' in blob)): return True
@@ -1273,7 +1274,7 @@ class Sources():
 			return self._process_post_results()
 		if next_action == 'imdb_year':
 			if next_setting in (1, 2) and self.active_external and not self.orig_results and not self.meta.get('custom_year'):
-				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]Reintentar con los Datos del Año de IMDb?'):
+				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]¿Reintentar con datos de año de IMDb?'):
 					from apis.imdb_api import imdb_year_check
 					imdb_year = str(imdb_year_check(self.meta.get('imdb_id')))
 					if imdb_year != self.get_search_year():
@@ -1284,14 +1285,14 @@ class Sources():
 			return self._process_post_results()
 		if next_action == 'with_all':
 			if next_setting in (1, 2) and self.active_external:
-				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]Reintentar incluyendo los proveedores externos de torrents desactivados?'):
+				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]¿Reintentar incluyendo proveedores de torrent externos desactivados?'):
 					self.threads, self.disabled_ext_ignored, self.prescrape = [], True, False
 					return self.get_sources()
 			return self._process_post_results()
 		if next_action == 'episode_group':
 			if next_setting in (1, 2) and self.media_type == 'episode':
 				if next_setting == 1 \
-											or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]Reintentar con un Grupo de Episodios personalizado si es posible?'):
+											or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados.[CR]¿Reintentar con Grupo de Episodios Personalizado si es posible?'):
 					if self.episode_group_used:
 						return self._process_post_results()
 					if next_setting == 2:
@@ -1306,13 +1307,13 @@ class Sources():
 						except: group_details = None
 						if group_details:
 							season, episode = group_details['season'], group_details['episode']
-							self.params.update({'custom_season': season, 'custom_episode': episode, 'episode_group_label': '[B]GRUPO PERSONALIZADO: T%02dE%02d[/B]' % (season, episode)})
+							self.params.update({'custom_season': season, 'custom_episode': episode, 'episode_group_label': '[B]CUSTOM GROUP: S%02dE%02d[/B]' % (season, episode)})
 							self.threads, self.prescrape = [], False
 							return self.playback_prep()
 			return self._process_post_results()
 		if next_action == 'ignore_filters':
 			if next_setting in (1, 2) and self.orig_results and not self.background:
-				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='No hay resultados. Acceder a los Resultados Filtrados?'):
+				if next_setting == 1 or kodi_utils.confirm_dialog(heading=self.meta.get('rootname', ''), text='Sin resultados. ¿Acceder a Resultados Filtrados?'):
 					if self.autoplay: kodi_utils.notification('Filtros Ignorados y Reproducción Automática Desactivada')
 					self.threads, self.ignore_scrape_filters, self.disabled_ext_ignored, self.autoplay = [], True, True, False
 					return self.get_sources()
@@ -1350,14 +1351,14 @@ class Sources():
 		return settings.debrid_cache_check(provider)
 
 	def _playback_failed_default_message(self):
-		reasons = ['expired', 'removed']
+		reasons = ['haya expirado', 'haya sido eliminado']
 		item = getattr(self, 'playing_item', None) or {}
 		if item.get('scrape_provider') == 'external':
 			provider = debrid.normalize_debrid_provider(item.get('debrid') or item.get('cache_provider'))
 			if provider and not self._external_cache_check_active(provider):
-				reasons.append('not cached on your debrid (cache check was off)')
-		reasons.append('unsupported on this device')
-		return 'This link could not be played. It may be %s, or %s.' % (', '.join(reasons[:-1]), reasons[-1])
+				reasons.append('no esté en caché en tu debrid (la comprobación de caché estaba desactivada)')
+		reasons.append('no sea compatible con este dispositivo')
+		return 'Este enlace no se pudo reproducir. Puede deberse a que %s, o a que %s.' % (', '.join(reasons[:-1]), reasons[-1])
 
 	def _show_playback_failed_dialog(self, text=None):
 		if self._playback_failed_notified:
@@ -1366,8 +1367,8 @@ class Sources():
 		self._close_progress_before_modal()
 		message = text or self._playback_failed_default_message()
 		if self.autoplay or self.background:
-			return kodi_utils.notification('Playback Failed', 4000, settle_ms=400)
-		return self._show_modal_message('Playback failed', message)
+			return kodi_utils.notification('Reproducción Fallida', 4000, settle_ms=400)
+		return self._show_modal_message('Reproducción fallida', message)
 
 	def _no_results(self):
 		if self.random_continual and self.media_type == 'episode' and self.tmdb_id:
@@ -1377,10 +1378,10 @@ class Sources():
 
 	def _show_no_results(self):
 		heading = self.meta.get('rootname', '') or self.meta.get('title', '') or 'Play TVBan'
-		return self._show_modal_message(heading, 'No se encontraron resultados.', '[B]Siguiente:[/B] Sin resultados')
+		return self._show_modal_message(heading, 'No se encontraron resultados.', '[B]Próximo:[/B] Sin Resultados')
 
 	def _random_continual_skip(self):
-		"""Continual random: no links for this episode — try another (capped), keep Still Watching count."""
+		"""Continual random: no links for this episode — try another (capped)."""
 		from modules.episode_tools import EpisodeTools
 		attempts = int(kodi_utils.get_property(PROP_RANDOM_CONTINUAL_SKIP_ATTEMPTS) or 0)
 		self._close_progress_before_modal()
@@ -1391,7 +1392,6 @@ class Sources():
 		kodi_utils.logger('Play TVBan', 'Continual random play: no results for %s S%02dE%02d, skipping to another episode' % (
 			self.meta.get('title', ''), self.meta.get('season', 0), self.meta.get('episode', 0)))
 		meta = metadata.tvshow_meta('tmdb_id', self.tmdb_id, settings.tmdb_api_key(), settings.mpaa_region(), get_datetime())
-		meta['watch_count'] = self.meta.get('watch_count', self.watch_count or 1)
 		return EpisodeTools(meta).play_random_continual(first_run=False)
 
 	def get_search_title(self):
@@ -1803,7 +1803,7 @@ class Sources():
 			kodi_utils.sleep(100)
 		return self.progress_dialog.resume_choice or 'resume'
 
-	def _make_still_watching_dialog(self, check_text, heading='Sigues Viendo?', right_align=False):
+	def _make_still_watching_dialog(self, check_text, heading='¿Sigues Viendo?', right_align=False):
 		try: action = open_window(('windows.playback_notifications', 'StillWatching'), 'playback_notifications.xml', meta=self.meta, check_text=check_text,
 			heading=heading, right_align='true' if right_align else 'false')
 		except: action = False
@@ -2075,7 +2075,7 @@ class Sources():
 			chosen_result = debrid_files[0]
 		else:
 			list_items = [{'line1': '%.2f GB | %s' % (float(item['size'])/1073741824, clean_file_name(item['filename']).upper())} for item in debrid_files]
-			picker_heading = 'Browse: %s' % name
+			picker_heading = 'Explorar: %s' % name
 			kwargs = {'items': json.dumps(list_items), 'heading': picker_heading, 'enumerate': 'true', 'narrow_window': 'true'}
 			chosen_result = kodi_utils.select_dialog(debrid_files, **kwargs)
 		if chosen_result is None:
@@ -2491,7 +2491,7 @@ class Sources():
 			meta = {'title': self.meta.get('title', ''), 'season': self.meta.get('season', 0),
 				'episode': self.meta.get('episode', 0), 'poster': self.meta.get('poster', '') or ''}
 		kodi_utils.clear_property(PROP_AUTOSCRAPE_NEXTEP_READY)
-		kodi_utils.notification('[B]Siguiente episodio listo:[/B] %s T%02dE%02d' \
+		kodi_utils.notification('[B]Siguiente Episodio Listo:[/B] %s T%02dE%02d' \
 				% (meta.get('title'), meta.get('season'), meta.get('episode')), 6500, meta.get('poster') or None)
 
 	def _notify_autoscrape_ready(self, remaining, window_time):
@@ -2530,20 +2530,16 @@ class Sources():
 	def still_watching_check(self):
 		watching_check = self.nextep_settings.get('watching_check', 0)
 		if watching_check == 0: return True
-		if self.play_type == 'random_continual' and not settings.random_continual_still_watching_enabled():
-			return True
 		player = kodi_utils.kodi_player()
 		# Autoplay next-episode idle edge case: don't prompt/count when nothing is playing.
-		# Continual random counts skipped episodes toward Still Watching when enabled (#62),
-		# including cold-start skip chains where playback never started.
-		if not player.isPlayingVideo() and self.play_type != 'random_continual':
+		if not player.isPlayingVideo():
 			return bool(self.background)
 		watch_count = self.meta.get('watch_count')
 		if watch_count is None:
 			watch_count = getattr(self, 'watch_count', None) or 1
 		try: watch_count = int(watch_count)
 		except (TypeError, ValueError): watch_count = 1
-		if watch_count == watching_check: still_watching, watch_count = self._make_still_watching_dialog('Are you still watching [B]%s[/B]?'), 0
+		if watch_count == watching_check: still_watching, watch_count = self._make_still_watching_dialog('¿Sigues viendo [B]%s[/B]?'), 0
 		else: still_watching = True
 		watch_count += 1
 		self.meta['watch_count'] = watch_count
@@ -2576,7 +2572,7 @@ class Sources():
 			return False
 
 	def random_continual_handler(self):
-		kodi_utils.notification('[B]Siguiente:[/B] %s T%02dE%02d' % (self.meta.get('title'), self.meta.get('season'), self.meta.get('episode')), 6500, self.meta.get('poster'))
+		kodi_utils.notification('[B]Próximo:[/B] %s T%02dE%02d' % (self.meta.get('title'), self.meta.get('season'), self.meta.get('episode')), 6500, self.meta.get('poster'))
 		player = kodi_utils.kodi_player()
 		while self._player_episode_active(player): kodi_utils.sleep(100)
 		self._make_resolve_dialog()
@@ -2610,7 +2606,7 @@ class Sources():
 
 	def autoscrape_nextep_handler(self):
 		if settings.autoscrape_confirm():
-			if not self._make_still_watching_dialog('Buscar automáticamente el siguiente episodio de [B]%s[/B]?', heading='Siguiente episodio?', right_align=True):
+			if not self._make_still_watching_dialog('¿Buscar Automáticamente el Siguiente Episodio de [B]%s[/B]?', heading='¿Buscar Automáticamente el Siguiente Episodio?', right_align=True):
 				self._decline_nextep_prep('autoscrape confirm')
 				return
 		player = kodi_utils.kodi_player()
@@ -2621,7 +2617,7 @@ class Sources():
 			self._decline_nextep_prep('superseded')
 			return
 		if not results:
-			kodi_utils.logger('Play TVBan', 'Autobúsqueda del siguiente episodio: sin resultados para %s T%02dE%02d' % (
+			kodi_utils.logger('Play TVBan', 'Autoscrape next episode: no results for %s S%02dE%02d' % (
 				self.meta.get('title'), self.meta.get('season'), self.meta.get('episode')))
 			self._decline_nextep_prep('no results')
 			return
@@ -2640,7 +2636,7 @@ class Sources():
 			if self._should_autoscrape_stop_notify(remaining, window_time):
 				self._notify_autoscrape_ready(remaining, window_time)
 			else:
-				kodi_utils.logger('Play TVBan', 'Autobúsqueda del siguiente episodio preparada (detenida durante la búsqueda): %s T%02dE%02d restante=%ss ventana_aviso=%ss' % (
+				kodi_utils.logger('Play TVBan', 'Autoscrape next episode ready (stopped during scrape): %s S%02dE%02d remaining=%ss alert_window=%ss' % (
 					self.meta.get('title'), self.meta.get('season'), self.meta.get('episode'), remaining, window_time))
 			return self._display_results_nextep_handoff(results)
 		# Toast only in the alert window (same with or without Confirm) — Ready must mean

@@ -114,19 +114,21 @@ def adjust_premiered_date(orig_date, adjust_hours):
 	adjusted_string = adjusted_datetime.strftime('%Y-%m-%d')
 	return adjusted_datetime.date(), adjusted_string
 
-def make_day(today, date, date_format='%Y-%m-%d', use_words=True):
-	if use_words:
-		day_diff = (date - today).days
-		if day_diff == -1: day = 'AYER'
-		elif day_diff == 0: day = 'HOY'
-		elif day_diff == 1: day = 'MAÑANA'
-		elif 1 < day_diff < 7: day = date.strftime('%A').upper()
-		else:
-			try: day = date.strftime(date_format)
-			except ValueError: day = date.strftime('%Y-%m-%d')
+def make_day(today, date, date_format='%Y-%m-%d', use_words=True, include_date=False):
+	try: formatted = date.strftime(date_format)
+	except ValueError: formatted = date.strftime('%Y-%m-%d')
+	if not use_words:
+		return formatted
+	day_diff = (date - today).days
+	if day_diff == -1: day = 'AYER'
+	elif day_diff == 0: day = 'HOY'
+	elif day_diff == 1: day = 'MAÑANA'
+	elif include_date or (1 < day_diff < 7):
+		day = date.strftime('%A').upper()
 	else:
-		try: day = date.strftime(date_format)
-		except ValueError: day = date.strftime('%Y-%m-%d')
+		return formatted
+	if include_date:
+		return '%s %s' % (day, formatted)
 	return day
 
 def subtract_dates(date1, date2):
@@ -431,7 +433,7 @@ def image_from_db(image_url, delete=True):
 			dbcur = dbcon.cursor()
 			dbcur.execute('''PRAGMA synchronous = OFF''')
 			dbcur.execute('''PRAGMA journal_mode = OFF''')
-		else: return notification('Failed')
+		else: return notification('Fallido')
 		try: image_id, image_location = dbcur.execute("SELECT id, cachedurl FROM texture WHERE url = ?", (image_url,)).fetchone()
 		except: return True
 		path = os.path.join(thumbs_folder, image_location)
@@ -473,7 +475,7 @@ def make_image(list_type, image_type, list_name, images, current_image):
 		try: shutil.rmtree(worker_image_folder)
 		except: pass
 		if current_image: os.remove(current_image)
-	except: notification('Error Creating Image')
+	except: notification('Error al Crear la Imagen')
 	return saved_final_image
 
 def download_image(list_type, image_type, list_name, url, current_image):
@@ -490,6 +492,6 @@ def download_image(list_type, image_type, list_name, url, current_image):
 		make_directory(final_image_folder)
 		urllib.request.urlretrieve(url, saved_final_image)
 		if current_image: os.remove(current_image)
-	except: notification('Error Creating Image')
+	except: notification('Error al Crear la Imagen')
 	return saved_final_image
 	

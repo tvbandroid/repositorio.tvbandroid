@@ -99,25 +99,38 @@ class SourcesResults(BaseDialog):
 				else: filtered_list = [i for i in self.item_list if i.getProperty(filter_type) == filter_value]
 			elif filter_type == 'special':
 				if filter_value == 'title':
-					keywords = kodi_dialog().input('Introduzca la Palabra Clave (Separada por Comas si son Varias).')
+					keywords = kodi_dialog().input('Introduce Palabra Clave (Separadas por Comas para Varias)')
 					if not keywords: return
 					keywords.replace(' ', '')
 					keywords = keywords.split(',')
 					choice = [i.upper() for i in keywords]
 					filtered_list = [i for i in self.item_list if all(x in i.getProperty('name') for x in choice)]
 				elif filter_value == 'extraInfo':
+					from modules.source_utils import matches_english_or_untagged
 					filters = source_filters()
 					list_items = [{'line1': item[0], 'icon': self.poster} for item in filters]
 					kwargs = {'items': json.dumps(list_items), 'heading': 'Filtrar Resultados', 'multi_choice': 'true'}
 					choice = select_dialog(filters, **kwargs)
 					if choice == None: return
 					choice = [i[1] for i in choice]
-					filtered_list = [i for i in self.item_list if all(x in i.getProperty('extraInfo') for x in choice)]
+					def _extra_info_tags(listitem):
+						extra = listitem.getProperty('extraInfo') or ''
+						return [p.replace('[B]', '').replace('[/B]', '').strip() for p in extra.split(' | ') if p.strip()]
+					def _matches_filters(listitem):
+						extra = listitem.getProperty('extraInfo') or ''
+						tags = _extra_info_tags(listitem)
+						for filt in choice:
+							if filt == 'ENG-OR-UNTAGGED':
+								if not matches_english_or_untagged(tags): return False
+							elif filt not in extra:
+								return False
+						return True
+					filtered_list = [i for i in self.item_list if _matches_filters(i)]
 				elif filter_value == 'showuncached': filtered_list = self.make_items(self.uncached_results)
 				else: #cache_check_rescrape
 					self.selected = ('cache_change_rescrape', 'false' if self._any_cache_check_active() else 'true')
 					return self.close()
-			if not filtered_list: return ok_dialog(text='No hay Resultados')
+			if not filtered_list: return ok_dialog(text='Sin Resultados')
 			self.set_filter(filtered_list)
 
 	def _offer_full_scrape(self):
@@ -291,13 +304,13 @@ class SourcesResults(BaseDialog):
 				elif scrape_provider == 'aiostreams':
 					scraper_module = get('aio_release_group') or ''
 					if scraper_module:
-						scraper_module_label = 'Group'
-						scraper_suffix = '     [COLOR %s][B]Group: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
-						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Group: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
+						scraper_module_label = 'Grupo'
+						scraper_suffix = '     [COLOR %s][B]Grupo: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
+						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Grupo: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
 				elif scrape_provider == 'nzb':
 					scraper_module = get('nzb_indexer') or ''
 					if scraper_module:
-						scraper_module_label = 'Site'
+						scraper_module_label = 'Sitio'
 						scraper_suffix = '     [COLOR %s][B]Sitio: [/B][/COLOR]%s' % (item_highlight, scraper_module.upper())
 						scraper_suffix_tint = '     [COLOR FFA8A8A8][B]Sitio: [/B][/COLOR][COLOR FFFFFFFF]%s[/COLOR]' % scraper_module.upper()
 				set_properties({'name': name.upper(), 'source_site': source_site, 'provider_icon': provider_icon, 'quality_icon': quality_icon, 'count': '%02d.' % count,
@@ -364,11 +377,11 @@ class SourcesResults(BaseDialog):
 				return (1, key)
 			return (2, key)
 		providers.sort(key=_provider_filter_sort_key)
-		qualities = [('Mostrar Solo [B]%s[/B] | [B]%d[/B] Resultados' % (i, quality_totals[i]), 'quality', i) for i in qualities]
-		providers = [('Mostrar Solo [B]%s[/B] | [B]%d[/B] Resultaldos' % (i, provider_totals[i]), 'provider', i) for i in providers]
+		qualities = [('Show [B]%s[/B] Only | [B]%d[/B] Results' % (i, quality_totals[i]), 'quality', i) for i in qualities]
+		providers = [('Show [B]%s[/B] Only | [B]%d[/B] Results' % (i, provider_totals[i]), 'provider', i) for i in providers]
 		data = []
-		if cache_functions_debrid: data.append(('Rescrape with External Cache Check [B]%s[/B]' % ('DESACTIVADO' if self._any_cache_check_active() else 'ACTIVADO'), 'special', 'cache_check_rescrape'))
-		if self.uncached_results: data.append(('Mostrar Solo [B]Uncached[/B] | [B]%d[/B] Resultadoss' % len(self.uncached_results), 'special', 'showuncached'))
+		if cache_functions_debrid: data.append(('Rescrape with External Cache Check [B]%s[/B]' % ('OFF' if self._any_cache_check_active() else 'ON'), 'special', 'cache_check_rescrape'))
+		if self.uncached_results: data.append(('Show [B]Uncached[/B] Only | [B]%d[/B] Results' % len(self.uncached_results), 'special', 'showuncached'))
 		data.extend(qualities)
 		data.extend(providers)
 		data.extend([('Filtrar por [B]Título[/B]...', 'special', 'title'), ('Filtrar por [B]Información[/B]...', 'special', 'extraInfo')])
@@ -419,13 +432,13 @@ class SourcesResults(BaseDialog):
 				'magnet_url': magnet_url,
 				'display_name': item_get('display_name', ''),
 			}
-		choices_append(('Info', 'results_info'))
+		choices_append(('Información', 'results_info'))
 		if add_magnet_to_cloud_params: choices_append(('Añadir a la Nube', add_magnet_to_cloud_params))
 		if browse_pack_params: choices_append(('Explorar', browse_pack_params))
 		if down_pack_params: choices_append(('Descargar Pack', down_pack_params))
 		if down_file_params: choices_append(('Descargar Archivo', down_file_params))
 		if provider_source == 'rd_cloud': choices_append(('Eliminar de la Nube de RD', 'rd_cloud_delete'))
-		if provider_source == 'tb_cloud': choices_append(('Eliminar de la nube de TorBox', 'tb_cloud_delete'))
+		if provider_source == 'tb_cloud': choices_append(('Eliminar de la Nube de TorBox', 'tb_cloud_delete'))
 		list_items = [{'line1': i[0], 'icon': self.poster} for i in choices]
 		kwargs = {'items': json.dumps(list_items)}
 		choice = select_dialog([i[1] for i in choices], **kwargs)
@@ -438,7 +451,7 @@ class SourcesResults(BaseDialog):
 		self.setFocusId(self.window_id)
 		self.setProperty('total_results', str(len(filtered_list)))
 		self.setProperty('filter_applied', 'true')
-		self.setProperty('filter_info', '| Pulsa [B]ATRÁS[/B] para Cancelar')
+		self.setProperty('filter_info', '| Press [B]BACK[/B] to Cancel')
 
 	def clear_filter(self):
 		self.filter_applied = False
@@ -566,7 +579,7 @@ class SourcesPlayback(BaseDialog):
 		self.setProperty('window_mode', self.window_mode)
 		self.setProperty('resume_percent', percent_str)
 		self.setProperty('resume_btn_label', 'Reanudar %s%%' % percent_str)
-		self.setProperty('startover_btn_label', 'Desde el inicio')
+		self.setProperty('startover_btn_label', 'Empezar de Nuevo')
 		self.setProperty('cancel_btn_label', 'Cancelar')
 		self.setProperty('resume_timeout_percent', '0')
 		self.setProperty('text', '')

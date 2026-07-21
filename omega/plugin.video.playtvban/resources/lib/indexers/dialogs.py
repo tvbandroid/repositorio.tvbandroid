@@ -1251,7 +1251,7 @@ def options_menu_choice(params, meta=None):
 		if settings.mdblist_user_active(): listing_append(('Administrador de MDBList', '', 'mdblist_manager'))
 		if settings.simkl_user_active(): listing_append(('Administrador de Listas de Simkl', '', 'simkl_manager'))
 		if settings.trakt_user_active(): listing_append(('Administrador de Listas de Trakt', '', 'trakt_manager'))
-		listing_append(('Administrador de Listas de TMDb', '', 'tmdblists_manager_choice'))
+		if settings.tmdblist_user_active(): listing_append(('TMDb Lists Manager', '', 'tmdblists_manager_choice'))
 		listing_append(('Administrador de Listas Personales', '', 'personallists_manager_choice'))
 		listing_append(('Administrador de Favoritos', '', 'favorites_manager_choice'))
 	if menu_type == 'tvshow': listing_append(('Reproducir Aleatoriamente', 'Basado en %s' % rootname, 'random'))

@@ -1943,38 +1943,32 @@ provider-name="ElSupremo">
   </extension>
 </addon>
 
-<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" provider-name="[COLOR white]JoseATeba[/COLOR]" version="1.3.2">
+<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" version="1.3.4" provider-name="[COLOR white]JoseATeba[/COLOR]">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.pil" version="1.1.7"/>
         <import addon="script.module.requests" version="2.19.1"/>
     </requires>
 
-    <extension point="xbmc.python.pluginsource"
-               library="resources/lib/playtvban.py">
+    <extension point="xbmc.python.pluginsource" library="resources/lib/playtvban.py">
         <provides>video</provides>
     </extension>
-
-    <extension point="xbmc.service"
-               library="resources/lib/service.py"/>
-
-    <extension point="xbmc.python.module"
-               library="resources/lib/"/>
-
+    <extension point="xbmc.service" library="resources/lib/service.py"/>
+    <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
-        <summary lang="en">[COLOR azure]Play[COLOR red]TV[COLOR white]Ban[/COLOR]</summary>
-        <description lang="en">[COLOR azure]Play[COLOR red]TV[COLOR white]Ban[/COLOR] [COLOR azure]add-on de vídeo mantenido por TVBand.[/COLOR]</description>
+        <summary lang="en">[COLOR azure][COLOR deepskyblue]>Play[COLOR red]TV[COLOR white]Ban[/COLOR]</summary>
+        <description lang="en">* [COLOR khaki]Nueva versión en español.[/COLOR]
+*[COLOR azure]add-on de vídeo mantenido por TVBand.[/COLOR]</description>
         <platform>all</platform>
-        <disclaimer lang="en">El autor de este complemento no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido..</disclaimer>
+        <disclaimer lang="es">[COLOR khaki]El autor de este complemento no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido[/COLOR]</disclaimer>
         <license/>
         <assets>
             <icon>resources/media/addon_icons/icon.png</icon>
             <fanart>resources/media/fanart.jpg</fanart>
         </assets>
-        <news>Bienvenido a PlayTVBan v1.0.0</news>
+        <news>[COLOR white]Bienvenido a [COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR] v1.0.0</news>
     </extension>
-
 </addon>
 
 <addon id="plugin.video.redbull.tv" name="Red Bull TV" version="3.2.2+matrix.1" provider-name="piejanssens">

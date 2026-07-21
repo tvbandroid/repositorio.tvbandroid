@@ -1,3 +1,8 @@
+[COLOR red][B]Versión 1.3.4[/B][/COLOR]
+- [B]Progreso[/B]: [B]Excluir Especiales del Progreso de Series[/B] (activado por defecto) — Los especiales de la Temporada 0 ya no cuentan para el progreso de series vistas, el porcentaje de progreso ni para la clasificación En curso / Vista. Independiente de [B]Mostrar Episodios Especiales Cuando Estén Disponibles[/B]. Desactívalo para restaurar el comportamiento anterior.
+- [B]Trakt[/B] / [B]Simkl[/B]: [B]Restablecer Scrobble[/B] ahora borra la base de datos de progreso del proveedor correspondiente incluso cuando hay otro proveedor de estado de reproducción activo (evita eliminar el marcador de reanudación del servicio equivocado).
+- [B]Menú Contextual[/B] / [B]Opciones[/B]: [B]Gestor de Listas de Trakt[/B], [B]En Listas de Trakt[/B] y [B]Gestor de Listas de TMDb[/B] solo aparecen cuando esa cuenta está autorizada (igual que Simkl / MDBList).
+
 [COLOR red][B]Versión 1.3.3[/B][/COLOR]
 - [B]Administrador de listas de Trakt[/B]: Agregar/Eliminar elementos de la lista de seguimiento, colección y favoritos con información de estado; Eliminar/Recuperar elementos de programas; selectores de listas personales filtrados por membresía; Marcar como visto/no visto y Reiniciar Scrobble; Abrir lista de seguimiento/colección/favoritos/listas que me gustan/mis listas y actualizar widgets (paridad con Simkl/MDBList).
 - [B]Administrador de listas de TMDb[/B]: Agregar o eliminar elementos de la lista de seguimiento/favoritos con información de estado; selectores de listas personalizadas filtrados por membresía usando el contenido de la lista en caché (estado del elemento en tiempo real solo cuando una lista no está en caché).

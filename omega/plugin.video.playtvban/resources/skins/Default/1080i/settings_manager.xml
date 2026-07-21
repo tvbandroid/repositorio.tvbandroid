@@ -872,6 +872,15 @@
                           <property name="setting_description">Seleccione la acción abierta cuando se seleccione un programa de televisión en luz roja. Las opciones son Ninguna o Extras abiertos</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=media_open_action_tvshow)</onclick>
                       </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.media_open_action_tvshow),0)</visible>
+                          <property name="setting_label">Omitir en Series en Progreso</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.media_open_action_skip_inprogress_tvshow)]</property>
+                          <property name="setting_description">Al elegir esta opción, la Acción de Apertura de Series (Extras) se omite cuando la serie tiene un episodio en progreso, abriendo las temporadas/episodios en su lugar. Las series parcialmente vistas sin un punto de reanudación no se modifican. Extras sigue estando disponible en el menú contextual.</property>
+                         <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=media_open_action_skip_inprogress_tvshow)</onclick>
+                      </item>
         <!-- RPDb Ratings Posters -->
                       <item>
                           <visible>Container(2000).HasFocus(20)</visible>
@@ -1041,18 +1050,26 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Utilice los Nombres de las Temporadas Cuando Estén Disponibles.</property>
+                          <property name="setting_label">Excluir Especiales del Progreso de la Serie</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.exclude_specials_progress)]</property>
+                          <property name="setting_description">Cuando está activado (por defecto), los especiales de la Temporada 0 no cuentan para el progreso de series de TV ni para la clasificación En Progreso / Visto. Independiente de Mostrar Episodios Especiales de la Serie Cuando Estén Disponibles.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=exclude_specials_progress)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(30)</visible>
+                          <property name="setting_label">Usar Nombres de Temporada Cuando Estén Disponibles</property>
                           <property name="setting_type">boolean</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.use_season_name)]</property>
-                          <property name="setting_description">Habilita esta opción y Play TVBan utilizará el nombre de una temporada cuando esté disponible.</property>
+                          <property name="setting_description">Activa esta opción y Play TVBan utilizará el nombre de una temporada cuando esté disponible.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=use_season_name)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Agrupar Temporadas de Series</property>
+                          <property name="setting_label">Aplanar Temporadas de Series</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.default_all_episodes_name)]</property>
-                          <property name="setting_description">Seleccione cuándo Play TVBan cargará todos los episodios de una serie al acceder a ella.</property>
+                          <property name="setting_description">Elige cuándo Play TVBan cargará todos los episodios de una serie de TV al acceder a ella</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=default_all_episodes)</onclick>
                       </item>
                       <item>
@@ -1060,7 +1077,7 @@
                           <property name="setting_label">Evitar Spoilers de Episodios</property>
                           <property name="setting_type">boolean</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.avoid_episode_spoilers)]</property>
-                          <property name="setting_description">Habilita esta opción para que Play TVBan oculte las miniaturas y las sinopsis de los episodios.</property>
+                          <property name="setting_description">Activa esta opción y Play TVBan ocultará la miniatura y la sinopsis de los episodios dentro de Play TVBan</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=avoid_episode_spoilers)</onclick>
                       </item>
                       <item>
@@ -1536,34 +1553,42 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(40)</visible>
-                          <property name="setting_label">Agrupar Series Emitidas el Mismo Día</property>
+                          <property name="setting_label">Aplanar Series Emitidas el Mismo Día</property>
                           <property name="setting_type">boolean</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.flatten_episodes)]</property>
-                          <property name="setting_description">Habilite esta opción para limitar la visualización a la primera instancia de un episodio de una serie TV cuando dicho programa tenga varios episodios que se emitan el mismo día.</property>
+                          <property name="setting_description">Activa esta opción para limitar al primer episodio de una serie de TV cuando esa serie tiene varios episodios emitidos el mismo día</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=trakt.flatten_episodes)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(40)</visible>
-                          <property name="setting_label">Calendar Display Format - Within Addon</property>
+                          <property name="setting_label">Formato de Visualización del Calendario - Dentro del Complemento</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_display_name)]</property>
-                          <property name="setting_description">Elige el formato de visualización que Play TVBan utiliza para nombrar los episodios dentro del Calendario Trakt en el addon</property>
+                          <property name="setting_description">Elige el formato de visualización que PlayTVBan utiliza al nombrar los episodios dentro del Calendario de Trakt en el complemento</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_display)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(40)</visible>
-                          <property name="setting_label">Calendar Display Format - Widgets</property>
+                          <property name="setting_label">Formato de Visualización del Calendario - Widgets</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_display_widget_name)]</property>
-                          <property name="setting_description">Elige el formato de visualización que Play TVBan utiliza para nombrar los episodios en el Calendario Trakt para widgets.</property>
+                          <property name="setting_description">Elige el formato de visualización que PlayTVBan utiliza al nombrar los episodios del Calendario de Trakt para los widgets</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_display_widget)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(40)</visible>
+                          <property name="setting_label">Etiquetas de Fecha del Calendario</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_date_labels_name)]</property>
+                          <property name="setting_description">Elige cómo PlayTVBan etiqueta la fecha de emisión de los episodios en el Calendario de Trakt. Palabras / fecha utiliza Hoy, Mañana y los nombres de los días de la semana para la semana próxima, y el formato de fecha elegido fuera de ese periodo. Día + fecha siempre muestra ambos. Los formatos de solo fecha mantienen la lista en orden cronológico normal (sin fijar el día de hoy). Cada grupo se ordena como AAAA-MM-DD, MM-DD-AAAA, DD-MM-AAAA</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_date_labels)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(40)</visible>
                           <property name="setting_label">Orden de Clasificación</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_sort_order_name)]</property>
-                          <property name="setting_description">Seleccione la dirección de ordenación de la lista del Calendario de Trakt: Ascendente o Descendente.</property>
+                          <property name="setting_description">Elige la dirección de ordenación de la lista del Calendario de Trakt. Ascendente o Descendente</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_sort_order)</onclick>
                       </item>
                       <item>
@@ -1571,7 +1596,7 @@
                           <property name="setting_label">Mostrar Días Anteriores</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_previous_days)]</property>
-                          <property name="setting_description">Elige cuántos días anteriores se mostrarán en el Calendario de Trakt.</property>
+                          <property name="setting_description">Elige cuántos días anteriores se mostrarán en el Calendario de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.calendar_previous_days)</onclick>
                       </item>
                       <item>
@@ -1609,7 +1634,7 @@
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=mdblist.mdblist_revoke_authentication)</onclick>
                       </item>
         <!-- Simkl -->
-                                            <item>
+                      <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <property name="setting_label">Simkl</property>
                           <property name="setting_type">separator</property>
@@ -1670,10 +1695,10 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Clave ID del Cliente</property>
+                          <property name="setting_label">Clave Client ID</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.client)]</property>
-                          <property name="setting_description">Introduce el ID del Cliente de tu aplicación en trakt.tv/oauth/applications (o deja el predeterminado de Play TVBan)</property>
+                          <property name="setting_description">Introduce el Client ID de tu aplicación en trakt.tv/oauth/applications (o deja el predeterminado de Play TVBan)</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=trakt.client)</onclick>
                       </item>
                       <item>
@@ -1686,19 +1711,19 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Clave Secreto del Cliente</property>
+                          <property name="setting_label">Clave Client Secret</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.secret)]</property>
-                          <property name="setting_description">Introduce el Secreto del Cliente de la misma aplicación de Trakt utilizada para el Client ID anterior</property>
+                          <property name="setting_description">Introduce el Client Secret de la misma aplicación de Trakt utilizada para el Client ID anterior</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=trakt.secret)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.secret),726f6b12a9f0079d5850a7bb0e15860725cd487cbfb54ce5471de217639465c5)</visible>
-                          <property name="setting_label">    - Restaurar Clave Secreto del Cliente Predeterminada</property>
+                          <property name="setting_label">    - Restaurar Clave Client Secret Predeterminada</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Restaurar la Clave Secreto del Cliente predeterminada de Trakt</property>
+                          <property name="setting_description">Restaurar la Clave Client Secret predeterminada de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.restore_setting_default&amp;setting_id=trakt.secret)</onclick>
                       </item>
                       <item>
@@ -1710,7 +1735,7 @@
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=trakt_credentials_check_choice)</onclick>
                       </item>
         <!-- TMDb API -->
-                                            <item>
+                      <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <property name="setting_label">API de TMDb</property>
                           <property name="setting_type">separator</property>
@@ -1743,7 +1768,7 @@
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=tmdb_api_check_choice)</onclick>
                       </item>
         <!-- TMDb Lists -->
-                                            <item>
+                      <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <property name="setting_label">Listas de TMDb</property>
                           <property name="setting_type">separator</property>
@@ -2883,7 +2908,7 @@
                           <property name="setting_description">Elige qué contenido resuelto se añadirá automáticamente a tu nube de Premiumize: todo el contenido o solo los paquetes de series</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=store_resolved_to_cloud.premiumize.me)</onclick>
                       </item>
-                                            <item>
+                      <item>
                           <visible>Container(2000).HasFocus(61)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.pm.token),empty_setting)</visible>
                           <visible>String.IsEqual(Window(10000).Property(playtvban.pm.enabled),true)</visible>
@@ -3617,7 +3642,7 @@
                           <property name="setting_description">Elige el color de EasyNews.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=scraper_color_choice&amp;setting_id=provider.easynews_highlight)</onclick>
                       </item>
-                                            <item>
+                      <item>
                           <visible>Container(2000).HasFocus(70)</visible>
                           <visible>String.IsEqual(Window(10000).Property(playtvban.highlight.type),0)</visible>
                           <property name="setting_label">    - Color de NZB Indexers</property>
@@ -3635,7 +3660,7 @@
                           <property name="setting_description">Elige el color de Offcloud.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=scraper_color_choice&amp;setting_id=provider.oc_highlight)</onclick>
                       </item>
-                                            <item>
+                      <item>
                           <visible>Container(2000).HasFocus(70)</visible>
                           <visible>String.IsEqual(Window(10000).Property(playtvban.highlight.type),0)</visible>
                           <property name="setting_label">    - Color de Premiumize</property>
@@ -3961,19 +3986,10 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(80)</visible>
-                          <visible>String.IsEqual(Window(10000).Property(playtvban.auto_play_episode),true) + String.IsEqual(Window(10000).Property(playtvban.autoplay_next_episode),true) + Integer.IsGreater(Window(10000).Property(playtvban.autoplay_watching_check),0)</visible>
-                          <property name="setting_label">    - Usar ¿Sigues viendo? con Reproducción Aleatoria Continua</property>
-                          <property name="setting_type">boolean</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.autoplay_random_continual_watching_check)]</property>
-                          <property name="setting_description">Cuando está desactivado, la Reproducción Aleatoria Continua no utiliza Comprobar ¿Sigues viendo? después de X (incluidas las cadenas de omisión por falta de resultados). La Reproducción Automática del Siguiente Episodio no cambia</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=autoplay_random_continual_watching_check)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(80)</visible>
-                          <property name="setting_label">Reanudar reproducción automáticamente</property>
+                          <property name="setting_label">Reanudar la Reproducción Automáticamente</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.auto_resume_episode_name)]</property>
-                          <property name="setting_description">Elige cuándo Play TVBan reanudará automáticamente la reproducción de un episodio que quedó a medias</property>
+                          <property name="setting_description">Elige cuándo PlayTVBan reanudará automáticamente la reproducción de un Episodio en curso</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=auto_resume_episode)</onclick>
                       </item>
         <!-- Playback Utilities -->

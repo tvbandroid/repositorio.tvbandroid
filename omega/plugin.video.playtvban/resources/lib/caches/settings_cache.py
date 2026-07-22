@@ -75,8 +75,18 @@ def _new_settings_affect_widgets(insert_list):
 		return True
 	return False
 
-def _new_setting_value(setting_id, setting_default, currentsettings, had_existing_settings):
+def _new_setting_value(setting_id, setting_default, currentsettings, had_existing_settings, fresh_install=False) -> str:
 	if not had_existing_settings:
+		# A genuine fresh install has nothing to migrate, but migrate_legacy_sort_settings() reads each
+		# absent legacy id as its own old getter fallback, so it would write six override rows for a user
+		# who has never touched a sort setting - breaking list_sort_cache's "a row means the user
+		# overrode this list" invariant. Seed the sentinel as already done so it never runs here.
+		#
+		# fresh_install, not had_existing_settings: the caller's dict comes from get_all(), which
+		# answers {} for a locked or corrupt database too. Seeding 'true' on that mistake would skip the
+		# migration forever - the next healthy sync reads the sentinel, never runs it, and the obsolete
+		# purge then deletes the five legacy ids and with them the only copy of the user's orderings.
+		if setting_id == 'migration.unified_list_sort': return 'true' if fresh_install else setting_default
 		return setting_default
 	old_setting_id = _NEW_SETTING_VALUE_MIGRATIONS.get(setting_id)
 	if not old_setting_id:
@@ -237,6 +247,23 @@ class SettingsCache:
 		try: all_settings = dict(dbcon.execute('SELECT setting_id, setting_value FROM settings').fetchall())
 		except: all_settings = {}
 		return all_settings
+
+	def is_empty_strict(self):
+		"""True only when this profile genuinely holds no settings. Raises rather than guessing.
+
+		get_all() swallows every sqlite error and answers {}, so its empty dict cannot tell a fresh
+		install from a database that is locked, corrupt or unreadable. Anything deciding "this profile
+		has never been written to" has to ask a question that is allowed to fail. An absent file and an
+		absent table are both genuinely empty - the service creates them on first run.
+		"""
+		from caches.base_cache import database_locations
+		if not kodi_utils.path_exists(database_locations('settings_db')): return True
+		dbcon = connect_database('settings_db')
+		try: row = dbcon.execute('SELECT setting_id FROM settings LIMIT 1').fetchone()
+		except Exception as error:
+			if 'no such table' in str(error).lower(): return True
+			raise
+		return row is None
 
 	def set(self, setting_id, setting_value=None):
 		setting_id = setting_id.replace('playtvban.', '')
@@ -507,6 +534,13 @@ _DIRECTORY_LISTING_MODES = frozenset((
 	'build_in_progress_episode', 'build_recently_watched_episode', 'build_next_episode',
 	'build_my_calendar', 'build_next_episode_manager'))
 
+# The five settings the unified-list-sort migration reads. They are no longer in default_settings(),
+# so the obsolete-id purge in sync_settings() would delete them on the same pass that migrates them -
+# leaving nothing to retry from if the migration fails. The purge is deferred until the sentinel says
+# the migration succeeded, which happens in the same run, so they are removed on the following sync.
+_LEGACY_SORT_SETTING_IDS = frozenset((
+	'sort.watchlist', 'sort.collection', 'sort.simkl', 'tmdbsort.watchlist', 'tmdbsort.favorites'))
+
 def is_directory_listing_mode(mode):
 	if not mode: return False
 	if mode.startswith('navigator.'): return True
@@ -571,13 +605,29 @@ def sync_settings(params={}):
 	insert_list = []
 	insert_list_append = insert_list.append
 	currentsettings = settings_cache.get_all()
+	# Redundant by design: the obsolete purge below defers the legacy sort ids until the migration has
+	# recorded success, so currentsettings still holds them when the migration runs. This pre-purge
+	# snapshot is the second line of defence if that deferral is ever removed - keep both.
+	legacy_sort_settings = {k: v for k, v in currentsettings.items() if k.startswith('sort.') or k.startswith('tmdbsort.')}
 	had_existing_settings = bool(currentsettings)
+	# Only a database that answers "no rows" without erroring is a fresh install. A failure here is
+	# treated as "not fresh", which defers the sort migration to the next sync instead of cancelling
+	# it: the sentinel stays 'false' and the obsolete purge keeps holding the legacy ids back.
+	fresh_install = False
+	if not had_existing_settings:
+		try: fresh_install = settings_cache.is_empty_strict()
+		except Exception as error:
+			kodi_utils.logger('sync_settings', 'settings db not readable, deferring sort migration: %s' % error)
 	d_settings = default_settings()
 	defaultsettings_ids = _defaultsettings_ids(d_settings)
 	defaults_map = {i['setting_id']: i for i in d_settings}
 	try:
 		c_settings = currentsettings.items()
-		obsoletesettings_ids = [k for k, v in c_settings if not k in defaultsettings_ids]
+		# Keep the legacy sort ids alive until the migration below has actually recorded success,
+		# otherwise a failed run purges the only copy of the user's per-list orderings.
+		defer_legacy_sort = currentsettings.get('migration.unified_list_sort') != 'true'
+		obsoletesettings_ids = [k for k, v in c_settings
+			if not k in defaultsettings_ids and not (defer_legacy_sort and k in _LEGACY_SORT_SETTING_IDS)]
 		if obsoletesettings_ids:
 			for item in obsoletesettings_ids: settings_cache.remove_setting(item)
 			migrated = True
@@ -645,6 +695,51 @@ def sync_settings(params={}):
 			settings_cache.write_db('migration.my_content_nav_mode_v136', 'true', defaults_map.get('migration.my_content_nav_mode_v136'))
 			currentsettings['migration.my_content_nav_mode_v136'] = 'true'
 			if load_properties: settings_cache.set_memory_cache('migration.my_content_nav_mode_v136', 'true')
+		if currentsettings.get('migration.unified_list_sort') != 'true':
+			# Only record the migration as done when it did not raise. The obsolete purge above
+			# holds back the five legacy sort ids while this sentinel is unset, so a failed run
+			# leaves both the sentinel and the source values in place and the next sync retries
+			# for real. They are purged on that following sync, once the sentinel is 'true'.
+			sort_migration_ok = True
+			try:
+				from modules.list_sort import run_sort_migration
+				def _write_sort_setting(setting_id, value):
+					settings_cache.write_db(setting_id, value, defaults_map.get(setting_id))
+					currentsettings[setting_id] = value
+					if load_properties: settings_cache.set_memory_cache(setting_id, value)
+				if run_sort_migration(legacy_sort_settings, _write_sort_setting): migrated = True
+				try:
+					# The _strict getters raise instead of returning {} on a locked database or a corrupt
+					# row. Their swallowing siblings, which the UI uses, would report "nothing stored"
+					# and let the sentinel be written over preferences that were never read.
+					from caches.trakt_cache import get_all_lists_custom_sort_strict
+					from caches.tmdb_lists import tmdb_lists_cache
+					from caches.list_sort_cache import set_override
+					from modules.list_sort import migrate_legacy_stores
+					from caches.personal_lists_cache import personal_lists_cache
+					personal_rows = personal_lists_cache.get_all_sort_orders()
+					store_overrides = migrate_legacy_stores(get_all_lists_custom_sort_strict(), personal_rows, tmdb_lists_cache.get_sort_orders_strict())
+					failed = [scope for scope, spec_string in store_overrides.items() if not set_override(scope, spec_string)]
+					if store_overrides: migrated = True
+					if failed:
+						sort_migration_ok = False
+						kodi_utils.logger('sync_settings', 'legacy sort store migration: could not persist %s' % ', '.join(sorted(failed)))
+				except Exception as e:
+					# Swallowing this would write the sentinel on a run that saved nothing, and the per-list
+					# Trakt, personal and TMDb preferences are deleted with the legacy ids on the next sync.
+					# Fold it into the outer flag instead so the sentinel stays unset and the next sync retries.
+					sort_migration_ok = False
+					kodi_utils.logger('sync_settings', 'legacy sort store migration: %s' % e)
+			except Exception as e:
+				# Deliberately catches an ImportError on modules.list_sort too: the sentinel stays false, so a
+				# genuinely broken install retries and logs on every sync rather than once. Do not narrow this.
+				sort_migration_ok = False
+				migrated = True # a partial run may already have written the mediatype defaults
+				kodi_utils.logger('sync_settings', 'unified list sort migration: %s' % e)
+			if sort_migration_ok:
+				settings_cache.write_db('migration.unified_list_sort', 'true', defaults_map.get('migration.unified_list_sort'))
+				currentsettings['migration.unified_list_sort'] = 'true'
+				if load_properties: settings_cache.set_memory_cache('migration.unified_list_sort', 'true')
 		for setting_id, value in list(currentsettings.items()):
 			if setting_id not in defaults_map: continue
 			sanitized = sanitize_setting_value(setting_id, value, defaults_map[setting_id], validate_paths=False)
@@ -661,7 +756,7 @@ def sync_settings(params={}):
 			continue
 		setting_type = item['setting_type']
 		setting_default = item['setting_default']
-		setting_value = _new_setting_value(setting_id, setting_default, currentsettings, had_existing_settings)
+		setting_value = _new_setting_value(setting_id, setting_default, currentsettings, had_existing_settings, fresh_install)
 		if setting_type == 'action' and 'settings_options' in item:
 			if setting_id == 'aiostreams.instance':
 				try:
@@ -705,7 +800,7 @@ def sync_settings(params={}):
 
 def set_default(setting_ids):
 	if not isinstance(setting_ids, list): setting_ids = [setting_ids]
-	if not kodi_utils.confirm_dialog(text='Are You Sure?', ok_label='Yes', cancel_label='No', default_control=11): return
+	if not kodi_utils.confirm_dialog(text='Estás Seguro?', ok_label='Sí', cancel_label='No', default_control=11): return
 	for setting_id in setting_ids:
 		try: set_setting(setting_id, default_setting_values(setting_id)['setting_default'])
 		except: pass
@@ -725,12 +820,12 @@ def set_string(params):
 	current_value = get_setting('playtvban.%s' % setting_id)
 	current_value = current_value.replace('empty_setting', '')
 	new_value = kodi_utils.kodi_dialog().input('', defaultt=current_value)
-	if not new_value and not kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
+	if not new_value and not kodi_utils.confirm_dialog(text='Introducir un Valor Vacío?', ok_label='Sí', cancel_label='No, volver a introducir', default_control=11):
 		return set_string(params)
 	if setting_id in _CREDENTIAL_STRING_SETTINGS:
 		new_value = normalize_credential_string(new_value)
 	if setting_id == 'tmdb_api' and new_value and looks_like_tmdb_v4_jwt(new_value):
-		kodi_utils.ok_dialog(heading='Wrong key type', text='This is a TMDb v4 Read Access Token (JWT), not the v3 API Key.[CR]Use TMDb Lists → Read Access Token for v4 tokens.')
+		kodi_utils.ok_dialog(heading='Tipo de Clave incorrecto', text='Esto es un Token de Acceso de Lectura v4 de TMDb (JWT), no una Clave API v3.[CR]Usa TMDb Lists → Token de Acceso de Lectura para los tokens v4.')
 		return set_string(params)
 	if setting_id == 'playback.submaker_manifest' and new_value:
 		new_value = new_value.strip()
@@ -757,11 +852,11 @@ def set_numeric(params):
 		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true', 'heading': 'Will this be a positive or negative number?'}
 		multiplier = kodi_utils.select_dialog(multiplier_values, **kwargs)
 	else: multiplier = None
-	new_value = kodi_utils.kodi_dialog().input('Range [B]%s - %s[/B].' % (min_value, max_value), type=1)
+	new_value = kodi_utils.kodi_dialog().input('Rango [B]%s - %s[/B].' % (min_value, max_value), type=1)
 	if not new_value: return
 	if multiplier: new_value = str(int(float(new_value) * multiplier[1]))
 	if int(new_value) < min_value or int(new_value) > max_value:
-		kodi_utils.ok_dialog(text='Please Choose Between the Range [B]%s - %s[/B].' % (min_value, max_value))
+		kodi_utils.ok_dialog(text='Por favor, Elija una Opción Dentro del Rango. [B]%s - %s[/B].' % (min_value, max_value))
 		return set_numeric(params)
 	set_setting(setting_id, new_value)
 
@@ -771,9 +866,9 @@ def set_path(params):
 	current = get_setting('playtvban.%s' % setting_id)
 	if browse_mode == 0:
 		force_defaultt = setting_id == 'import_export_directory'
-		new_value = kodi_utils.browse_directory(current, heading='Choose folder', use_defaultt=True, force_defaultt=force_defaultt)
+		new_value = kodi_utils.browse_directory(current, heading='Elegir carpeta', use_defaultt=True, force_defaultt=force_defaultt)
 	else:
-		result = kodi_utils.kodi_dialog().browse(browse_mode, 'Choose file', '', defaultt=current or None)
+		result = kodi_utils.kodi_dialog().browse(browse_mode, 'Elegir archivo', '', defaultt=current or None)
 		new_value = result if result and str(result).strip() else None
 	if not new_value:
 		return
@@ -818,26 +913,26 @@ def set_from_list(params):
 		mode_label = mode_opts.get(setting_value, '')
 		current = str(get_setting('playtvban.external_scraper.run_mode', '1'))
 		warning_text = (
-			'Many indexers are volunteer-run community resources. '
-			'[B]%s[/B] can query the same indexers multiple times. [B]Series (Fallback by Slot Order)[/B] is the recommended default.[CR][CR]'
-			'Please scrape responsibly.' % mode_label
+			'Muchos indexadores son recursos comunitarios gestionados por voluntarios. '
+			'[B]%s[/B] puede consultar los mismos indexadores varias veces. [B]Series (Alternativa por Orden de Ranura)[/B] es la opción predeterminada recomendada.[CR][CR]'
+			'Por favor, realiza las búsquedas de forma responsable.' % mode_label
 		)
 		if current == '1':
 			confirmed = kodi_utils.confirm_dialog(
-				heading='Search Mode',
+				heading='Modo de búsqueda',
 				text=warning_text,
-				ok_label='Continue',
-				cancel_label='Cancel',
+				ok_label='Continuar',
+				cancel_label='Cancelar',
 				default_control=11,
 			)
 			if confirmed is None or not confirmed:
 				return
 		else:
 			confirmed = kodi_utils.confirm_dialog(
-				heading='Search Mode',
+				heading='Modo de Búsqueda',
 				text=warning_text,
-				ok_label='Series (Fallback)',
-				cancel_label='Continue',
+				ok_label='Series (Alternativa)',
+				cancel_label='Continuar',
 				default_control=10,
 			)
 			if confirmed is None:
@@ -876,7 +971,7 @@ def set_source_folder_path(params):
 	setting_id = params['setting_id']
 	current_setting = get_setting('playtvban.%s' % setting_id)
 	if current_setting not in (None, 'None', ''):
-		if kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
+		if kodi_utils.confirm_dialog(text='Introducir un Valor Vacío?', ok_label='Sí', cancel_label='Volver a Introducir', default_control=11):
 			return set_setting(setting_id, 'None')
 	return set_path(params)
 
@@ -888,7 +983,7 @@ def restore_setting_default(params):
 		setting_default = default_setting_values(setting_id)['setting_default']
 		set_setting(setting_id, setting_default)
 	except:
-		if not silent: kodi_utils.ok_dialog(text='Error restoring default setting')
+		if not silent: kodi_utils.ok_dialog(text='Error al restaurar la configuración predeterminada')
 
 def default_setting_values(setting_id):
 	if 'playtvban.' in setting_id: setting_id = setting_id.replace('playtvban.', '')
@@ -917,14 +1012,14 @@ def default_settings():
 {'setting_id': 'window_theme_opacity', 'setting_type': 'string', 'setting_default': 'CC'},
 #==================== Watched Indicators
 {'setting_id': 'watched_indicators', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'3': 'MDBList', '0': 'Play TVBan', '2': 'Simkl', '1': 'Trakt'}},
-#======+============= Caché de MDBList
+#======+============= MDBList Cache
 {'setting_id': 'mdblist.user', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'mdblist.client', 'setting_type': 'string', 'setting_default': 'JFZCpEIYFtpvGk47pEEprjEkXzlPL8hJR45jqddJ'},
 {'setting_id': 'mdblist.token', 'setting_type': 'string', 'setting_default': '0'},
 {'setting_id': 'mdblist.refresh', 'setting_type': 'string', 'setting_default': '0'},
 {'setting_id': 'mdblist.sync_interval', 'setting_type': 'action', 'setting_default': '60', 'min_value': '5', 'max_value': '600'},
 {'setting_id': 'mdblist.refresh_widgets', 'setting_type': 'boolean', 'setting_default': 'true'},
-#======+============= Caché de Simkl
+#======+============= Simkl Cache
 {'setting_id': 'simkl.user', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'simkl.token', 'setting_type': 'string', 'setting_default': '0'},
 {'setting_id': 'simkl.sync_interval', 'setting_type': 'action', 'setting_default': '60', 'min_value': '5', 'max_value': '600'},
@@ -934,12 +1029,12 @@ def default_settings():
 {'setting_id': 'external_scraper.cm_menu_migrated', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'cm_manager_order_migrated', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'cm_manager_order_migrated_v2', 'setting_type': 'boolean', 'setting_default': 'false'},
-#======+============= Caché de Trakt
+#======+============= Trakt Cache
 {'setting_id': 'trakt.sync_interval', 'setting_type': 'action', 'setting_default': '60', 'min_value': '5', 'max_value': '600'},
 {'setting_id': 'trakt.refresh_widgets', 'setting_type': 'boolean', 'setting_default': 'true'},
-#==================== Desfase Horario UTC
+#==================== UTC Time Offset
 {'setting_id': 'datetime.offset', 'setting_type': 'action', 'setting_default': '0', 'min_value': '-15', 'max_value': '15'},
-#==================== Descargas
+#==================== Downloads
 {'setting_id': 'movie_download_directory', 'setting_type': 'path', 'setting_default': 'special://profile/addon_data/plugin.video.playtvban/Movies Downloads/', 'browse_mode': '0'},
 {'setting_id': 'tvshow_download_directory', 'setting_type': 'path', 'setting_default': 'special://profile/addon_data/plugin.video.playtvban/TV Show Downloads/', 'browse_mode': '0'},
 {'setting_id': 'premium_download_directory', 'setting_type': 'path', 'setting_default': 'special://profile/addon_data/plugin.video.playtvban/Premium Downloads/', 'browse_mode': '0'},
@@ -948,19 +1043,19 @@ def default_settings():
 
 
 #================================================================================#
-#====================================CARACTERÍSTICAS====================================#
+#====================================FEATURES====================================#
 #================================================================================#
 #==================== Extras
 {'setting_id': 'extras.enable_extra_ratings', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'extras.enabled_ratings', 'setting_type': 'string', 'setting_default': 'Meta, Tom/Critic, Tom/User, IMDb, TMDb'},
 {'setting_id': 'extras.enable_item_ratings', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'extras.enable_scrollbars', 'setting_type': 'boolean', 'setting_default': 'false'},
-#==================== Acciones Especiales de Apertura
+#==================== Special Open Actions
 {'setting_id': 'media_open_action_movie', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Abrir Extras', '2': 'Abrir Colección de Películas', '3': 'Ambos'}},
 {'setting_id': 'media_open_action_tvshow', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Abrir Extras'}},
 {'setting_id': 'media_open_action_skip_inprogress_movie', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'media_open_action_skip_inprogress_tvshow', 'setting_type': 'boolean', 'setting_default': 'false'},
-#==================== Títulos Similares Generados por IA
+#==================== AI Generated Similar Titles
 {'setting_id': 'ai_model.order', 'setting_type': 'string', 'setting_default': 'gemini-2.5-flash-lite,llama-3.3-70b-versatile,gemma-3-27b-it,llama-3.1-8b-instant'},
 {'setting_id': 'ai_model.limit', 'setting_type': 'action', 'setting_default': '15', 'min_value': '1', 'max_value': '25'},
 
@@ -969,7 +1064,7 @@ def default_settings():
 #====================================CONTENT=======================================#
 #==================================================================================#
 #==================== General
-{'setting_id': 'paginate.lists', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '1': 'Solo dentro del complemento', '2': 'Solo widgets', '3': 'Ambos'}},
+{'setting_id': 'paginate.lists', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '1': 'Solo dentro del Addon', '2': 'Solo Widgets', '3': 'Ambos'}},
 {'setting_id': 'paginate.limit_addon', 'setting_type': 'action', 'setting_default': '20'},
 {'setting_id': 'paginate.limit_widgets', 'setting_type': 'action', 'setting_default': '20'},
 {'setting_id': 'paginate.jump_to', 'setting_type': 'boolean', 'setting_default': 'true'},
@@ -981,11 +1076,11 @@ def default_settings():
 '9': 'Últimos 9 vistos', '10': 'Últimos 10 vistos'}},
 {'setting_id': 'mpaa_region', 'setting_type': 'string', 'setting_default': 'US'},
 {'setting_id': 'lists_cache_duraton', 'setting_type': 'string', 'setting_default': '24'},
-{'setting_id': 'tv_progress_location', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Vistos', '1': 'En Progreso', '2': 'Ambos'}},
+{'setting_id': 'tv_progress_location', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Vistas', '1': 'En Progreso', '2': 'Ambos'}},
 {'setting_id': 'show_specials', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'exclude_specials_progress', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'use_season_name', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'default_all_episodes', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Nunca', '1': 'Si solo hay una temporada', '2': 'Siempre'}},
+{'setting_id': 'default_all_episodes', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Nunca', '1': 'Solo si hay una temporada', '2': 'Siempre'}},
 {'setting_id': 'avoid_episode_spoilers', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'include_anime_tvshow', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'show_unaired_watchlist', 'setting_type': 'boolean', 'setting_default': 'true'},
@@ -999,20 +1094,15 @@ def default_settings():
 {'setting_id': 'view.episodes', 'setting_type': 'string', 'setting_default': '55'},
 {'setting_id': 'view.episodes_single', 'setting_type': 'string', 'setting_default': '55'},
 {'setting_id': 'view.premium', 'setting_type': 'string', 'setting_default': '55'},
-#==================== Orden de Contenido Para Progreso Visto
+#==================== Orden de clasificación del contenido para el progreso de vistos
 {'setting_id': 'sort.progress', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Título', '1': 'Vistos Recientemente'}},
 {'setting_id': 'sort.watched', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Título', '1': 'Vistos Recientemente'}},
-#==================== Orden de Contenido Para Listas de Simkl
-{'setting_id': 'sort.simkl', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Título', '1': 'Fecha de Añadido (desc)', '2': 'Fecha de Estreno (desc)', '3': 'Fecha de Añadido (asc)', '4': 'Fecha de Estreno (asc)'}},
-#==================== Orden de Contenido Para Listas de Trakt
-{'setting_id': 'sort.collection', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Título', '1': 'Fecha de Añadido (desc)', '2': 'Fecha de Estreno (desc)', '3': 'Fecha de Añadido (asc)', '4': 'Fecha de Estreno (asc)'}},
-{'setting_id': 'sort.watchlist', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Título', '1': 'Fecha de Añadido (desc)', '2': 'Fecha de Estreno (desc)', '3': 'Fecha de Añadido (asc)', '4': 'Fecha de Estreno (asc)'}},
-#==================== Orden de Contenido Para Listas de TMDb
-{'setting_id': 'tmdbsort.watchlist', 'setting_type': 'action', 'setting_default': '4', 'settings_options': {'0': 'Título', '1': 'Fecha de Estreno (asc)', '2': 'Fecha de Estreno (desc)',
-'3': 'Aleatorio', '4': 'Predeterminado de TMDb (Ninguno)'}},
-{'setting_id': 'tmdbsort.favorites', 'setting_type': 'action', 'setting_default': '4', 'settings_options': {'0': 'Título', '1': 'Fecha de Estreno (asc)', '2': 'Fecha de Estreno (desc)',
-'3': 'Aleatorio', '4': 'Predeterminado de TMDb (Ninguno)'}},
-#==================== Listas Personales
+#==================== Valores predeterminados de orden de clasificación del contenido (por tipo de contenido, todas las listas)
+{'setting_id': 'sort.default.movies', 'setting_type': 'string', 'setting_default': 'title:asc'},
+{'setting_id': 'sort.default.movies_name', 'setting_type': 'name', 'setting_default': 'Título (ascendente)'},
+{'setting_id': 'sort.default.shows', 'setting_type': 'string', 'setting_default': 'title:asc'},
+{'setting_id': 'sort.default.shows_name', 'setting_type': 'name', 'setting_default': 'Título (ascendente)'},
+#==================== Listas personales
 {'setting_id': 'personal_list.sort_unseen_to_top', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'personal_list.highlight_unseen', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'personal_list.unseen_highlight', 'setting_type': 'string', 'setting_default': 'FF4DDBFF'},
@@ -1022,10 +1112,10 @@ def default_settings():
 {'setting_id': 'widget_refresh_notification', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'widget_hide_watched', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'widget_hide_next_page', 'setting_type': 'boolean', 'setting_default': 'false'},
-#==================== Carteles de Valoraciones RPDb
+#==================== Pósteres de valoraciones de RPDb
 {'setting_id': 'rpdb_enabled', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Películas', '2': 'Series', '3': 'Ambos'}},
 {'setting_id': 'rpdb_format', 'setting_type': 'string', 'setting_default': ''},
-#==================== Menú Contextual
+#==================== Menú contextual
 {'setting_id': 'context_menu.enabled', 'setting_type': 'string',
 'setting_default': 'extras,options,playback_options,external_scraper_settings,browse_movie_set,browse_seasons,browse_episodes,recommended,related,more_like_this,similar,in_trakt_list,' \
 'mdblist_manager,simkl_manager,trakt_manager,tmdb_manager,personal_manager,favorites_manager,mark_watched,unmark_previous_episode,exit,refresh,reload'},
@@ -1041,13 +1131,13 @@ def default_settings():
 {'setting_id': 'single_ep_display', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'TÍTULO: SxE - EPISODIO', '1': 'SxE - EPISODIO', '2': 'EPISODIO'}},
 {'setting_id': 'single_ep_display_widget', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'TÍTULO: SxE - EPISODIO', '1': 'SxE - EPISODIO', '2': 'EPISODIO'}},
 {'setting_id': 'single_ep_unwatched_episodes', 'setting_type': 'boolean', 'setting_default': 'false'},
-#==================== Próximos Episodios
-{'setting_id': 'nextep.method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Último Emitido', '1': 'Último Visto'}},
-{'setting_id': 'nextep.sort_type', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Vistos Recientemente', '1': 'Fecha de Emisión', '2': 'Título'}},
+#==================== Next Episodes
+{'setting_id': 'nextep.method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Último emitido', '1': 'Último visto'}},
+{'setting_id': 'nextep.sort_type', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Vistos recientemente', '1': 'Fecha de emisión', '2': 'Título'}},
 {'setting_id': 'nextep.sort_order', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Descendente', '1': 'Ascendente'}},
 {'setting_id': 'nextep.limit_history', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'nextep.limit', 'setting_type': 'action', 'setting_default': '20', 'min_value': '1', 'max_value': '200'},
-{'setting_id': 'nextep.include_unwatched', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Lista de Seguimiento', '2': 'Favoritos', '3': 'Ambos'}},
+{'setting_id': 'nextep.include_unwatched', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Lista de seguimiento', '2': 'Favoritos', '3': 'Ambos'}},
 {'setting_id': 'nextep.include_airdate', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'nextep.airing_today', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'nextep.include_unaired', 'setting_type': 'boolean', 'setting_default': 'false'},
@@ -1057,9 +1147,9 @@ def default_settings():
 {'setting_id': 'trakt.calendar_display_widget', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'TÍTULO: SxE - EPISODIO', '1': 'SxE - EPISODIO', '2': 'EPISODIO'}},
 {'setting_id': 'trakt.calendar_sort_order', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Descendente', '1': 'Ascendente'}},
 {'setting_id': 'trakt.calendar_date_labels', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {
-	'0': 'Palabras / YYYY-MM-DD', '7': 'Palabras / MM-DD-YYYY', '8': 'Palabras / DD-MM-YYYY',
-	'3': 'YYYY-MM-DD', '1': 'MM-DD-YYYY', '2': 'DD-MM-YYYY',
-	'6': 'Día + YYYY-MM-DD', '4': 'Día + MM-DD-YYYY', '5': 'Día + DD-MM-YYYY'}},
+	'0': 'Palabras / AAAA-MM-DD', '7': 'Palabras / MM-DD-AAAA', '8': 'Palabras / DD-MM-AAAA',
+	'3': 'AAAA-MM-DD', '1': 'MM-DD-AAAA', '2': 'DD-MM-AAAA',
+	'6': 'Día + AAAA-MM-DD', '4': 'Día + MM-DD-AAAA', '5': 'Día + DD-MM-AAAA'}},
 {'setting_id': 'trakt.calendar_previous_days', 'setting_type': 'action', 'setting_default': '7', 'min_value': '0', 'max_value': '14'},
 {'setting_id': 'trakt.calendar_future_days', 'setting_type': 'action', 'setting_default': '7', 'min_value': '0', 'max_value': '14'},
 
@@ -1091,7 +1181,7 @@ def default_settings():
 #=====================================================================================#
 #====================================STREAMING ACCOUNTS===============================#
 #=====================================================================================#
-#==================== External
+#==================== Externo
 {'setting_id': 'provider.external', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'external_scraper.name', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'external_scraper.slot1.module', 'setting_type': 'string', 'setting_default': 'empty_setting'},
@@ -1103,17 +1193,18 @@ def default_settings():
 {'setting_id': 'external_scraper.slot3.module', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'external_scraper.slot3.name', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'external_scraper.slot3.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'external_scraper.run_mode', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'1': 'Series (Fallback by Slot Order)', '2': 'Series (All Slots in Order)', '3': 'Primary Slot + Parallel Fallback', '0': 'Parallel (All Enabled Slots)'}},
+{'setting_id': 'external_scraper.run_mode', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'1': 'Series (Alternativa por Orden de Ranura)', '2': 'Series (Todas las Ranuras en Orden)', '3': 'Ranura Principal + Alternativa en Paralelo', '0': 'Paralelo (Todas las Ranuras Activadas)'}},
 {'setting_id': 'migration.external_scraper_slots_v160', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'migration.cache_check_pm_oc_tb_v129e', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'migration.ad_cache_check_removed_v173', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'migration.my_content_nav_mode_v136', 'setting_type': 'boolean', 'setting_default': 'false'},
+{'setting_id': 'migration.unified_list_sort', 'setting_type': 'boolean', 'setting_default': 'false'},
 #==================== Real Debrid
 {'setting_id': 'rd.token', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'rd.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'rd.cache_check', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'rd.account_id', 'setting_type': 'string', 'setting_default': 'empty_setting'},
-{'setting_id': 'store_resolved_to_cloud.real-debrid', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'All', '2': 'Show Packs Only'}},
+{'setting_id': 'store_resolved_to_cloud.real-debrid', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Todos', '2': 'Mostrar Solo Packs'}},
 {'setting_id': 'provider.rd_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'rd_cloud.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'check.rd_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
@@ -1128,7 +1219,7 @@ def default_settings():
 {'setting_id': 'pm.cache_check', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'pm.include_uncached', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'pm.account_id', 'setting_type': 'string', 'setting_default': 'empty_setting'},
-{'setting_id': 'store_resolved_to_cloud.premiumize.me', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'All', '2': 'Show Packs Only'}},
+{'setting_id': 'store_resolved_to_cloud.premiumize.me', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Todos', '2': 'Mostrar Solo Packs'}},
 {'setting_id': 'provider.pm_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'pm_cloud.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'check.pm_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
@@ -1140,7 +1231,7 @@ def default_settings():
 {'setting_id': 'ad.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'ad.cache_check', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'ad.account_id', 'setting_type': 'string', 'setting_default': 'empty_setting'},
-{'setting_id': 'store_resolved_to_cloud.alldebrid', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'All', '2': 'Show Packs Only'}},
+{'setting_id': 'store_resolved_to_cloud.alldebrid', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Todos', '2': 'Mostrar Solo Packs'}},
 {'setting_id': 'provider.ad_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'ad_cloud.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'check.ad_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
@@ -1153,7 +1244,7 @@ def default_settings():
 {'setting_id': 'oc.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'oc.cache_check', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'oc.include_uncached', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'store_resolved_to_cloud.offcloud', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'All', '2': 'Show Packs Only'}},
+{'setting_id': 'store_resolved_to_cloud.offcloud', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Todos', '2': 'Mostrar Solo Packs'}},
 {'setting_id': 'oc.notify_cloud_ready', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'provider.oc_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'oc_cloud.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
@@ -1166,7 +1257,7 @@ def default_settings():
 {'setting_id': 'tb.enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'tb.cache_check', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'tb.include_uncached', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'store_resolved_to_cloud.torbox', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'All', '2': 'Show Packs Only'}},
+{'setting_id': 'store_resolved_to_cloud.torbox', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Todos', '2': 'Mostrar Solo Packs'}},
 {'setting_id': 'tb.notify_cloud_ready', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'provider.tb_cloud', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'tb_cloud.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
@@ -1187,7 +1278,7 @@ def default_settings():
 {'setting_id': 'easynews.refresh_credentials', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'easynews.lang_include_unknown', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'easynews.fallback_search', 'setting_type': 'boolean', 'setting_default': 'true'},
-{'setting_id': 'easynews.search_width', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Focused', '1': 'Balanced', '2': 'Broad'}},
+{'setting_id': 'easynews.search_width', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Enfocada', '1': 'Equilibrada', '2': 'Amplia'}},
 {'setting_id': 'check.easynews', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'autoplay.easynews', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'en.priority', 'setting_type': 'action', 'setting_default': '7', 'min_value': '1', 'max_value': '10'},
@@ -1235,7 +1326,7 @@ def default_settings():
 {'setting_id': 'nzb3.key', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'nzb.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'nzb.fallback_search', 'setting_type': 'boolean', 'setting_default': 'true'},
-{'setting_id': 'nzb.search_width', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Focused', '1': 'Balanced', '2': 'Broad'}},
+{'setting_id': 'nzb.search_width', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Enfocado', '1': 'Equilibrado', '2': 'Amplio'}},
 {'setting_id': 'check.nzb', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'autoplay.nzb', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'nzb.priority', 'setting_type': 'action', 'setting_default': '7', 'min_value': '1', 'max_value': '10'},
@@ -1245,25 +1336,25 @@ def default_settings():
 #===============================================================================#
 #====================================RESULTS====================================#
 #===============================================================================#
-#==================== Display
+#==================== Pantalla
 {'setting_id': 'results.timeout', 'setting_type': 'action', 'setting_default': '20', 'min_value': '1'},
-{'setting_id': 'results.list_format', 'setting_type': 'string', 'setting_default': 'List'},
-#==================== Rescrape
-{'setting_id': 'rescrape.cache_ignored', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Off', '1': 'Auto', '2': 'Prompt'}},
+{'setting_id': 'results.list_format', 'setting_type': 'string', 'setting_default': 'Lista'},
+#==================== Reescanear
+{'setting_id': 'rescrape.cache_ignored', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Desactivado', '1': 'Automático', '2': 'Preguntar'}},
 {'setting_id': 'rescrape.cache_ignored.order', 'setting_type': 'action', 'setting_default': '0', 'min_value': '1', 'max_value': '5'},
-{'setting_id': 'rescrape.imdb_year', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '1': 'Auto', '2': 'Prompt'}},
+{'setting_id': 'rescrape.imdb_year', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '1': 'Automático', '2': 'Preguntar'}},
 {'setting_id': 'rescrape.imdb_year.order', 'setting_type': 'action', 'setting_default': '1', 'min_value': '1', 'max_value': '5'},
-{'setting_id': 'rescrape.with_all', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '1': 'Auto', '2': 'Prompt'}},
+{'setting_id': 'rescrape.with_all', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '1': 'Automático', '2': 'Preguntar'}},
 {'setting_id': 'rescrape.with_all.order', 'setting_type': 'action', 'setting_default': '2', 'min_value': '1', 'max_value': '5'},
-{'setting_id': 'rescrape.episode_group', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '1': 'Auto', '2': 'Prompt'}},
+{'setting_id': 'rescrape.episode_group', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '1': 'Automático', '2': 'Preguntar'}},
 {'setting_id': 'rescrape.episode_group.order', 'setting_type': 'action', 'setting_default': '3', 'min_value': '1', 'max_value': '5'},
-{'setting_id': 'rescrape.ignore_filters', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '1': 'Auto', '2': 'Prompt'}},
+{'setting_id': 'rescrape.ignore_filters', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '1': 'Automático', '2': 'Preguntar'}},
 {'setting_id': 'rescrape.ignore_filters.order', 'setting_type': 'action', 'setting_default': '4', 'min_value': '1', 'max_value': '5'},
-{'setting_id': 'rescrape.full_scrape', 'setting_type': 'action', 'setting_default': '2', 'settings_options': {'0': 'Off', '1': 'Auto', '2': 'Prompt'}},
+{'setting_id': 'rescrape.full_scrape', 'setting_type': 'action', 'setting_default': '2', 'settings_options': {'0': 'Desactivado', '1': 'Automático', '2': 'Preguntar'}},
 {'setting_id': 'rescrape.full_scrape.order', 'setting_type': 'action', 'setting_default': '5', 'min_value': '1', 'max_value': '5'},
-#==================== Sorting and Filtering
-{'setting_id': 'results.sort_order_display', 'setting_type': 'string', 'setting_default': 'Quality, Size, Provider'},
-{'setting_id': 'results.filter_size_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '1': 'Use Line Speed', '2': 'Use Size'}},
+#==================== Ordenación y Filtrado
+{'setting_id': 'results.sort_order_display', 'setting_type': 'string', 'setting_default': 'Calidad, Tamaño, Proveedor'},
+{'setting_id': 'results.filter_size_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '1': 'Usar Velocidad de Línea', '2': 'Usar Tamaño'}},
 {'setting_id': 'results.line_speed', 'setting_type': 'action', 'setting_default': '25', 'min_value': '1'},
 {'setting_id': 'results.movie_size_max', 'setting_type': 'action', 'setting_default': '10000', 'min_value': '1'},
 {'setting_id': 'results.episode_size_max', 'setting_type': 'action', 'setting_default': '3000', 'min_value': '1'},
@@ -1271,25 +1362,25 @@ def default_settings():
 {'setting_id': 'results.episode_size_min', 'setting_type': 'action', 'setting_default': '0', 'min_value': '0'},
 {'setting_id': 'results.size_unknown', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'results.size_sort_weighted', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'results.size_sort_direction', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Descending', '1': 'Ascending'}},
+{'setting_id': 'results.size_sort_direction', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Descendente', '1': 'Ascendente'}},
 {'setting_id': 'results.uncached_min_seeders', 'setting_type': 'action', 'setting_default': '0', 'min_value': '0'},
 {'setting_id': 'results.limit_number_quality', 'setting_type': 'string', 'setting_default': '0'},
 {'setting_id': 'results.limit_number_total', 'setting_type': 'string', 'setting_default': '0'},
 {'setting_id': 'results.include.unknown.size', 'setting_type': 'boolean', 'setting_default': 'true'},
-{'setting_id': 'filter.include_prerelease', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Include', '1': 'Exclude'}},
-{'setting_id': 'filter.hevc', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Include', '1': 'Exclude'}},
+{'setting_id': 'filter.include_prerelease', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Incluir', '1': 'Excluir'}},
+{'setting_id': 'filter.hevc', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Incluir', '1': 'Excluir'}},
 {'setting_id': 'filter.hevc.max_quality', 'setting_type': 'action', 'setting_default': '4K', 'settings_options': {'4K': '4K', '1080p': '1080p', '720p': '720p', 'SD': 'SD'}},
 {'setting_id': 'filter.hevc.max_autoplay_quality', 'setting_type': 'action', 'setting_default': '4K', 'settings_options': {'4K': '4K', '1080p': '1080p', '720p': '720p', 'SD': 'SD'}},
-{'setting_id': 'filter.3d', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Include', '1': 'Exclude'}},
-{'setting_id': 'filter.hdr', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Include', '1': 'Exclude'}},
-{'setting_id': 'filter.dv', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Include', '1': 'Exclude'}},
-{'setting_id': 'filter.av1', 'setting_type': 'action', 'setting_default': '0', 'settings_options':{'0': 'Include', '1': 'Exclude'}},
-{'setting_id': 'filter.enhanced_upscaled', 'setting_type': 'action', 'setting_default': '0', 'settings_options':{'0': 'Include', '1': 'Exclude'}},
-{'setting_id': 'filter.sort_to_top', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'Source Select', '2': 'Autoplay', '3': 'Both'}},
+{'setting_id': 'filter.3d', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Incluir', '1': 'Excluir'}},
+{'setting_id': 'filter.hdr', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Incluir', '1': 'Excluir'}},
+{'setting_id': 'filter.dv', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Incluir', '1': 'Excluir'}},
+{'setting_id': 'filter.av1', 'setting_type': 'action', 'setting_default': '0', 'settings_options':{'0': 'Incluir', '1': 'Excluir'}},
+{'setting_id': 'filter.enhanced_upscaled', 'setting_type': 'action', 'setting_default': '0', 'settings_options':{'0': 'Incluir', '1': 'Excluir'}},
+{'setting_id': 'filter.sort_to_top', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Selección de Fuente', '2': 'Reproducción Automática', '3': 'Ambos'}},
 {'setting_id': 'filter.preferred_filters', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'filter_audio', 'setting_type': 'string', 'setting_default': 'empty_setting'},
-#==================== Results Color Highlights
-{'setting_id': 'highlight.type', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Provider', '1': 'Quality', '2': 'Single Color'}},
+#==================== Resultados de Color Destacados
+{'setting_id': 'highlight.type', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Proveedor', '1': 'Calidad', '2': 'Un Solo Color'}},
 {'setting_id': 'provider.easynews_highlight', 'setting_type': 'string', 'setting_default': 'FF00B3B2'},
 {'setting_id': 'provider.debrid_cloud_highlight', 'setting_type': 'string', 'setting_default': 'FF7A01CC'},
 {'setting_id': 'provider.folders_highlight', 'setting_type': 'string', 'setting_default': 'FFB36B00'},
@@ -1313,31 +1404,31 @@ def default_settings():
 #===============================================================================#
 #===================================PLAYBACK====================================#
 #===============================================================================#
-#==================== Playback Movies
+#======#==================== Playback Movies
 {'setting_id': 'auto_play_movie', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'results_quality_movie', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
 {'setting_id': 'autoplay_quality_movie', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
-{'setting_id': 'auto_resume_movie', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Never', '1': 'Always', '2': 'Autoplay Only'}},
+{'setting_id': 'auto_resume_movie', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Nunca', '1': 'Siempre', '2': 'Solo Reproducción Automática'}},
 {'setting_id': 'stinger_alert.show', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'stinger_alert.window_percentage', 'setting_type': 'action', 'setting_default': '90', 'min_value': '1', 'max_value': '99'},
-{'setting_id': 'stinger_alert.alert_timing', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Playback Percentage', '1': 'Chapter Info', '2': 'Subtitles Info'}},
+{'setting_id': 'stinger_alert.alert_timing', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Porcentaje de Reproducción', '1': 'Información del Capítulo', '2': 'Información de Subtítulos'}},
 #==================== Playback Episodes
 {'setting_id': 'auto_play_episode', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'results_quality_episode', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
 {'setting_id': 'autoplay_quality_episode', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
 {'setting_id': 'autoplay_next_episode', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'autoplay_alert_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Window', '1': 'Notification'}},
-{'setting_id': 'autoplay_default_action', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Play', '1': 'Cancel', '2': 'Pause & Wait'}},
+{'setting_id': 'autoplay_alert_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ventana', '1': 'Notificación'}},
+{'setting_id': 'autoplay_default_action', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Reproducir', '1': 'Cancelar', '2': 'Pausar y Esperar'}},
 {'setting_id': 'autoplay_next_window_percentage', 'setting_type': 'action', 'setting_default': '95', 'min_value': '75', 'max_value': '99'},
-{'setting_id': 'autoplay_alert_timing', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Playback Percentage', '1': 'Chapter Info', '2': 'Subtitles Info', '3': 'IntroDB Info'}},
-{'setting_id': 'autoplay_skip_intro', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Off', '2': 'Auto', '1': 'Prompt'}},
+{'setting_id': 'autoplay_alert_timing', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Porcentaje de Reproducción', '1': 'Información del capítulo', '2': 'Información de Subtítulos', '3': 'Información de IntroDB'}},
+{'setting_id': 'autoplay_skip_intro', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Desactivado', '2': 'Automático', '1': 'Preguntar'}},
 {'setting_id': 'skip_intro_all_episodes', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'autoplay_watching_check', 'setting_type': 'action', 'setting_default': '3', 'min_value': '0', 'max_value': '5'},
 {'setting_id': 'autoscrape_next_episode', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'autoscrape_next_window_percentage', 'setting_type': 'action', 'setting_default': '95', 'min_value': '75', 'max_value': '99'},
-{'setting_id': 'autoscrape_alert_timing', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Playback Percentage', '1': 'Chapter Info', '2': 'Subtitles Info', '3': 'IntroDB Info'}},
+{'setting_id': 'autoscrape_alert_timing', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'Porcentaje de Reproducción', '1': 'Información del Capítulo', '2': 'Información de Subtítulos', '3': 'Información de IntroDB'}},
 {'setting_id': 'autoscrape_confirm', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'auto_resume_episode', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Never', '1': 'Always', '2': 'Autoplay Only'}},
+{'setting_id': 'auto_resume_episode', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Nunca', '1': 'Siempre', '2': 'Solo Reproducción Automática'}},
 #==================== Playback Utilities
 {'setting_id': 'playback.limit_resolve', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'easynews.playback_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'Retry', '2': 'No Seek', '3': 'Both'}},
@@ -1369,14 +1460,14 @@ def default_settings():
 {'setting_id': 'tmdb.account_session_id', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'reuse_language_invoker', 'setting_type': 'string', 'setting_default': 'true'},
 {'setting_id': 'addon_icon_choice_name', 'setting_type': 'string', 'setting_default': 'icon.png'},
-{'setting_id': 'widget_refresh_timer_name', 'setting_type': 'string', 'setting_default': 'Off'},
-{'setting_id': 'mpaa_region_display_name', 'setting_type': 'string', 'setting_default': 'United States'},
-{'setting_id': 'lists_cache_duraton_display_name', 'setting_type': 'string', 'setting_default': '1 Day'},
-{'setting_id': 'results.limit_number_quality_name', 'setting_type': 'string', 'setting_default': 'Off'},
-{'setting_id': 'results.limit_number_total_name', 'setting_type': 'string', 'setting_default': 'Off'},
-{'setting_id': 'rpdb_format_name', 'setting_type': 'string', 'setting_default': 'Default'},
+{'setting_id': 'widget_refresh_timer_name', 'setting_type': 'string', 'setting_default': 'Desactivado'},
+{'setting_id': 'mpaa_region_display_name', 'setting_type': 'string', 'setting_default': 'Estados Unidos'},
+{'setting_id': 'lists_cache_duraton_display_name', 'setting_type': 'string', 'setting_default': '1 Día'},
+{'setting_id': 'results.limit_number_quality_name', 'setting_type': 'string', 'setting_default': 'Desactivado'},
+{'setting_id': 'results.limit_number_total_name', 'setting_type': 'string', 'setting_default': 'Desactivado'},
+{'setting_id': 'rpdb_format_name', 'setting_type': 'string', 'setting_default': 'Predeterminado'},
 {'setting_id': 'window_theme_contrast', 'setting_type': 'string', 'setting_default': 'FF4a4347'},
-{'setting_id': 'window_theme_name', 'setting_type': 'string', 'setting_default': 'Dark'},
+{'setting_id': 'window_theme_name', 'setting_type': 'string', 'setting_default': 'Oscuro'},
 {'setting_id': 'window_theme_opacity_name', 'setting_type': 'string', 'setting_default': '80%'},
 {'setting_id': 'external_scraper.module', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'trakt.next_daily_clear', 'setting_type': 'string', 'setting_default': '0'},
@@ -1385,28 +1476,28 @@ def default_settings():
 {'setting_id': 'trakt.token', 'setting_type': 'string', 'setting_default': '0'},
 {'setting_id': 'playback.opensubs_token', 'setting_type': 'string', 'setting_default': '0'},
 {'setting_id': 'tmdblist.list_sort', 'setting_type': 'string', 'setting_default': '0'},
-{'setting_id': 'tmdblist.list_sort_name', 'setting_type': 'string', 'setting_default': 'Title'},
+{'setting_id': 'tmdblist.list_sort_name', 'setting_type': 'string', 'setting_default': 'Título'},
 {'setting_id': 'personal_list.list_sort', 'setting_type': 'string', 'setting_default': '0'},
-{'setting_id': 'personal_list.list_sort_name', 'setting_type': 'string', 'setting_default': 'Title'},
+{'setting_id': 'personal_list.list_sort_name', 'setting_type': 'string', 'setting_default': 'Título'},
 {'setting_id': 'rd.client_id', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'rd.refresh', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'rd.secret', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'results.sort_order', 'setting_type': 'string', 'setting_default': '1'},
-{'setting_id': 'folder1.display_name', 'setting_type': 'string', 'setting_default': 'Folder 1'},
-{'setting_id': 'folder1.movies_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder1.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder2.display_name', 'setting_type': 'string', 'setting_default': 'Folder 2'},
-{'setting_id': 'folder2.movies_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder2.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder3.display_name', 'setting_type': 'string', 'setting_default': 'Folder 3'},
-{'setting_id': 'folder3.movies_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder3.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder4.display_name', 'setting_type': 'string', 'setting_default': 'Folder 4'},
-{'setting_id': 'folder4.movies_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder4.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder5.display_name', 'setting_type': 'string', 'setting_default': 'Folder 5'},
-{'setting_id': 'folder5.movies_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
-{'setting_id': 'folder5.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'None', 'browse_mode': '0'},
+{'setting_id': 'folder1.display_name', 'setting_type': 'string', 'setting_default': 'Carpeta 1'},
+{'setting_id': 'folder1.movies_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder1.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder2.display_name', 'setting_type': 'string', 'setting_default': 'Carpeta 2'},
+{'setting_id': 'folder2.movies_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder2.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder3.display_name', 'setting_type': 'string', 'setting_default': 'Carpeta 3'},
+{'setting_id': 'folder3.movies_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder3.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder4.display_name', 'setting_type': 'string', 'setting_default': 'Carpeta 4'},
+{'setting_id': 'folder4.movies_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder4.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder5.display_name', 'setting_type': 'string', 'setting_default': 'Carpeta 5'},
+{'setting_id': 'folder5.movies_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
+{'setting_id': 'folder5.tv_shows_directory', 'setting_type': 'path', 'setting_default': 'Ninguno', 'browse_mode': '0'},
 {'setting_id': 'extras.enabled', 'setting_type': 'string', 'setting_default': '2050,2051,2052,2053,2054,2055,2056,2057,2058,2059,2060,2061,2062,2063,2064,2065,2066'},
 {'setting_id': 'extras.order', 'setting_type': 'string', 'setting_default': '2050,2051,2052,2053,2054,2055,2056,2057,2058,2059,2060,2061,2062,2063,2064,2065,2066'},
 {'setting_id': 'rescrape.enabled', 'setting_type': 'string', 'setting_default': 'cache_ignored,imdb_year,with_all,episode_group,ignore_filters,full_scrape'},

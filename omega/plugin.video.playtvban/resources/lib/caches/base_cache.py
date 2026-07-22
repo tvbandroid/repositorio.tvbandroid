@@ -67,7 +67,9 @@ expires integer, unique (provider, db_type, tmdb_id, title, year, season, episod
 'tmdb_lists_db': (
 'CREATE TABLE IF NOT EXISTS tmdb_lists (id text unique, data text, expires integer)',),
 'random_widgets_db': (
-'CREATE TABLE IF NOT EXISTS random_widgets (id text unique, data text, expires integer)',)
+'CREATE TABLE IF NOT EXISTS random_widgets (id text unique, data text, expires integer)',),
+'list_sort_db': (
+'CREATE TABLE IF NOT EXISTS list_sort (scope text unique, spec text)',)
 		}
 
 def locations():
@@ -75,7 +77,7 @@ def locations():
 'navigator_db': 'navigator.db', 'watched_db': 'watched.db', 'favorites_db': 'favourites.db', 'settings_db': 'settings.db', 'trakt_db': 'traktcache.db', 'simkl_db': 'simklcache.db', 'mdblist_db': 'mdblistcache.db',
 'maincache_db': 'maincache.db', 'metacache_db': 'metacache.db', 'debridcache_db': 'debridcache.db', 'lists_db': 'lists.db', 'tmdb_lists_db': 'tmdb_lists.db',
 'discover_db': 'discover.db', 'external_db': 'external.db', 'episode_groups_db': 'episode_groups.db', 'personal_lists_db': 'personal_lists.db',
-'random_widgets_db': 'random_widgets.db'
+'random_widgets_db': 'random_widgets.db', 'list_sort_db': 'list_sort.db'
 			}
 
 def database_locations(database_name):
@@ -244,6 +246,11 @@ def clear_cache(cache_type, silent=False):
 		if not _confirm(): return
 		from apis.imdb_api import clear_imdb_cache
 		success = clear_imdb_cache()
+	elif cache_type == 'subtitles':
+		if not _confirm(): return
+		from indexers.subtitles import clear_subtitles_cache
+		clear_subtitles_cache()
+		success = True
 	elif cache_type == 'pm_cloud':
 		if not _confirm(): return
 		from apis.premiumize_api import Premiumize
@@ -284,7 +291,7 @@ def clear_cache(cache_type, silent=False):
 		if not _confirm(): return
 		from caches.main_cache import main_cache
 		success = main_cache.delete_all()
-	if not silent and success: kodi_utils.notification('Correcto')
+	if not silent and success and cache_type not in ('trakt', 'simkl', 'mdblist'): kodi_utils.notification('Correcto')
 	return success
 
 def clear_all_cache():
@@ -292,10 +299,11 @@ def clear_all_cache():
 	from modules.search import clear_easynews_search_history
 	progressDialog = kodi_utils.progress_dialog()
 	line = 'Limpiando....[CR]%s'
-	caches = (('meta', 'Meta Cache'), ('internal_scrapers', 'Internal Scrapers Cache'), ('external_scrapers', 'External Scrapers Cache'), ('trakt', 'Trakt Cache'),
-			('simkl', 'Simkl Cache'), ('mdblist', 'MDBList Cache'), ('imdb', 'IMDb Cache'), ('list', 'List Data Cache'), ('ai_functions', 'AI Data Cache'), ('tmdb_list', 'TMDb Personal List Cache'), ('main', 'Main Cache'),
-			('pm_cloud', 'Premiumize Cloud'), ('rd_cloud', 'Real Debrid Cloud'), ('ad_cloud', 'All Debrid Cloud'),
-			('oc_cloud', 'Offcloud Cloud'), ('tb_cloud', 'TorBox Cloud'))
+	caches = (('meta', 'Meta Cache'), ('ai_functions', 'AI Data Cache'), ('list', 'List Data Cache'), ('main', 'Main Cache'),
+			('tmdb_list', 'TMDb Personal List Cache'), ('imdb', 'IMDb Cache'), ('mdblist', 'MDBList Cache'), ('simkl', 'Simkl Cache'),
+			('trakt', 'Trakt Cache'), ('subtitles', 'Subtitles Cache'), ('internal_scrapers', 'Internal Scrapers Cache'),
+			('external_scrapers', 'External Scrapers Cache'), ('ad_cloud', 'All Debrid Cloud'), ('oc_cloud', 'Offcloud Cloud'),
+			('pm_cloud', 'Premiumize Cloud'), ('rd_cloud', 'Real Debrid Cloud'), ('tb_cloud', 'TorBox Cloud'))
 	for count, cache_type in enumerate(caches, 1):
 		try:
 			progressDialog.update(line % (cache_type[1]), int(float(count) / float(len(caches)) * 100))

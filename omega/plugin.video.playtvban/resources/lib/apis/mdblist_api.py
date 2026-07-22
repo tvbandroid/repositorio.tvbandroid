@@ -2,11 +2,10 @@
 import json
 import time
 import requests
-from operator import itemgetter
 from caches import mdblist_cache
 from caches.settings_cache import get_setting, set_setting
-from modules import kodi_utils, settings
-from modules.utils import sort_for_article, paginate_list, get_datetime, TaskPool, make_thread_list, copy2clip, make_qrcode, make_tinyurl
+from modules import kodi_utils, settings, list_sort
+from modules.utils import paginate_list, get_datetime, TaskPool, make_thread_list, copy2clip, make_qrcode, make_tinyurl
 
 BASE_URL = 'https://api.mdblist.com/%s'
 _OAUTH_DEVICE_URL = 'https://api.mdblist.com/oauth/device-authorization/'
@@ -19,11 +18,11 @@ def _mdblist_token():
 	from caches.settings_cache import settings_cache
 	token = settings_cache.read_db_value('mdblist.token')
 	if token in (None, '0', '', 'empty_setting'):
-		token = get_setting('playtvban.mdblist.token', '0')
+		token = get_setting('redlight.mdblist.token', '0')
 	return token
 
 def _mdblist_oauth_active():
-	refresh = get_setting('playtvban.mdblist.refresh', '0')
+	refresh = get_setting('redlight.mdblist.refresh', '0')
 	return refresh not in (None, '0', '', 'empty_setting')
 
 def call_mdblist(path, params=None, json_data=None, method=None):
@@ -175,6 +174,29 @@ def _mdbl_item_to_list_entry(item, media_kind):
 		except: pass
 	return None
 
+def mdbl_list_media_type(list_item, fallback='movie'):
+	"""Route param for build_mdbl_list: movie | tvshow from MDBList list metadata."""
+	if not isinstance(list_item, dict):
+		return 'tvshow' if fallback in ('tv', 'tvshow', 'show', 'shows', 'series') else 'movie'
+	mediatype = (list_item.get('mediatype') or list_item.get('media_type') or '').lower()
+	if mediatype in ('show', 'shows', 'tvshow', 'tv', 'series'):
+		return 'tvshow'
+	if mediatype in ('movie', 'movies'):
+		return 'movie'
+	if fallback in ('tv', 'tvshow', 'show', 'shows', 'series'):
+		return 'tvshow'
+	return 'movie'
+
+def mdbl_unified_item_tmdb_id(item):
+	"""Resolve TMDb id from unified list item payloads (nested show/movie blocks)."""
+	entry = _mdbl_item_to_list_entry(item, _mdbl_item_media_kind(item))
+	if not entry or not entry.get('id'):
+		return None
+	try:
+		return int(entry['id'])
+	except:
+		return None
+
 def _mdbl_personal_list(original_list, media_kind):
 	is_movie = media_kind in ('movie', 'movies')
 	key = 'movies' if is_movie else 'shows'
@@ -213,11 +235,11 @@ def mdblist_poll_device(device_data):
 	qr_code = make_qrcode(auth_url) or ''
 	copy2clip(auth_url)
 	short_url = make_tinyurl(auth_url)
-	p_dialog_insert = '[CR]O visita [B]%s[/B]' % short_url if short_url else ''
+	p_dialog_insert = '[CR]OR visit [B]%s[/B]' % short_url if short_url else ''
 	verify_display = (device_data.get('verification_uri') or device_data.get('verification_url') or 'mdblist.com/oauth/device').replace('https://', '')
-	content = ('Introduce [B]%s[/B] en [B]%s[/B][CR]O escanea el [B]código QR[/B][CR]Enlace copiado al portapapeles%s[CR][CR]'
-		'Esperando autorización...' % (user_code, verify_display, p_dialog_insert))
-	progress = kodi_utils.progress_dialog('Autorizar MDBList', qr_code)
+	content = ('Enter [B]%s[/B] at [B]%s[/B][CR]OR scan the [B]QR Code[/B][CR]Link copied to clipboard%s[CR][CR]'
+		'Waiting for authorisation...' % (user_code, verify_display, p_dialog_insert))
+	progress = kodi_utils.progress_dialog('MDBList Authorise', qr_code)
 	progress.update(content, 0)
 	start = time.time()
 	while time.time() - start < expires_in:
@@ -242,26 +264,26 @@ def mdblist_poll_device(device_data):
 
 def mdblist_authenticate(dummy=''):
 	device_data = mdblist_get_device_code()
-	if not device_data or not device_data.get('user_code'): return kodi_utils.notification('Autorización de MDBList Fallida', 3000)
+	if not device_data or not device_data.get('user_code'): return kodi_utils.notification('MDBList Authorisation Failed', 3000)
 	token_result = mdblist_poll_device(device_data)
-	if not token_result: return kodi_utils.notification('Autorización de MDBList Cancelada', 3000)
+	if not token_result: return kodi_utils.notification('MDBList Authorisation Canceled', 3000)
 	access_token = token_result.get('access_token')
-	if not access_token: return kodi_utils.notification('Autorización de MDBList Fallida', 3000)
+	if not access_token: return kodi_utils.notification('MDBList Authorisation Failed', 3000)
 	set_setting('mdblist.token', access_token)
 	set_setting('mdblist.refresh', token_result.get('refresh_token') or '0')
 	from caches.settings_cache import settings_cache
 	settings_cache.clear_db_cache()
 	user_info = call_mdblist('user') or {}
-	set_setting('mdblist.user', str(user_info.get('username') or user_info.get('user_id') or 'Usuario de MDBList'))
+	set_setting('mdblist.user', str(user_info.get('username') or user_info.get('user_id') or 'MDBList User'))
 	settings_cache.clear_db_cache()
 	mdblist_cache.clear_mdblist_collection_watchlist_data('watchlist')
 	try: _mdbl_watchlist_raw()
 	except: pass
 	switched = settings.offer_watched_provider(3, 'MDBList')
-	kodi_utils.notification('Cuenta de MDBList Autorizada', 3000)
+	kodi_utils.notification('MDBList Account Authorised', 3000)
 	if switched:
 		try: mdblist_sync_activities(force_update=True)
-		except Exception as e: kodi_utils.logger('MDBList', 'Sincronización posterior a la autorización fallida: %s' % e)
+		except Exception as e: kodi_utils.logger('MDBList', 'Post-auth sync failed: %s' % e)
 	try: kodi_utils.container_refresh()
 	except: pass
 	return True
@@ -272,24 +294,24 @@ def mdblist_revoke_authentication(dummy=''):
 	set_setting('mdblist.refresh', '0')
 	settings.fallback_watched_provider_on_revoke(3)
 	mdblist_cache.clear_all_mdblist_cache_data(silent=True, refresh=False)
-	kodi_utils.notification('Autorización de MDBList Restablecida', 3000)
+	kodi_utils.notification('MDBList Authorisation Reset', 3000)
 
 def mdblist_force_sync(params=None):
-	if not settings.mdblist_user_active(): return kodi_utils.notification('La cuenta de MDBList no está autorizada', 3000)
-	progress = kodi_utils.progress_dialog('Sincronización de MDBList')
-	progress.update('Sincronizando con MDBList...', 0)
+	if not settings.mdblist_user_active(): return kodi_utils.notification('MDBList account not authorised', 3000)
+	progress = kodi_utils.progress_dialog('MDBList Sync')
+	progress.update('Syncing with MDBList...', 0)
 	status = 'failed'
 	try:
 		status = mdblist_sync_activities(force_update=True, progress=progress)
 	except Exception as e:
-		kodi_utils.logger('MDBList', 'Error en la sincronización forzada: %s' % e)
+		kodi_utils.logger('MDBList', 'Force sync failed: %s' % e)
 		status = 'failed'
 	finally:
 		kodi_utils.close_progress_dialog(progress)
 	if status == 'canceled': return status
-	if status == 'failed': kodi_utils.notification('Sincronización de MDBList Fallida', 3000)
+	if status == 'failed': kodi_utils.notification('MDBList Sync Failed', 3000)
 	elif status != 'no account':
-		kodi_utils.notification('Sincronización de MDBList Completada', 3000)
+		kodi_utils.notification('MDBList Sync Complete', 3000)
 		kodi_utils.kodi_refresh()
 	return status
 
@@ -417,8 +439,8 @@ def mdblist_hide_unhide_progress_items(params):
 	mdblist_cache.mdblist_cache.delete(_MDBL_DROPPED_CACHE_KEY)
 	mdblist_sync_activities()
 	kodi_utils.kodi_refresh()
-	if action == 'hide': kodi_utils.notification('Eliminado del Progreso de MDBList', 3000)
-	else: kodi_utils.notification('Eliminado de Eliminados de MDBList', 3000)
+	if action == 'hide': kodi_utils.notification('Dropped from MDBList Progress', 3000)
+	else: kodi_utils.notification('Removed from MDBList Dropped', 3000)
 
 def mdblist_indicators_movies(watched_info):
 	insert_list = []
@@ -537,21 +559,18 @@ def mdblist_watchlist(media_kind, page_no):
 			if key == 'movies' and kind == 'movie': original_list.append(item)
 			elif key == 'shows' and kind == 'show': original_list.append(item)
 	if not original_list:
-		 kodi_utils.logger('MDBList Watchlist', 'No Hay %s Elementos (películas=%s series=%s)' % (
+		kodi_utils.logger('MDBList Watchlist', 'No %s items (movies=%s shows=%s)' % (
 			media_kind, len(raw.get('movies') or []), len(raw.get('shows') or [])))
 	else:
-		kodi_utils.logger('MDBList Watchlist', '%s: %s Elementos' % (media_kind, len(original_list)))
+		kodi_utils.logger('MDBList Watchlist', '%s: %s items' % (media_kind, len(original_list)))
 	normalized = []
 	for item in original_list:
 		entry = _mdbl_item_to_list_entry(item, media_kind)
 		if entry: normalized.append(entry)
 	if original_list and not normalized:
-		kodi_utils.logger('MDBList Watchlist', 'No Se Pudieron Resolver los IDs de TMDb de %s Elementos Originales' % len(original_list))
+		kodi_utils.logger('MDBList Watchlist', 'Could not resolve TMDb ids from %s raw items' % len(original_list))
 	original_list = normalized
-	sort_key = settings.lists_sort_order('watchlist')
-	if sort_key == 2: original_list.sort(key=itemgetter('release_date'), reverse=True)
-	elif sort_key == 1: original_list.sort(key=itemgetter('watchlist_at'), reverse=True)
-	else: original_list = sort_for_article(original_list, 'title', settings.ignore_articles())
+	original_list = list_sort.sort_source(original_list, 'mdblist.watchlist', media_kind, 'mdblist_watchlist')
 	is_home = kodi_utils.external()
 	if settings.paginate(is_home): return paginate_list(original_list, page_no, settings.page_limit(is_home))
 	return original_list, 1
@@ -559,10 +578,7 @@ def mdblist_watchlist(media_kind, page_no):
 def mdblist_collection(media_kind, page_no):
 	string, url = 'mdblist_collection', 'sync/collection'
 	original_list = _mdbl_personal_list(_mdbl_collection_watchlist_items(string, url), media_kind)
-	sort_key = settings.lists_sort_order('collection')
-	if sort_key == 2: original_list.sort(key=itemgetter('year'), reverse=True)
-	elif sort_key == 1: original_list.sort(key=itemgetter('collected_at'), reverse=True)
-	else: original_list = sort_for_article(original_list, 'title', settings.ignore_articles())
+	original_list = list_sort.sort_source(original_list, 'mdblist.collection', media_kind, 'mdblist_collection')
 	is_home = kodi_utils.external()
 	if settings.paginate(is_home): return paginate_list(original_list, page_no, settings.page_limit(is_home))
 	return original_list, 1
@@ -621,7 +637,7 @@ def mdblist_add_to_watchlist(tmdb_id, media_type, imdb_id=None):
 	result = call_mdblist('watchlist/items/add', json_data=_mdblist_list_payload(media_type, tmdb_id, imdb_id), method='post')
 	if isinstance(result, dict) and result.get('added', {}).get('movies', 0) + result.get('added', {}).get('shows', 0) > 0:
 		mdblist_sync_activities()
-		return kodi_utils.notification('Añadido a la Lista de Seguimiento de MDBList', 3000)
+		return kodi_utils.notification('Añadido a la Lista de seguimiento de MDBList', 3000)
 	return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
 
 def mdblist_remove_from_watchlist(tmdb_id, media_type, imdb_id=None):
@@ -629,7 +645,7 @@ def mdblist_remove_from_watchlist(tmdb_id, media_type, imdb_id=None):
 	if isinstance(result, dict) and result.get('removed', {}).get('movies', 0) + result.get('removed', {}).get('shows', 0) > 0:
 		mdblist_sync_activities()
 		kodi_utils.kodi_refresh()
-		return kodi_utils.notification('Eliminado de la Lista de Seguimiento de MDBList', 3000)
+		return kodi_utils.notification('Eliminado de la Lista de seguimiento de MDBList', 3000)
 	return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
 
 def mdblist_add_to_library(tmdb_id, media_type, imdb_id=None):
@@ -678,55 +694,55 @@ def _mdbl_item_in_dropped(tmdb_id):
 	return tmdb_id in mdblist_get_dropped_items()
 
 def mdblist_manager_choice(params):
-	if not settings.mdblist_user_active(): return kodi_utils.notification('No Hay Ninguna Cuenta MDBList Activa', 3500)
+	if not settings.mdblist_user_active(): return kodi_utils.notification('No hay una Cuenta de MDBList Activa', 3500)
 	media_type = params.get('media_type') or params.get('content') or 'movie'
 	list_media = 'movie' if media_type == 'movie' else 'tvshow'
 	icon = params.get('icon') or kodi_utils.get_icon('mdblist')
 	tmdb_id, imdb_id, tvdb_id = params.get('tmdb_id'), params.get('imdb_id'), params.get('tvdb_id')
 	choices = []
 	if _mdbl_item_in_watchlist(list_media, tmdb_id):
-		choices.append(('Eliminar de la [B]Lista de Seguimiento de MDBList[/B]', 'remove_watchlist'))
+		choices.append(('Eliminar de la [B]Lista de seguimiento de MDBList[/B]', 'remove_watchlist'))
 	else:
-		choices.append(('Añadir a la [B]Lista de Seguimiento de MDBList[/B]', 'add_watchlist'))
+		choices.append(('Añadir a [B]Lista de seguimiento de MDBList[/B]', 'add_watchlist'))
 	if _mdbl_item_in_library(list_media, tmdb_id):
-		choices.append(('Eliminar de la [B]Biblioteca de MDBList[/B]', 'remove_library'))
+		choices.append(('Eliminar de [B]Biblioteca de MDBList[/B]', 'remove_library'))
 	else:
-		choices.append(('Añadir a la [B]Biblioteca de MDBList[/B]', 'add_library'))
+		choices.append(('Añadir a [B]Biblioteca de MDBList[/B]', 'add_library'))
 	if list_media != 'movie':
 		if _mdbl_item_in_dropped(tmdb_id):
-			choices.append(('Restaurar [B]Serie[/B]', 'undrop'))
+			choices.append(('Deshacer [B]TV Show[/B]', 'undrop'))
 		else:
-			choices.append(('Eliminar del Progreso [B]Serie[/B]', 'drop'))
+			choices.append(('Descartar [B]TV Show[/B]', 'drop'))
 	choices.extend([
 		('Marcar como [B]Visto[/B]', 'mark_watched'),
-		('Marcar como [B]No Visto[/B]', 'mark_unwatched'),
-		('Restablecer [B]Progreso[/B]', 'reset_scrobble'),
-		('Abrir [B]Lista de Seguimiento de MDBList[/B]', 'open_watchlist'),
+		('Marcar como [B]No visto[/B]', 'mark_unwatched'),
+		('Restablecer [B]Scrobble[/B]', 'reset_scrobble'),
+		('Abrir [B]Lista de seguimiento de MDBList[/B]', 'open_watchlist'),
 		('Abrir [B]Biblioteca de MDBList[/B]', 'open_library'),
 	])
 	if list_media != 'movie':
-		choices.append(('Abrir [B]Series Eliminadas del Progreso[/B]', 'open_dropped'))
+		choices.append(('Abrir [B]TV Shows descartadas[/B]', 'open_dropped'))
 	choices.extend([
-		('Abrir [B]Listas Favoritas[/B]', 'open_liked_lists'),
-		('Abrir [B]Mis Listas MDBList[/B]', 'open_my_lists'),
+		('Abrir [B]Listas que me gustan[/B]', 'open_liked_lists'),
+		('Abrir [B]Mis listas de MDBList[/B]', 'open_my_lists'),
 		('Actualizar Widgets', 'refresh'),
 	])
 	list_items = [{'line1': item[0], 'icon': icon} for item in choices]
-	choice = kodi_utils.select_dialog([i[1] for i in choices], **{'items': json.dumps(list_items), 'heading': 'Gestor de MDBList'})
+	choice = kodi_utils.select_dialog([i[1] for i in choices], **{'items': json.dumps(list_items), 'heading': 'Administrador de MDBList'})
 	if choice is None: return
 	if choice == 'refresh':
 		kodi_utils.kodi_refresh()
-		return kodi_utils.notification('Widgets Actualizados', 2500)
-	watchlist_label = 'Lista de Seguimiento de Películas' if list_media == 'movie' else 'Lista de Seguimiento de Series'
-	library_label = 'Biblioteca de Películas' if list_media == 'movie' else 'Biblioteca de Series'
+		return kodi_utils.notification('Widgets actualizados', 2500)
+	watchlist_label = 'Lista de seguimiento de películas' if list_media == 'movie' else 'Lista de seguimiento de TV Shows'
+	library_label = 'Biblioteca de películas' if list_media == 'movie' else 'Biblioteca de TV Shows'
 	watchlist_mode = 'build_movie_list' if list_media == 'movie' else 'build_tvshow_list'
 	library_mode = 'build_movie_list' if list_media == 'movie' else 'build_tvshow_list'
 	open_modes = {
 		'open_watchlist': {'mode': watchlist_mode, 'action': 'mdblist_watchlist', 'category_name': watchlist_label},
 		'open_library': {'mode': library_mode, 'action': 'mdblist_collection', 'category_name': library_label},
-		'open_dropped': {'mode': 'build_tvshow_list', 'action': 'mdblist_droplist', 'category_name': 'Series Eliminadas del Progreso'},
-		'open_liked_lists': {'mode': 'mdblist.get_mdbl_liked_lists', 'name': 'Listas Favoritas', 'media_type': media_type},
-		'open_my_lists': {'mode': 'mdblist.get_mdbl_lists', 'name': 'Mis Listas', 'media_type': media_type},
+		'open_dropped': {'mode': 'build_tvshow_list', 'action': 'mdblist_droplist', 'category_name': 'TV Shows descartadas'},
+		'open_liked_lists': {'mode': 'mdblist.get_mdbl_liked_lists', 'name': 'Listas que me gustan', 'media_type': media_type},
+		'open_my_lists': {'mode': 'mdblist.get_mdbl_lists', 'name': 'Mis listas', 'media_type': media_type},
 	}
 	if choice in open_modes:
 		return kodi_utils.container_update(open_modes[choice])

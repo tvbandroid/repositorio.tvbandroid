@@ -12,9 +12,9 @@ def _trakt_setting(setting_id, fallback=''):
 	return val
 from caches.main_cache import cache_object
 from caches.lists_cache import lists_cache_object
-from modules import kodi_utils, settings
+from modules import kodi_utils, settings, list_sort
 from modules.metadata import movie_meta_external_id, tvshow_meta_external_id
-from modules.utils import sort_list, sort_for_article, get_datetime, timedelta, replace_html_codes, copy2clip, make_qrcode, make_tinyurl, \
+from modules.utils import get_datetime, timedelta, replace_html_codes, copy2clip, make_qrcode, make_tinyurl, \
 							TaskPool, jsondate_to_datetime as js2date
 # logger = kodi_utils.logger
 
@@ -29,11 +29,11 @@ def _trakt_fetch_page_limit(base_params):
 	return TRAKT_PAGE_LIMIT
 
 def no_client_key():
-	kodi_utils.notification('Por favor, establece una Clave de ID de Cliente de Trakt válida')
+	kodi_utils.notification('Por favor, establece una Clave Client ID de Trakt válida')
 	return None
 
 def no_secret_key():
-	kodi_utils.notification('Por favor, establece una Clave Secreta de Cliente de Trakt válida')
+	kodi_utils.notification('Por favor, establece una Clave Client Secret de Trakt válida')
 	return None
 
 def get_trakt(params):
@@ -142,23 +142,23 @@ def trakt_get_device_code():
 def trakt_test_credentials():
 	CLIENT_ID = settings.trakt_client()
 	if CLIENT_ID in (None, 'empty_setting', ''):
-		return False, 'La Clave de ID de Cliente de Trakt no está establecida.'
+		return False, 'La Clave Client ID de Trakt no está establecida.'
 	CLIENT_SECRET = settings.trakt_secret()
 	if CLIENT_SECRET in (None, 'empty_setting', ''):
-		return False, 'La Clave Secreta de Cliente de Trakt no está establecida.'
+		return False, 'La Clave Client Secret de Trakt no está establecida.'
 	try:
 		headers = {'Content-Type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': CLIENT_ID}
 		response = requests.post('https://api.trakt.tv/oauth/device/code', json={'client_id': CLIENT_ID}, headers=headers, timeout=15)
 		if response.status_code == 200:
-			return True, 'Las claves de cliente de Trakt son válidas.'
+			return True, 'Las claves client de Trakt son válidas.'
 		try:
 			payload = response.json()
 			detail = payload.get('error_description') or payload.get('error') or ''
 		except: detail = ''
 		if not detail: detail = (response.text or '').strip() or 'No se devolvieron detalles.'
-		return False, 'Las claves de cliente de Trakt fallaron.[CR]Trakt rechazó el ID de cliente (HTTP %s).[CR]%s' % (response.status_code, detail)
+		return False, 'Las claves client de Trakt fallaron.[CR]Trakt rechazó client ID (HTTP %s).[CR]%s' % (response.status_code, detail)
 	except Exception as e:
-		return False, 'Las claves de cliente de Trakt fallaron.[CR]No se pudo conectar con Trakt: %s' % str(e)
+		return False, 'Las claves client de Trakt fallaron.[CR]No se pudo conectar con Trakt: %s' % str(e)
 
 def trakt_get_device_token(device_codes):
 	API_ENDPOINT = 'https://api.trakt.tv/%s'
@@ -438,9 +438,9 @@ def trakt_reset_scrobble(params):
 			if resume_id: trakt_progress('clear_progress', 'episode', tmdb_id, 0, season, episode, resume_id)
 			erase_bookmark('episode', tmdb_id, season, episode, 'true', 1)
 		else:
-			return kodi_utils.notification('Reset Scrobble is only available for movies and episodes', 3500)
+			return kodi_utils.notification('El reinicio de Scrobble solo está disponible para películas y episodios.', 3500)
 		trakt_sync_activities()
-		kodi_utils.notification('Success', 3000)
+		kodi_utils.notification('Éxito', 3000)
 	except:
 		kodi_utils.notification('Error', 3000)
 
@@ -460,7 +460,7 @@ def trakt_watchlist_lists(media_type, list_type=None):
 
 def trakt_collection(media_type, dummy_arg):
 	data = trakt_fetch_collection_watchlist('collection', media_type)
-	return settings.sort_trakt_sync_list(data, 'collection')
+	return list_sort.sort_source(data, 'trakt.collection', media_type, 'trakt_sync')
 
 def trakt_watchlist(media_type, dummy_arg):
 	data = trakt_fetch_collection_watchlist('watchlist', media_type)
@@ -489,7 +489,7 @@ def trakt_fetch_collection_watchlist(list_type, media_type):
 
 def add_to_list(user, slug, data):
 	result = call_trakt('/users/%s/lists/%s/items' % (user, slug), data=data)
-	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya está en la Lista', 3000)
+	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
 	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
@@ -604,7 +604,7 @@ def select_trakt_personal_lists(lists):
 
 def add_to_watchlist(data):
 	result = call_trakt('/sync/watchlist', data=data)
-	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya está en la Lista', 3000)
+	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
 	kodi_utils.notification('Éxito', 3000)
 	trakt_sync_activities()
@@ -695,12 +695,15 @@ def trakt_lists_with_media(media_type, imdb_id):
 	params = {'path': '%s/%s/lists/personal', 'path_insert': (media_type, imdb_id), 'params': {'limit': 100}, 'pagination': False}
 	return cache_object(_process, string, 'foo', False, 168)
 
-def get_trakt_list_contents(list_type, user, slug, with_auth, list_id=None, sort_by='default', sort_how='default'):
-	if sort_by == 'skip': skip_sort, custom_sort, method = True, False, None
-	else:
-		skip_sort = False
-		custom_sort = sort_by != 'default'
-		method = None if custom_sort else 'sort_by_headers'
+def get_trakt_list_contents(list_type, user, slug, with_auth, list_id=None, skip_sort=False):
+	# skip_sort is the random builders' flag: they reshuffle the payload themselves, so resolving
+	# and applying a sort first is wasted work. Everything else takes the list's own ordering.
+	# There is deliberately no caller-supplied sort: the ordering comes from the payload headers
+	# below and from the stored override, never from an argument. A parameter that could select a
+	# different `method` is what let two callers write two shapes into one cache key.
+	# Always ask for the sort headers. The disk cache key below does not encode `method`, so a row
+	# written by one caller is read back by all of them.
+	method = 'sort_by_headers'
 	if list_type == 'my_lists':
 		string = 'trakt_list_contents_%s_%s_%s' % (list_type, user, slug)
 		params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended': 'full'}, 'method': method, 'with_auth': with_auth, 'fetch_all': True}
@@ -712,17 +715,30 @@ def get_trakt_list_contents(list_type, user, slug, with_auth, list_id=None, sort
 		if user == 'Trakt Official': params = {'path': 'lists/%s/items', 'path_insert': slug, 'params': {'extended': 'full'}, 'method': method, 'fetch_all': True}
 		else: params = {'path': 'users/%s/lists/%s/items', 'path_insert': (user, slug), 'params': {'extended': 'full'}, 'method': method, 'with_auth': with_auth, 'fetch_all': True}
 	data = trakt_cache.cache_trakt_object(get_trakt, string, params) or []
+	# The list's declared order, as recorded in the cached row. 'default' is the standing-in value
+	# for a legacy bare-list row that carries no headers at all.
+	sort_by, sort_how = 'default', 'default'
+	# Unwrapped unconditionally, including when skip_sort is set: a cache row left behind by an
+	# older build, or by any caller at all, must never reach the enumerate() below as a dict.
+	if isinstance(data, dict):
+		sort_by, sort_how = data.get('sort_by', sort_by), data.get('sort_how', sort_how)
+		data = data.get('data') or []
+	elif not isinstance(data, list): data = []
 	if not skip_sort:
-		if not custom_sort:
-			if isinstance(data, dict) and 'data' in data:
-				sort_by, sort_how = data['sort_by'], data['sort_how']
-				data = data['data'] or []
-			elif not isinstance(data, list): data = []
+		# Guarded per item, like the extraction loop below: a season or episode row that is missing
+		# 'show' is one bad row, and it must cost that row its retitling, not the whole list render.
 		for i in data:
-			if i['type'] == 'season': i['season']['title'] = '%s - %s' % (i['show']['title'], i['season']['title'])
-			elif i['type'] == 'episode': i['episode']['title'] = '%s - %s' % (i['show']['title'], i['episode']['title'])
-			else: pass
-		data = sort_list(sort_by, sort_how, data, settings.ignore_articles())
+			try:
+				if i['type'] == 'season': i['season']['title'] = '%s - %s' % (i['show']['title'], i['season']['title'])
+				elif i['type'] == 'episode': i['episode']['title'] = '%s - %s' % (i['show']['title'], i['episode']['title'])
+				else: pass
+			except: pass
+		# The payload sort is the ordering this list already had, so it is what a list with no stored
+		# override must keep - resolving to DEFAULT_SPEC here would retitle-sort every user list
+		# belonging to anyone who never opened "Set Custom Sort", with no row left to migrate.
+		payload_spec = list_sort.trakt_list_fallback(sort_by, sort_how)
+		data = list_sort.sort_source(data, 'trakt.list:%s' % list_id, None, 'trakt_list', fallback=payload_spec) if list_id is not None \
+			else list_sort.apply(data, list_sort.parse_spec(payload_spec), list_sort.TRAKT_LIST, settings.ignore_articles())
 	results = []
 	results_append = results.append
 	for c, i in enumerate(data):
@@ -807,7 +823,7 @@ def trakt_like_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='post')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='post')
-		kodi_utils.notification('Éxito - Lista de Trakt Marcada como Favorita', 3000)
+		kodi_utils.notification('Éxito - Lista de Trakt Marcada como Me gusta', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True
@@ -821,7 +837,7 @@ def trakt_unlike_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='delete')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='delete')
-		kodi_utils.notification('Éxito - Lista de Trakt Ya No es Favorita', 3000)
+		kodi_utils.notification('Éxito - Lista de Trakt Desmarcada de Me gusta', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True

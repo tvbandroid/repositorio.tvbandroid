@@ -1092,9 +1092,9 @@
                           <visible>Container(2000).HasFocus(30)</visible>
                           <property name="setting_label">Incluir Contenido no Emitido en las Listas de Seguimiento de Trakt</property>
                           <property name="setting_type">boolean</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.show_unaired_watchlist)]</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.show_unaired_Lista de seguimiento)]</property>
                           <property name="setting_description">Habilita esta opción para mostrar contenido aún no emitido en sus listas de seguimiento de películas y series de Trakt. Si la desactiva, dicho contenido permanecerá oculto.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=show_unaired_watchlist)</onclick>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=show_unaired_Lista de seguimiento)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
@@ -1184,7 +1184,7 @@
                           <property name="setting_description">Introduzca el ID del Tipo de Vista para el Contenido de Archivos Premium.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=view.premium&amp;min_value=1)</onclick>
                       </item>
-        <!-- Contents Sort Order For Watched Progress -->
+        <!-- Orden de Clasificación del Contenido Según el Progreso Visto -->
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
                           <property name="setting_label">Orden de Clasificación del Contenido Según el Progreso Visto.</property>
@@ -1196,7 +1196,7 @@
                           <property name="setting_label">En Progreso</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.progress_name)]</property>
-                          <property name="setting_description">Elige el orden de clasificación para tus archivos multimedia en Progreso.</property>
+                          <property name="setting_description">Elige el orden de clasificación para tus contenidos En Progreso</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=sort.progress)</onclick>
                       </item>
                       <item>
@@ -1204,74 +1204,33 @@
                           <property name="setting_label">Vistos</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.watched_name)]</property>
-                          <property name="setting_description">Elige el orden de clasificación para tus contenidos multimedia Vistos.</property>
+                          <property name="setting_description">Elige el orden de clasificación para tus contenidos Vistos</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=sort.watched)</onclick>
                       </item>
-        <!-- Contents Sort Order For Simkl Lists -->
+        <!-- Orden de Clasificación de Listas -->
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Orden de Clasificación del Contenido para Listas Simkl</property>
+                          <property name="setting_label">Orden de Clasificación de Listas</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
-                          <property name="setting_label">Listas Simkl</property>
+                          <property name="setting_label">Películas</property>
                           <property name="setting_type">action</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.simkl_name)]</property>
-                          <property name="setting_description">Orden de clasificación para Simkl Plan to Watch, Viendo, Completado, En espera y Abandonado. La fecha de lanzamiento utiliza el año de Simkl o los metadatos de lanzamiento (TV utiliza el año de estreno cuando no se dispone de la fecha de emisión completa).</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=sort.simkl)</onclick>
-                      </item>
-        <!-- Contents Sort Order For Trakt Lists -->
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Orden de Clasificación del Contenido para las Listas de Trakt</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.default.movies_name)]</property>
+                          <property name="setting_description">Orden de clasificación predeterminado para las listas de películas - Lista de seguimiento, Colección, Simkl y MDBList. Las listas individuales pueden modificar este orden desde su Menú Contextual.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=sort_default_choice&amp;media_type=movies)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
-                          <property name="setting_label">Colección Trakt</property>
+                          <property name="setting_label">Series</property>
                           <property name="setting_type">action</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.collection_name)]</property>
-                          <property name="setting_description">Elige el orden de clasificación para tu Colección de Trakt. La fecha de lanzamiento utiliza la fecha de estreno de la película / la fecha de primera emisión en TV.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=sort.collection)</onclick>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.default.shows_name)]</property>
+                          <property name="setting_description">Orden de clasificación predeterminado para las listas de series - Lista de seguimiento, Colección, Simkl y MDBList. Las listas individuales pueden modificar este orden desde su Menú Contextual.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=sort_default_choice&amp;media_type=shows)</onclick>
                       </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
-                          <property name="setting_label">Lista de Seguimiento de Trakt</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.watchlist_name)]</property>
-                          <property name="setting_description">Elige el orden de clasificación para tu Contenido multimedia de la Lista de Seguimiento de Trakt. La fecha de lanzamiento utiliza la fecha de estreno de la película / la fecha de primera emisión en TV.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=sort.watchlist)</onclick>
-                      </item>
-        <!-- Contents Sort Order For TMDb Lists -->
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Orden de Clasificación del Contenido para las Listas de TMDb</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Lista de Seguimiento de TMDb</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.tmdbsort.watchlist_name)]</property>
-                          <property name="setting_description">Elige el orden de clasificación para los archivos multimedia de tu Lista de Seguimiento de TMDb.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=tmdbsort.watchlist)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Favoritos de TMDb</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.tmdbsort.favorites_name)]</property>
-                          <property name="setting_description">Elige el orden de clasificación para tus archivos multimedia Favoritos de TMDb.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=tmdbsort.favorites)</onclick>
-                      </item>
-        <!-- TMDb Lists -->
+        <!-- Listas de TMDb -->
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
                           <property name="setting_label">Listas TMDB</property>

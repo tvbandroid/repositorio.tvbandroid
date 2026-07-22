@@ -377,11 +377,11 @@ class SourcesResults(BaseDialog):
 				return (1, key)
 			return (2, key)
 		providers.sort(key=_provider_filter_sort_key)
-		qualities = [('Show [B]%s[/B] Only | [B]%d[/B] Results' % (i, quality_totals[i]), 'quality', i) for i in qualities]
-		providers = [('Show [B]%s[/B] Only | [B]%d[/B] Results' % (i, provider_totals[i]), 'provider', i) for i in providers]
+		qualities = [('Mostrar solo [B]%s[/B] | [B]%d[/B] resultados' % (i, quality_totals[i]), 'quality', i) for i in qualities]
+		providers = [('Mostrar solo [B]%s[/B] | [B]%d[/B] resultados' % (i, provider_totals[i]), 'provider', i) for i in providers]
 		data = []
-		if cache_functions_debrid: data.append(('Rescrape with External Cache Check [B]%s[/B]' % ('OFF' if self._any_cache_check_active() else 'ON'), 'special', 'cache_check_rescrape'))
-		if self.uncached_results: data.append(('Show [B]Uncached[/B] Only | [B]%d[/B] Results' % len(self.uncached_results), 'special', 'showuncached'))
+		if cache_functions_debrid: data.append(('Volver a buscar con comprobación de caché externa [B]%s[/B]' % ('DESACTIVADA' if self._any_cache_check_active() else 'ACTIVADA'), 'special', 'cache_check_rescrape'))
+		if self.uncached_results: data.append(('Mostrar solo resultados [B]sin caché[/B] | [B]%d[/B] resultados' % len(self.uncached_results), 'special', 'showuncached'))
 		data.extend(qualities)
 		data.extend(providers)
 		data.extend([('Filtrar por [B]Título[/B]...', 'special', 'title'), ('Filtrar por [B]Información[/B]...', 'special', 'extraInfo')])

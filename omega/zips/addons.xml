@@ -1679,7 +1679,7 @@ No se acepta ninguna responsabilidad por el uso de este addon.
 
 <addon id="plugin.video.liscatvband"
        name="[B][COLOR orangered]Lisca[COLOR white]TVband[/COLOR][/B]"
-       version="1.4.4"
+       version="1.4.5"
        provider-name="[COLOR darkorange]JoseaTeba[/COLOR]">
 
     <requires>
@@ -1715,7 +1715,7 @@ No se acepta ninguna responsabilidad por el uso de este addon.
         <platform>all</platform>
 
         <news>
-- Nuevo 1.2.4
+# Nuevo 1.2.4
         </news>
 
         <assets>

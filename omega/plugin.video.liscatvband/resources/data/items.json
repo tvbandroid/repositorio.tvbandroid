@@ -14,6 +14,13 @@
         "fanart": "https://i.imgur.com/a5Muv55.jpg"
     },
 	{
+    "type": "m3u",
+    "name": "[B][COLOR red]LG [COLOR orange]CHANNELS[/COLOR][/B]",
+    "url": "https://www.apsattv.com/eslg.m3u",
+    "logo": "https://i.ibb.co/qLqzKrKp/LGCH.png",
+    "fanart": "https://i.ibb.co/whcJCydJ/fanart-Llg.jpg"
+    },
+	{
         "type": "m3u",
         "name": "[B][COLOR red]RAKUTEN [COLOR white]TV[/B][/COLOR]",
         "url": "https://raw.githubusercontent.com/tvbandroid/repositorio.tvbandroid/refs/heads/master/tvlist/streams/rakutentv.m3u",

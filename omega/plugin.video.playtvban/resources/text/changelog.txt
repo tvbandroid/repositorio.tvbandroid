@@ -1,3 +1,26 @@
+[COLOR red][B]Versión 1.3.8[/B][/COLOR]
+- [B]Ajustes[/B]: El [B]Proveedor de estado de visualización[/B] y las herramientas de sincronización de Trakt/Simkl/MDBList (intervalo, actualizar widgets, forzar sincronización, borrar caché) se mueven de General a [B]Cuentas meta[/B]; el proveedor aparece en la parte superior; la sincronización/caché se encuentra debajo de cada servicio cuando está autorizado.
+
+- [B]Simkl[/B]: Las listas de estado (Planear para ver / Viendo / etc.) se ordenan nuevamente por título cuando el título es el criterio de ordenación activo; la obtención de listas ya no utiliza [I]ids_only[/I], que omitía los títulos y dejaba las listas en el orden de la API.
+
+- [B]Reproducción[/B]: [B]Limitar tamaño de reproducción automática (MB)[/B] en Películas/Episodios cuando la reproducción automática está activada; limita solo el tamaño del archivo de reproducción automática (valor predeterminado [B]0[/B] = Desactivado). La opción Seleccionar origen no se ve afectada; las carpetas en la nube y locales están exentas (#149).
+
+- [B]Mis servicios[/B]: En Configuración > General > Mis servicios, se muestran las cuentas autorizadas de Debrid/EasyNews como interruptores de activación/desactivación de alertas de caducidad por servicio (activado por defecto) cuando [B]Alerta cuando el servicio caduque en (días)[/B] no sea [B]0[/B]. El orden es alfabético; los servicios no autorizados permanecen ocultos.
+
+- [B]Siguientes episodios[/B] / [B]Preparación del siguiente episodio[/B]: las series que usan números de episodio absolutos dentro de las temporadas (por ejemplo, One Piece T23E1170) ya no omiten la lista; el siguiente S/E se resuelve a partir de las listas de episodios de TMDb en lugar de asumir que los episodios son del 1 al número de temporada (#144).
+- [B]Progreso[/B]: Las series finalizadas o canceladas ya no cuentan las temporadas no emitidas como marcadores de posición para el total de episodios emitidos (por ejemplo, un S2E1 en blanco después del final de la S1), por lo que títulos como I Parry Everything dejan de estar en progreso cuando se ven todos los episodios emitidos (#144).
+
+- [B]Reanudar[/B]: Las películas y episodios en progreso ahora pasan la duración total al punto de reanudación de Kodi para que los temas y los nodos dinámicos de variables de tema puedan calcular [B]EndTimeResume[/B] / progreso correctamente (#116).
+
+- [B]Siguientes episodios[/B]: [B]Incluir lista de seguimiento de indicadores de visualización/favoritos con luz roja[/B]: la lista de seguimiento ahora sigue los indicadores de visualización (lista de seguimiento de Trakt, plan de visualización de Simkl o lista de seguimiento de MDBList) en lugar de usar siempre Trakt. Los favoritos permanecen como locales con luz roja. Cuando los indicadores están en luz roja, la lista de seguimiento no tiene fuente.
+- [B]Trakt[/B]: Se cambió el nombre de [B]Colección[/B] a [B]Biblioteca[/B] en los menús, el Administrador de listas de Trakt, los accesos directos contextuales y los selectores de listas (coincide con el cambio de nombre del sitio web de Trakt). Las rutas de la API permanecen sin cambios.
+
+- [B]Ordenación de listas[/B]: Las secciones de estado de [B]Simkl[/B] (Planear para ver / Viendo / Completado / En espera / Abandonado) tienen cada una su propia [B]Ordenación personalizada[/B] para Películas y TV (ya no hay un orden compartido para todas las listas de Simkl). Una ordenación compartida previa de Simkl se copia en cada sección la primera vez que se usa y luego se borra, por lo que [B]Usar predeterminado[/B] en una sección vuelve correctamente a la configuración predeterminada de Contenido > Películas/TV.
+
+- [B]Ordenación de listas[/B]: Las listas de seguimiento, Favoritos y Recomendaciones de [B]TMDb[/B] tienen [B]Ordenación personalizada[/B] (Películas/TV por separado). La opción "Mis listas personalizadas" también muestra "Establecer orden personalizado" en el menú contextual (igual que en "Editar propiedades > Cambiar orden de clasificación"). El orden de visualización de "Mis listas de TMDb" en "Configuración" permanece sin cambios: solo ordena la lista de listas, no su contenido.
+
+- Consejos: nuevo consejo sobre "Orden de clasificación de listas" que abarca la configuración predeterminada, el orden personalizado por lista (Simkl/TMDb) y el cambio de nombre de la biblioteca de Trakt.
+
 [COLOR red][B]Versión 1.3.6[/B][/COLOR]
 - [B]Orden de clasificación de listas[/B]: Las películas y las series ahora tienen órdenes de clasificación predeterminados independientes (Configuración → Contenido → Orden de clasificación de listas). Esto se aplica a la lista de seguimiento (Watchlist), la colección, Simkl y MDBList; las listas individuales pueden modificar esta configuración desde el menú contextual o utilizar la opción "Usar predeterminado" para restablecerla. Un modelo de clasificación único y compartido sustituye a los mecanismos anteriores que dependían de cada proveedor; se conserva el orden existente tras la actualización, aunque la clasificación por título ahora no distingue entre mayúsculas y minúsculas (gracias a JMAN730 / #40).
 

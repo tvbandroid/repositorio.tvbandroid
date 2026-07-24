@@ -18,7 +18,7 @@ class OffcloudAPI:
 		self._sync_token()
 
 	def _sync_token(self):
-		self.token = get_setting('playtvban.oc.token', 'empty_setting')
+		self.token = get_setting('redlight.oc.token', 'empty_setting')
 
 	def _authorized(self):
 		return self.token not in ('empty_setting', '', None)
@@ -78,23 +78,23 @@ class OffcloudAPI:
 			return False, 'Offcloud: Unexpected status "%s"' % (result.get('status') or 'unknown')
 		return True, result
 
-def auth(self):
+	def auth(self):
 		self.token = ''
 		try:
 			response = oauth_session.post('%sdevice/code' % self.oauth_url, json={}, timeout=20)
 			payload = response.json()
 		except Exception:
-			return ok_dialog(text='No se pudo iniciar la Autorización de Offcloud')
+			return ok_dialog(text='No se puede iniciar la autorización de Offcloud.')
 		device_code = payload.get('device_code')
 		user_code = payload.get('user_code')
 		verify_url = payload.get('verification_uri_complete') or payload.get('verification_uri') or 'https://offcloud.com/activate'
 		if not device_code or not user_code:
-			return ok_dialog(text='Respuesta de Autorización de Offcloud no válida')
+			return ok_dialog(text='Respuesta de autorización de Offcloud no válida')
 		qr_code = make_qrcode(verify_url) or ''
 		copy2clip(verify_url)
-		p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visita: [B]offcloud.com/activate[/B][CR]O Introduce este Código: [B]%s[/B]' % user_code
-		content = 'Escanea el código QR%s[CR]' % p_dialog_insert
-		progress = progress_dialog('Autorizar Offcloud', qr_code)
+		p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visite: [B]offcloud.com/activate[/B][CR]E Introduzca este Código:[B]%s[/B]' % user_code
+		content = 'Por favor, Escanee el Código QR.%s[CR]' % p_dialog_insert
+		progress = progress_dialog('Auitorizar Offcloud', qr_code)
 		progress.update(content, 0)
 		expires_in = int(payload.get('expires_in') or 600)
 		poll_interval = int(payload.get('interval') or 5)
@@ -107,7 +107,7 @@ def auth(self):
 			if token_ttl <= 0:
 				try: progress.close()
 				except Exception: pass
-				return ok_dialog(text='Offcloud: Tiempo de Autorización agotado')
+				return ok_dialog(text='Offcloud: La autenticación ha caducado.')
 			sleep(poll_interval * 1000)
 			token_ttl -= poll_interval
 			progress.update(content, int(100 * (expires_in - token_ttl) / float(expires_in)))
@@ -143,7 +143,7 @@ def auth(self):
 		if username:
 			set_setting('oc.account_id', username)
 		self.clear_cache()
-		ok_dialog(heading='Offcloud', text='Cuenta Autorizada.')
+		ok_dialog(heading='Offcloud', text='Cuenta autorizada.')
 
 	def item_play_link(self, item):
 		url = item.get('url')
@@ -236,13 +236,13 @@ def auth(self):
 				label = title or poll.get('fileName') or 'Download'
 				label = clean_file_name(normalize(label))[:80]
 				self.clear_cache()
-				notification('Offcloud: Ready in Cloud Storage — %s' % label, 6000)
+				notification('Offcloud: Listo en el Almacenamiento en la Nube — %s' % label, 6000)
 				return
 			if status in ('error', 'failed'):
 				detail = poll.get('message') or poll.get('detail') or status
 				notification('Offcloud: Transfer failed — %s' % (title or detail), 5000)
 				return
-		notification('Offcloud: Still downloading — check Offcloud History', 4500)
+		notification('Offcloud: Todavía se está descargando; consulte el Historial de Offcloud.', 4500)
 
 	def add_to_cloud(self, url, title=''):
 		ok, result = self._parse_cloud_response(self.add_magnet(url))

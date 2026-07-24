@@ -373,7 +373,7 @@ def mark_tvshow(params):
 	except: tvdb_id = 0
 	watched_indicators = settings.watched_indicators()
 	progress_backround = kodi_progress_background()
-	progress_backround.create('[B]Please Wait..[/B]', '')
+	progress_backround.create('[B]Espere por Favor..[/B]', '')
 	if watched_indicators == 1:
 		if not trakt_watched_status_mark(action, 'shows', tmdb_id, tvdb_id): return notification('Error')
 		clear_trakt_collection_watchlist_data('watchlist', 'tvshow')
@@ -396,7 +396,7 @@ def mark_tvshow(params):
 			season_number = ep['season']
 			ep_number = ep['episode']
 			display = '%s - S%.2dE%.2d' % (title, int(season_number), int(ep_number))
-			progress_backround.update(int(float(count)/float(total)*100), '[B]Please Wait..[/B]', display)
+			progress_backround.update(int(float(count)/float(total)*100), '[B]Espere por Favor..[/B]', display)
 			episode_date, premiered = adjust_premiered_date(ep['premiered'], settings.date_offset())
 			if episode_date and current_date < episode_date: continue
 			insert_append(make_batch_insert(action, 'episode', tmdb_id, season_number, ep_number, last_played, title))
@@ -422,7 +422,7 @@ def mark_season(params):
 	elif watched_indicators == 3:
 		if not mdblist_watched_status_mark(action, 'season', tmdb_id, tvdb_id, season): return notification('Error')
 	progress_backround = kodi_progress_background()
-	progress_backround.create('[B]Please Wait..[/B]', '')
+	progress_backround.create('[B]Espere por Favor..[/B]', '')
 	current_date = get_datetime()
 	meta = metadata.tvshow_meta('tmdb_id', tmdb_id, settings.tmdb_api_key(), settings.mpaa_region(), get_datetime())
 	ep_data = metadata.episodes_meta(season, meta)
@@ -433,7 +433,7 @@ def mark_season(params):
 		display = '%s - S%.2dE%.2d' % (title, season_number, ep_number)
 		episode_date, premiered = adjust_premiered_date(item['premiered'], settings.date_offset())
 		if episode_date and current_date < episode_date: continue
-		progress_backround.update(int(float(count) / float(len(ep_data)) * 100), '[B]Please Wait..[/B]', display)
+		progress_backround.update(int(float(count) / float(len(ep_data)) * 100), '[B]Espere por Favor..[/B]', display)
 		insert_append(make_batch_insert(action, 'episode', tmdb_id, season_number, ep_number, last_played, title))
 	batch_watched_status_mark(watched_indicators, insert_list, action)
 	progress_backround.close()

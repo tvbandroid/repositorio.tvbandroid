@@ -78,23 +78,23 @@ class OffcloudAPI:
 			return False, 'Offcloud: Unexpected status "%s"' % (result.get('status') or 'unknown')
 		return True, result
 
-	def auth(self):
+def auth(self):
 		self.token = ''
 		try:
 			response = oauth_session.post('%sdevice/code' % self.oauth_url, json={}, timeout=20)
 			payload = response.json()
 		except Exception:
-			return ok_dialog(text='Unable to start Offcloud authorisation')
+			return ok_dialog(text='No se pudo iniciar la Autorización de Offcloud')
 		device_code = payload.get('device_code')
 		user_code = payload.get('user_code')
 		verify_url = payload.get('verification_uri_complete') or payload.get('verification_uri') or 'https://offcloud.com/activate'
 		if not device_code or not user_code:
-			return ok_dialog(text='Invalid Offcloud authorisation response')
+			return ok_dialog(text='Respuesta de Autorización de Offcloud no válida')
 		qr_code = make_qrcode(verify_url) or ''
 		copy2clip(verify_url)
-		p_dialog_insert = '[CR]Full link copied to clipboard[CR]OR visit: [B]offcloud.com/activate[/B][CR]AND Enter this Code: [B]%s[/B]' % user_code
-		content = 'Please Scan the QR Code%s[CR]' % p_dialog_insert
-		progress = progress_dialog('Offcloud Authorise', qr_code)
+		p_dialog_insert = '[CR]Enlace completo copiado al portapapeles[CR]O visita: [B]offcloud.com/activate[/B][CR]O Introduce este Código: [B]%s[/B]' % user_code
+		content = 'Escanea el código QR%s[CR]' % p_dialog_insert
+		progress = progress_dialog('Autorizar Offcloud', qr_code)
 		progress.update(content, 0)
 		expires_in = int(payload.get('expires_in') or 600)
 		poll_interval = int(payload.get('interval') or 5)
@@ -107,7 +107,7 @@ class OffcloudAPI:
 			if token_ttl <= 0:
 				try: progress.close()
 				except Exception: pass
-				return ok_dialog(text='Offcloud: Authorisation timed out')
+				return ok_dialog(text='Offcloud: Tiempo de Autorización agotado')
 			sleep(poll_interval * 1000)
 			token_ttl -= poll_interval
 			progress.update(content, int(100 * (expires_in - token_ttl) / float(expires_in)))
@@ -143,7 +143,7 @@ class OffcloudAPI:
 		if username:
 			set_setting('oc.account_id', username)
 		self.clear_cache()
-		ok_dialog(heading='Offcloud', text='Account authorised.')
+		ok_dialog(heading='Offcloud', text='Cuenta Autorizada.')
 
 	def item_play_link(self, item):
 		url = item.get('url')
@@ -163,7 +163,7 @@ class OffcloudAPI:
 		set_setting('oc.token', 'empty_setting')
 		set_setting('oc.enabled', 'false')
 		set_setting('oc.account_id', 'empty_setting')
-		notification('Offcloud Authorisation Reset', 3000)
+		notification('Restablecimiento de Autorización de Offcloud', 3000)
 
 	def user_cloud(self):
 		return cache_object(self._get, 'oc_user_cloud', 'cloud/history', False, 0.03)

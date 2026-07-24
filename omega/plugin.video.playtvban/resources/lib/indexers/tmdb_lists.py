@@ -144,7 +144,7 @@ def build_tmdb_list(params):
 		if total_pages > page_no and not hide_next_page:
 			new_page = str(page_no + 1)
 			new_params['new_page'] = new_page
-			kodi_utils.add_dir(handle, new_params, 'Next Page (%s) >>' % new_page, 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
+			kodi_utils.add_dir(handle, new_params, 'Página Siguiente (%s) >>' % new_page, 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
 	except: pass
 	kodi_utils.set_content(handle, content)
 	kodi_utils.set_category(handle, list_name)
@@ -180,7 +180,7 @@ def adjust_tmdb_list_properties(params):
 		elif params.get('refresh', 'false') == 'true': return kodi_utils.kodi_refresh()
 		return None
 	if action in ('make_poster', 'make_fanart'):
-		art_type = 'Pósteres' if action == 'make_poster' else 'Fanart'
+		art_type = 'Carteles' if action == 'make_poster' else 'Fanart'
 		shuffle_sort_order = kodi_utils.confirm_dialog(heading='Listas de TMDb', text='¿Usar [B]4 %s aleatorios[/B] de la lista?[CR]O[CR]¿Usar los [B]primeros 4[/B] %s de la lista?' % (art_type, art_type),
 												ok_label='4 aleatorios', cancel_label='Primeros 4')
 		if shuffle_sort_order == None: return adjust_tmdb_list_properties(params)

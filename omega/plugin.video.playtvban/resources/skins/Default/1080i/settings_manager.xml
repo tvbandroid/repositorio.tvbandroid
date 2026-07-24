@@ -826,7 +826,7 @@
                       <item>
                           <visible>Container(2000).HasFocus(20)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.rpdb_api),empty_setting)</visible>
-                          <property name="setting_label">Habilitar la Clasificación de Pósteres (RPDb) para las Listas de Extras</property>
+                          <property name="setting_label">Habilitar la Clasificación de Carteles (RPDb) para las Listas de Extras</property>
                           <property name="setting_type">boolean</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.extras.enable_item_ratings)]</property>
                           <property name="setting_description">Seleccione esta opción y los widgets que se muestran en la ventana de Extras mostrarán los carteles de clasificación de RPDb.</property>
@@ -884,7 +884,7 @@
         <!-- RPDb Ratings Posters -->
                       <item>
                           <visible>Container(2000).HasFocus(20)</visible>
-                          <property name="setting_label">Calificaciones Pósters</property>
+                          <property name="setting_label">Calificaciones de Carteles</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>
@@ -913,7 +913,7 @@
                           <property name="setting_label">    - Formato de Póster RPDb</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.rpdb_format_name)]</property>
-                          <property name="setting_description">Elija el formato que se utilizará para los pósters de RPDb. Las opciones son Predeterminado, Bloques o Redondeado.</property>
+                          <property name="setting_description">Elija el formato que se utilizará para los carteles de RPDb. Las opciones son Predeterminado, Bloques o Redondeado.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=rpdb_poster_format_choice)</onclick>
                       </item>
         <!-- AI Generated Similar Titles -->
@@ -1336,7 +1336,7 @@
         <!-- RPDb Ratings Posters -->
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Pósteres con Clasificaciones</property>
+                          <property name="setting_label">Carteles con Clasificaciones</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>
@@ -1346,26 +1346,26 @@
                           <property name="setting_label">[I]Introduce una Clave API de RPDb en Meta Accounts[/I]</property>
                           <property name="setting_type">info</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Ve a Meta Accounts -> RPDb (Pósteres con Clasificaciones) dentro de estos ajustes e introduce una clave API para acceder a esta función.</property>
+                          <property name="setting_description">Ve a Meta Accounts -> RPDb (Carteles con Clasificaciones) dentro de estos ajustes e introduce una clave API para acceder a esta función.</property>
                           <onclick>noop</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.rpdb_api),empty_setting)</visible>
-                          <property name="setting_label">Usar Pósteres con Clasificaciones de RPDb para...</property>
+                          <property name="setting_label">Usar Carteles con Clasificaciones de RPDb para...</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.rpdb_enabled_name)]</property>
-                          <property name="setting_description">Elige para qué tipo de contenido se utilizarán los pósteres con clasificaciones proporcionados por RPDb. Opciones: Ninguno, Películas, Series o Ambos.</property>
+                          <property name="setting_description">Elige para qué tipo de contenido se utilizarán los Carteles con clasificaciones proporcionados por RPDb. Opciones: Ninguno, Películas, Series o Ambos.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=rpdb_enabled)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(30)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.rpdb_api),empty_setting)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.rpdb_enabled),0)</visible>
-                          <property name="setting_label">    - Formato de los Pósteres RPDb</property>
+                          <property name="setting_label">    - Formato de los Carteles RPDb</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.rpdb_format_name)]</property>
-                          <property name="setting_description">Elige el formato utilizado para los pósteres de RPDb. Opciones: Predeterminado, Bloques o Redondeado.</property>
+                          <property name="setting_description">Elige el formato utilizado para los Carteles de RPDb. Opciones: Predeterminado, Bloques o Redondeado.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=rpdb_poster_format_choice)</onclick>
                       </item>
         <!-- Context Menu -->
@@ -1795,7 +1795,7 @@
         <!-- RPDb -->
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">RPDb (Pósteres con Valoraciones)</property>
+                          <property name="setting_label">RPDb (Carteles con Valoraciones)</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>
@@ -1804,7 +1804,7 @@
                           <property name="setting_label">Clave API</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.rpdb_api)]</property>
-                          <property name="setting_description">Introduce aquí tu Clave API de RPDb. Esto te permitirá utilizar pósteres con valoraciones integradas cuando estén disponibles.</property>
+                          <property name="setting_description">Introduce aquí tu Clave API de RPDb. Esto te permitirá utilizar Carteles con valoraciones integradas cuando estén disponibles.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=rpdb_api)</onclick>
                       </item>
                       <item>

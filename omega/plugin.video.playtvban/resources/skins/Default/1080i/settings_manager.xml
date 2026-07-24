@@ -552,156 +552,71 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(10)</visible>
-                          <property name="setting_label">Avisar cuando un Servicio caduque en menos de (días)</property>
+                          <property name="setting_label">Avisar Cuando El Servicio Caduque En (Días)</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert_days)]</property>
-                          <property name="setting_description">Al iniciar Kodi, notifica cuando las cuentas autorizadas de Debrid y EasyNews caduquen dentro del número de días indicado. Establézcalo en 0 para desactivarlo. Cada servicio solo avisará una vez por cada número de días restantes.</property>
+                          <property name="setting_description">Al iniciar Kodi, avisar cuando las cuentas autorizadas de Debrid y EasyNews caduquen dentro de este número de días. Establecer en 0 para desactivar (también oculta los interruptores de aviso individuales de los servicios de abajo). Cada servicio avisa una vez por cada número de días restantes. Cuando está activado, los servicios autorizados aparecen debajo para que puedas activar o desactivar los avisos de cada servicio (activado por defecto).</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=services.expiry_alert_days)</onclick>
                       </item>
-        <!-- Watched Indicators -->
                       <item>
                           <visible>Container(2000).HasFocus(10)</visible>
-                          <property name="setting_label">Indicadores Vistos</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting) | !String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting) | !String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
-                          <property name="setting_label">Proveedor de Estado de Vistos</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.watched_indicators_name)]</property>
-                          <property name="setting_description">Marcas de visto, barras de reanudación, seguimiento de reproducción (scrobble), Próximos Episodios y listas En Progreso. MDBList, Play TVBan (local), Simkl o Trakt (autorizar en Cuentas Meta).</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=watched_indicators)</onclick>
-                      </item>
-        <!-- MDBList Cache -->
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <property name="setting_label">Cache MDBList</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
-                          <property name="setting_label">Intervalo de Resincronización (minutos)</property>
-                          <property name="setting_type">numeric</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.mdblist.sync_interval)]</property>
-                          <property name="setting_description">Elige con qué frecuencia Play TVBan consulta MDBList para ver el estado de seguimiento y los cambios de progreso.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=mdblist.sync_interval)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
-                          <property name="setting_label">Actualizar Widgets Después de la Sincronización de MDBList</property>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.services.expiry_alert_days),0)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.services.authorised.ad),true)</visible>
+                          <property name="setting_label">    - All Debrid</property>
                           <property name="setting_type">boolean</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.mdblist.refresh_widgets)]</property>
-                          <property name="setting_description">Actualizar widgets después de una sincronización de MDBList cuando se detectaron cambios.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=mdblist.refresh_widgets)</onclick>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert.ad)]</property>
+                          <property name="setting_description">Avisar cuando tu suscripción de All Debrid esté dentro del periodo de aviso.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=services.expiry_alert.ad)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
-                          <property name="setting_label">Forzar Sincronización de MDBList</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Obtén ahora el estado de visualización y el progreso de reproducción desde MDBList.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=mdblist.mdblist_force_sync)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
-                          <property name="setting_label">Borrar Cache MDBList</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Borre las listas MDBList almacenadas en caché y sincronice los datos, luego vuelva a sincronizar desde MDBList.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=clear_cache&amp;cache=mdblist)</onclick>
-                      </item>
-        <!-- Simkl Cache -->
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <property name="setting_label">Cache Simkl</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
-                          <property name="setting_label">Intervalo de Resincronización (minutos)</property>
-                          <property name="setting_type">numeric</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.simkl.sync_interval)]</property>
-                          <property name="setting_description">Elige con qué frecuencia Play TVBan consulta tu servicio Simkl para detectar cualquier cambio.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=simkl.sync_interval)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
-                          <property name="setting_label">Actualizar Widgets Después de la Sincronización de Simkl</property>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.services.expiry_alert_days),0)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.services.authorised.easynews),true)</visible>
+                          <property name="setting_label">    - EasyNews</property>
                           <property name="setting_type">boolean</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.simkl.refresh_widgets)]</property>
-                          <property name="setting_description">Habilita esta opción y Play TVBan actualizará los widgets después de realizar una sincronización de Simkl si se produjo algún cambio.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=simkl.refresh_widgets)</onclick>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert.easynews)]</property>
+                          <property name="setting_description">Avisar cuando tu suscripción de EasyNews esté dentro del periodo de aviso.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=services.expiry_alert.easynews)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
-                          <property name="setting_label">Forzar Sincronización de Simkl</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Obtén ahora el estado de visualización y el progreso de reproducción desde Simkl.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=simkl.simkl_force_sync)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
-                          <property name="setting_label">Borrar Cache de Simkl</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Borre las listas de Simkl almacenadas en caché y sincronice los datos, luego vuelva a sincronizar desde Simkl.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=clear_cache&amp;cache=simkl)</onclick>
-                      </item>
-        <!-- Trakt Cache -->
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <property name="setting_label">Cache Trakt</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
-                          <property name="setting_label">Intervalo de Resincronización (minutos)</property>
-                          <property name="setting_type">numeric</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.sync_interval)]</property>
-                          <property name="setting_description">Elige con qué frecuencia Play TVBan consulta tu servicio Trakt para detectar cualquier cambio.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.sync_interval)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
-                          <property name="setting_label">Actualizar Widgets Después de la Sincronización de Trakt</property>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.services.expiry_alert_days),0)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.services.authorised.oc),true)</visible>
+                          <property name="setting_label">    - Offcloud</property>
                           <property name="setting_type">boolean</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.refresh_widgets)]</property>
-                          <property name="setting_description">Habilita esta opción y Play TVBan actualizará los widgets después de realizar una sincronización de Trakt si se produjo algún cambio.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=trakt.refresh_widgets)</onclick>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert.oc)]</property>
+                          <property name="setting_description">Avisar cuando tu suscripción de Offcloud esté dentro del periodo de aviso.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=services.expiry_alert.oc)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
-                          <property name="setting_label">Forzar Sincronización de Trakt</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Obtén ahora el estado de reproducción y el progreso de la reproducción desde Trakt.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=trakt.trakt_force_sync)</onclick>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.services.expiry_alert_days),0)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.services.authorised.pm),true)</visible>
+                          <property name="setting_label">    - Premiumize</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert.pm)]</property>
+                          <property name="setting_description">Avisar cuando tu suscripción de Premiumize esté dentro del periodo de aviso.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=services.expiry_alert.pm)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(10)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
-                          <property name="setting_label">Borrar Cache de Trakt</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Borra las listas de Trakt almacenadas en caché y sincroniza los datos, luego vuelve a sincronizar desde Trakt.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=clear_cache&amp;cache=trakt)</onclick>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.services.expiry_alert_days),0)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.services.authorised.rd),true)</visible>
+                          <property name="setting_label">    - Real Debrid</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert.rd)]</property>
+                          <property name="setting_description">Avisar cuando tu suscripción de Real Debrid esté dentro del periodo de aviso.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=services.expiry_alert.rd)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(10)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.services.expiry_alert_days),0)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.services.authorised.tb),true)</visible>
+                          <property name="setting_label">    - TorBox</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.services.expiry_alert.tb)]</property>
+                          <property name="setting_description">Avisar cuando tu suscripción de TorBox esté dentro del periodo de aviso.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=services.expiry_alert.tb)</onclick>
                       </item>
         <!-- UTC Time Offset -->
                       <item>
@@ -1567,6 +1482,21 @@
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.calendar_future_days)</onclick>
                       </item>
 <!-- META ACCOUNTS 50 -->
+        <!-- Watched Indicators -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Watched Indicators</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Watched Status Provider</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.watched_indicators_name)]</property>
+                          <property name="setting_description">Watched ticks, resume bars, scrobble, Next Episodes, and In Progress lists. Choose MDBList, Red Light (local), Simkl, or Trakt. Authorise a service below to use it.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=watched_indicators)</onclick>
+                      </item>
         <!-- MDBList -->
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
@@ -1580,7 +1510,7 @@
                           <property name="setting_label">Autorizar</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Autoriza tu cuenta de MDBList. Introduce el código que aparece en pantalla o escanea el código QR; el proceso es el mismo que para Trakt y Simkl.</property>
+                          <property name="setting_description">Autoriza tu cuenta de MDBList. Introduce el código que aparece en pantalla o escanea el código QR — mismo proceso que Trakt y Simkl.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=mdblist.mdblist_authenticate)</onclick>
                       </item>
                       <item>
@@ -1589,8 +1519,44 @@
                           <property name="setting_label">Revocar Autorización</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.mdblist.user)]</property>
-                          <property name="setting_description">Revocar la autorización de tu cuenta de MDBList</property>
+                          <property name="setting_description">Revoca la autorización de tu cuenta de MDBList</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=mdblist.mdblist_revoke_authentication)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
+                          <property name="setting_label">    - Intervalo de Resincronización (mins)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.mdblist.sync_interval)]</property>
+                          <property name="setting_description">Elige con qué frecuencia Red Light consulta MDBList para comprobar cambios en el estado de reproducción y el progreso</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=mdblist.sync_interval)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
+                          <property name="setting_label">    - Actualizar Widgets Después de Sincronizar</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.mdblist.refresh_widgets)]</property>
+                          <property name="setting_description">Actualiza los widgets después de una sincronización de MDBList cuando se detecten cambios. Solo se ejecuta cuando el [B]Proveedor del Estado de Reproducción[/B] está configurado en [B]MDBList[/B].</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=mdblist.refresh_widgets)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
+                          <property name="setting_label">    - Forzar Sincronización</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Obtén ahora el estado de reproducción y el progreso de reproducción desde MDBList</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=mdblist.mdblist_force_sync)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.mdblist.user),empty_setting)</visible>
+                          <property name="setting_label">    - Borrar Caché</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Borra las listas y los datos de sincronización almacenados en caché de MDBList y, después, vuelve a sincronizar desde MDBList</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=clear_cache&amp;cache=mdblist)</onclick>
                       </item>
         <!-- Simkl -->
                       <item>
@@ -1605,7 +1571,7 @@
                           <property name="setting_label">Autorizar</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Autoriza tu cuenta de Simkl. Se mostrará un PIN en pantalla; visita simkl.com/pin.</property>
+                          <property name="setting_description">Autoriza tu cuenta de Simkl. PIN mostrado en pantalla — visita simkl.com/pin</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=simkl.simkl_authenticate)</onclick>
                       </item>
                       <item>
@@ -1614,16 +1580,52 @@
                           <property name="setting_label">Revocar Autorización</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.simkl.user)]</property>
-                          <property name="setting_description">Revoca la autorización de tu cuenta de Simkl.</property>
+                          <property name="setting_description">Revoca la autorización de tu cuenta de Simkl</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=simkl.simkl_revoke_authentication)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
-                          <property name="setting_label">Importar Trakt a Simkl</property>
+                          <property name="setting_label">    - Intervalo de Resincronización (mins)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.simkl.sync_interval)]</property>
+                          <property name="setting_description">Elige con qué frecuencia Play TVBan consulta tu servicio de Simkl para detectar cualquier cambio</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=simkl.sync_interval)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
+                          <property name="setting_label">    - Actualizar Widgets Después de Sincronizar</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.simkl.refresh_widgets)]</property>
+                          <property name="setting_description">Actualiza los widgets después de una sincronización de Simkl cuando se detecten cambios. Solo se ejecuta cuando el [B]Proveedor del Estado de Reproducción[/B] está configurado en [B]Simkl[/B].</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=simkl.refresh_widgets)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
+                          <property name="setting_label">    - Forzar Sincronización</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Abre la página oficial de importación de Trakt a Simkl (código QR o enlace copiado). Úsalo para transferir tu historial de visualización de Trakt a Simkl.</property>
+                          <property name="setting_description">Obtén ahora el estado de reproducción y el progreso de reproducción desde Simkl</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=simkl.simkl_force_sync)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
+                          <property name="setting_label">    - Borrar Caché</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Borra las listas y los datos de sincronización almacenados en caché de Simkl y, después, vuelve a sincronizar desde Simkl</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=clear_cache&amp;cache=simkl)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.simkl.user),empty_setting)</visible>
+                          <property name="setting_label">    - Importar Trakt a Simkl</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Abre la página oficial de importación de Trakt de Simkl (código QR o enlace copiado). Úsalo cuando quieras trasladar el historial de reproducción de Trakt a Simkl.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=simkl.simkl_import_trakt)</onclick>
                       </item>
         <!-- Trakt -->
@@ -1639,58 +1641,93 @@
                           <property name="setting_label">Autorizar</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Autoriza tu cuenta de Trakt para utilizarla en Play TVBan</property>
+                          <property name="setting_description">Autoriza tu cuenta de Trakt y úsala dentro de Play TVBan</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=trakt.trakt_authenticate)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
-                          <property name="setting_label">Revocar Autorización</property>
+                          <property name="setting_label">Revocar autorización</property>
                           <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.user)]</property>
                           <property name="setting_description">Revoca la autorización de tu cuenta de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=trakt.trakt_revoke_authentication)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Clave Client ID</property>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
+                          <property name="setting_label">    - Intervalo de Resincronización (mins)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.sync_interval)]</property>
+                          <property name="setting_description">Elige con qué frecuencia Play TVBan consulta tu servicio de Trakt para detectar cambios</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.sync_interval)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
+                          <property name="setting_label">    - Actualizar Widgets Después de Sincronizar</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.refresh_widgets)]</property>
+                          <property name="setting_description">Actualiza los widgets después de una sincronización de Trakt cuando se detectan cambios. Solo se ejecuta cuando [B]Proveedor de Estado de Visto[/B] está establecido en [B]Trakt[/B].</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=trakt.refresh_widgets)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
+                          <property name="setting_label">    - Forzar Sincronización</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Obtiene ahora el estado de visto y el progreso de reproducción desde Trakt</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=trakt.trakt_force_sync)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.user),empty_setting)</visible>
+                          <property name="setting_label">    - Borrar Caché</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Borra las listas y los datos de sincronización almacenados en caché de Trakt y vuelve a sincronizar desde Trakt</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=clear_cache&amp;cache=trakt)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Clave de ID de Cliente</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.client)]</property>
-                          <property name="setting_description">Introduce el Client ID de tu aplicación en trakt.tv/oauth/applications (o deja el predeterminado de Play TVBan)</property>
+                          <property name="setting_description">Introduce el ID de cliente de tu aplicación en trakt.tv/oauth/applications (o deja el valor predeterminado de Play TVBan)</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=trakt.client)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.client),30e6c73030cc41dbff996200ac3060cde689555ba207020e08a2175533b912c3)</visible>                          <property name="setting_label">    - Restore Default Client ID Key</property>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.client),30e6c73030cc41dbff996200ac3060cde689555ba207020e08a2175533b912c3)</visible>                          <property name="setting_label">    - Restaurar Clave de ID de Cliente Predeterminada</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Restaurar la Clave ID Cliente predeterminada de Trakt</property>
+                          <property name="setting_description">Restaura la clave de ID de cliente predeterminada de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.restore_setting_default&amp;setting_id=trakt.client)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Clave Client Secret</property>
+                          <property name="setting_label">Clave Secreta de Cliente</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.secret)]</property>
-                          <property name="setting_description">Introduce el Client Secret de la misma aplicación de Trakt utilizada para el Client ID anterior</property>
+                          <property name="setting_description">Introduce el secreto de cliente de la misma aplicación de Trakt que el ID de cliente anterior</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=trakt.secret)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
                           <visible>!String.IsEqual(Window(10000).Property(playtvban.trakt.secret),726f6b12a9f0079d5850a7bb0e15860725cd487cbfb54ce5471de217639465c5)</visible>
-                          <property name="setting_label">    - Restaurar Clave Client Secret Predeterminada</property>
+                          <property name="setting_label">    - Restaurar Clave Secreta de Cliente Predeterminada</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Restaurar la Clave Client Secret predeterminada de Trakt</property>
+                          <property name="setting_description">Restaura la clave secreta de cliente predeterminada de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.restore_setting_default&amp;setting_id=trakt.secret)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Probar Claves del Cliente...</property>
+                          <property name="setting_label">Probar Claves de Cliente...</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Comprueba que tu Client ID (y Client Secret si está configurado) sean aceptados por Trakt antes de autorizar</property>
+                          <property name="setting_description">Comprueba que tu ID de cliente de Trakt (y el secreto, si está configurado) sean aceptados por Trakt antes de usar Autorizar</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=trakt_credentials_check_choice)</onclick>
                       </item>
         <!-- TMDb API -->
@@ -2430,7 +2467,7 @@
                           <property name="setting_description">Elige el orden en el que aparecerán los resultados de EasyNews con respecto a las demás cuentas activas. Cuanto menor sea el número, mayor será su prioridad.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=en.priority)</onclick>
                       </item>
-        <!-- Indexadores NZB -->
+        <!-- NZB Indexers -->
                       <item>
                           <visible>Container(2000).HasFocus(62)</visible>
                           <property name="setting_label">Indexadores NZB</property>
@@ -3228,7 +3265,7 @@
                           <property name="setting_label">Activar</property>
                           <property name="setting_type">boolean</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.provider.folders)]</property>
-                          <property name="setting_description">Activa el uso de cualquier carpeta multimedia local, como unidades NAS, discos duros, etc.</property>
+                          <property name="setting_description">Activa el uso de cualquier carpeta multimedia local, como unidades NAS, HDDs, etc.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=provider.folders)</onclick>
                       </item>
                       <item>
@@ -3553,7 +3590,7 @@
         <!-- Results Color Highlights -->
                       <item>
                           <visible>Container(2000).HasFocus(70)</visible>
-                          <property name="setting_label">Colores de Resaltado de Resultados</property>
+                          <property name="setting_label">Resultados Resaltados de Color</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>
@@ -3770,11 +3807,12 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(80)</visible>
-                          <property name="setting_label">Reanudar Reproducción Automáticamente</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.auto_resume_movie_name)]</property>
-                          <property name="setting_description">Elige cuándo Play TVBan reanudará automáticamente la reproducción de una película iniciada.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=auto_resume_movie)</onclick>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.auto_play_movie),true)</visible>
+                          <property name="setting_label">Limitar Tamaño de Reproducción Automática (MB)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.autoplay.movie_size_max)]</property>
+                          <property name="setting_description">Tamaño máximo de archivo permitido para la reproducción automática de Películas. Establece 0 para desactivar (ilimitado). No afecta a Seleccionar Fuente. Los resultados de la Nube y las carpetas locales están exentos.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=autoplay.movie_size_max)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(80)</visible>
@@ -3786,20 +3824,28 @@
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(80)</visible>
+                          <property name="setting_label">Mostrar Alerta de Stinger de Créditos</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.stinger_alert.show)]</property>
+                          <property name="setting_description">Activa esta opción y Play TVBan mostrará una alerta hacia el final de una película si tiene stingers durante los créditos o después de los créditos</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=stinger_alert.show)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(80)</visible>
                           <visible>String.IsEqual(Window(10000).Property(playtvban.stinger_alert.show),true)</visible>
-                          <property name="setting_label">    - Mostrar Aviso Tras (%) de Reproducción</property>
+                          <property name="setting_label">    - Mostrar Alerta Después de (%) Reproducción</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.stinger_alert.window_percentage)]</property>
-                          <property name="setting_description">Elige cuándo Play TVBan mostrará el aviso de escenas postcréditos.</property>
+                          <property name="setting_description">Elige cuándo Play TVBan mostrará la Alerta de Stingers de Créditos</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=stinger_alert.window_percentage)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(80)</visible>
                           <visible>String.IsEqual(Window(10000).Property(playtvban.stinger_alert.show),true)</visible>
-                          <property name="setting_label">    - Fuente de Temporización del Aviso</property>
+                          <property name="setting_label">    - Fuente de Tiempo de la Alerta</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.stinger_alert.alert_timing_name)]</property>
-                          <property name="setting_description">Elige cuándo mostrar el aviso de escenas postcréditos. Puede utilizar el porcentaje anterior, marcadores de capítulos o la información de subtítulos cuando haya configurada una URL de SubMaker y/o una cuenta de OpenSubtitles en la sección de Subtítulos. La información de subtítulos utiliza las marcas del archivo de subtítulos (no los créditos en pantalla), por lo que el momento puede variar. Si no está disponible, se utilizará el porcentaje de reproducción.</property>
+                          <property name="setting_description">Elige cuándo mostrar la alerta de Stingers de Créditos. Utiliza el porcentaje anterior, los marcadores de capítulos o la Información de Subtítulos cuando una URL de manifiesto de SubMaker y/o una cuenta de OpenSubtitles estén configuradas en Subtítulos a continuación. La Información de Subtítulos sigue las señales del archivo de subtítulos (no los créditos que aparecen en pantalla), por lo que el tiempo puede variar según el episodio. Vuelve al Porcentaje de Reproducción cuando no esté disponible</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=stinger_alert.alert_timing)</onclick>
                       </item>
         <!-- Playback Episodes -->
@@ -3834,6 +3880,15 @@
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.autoplay_quality_episode)]</property>
                           <property name="setting_description">Elige las calidades permitidas para la reproducción automática.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=set_quality_choice&amp;setting_id=autoplay_quality_episode)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(80)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.auto_play_episode),true)</visible>
+                          <property name="setting_label">Limitar Tamaño de Reproducción Automática (MB)</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.autoplay.episode_size_max)]</property>
+                          <property name="setting_description">Tamaño máximo de archivo permitido para la reproducción automática de Episodios. Establece 0 para desactivar (ilimitado). No afecta a Seleccionar Fuente. Los resultados de la Nube y las carpetas locales están exentos.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=autoplay.episode_size_max)</onclick>
                       </item>
                       <item>
                           <visible>Container(2000).HasFocus(80)</visible>

@@ -340,15 +340,10 @@ def skip_intro_enabled(play_type):
 	return skip_intro_all_episodes()
 
 def skip_intro_auto_approved(play_type):
-	return skip_intro_mode() == 2 and _skip_intro_chain_play_type(play_type)
+	return skip_intro_mode() == 2 and skip_intro_enabled(play_type)
 
 def skip_intro_needs_prompt(play_type):
-	mode = skip_intro_mode()
-	if mode == 1:
-		return True
-	if mode == 2 and not _skip_intro_chain_play_type(play_type):
-		return True
-	return False
+	return skip_intro_mode() == 1 and skip_intro_enabled(play_type)
 
 def autoplay_skip_intro_mode():
 	return skip_intro_mode()
@@ -733,7 +728,7 @@ def append_list_shortcut_context_menus(cm_append, build_url_fn, cm_sort_order, m
 	if trakt_user_active():
 		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_watchlist', '[B]Lista de Seguimiento de Trakt[/B]',
 			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_watchlist_shortcut_choice')))
-		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_collection', '[B]Colección de Trakt[/B]',
+		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_collection', '[B]Biblioteca de Trakt[/B]',
 			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_collection_shortcut_choice')))
 	if tmdblist_user_active():
 		tmdb_media = 'movie' if media_type == 'movie' else 'tv'
@@ -998,21 +993,11 @@ def watched_provider_options():
 
 def offer_watched_provider(provider_index, name):
 	from modules.kodi_utils import confirm_dialog
-	if confirm_dialog(heading='Proveedor de Estado de Visto', text='¿Quieres establecer %s como tu Proveedor de Estado de Visto?' % name,
+	if confirm_dialog(heading='Proveedor de Estado Visto', text='Quieres establecer %s como Proveedor de Estado Visto?' % name,
 						ok_label='Sí', cancel_label='No', default_control=10):
 		set_setting('watched_indicators', str(provider_index))
 		return True
 	return False
-
-def offer_trakt_import_to_simkl():
-	if not trakt_user_active() or not simkl_user_active(): return False
-	from modules.kodi_utils import confirm_dialog
-	if not confirm_dialog(heading='Importar Trakt a Simkl',
-		text='¿Importar tu historial de visualización de Trakt a Simkl?',
-		ok_label='Sí', cancel_label='No', default_control=10): return False
-	from apis.simkl_api import simkl_import_trakt
-	simkl_import_trakt()
-	return True
 
 def fallback_watched_provider_on_revoke(revoked_index):
 	current = int(get_setting('playtvban.watched_indicators', '0'))

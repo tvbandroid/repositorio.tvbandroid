@@ -1,3 +1,6 @@
+[COLOR red][B]Versión 1.4.0[/B][/COLOR]
+- [B]Saltar introducción[/B]: [B]Desactivado[/B] = desactivado; [B]Automático[/B] = salta sin preguntar cuando se aplica la opción Saltar introducción (reproducción automática, selección de fuente, primer episodio o posterior; se reproduce automáticamente cuando esta opción está activada); [B]Preguntar[/B] = pregunta primero (Sí salta; No o ignorar/tiempo de espera no salta). Descripción más clara para [B]También activado Reproduce automáticamente[/B].
+
 [COLOR red][B]Versión 1.3.9[/B][/COLOR]
 - [B]Rendimiento[/B]: las listas de películas y series de televisión reutilizan una conexión de metacaché SQLite por hilo de trabajo al crear los elementos de la lista (menos ciclos de apertura/cierre; gracias a Tikipeter).
 

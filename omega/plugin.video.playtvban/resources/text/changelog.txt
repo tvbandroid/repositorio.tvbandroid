@@ -1,3 +1,6 @@
+[COLOR red][B]Versión 1.3.9[/B][/COLOR]
+- [B]Rendimiento[/B]: las listas de películas y series de televisión reutilizan una conexión de metacaché SQLite por hilo de trabajo al crear los elementos de la lista (menos ciclos de apertura/cierre; gracias a Tikipeter).
+
 [COLOR red][B]Versión 1.3.8[/B][/COLOR]
 - [B]Ajustes[/B]: El [B]Proveedor de estado de visualización[/B] y las herramientas de sincronización de Trakt/Simkl/MDBList (intervalo, actualizar widgets, forzar sincronización, borrar caché) se mueven de General a [B]Cuentas meta[/B]; el proveedor aparece en la parte superior; la sincronización/caché se encuentra debajo de cada servicio cuando está autorizado.
 

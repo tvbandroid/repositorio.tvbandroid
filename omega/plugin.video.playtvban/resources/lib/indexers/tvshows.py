@@ -187,7 +187,7 @@ class TVShows:
 			if self.new_page and not self.widget_hide_next_page:
 				self.new_page.update({'mode': 'build_tvshow_list', 'action': self.action, 'category_name': self.category_name})
 				if self.is_anime_list is not None: self.new_page['is_anime_list'] == {True: 'true', False: 'false'}[self.is_anime_list]
-				kodi_utils.add_dir(handle, self.new_page, 'Página Siguiente (%s) >>' % self.new_page['new_page'], 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
+				kodi_utils.add_dir(handle, self.new_page, 'Next Page (%s) >>' % self.new_page['new_page'], 'nextpage', kodi_utils.get_icon('nextpage_landscape'))
 		except Exception as e:
 			if self.action in self.mdblist_personal or self.action == 'mdblist_user_list':
 				kodi_utils.logger('MDBList List Error', '%s: %s' % (self.action, e))
@@ -198,9 +198,9 @@ class TVShows:
 			if self.params_get('refreshed') == 'true': kodi_utils.sleep(1000)
 			kodi_utils.set_view_mode('view.tvshows', 'tvshows', self.is_external)
 
-	def build_tvshow_content(self, _position, _id):
+	def build_tvshow_content(self, _position, _id, dbcon=None):
 		try:
-			meta = tvshow_meta(self.id_type, _id, self.tmdb_api_key, self.mpaa_region, self.current_date, self.current_time, self.is_anime_list)
+			meta = tvshow_meta(self.id_type, _id, self.tmdb_api_key, self.mpaa_region, self.current_date, self.current_time, self.is_anime_list, dbcon=dbcon)
 			if not meta or 'blank_entry' in meta: return
 			cm = []
 			cm_append = cm.append
@@ -353,10 +353,10 @@ class TVShows:
 		self.watched_info = watched_status.watched_info_tvshow(watched_db)
 		self.window_command = 'ActivateWindow(Videos,%s,return)' if self.is_external else 'Container.Update(%s)'
 		if self.custom_order:
-			threads = TaskPool().tasks(self.build_tvshow_content, self.list, min(len(self.list), settings.max_threads()))
+			threads = TaskPool().tasks(self.build_tvshow_content, self.list, min(len(self.list), settings.max_threads()), 'metacache_db')
 			[i.join() for i in threads]
 		else:
-			threads = TaskPool().tasks_enumerate(self.build_tvshow_content, self.list, min(len(self.list), settings.max_threads()))
+			threads = TaskPool().tasks_enumerate(self.build_tvshow_content, self.list, min(len(self.list), settings.max_threads()), 'metacache_db')
 			[i.join() for i in threads]
 			self.items.sort(key=lambda k: k[1])
 			self.items = [i[0] for i in self.items]

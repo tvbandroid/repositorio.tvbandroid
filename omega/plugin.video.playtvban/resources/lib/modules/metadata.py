@@ -138,7 +138,7 @@ def movie_meta(id_type, media_id, api_key, mpaa_region, current_date, current_ti
 	except: pass
 	return meta
 
-ef tvshow_meta(id_type, media_id, api_key, mpaa_region, current_date, current_time=None, is_anime_list=None, dbcon=None):
+def tvshow_meta(id_type, media_id, api_key, mpaa_region, current_date, current_time=None, is_anime_list=None, dbcon=None):
 	if id_type == 'trakt_dict':
 		if media_id.get('tmdb', None): id_type, media_id = 'tmdb_id', media_id['tmdb']
 		elif media_id.get('imdb', None): id_type, media_id = 'imdb_id', media_id['imdb']

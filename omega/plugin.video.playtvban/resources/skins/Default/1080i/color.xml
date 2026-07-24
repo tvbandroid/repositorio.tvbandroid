@@ -39,7 +39,7 @@
                     <textcolor>FFCCCCCC</textcolor>
                     <align>center</align>
                     <aligny>center</aligny>
-                    <label>[B]Choose Highlight Color[/B]</label>
+                    <label>[B]Elige Color Resaltado[/B]</label>
                 </control>
             </control>
             <!-- Color picker panel -->
@@ -110,7 +110,7 @@
                     <ondown>12</ondown>
                     <onleft>2000</onleft>
                     <onright>2000</onright>
-                    <label>Cancel</label>
+                    <label>Cancelar</label>
                     <font>font12</font> <!-- PLAYTVBAN_26 -->
                     <textcolor>FFCCCCCC</textcolor>
                     <focusedcolor>FF1F2020</focusedcolor>
@@ -128,7 +128,7 @@
                     <textcolor>white</textcolor>
                     <shadowcolor>black</shadowcolor>
                     <font>font12</font> <!-- PLAYTVBAN_26 -->
-                    <label>[B]Enter Value[/B]</label>
+                    <label>[B]Introduzca Valor[/B]</label>
                 </control>
                 <control type="button" id="12">
                     <description>Input Value Choice</description>

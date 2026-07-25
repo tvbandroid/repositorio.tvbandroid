@@ -1418,10 +1418,10 @@
                           <property name="setting_description">Habilita esta opción para incluir episodios no emitidos en la sección "Próximos episodios". Se mostrarán resaltados en ROJO y serán visibles dentro de los 7 días posteriores a su fecha de emisión.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=nextep.include_unaired)</onclick>
                       </item>
-        <!-- Trakt Calendar -->
+       <!-- Calendars (MDBList Calendar + Trakt Calendar) -->
                       <item>
                           <visible>Container(2000).HasFocus(40)</visible>
-                          <property name="setting_label">Calendario de Trakt</property>
+                          <property name="setting_label">Calendarios</property>
                           <property name="setting_type">separator</property>
                           <onclick>noop</onclick>
                       </item>
@@ -1430,7 +1430,7 @@
                           <property name="setting_label">Aplanar Series Emitidas el Mismo Día</property>
                           <property name="setting_type">boolean</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.flatten_episodes)]</property>
-                          <property name="setting_description">Activa esta opción para limitar al primer episodio de una serie de TV cuando esa serie tiene varios episodios emitidos el mismo día</property>
+                          <property name="setting_description">Habilite esta opción para limitar la visualización a la primera instancia de un episodio de una serie de televisión cuando dicha serie tenga varios episodios que se emitan el mismo día en el Calendario MDBList y el Calendario Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=trakt.flatten_episodes)</onclick>
                       </item>
                       <item>
@@ -1438,7 +1438,7 @@
                           <property name="setting_label">Formato de Visualización del Calendario - Dentro del Complemento</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_display_name)]</property>
-                          <property name="setting_description">Elige el formato de visualización que PlayTVBan utiliza al nombrar los episodios dentro del Calendario de Trakt en el complemento</property>
+                          <property name="setting_description">Elige el formato de visualización que usa Play TVBan al nombrar los episodios en el Calendario MDBList y el Calendario Trakt dentro del complemento</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_display)</onclick>
                       </item>
                       <item>
@@ -1446,7 +1446,7 @@
                           <property name="setting_label">Formato de Visualización del Calendario - Widgets</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_display_widget_name)]</property>
-                          <property name="setting_description">Elige el formato de visualización que PlayTVBan utiliza al nombrar los episodios del Calendario de Trakt para los widgets</property>
+                          <property name="setting_description">Elige el formato de visualización que usa Play TVBan al nombrar episodios en Calendario MDBList y Calendario Trakt para widgets</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_display_widget)</onclick>
                       </item>
                       <item>
@@ -1454,7 +1454,7 @@
                           <property name="setting_label">Etiquetas de Fecha del Calendario</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_date_labels_name)]</property>
-                          <property name="setting_description">Elige cómo PlayTVBan etiqueta la fecha de emisión de los episodios en el Calendario de Trakt. Palabras / fecha utiliza Hoy, Mañana y los nombres de los días de la semana para la semana próxima, y el formato de fecha elegido fuera de ese periodo. Día + fecha siempre muestra ambos. Los formatos de solo fecha mantienen la lista en orden cronológico normal (sin fijar el día de hoy). Cada grupo se ordena como AAAA-MM-DD, MM-DD-AAAA, DD-MM-AAAA</property>
+                          <property name="setting_description">Elige cómo Play TVBan etiqueta la fecha de emisión de los episodios en el Calendario MDBList y el Calendario Trakt. Palabras / fecha usa Hoy, Mañana y los nombres de los días de la semana para la semana más cercana, y el formato de fecha elegido fuera de eso. Día + fecha siempre muestra ambos. Los formatos solo de fecha mantienen la lista en orden cronológico simple (sin fijar hoy). Cada grupo se ordena AAAA-MM-DD, MM-DD-AAAA, DD-MM-AAAA</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_date_labels)</onclick>
                       </item>
                       <item>
@@ -1462,7 +1462,7 @@
                           <property name="setting_label">Orden de Clasificación</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_sort_order_name)]</property>
-                          <property name="setting_description">Elige la dirección de ordenación de la lista del Calendario de Trakt. Ascendente o Descendente</property>
+                          <property name="setting_description">Elige la dirección de ordenación del Calendario MDBList y del Calendario Trakt. Ascendente o Descendente</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=trakt.calendar_sort_order)</onclick>
                       </item>
                       <item>
@@ -1470,7 +1470,7 @@
                           <property name="setting_label">Mostrar Días Anteriores</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_previous_days)]</property>
-                          <property name="setting_description">Elige cuántos días anteriores se mostrarán en el Calendario de Trakt</property>
+                          <property name="setting_description">Elige cuántos días anteriores se mostrarán en el Calendario MDBList y en el Calendario Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.calendar_previous_days)</onclick>
                       </item>
                       <item>
@@ -1478,7 +1478,7 @@
                           <property name="setting_label">Mostrar Días Futuros</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_future_days)]</property>
-                          <property name="setting_description">Elige cuántos días futuros se mostrarán en el Calendario de Trakt.</property>
+                          <property name="setting_description">Elige cuántos días futuros se mostrarán en el Calendario de MDBList y en el Calendario de Trakt</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.calendar_future_days)</onclick>
                       </item>
 <!-- META ACCOUNTS 50 -->
@@ -1494,7 +1494,7 @@
                           <property name="setting_label">Watched Status Provider</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.watched_indicators_name)]</property>
-                          <property name="setting_description">Watched ticks, resume bars, scrobble, Next Episodes, and In Progress lists. Choose MDBList, Red Light (local), Simkl, or Trakt. Authorise a service below to use it.</property>
+                          <property name="setting_description">Watched ticks, resume bars, scrobble, Next Episodes, and In Progress lists. Choose MDBList, Play TVBan (local), Simkl, or Trakt. Authorise a service below to use it.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=watched_indicators)</onclick>
                       </item>
         <!-- MDBList -->
@@ -1528,7 +1528,7 @@
                           <property name="setting_label">    - Intervalo de Resincronización (mins)</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.mdblist.sync_interval)]</property>
-                          <property name="setting_description">Elige con qué frecuencia Red Light consulta MDBList para comprobar cambios en el estado de reproducción y el progreso</property>
+                          <property name="setting_description">Elige con qué frecuencia Play TVBan consulta MDBList para comprobar cambios en el estado de reproducción y el progreso</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=mdblist.sync_interval)</onclick>
                       </item>
                       <item>

@@ -508,6 +508,9 @@ def mdblist_sync_activities(params=None, force_update=False, progress=None):
 	if force_update or _changed('watchlisted_at'):
 		success = 'success'
 		mdblist_cache.clear_mdblist_collection_watchlist_data('watchlist')
+		mdblist_cache.mdblist_cache.delete('mdblist_calendar_airings')
+		mdblist_cache.mdblist_cache.delete('mdblist_calendar_airings_v3')
+		mdblist_cache.mdblist_cache.delete('mdblist_calendar_events')
 	if _sync_canceled(): return 'canceled'
 	if force_update or _changed('dropped_at'):
 		success = 'success'
@@ -523,6 +526,10 @@ def mdblist_sync_activities(params=None, force_update=False, progress=None):
 	refresh_episodes = force_update or _changed('episode_watched_at')
 	refresh_movie_pause = force_update or _changed('paused_at')
 	refresh_episode_pause = force_update or _changed('episode_paused_at')
+	if refresh_episodes:
+		mdblist_cache.mdblist_cache.delete('mdblist_calendar_airings')
+		mdblist_cache.mdblist_cache.delete('mdblist_calendar_airings_v3')
+		mdblist_cache.mdblist_cache.delete('mdblist_calendar_events')
 	if refresh_movies or refresh_episodes:
 		if _sync_canceled(): return 'canceled'
 		success = 'success'
@@ -548,7 +555,7 @@ def _mdbl_watchlist_raw():
 	string, url = 'mdblist_watchlist_live', 'watchlist/items'
 	return mdblist_cache.cache_mdblist_object(_get_mdbl_paginated_list, string, url) or {'movies': [], 'shows': [], 'items': []}
 
-def mdblist_watchlist(media_kind, page_no):
+def _mdblist_watchlist_normalized(media_kind):
 	# Umbrella/POV: plain GET watchlist/items → flat movies[]/shows[] (id = TMDb, imdb_id on item).
 	raw = _mdbl_watchlist_raw()
 	key = 'movies' if media_kind in ('movie', 'movies') else 'shows'
@@ -569,11 +576,23 @@ def mdblist_watchlist(media_kind, page_no):
 		if entry: normalized.append(entry)
 	if original_list and not normalized:
 		kodi_utils.logger('MDBList Watchlist', 'Could not resolve TMDb ids from %s raw items' % len(original_list))
-	original_list = normalized
-	original_list = list_sort.sort_source(original_list, 'mdblist.watchlist', media_kind, 'mdblist_watchlist')
+	return list_sort.sort_source(normalized, 'mdblist.watchlist', media_kind, 'mdblist_watchlist')
+
+def mdblist_watchlist(media_kind, page_no):
+	original_list = _mdblist_watchlist_normalized(media_kind)
 	is_home = kodi_utils.external()
 	if settings.paginate(is_home): return paginate_list(original_list, page_no, settings.page_limit(is_home))
 	return original_list, 1
+
+def mdblist_watchlist_media_ids(media_kind):
+	"""Full watchlist as media_ids dicts (no pagination) for Next Episodes include-unwatched."""
+	result = []
+	for entry in _mdblist_watchlist_normalized(media_kind):
+		try: tmdb_id = int(entry['id'])
+		except: continue
+		result.append({'media_ids': {'tmdb': tmdb_id, 'imdb': entry.get('imdb_id') or '', 'tvdb': entry.get('tvdb_id') or ''},
+			'title': entry.get('title', '')})
+	return result
 
 def mdblist_collection(media_kind, page_no):
 	string, url = 'mdblist_collection', 'sync/collection'
@@ -766,6 +785,59 @@ def mdblist_manager_choice(params):
 		return mdblist_hide_unhide_progress_items({'action': 'drop', 'media_type': 'shows', 'media_id': tmdb_id, 'imdb_id': imdb_id})
 	if choice == 'undrop':
 		return mdblist_hide_unhide_progress_items({'action': 'undrop', 'media_type': 'shows', 'media_id': tmdb_id, 'imdb_id': imdb_id})
+
+def mdblist_get_my_calendar(dummy=None):
+	"""Episode airings for the authenticated user (undocumented /calendar/events).
+
+	Cached payload is unfiltered; Show Previous/Future Days is applied on read so
+	calendar settings match Trakt Calendar without waiting for cache expiry.
+	"""
+	def _process(_url):
+		result = call_mdblist(_url)
+		if not result: return []
+		events = result.get('events') if isinstance(result, dict) else result
+		if not isinstance(events, list): return []
+		data = []
+		for item in events:
+			try:
+				# Episodes only — skip movie premieres. Do not filter release_type=watched:
+				# MDBList tags upcoming airings of in-progress shows that way too.
+				item_type = item.get('type')
+				if item_type and item_type != 'episode': continue
+				show_tmdb = item.get('show_tmdb')
+				season, episode = item.get('season_number'), item.get('episode_number')
+				start = item.get('start')
+				if not show_tmdb or season is None or episode is None or not start: continue
+				if int(season) < 1: continue
+				title = item.get('title') or ''
+				data.append({
+					'sort_title': '%s s%s e%s' % (title, str(season).zfill(2), str(episode).zfill(2)),
+					'media_ids': {'tmdb': int(show_tmdb)},
+					'season': int(season),
+					'episode': int(episode),
+					'first_aired': str(start).split('T')[0]
+				})
+			except Exception:
+				continue
+		# Prefer latest occurrence when the API repeats the same show/day.
+		data = [i for n, i in enumerate(data) if i not in data[n + 1:]]
+		return data
+	# v3: keep release_type=watched episode airings (see _process).
+	data = mdblist_cache.cache_mdblist_object(_process, 'mdblist_calendar_airings_v3', 'calendar/events') or []
+	return _filter_mdblist_calendar_day_window(data)
+
+def _filter_mdblist_calendar_day_window(data):
+	from datetime import datetime
+	start_date, end_date = settings.calendar_day_window()
+	filtered = []
+	for item in data:
+		try:
+			aired = datetime.strptime(str(item.get('first_aired', ''))[:10], '%Y-%m-%d').date()
+		except Exception:
+			continue
+		if start_date <= aired <= end_date:
+			filtered.append(item)
+	return filtered
 
 def get_mdbl_lists(params):
 	from indexers import mdblist_lists

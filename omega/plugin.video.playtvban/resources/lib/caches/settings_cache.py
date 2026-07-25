@@ -17,6 +17,15 @@ _SETTINGS_WIDGETS_MIGRATED = 'playtvban.settings_widgets_migrated'
 _SETTINGS_DB_SYNCED = 'playtvban.settings_db_synced'
 _SETTINGS_SYNC_FINGERPRINT = 'playtvban.settings_sync_fingerprint'
 _WIDGET_REFRESH_SCHEDULED = 'playtvban.widgets_refresh_scheduled'
+_SERVICE_AUTH_VISIBILITY_SETTINGS = frozenset((
+	'rd.token', 'pm.token', 'ad.token', 'oc.token', 'tb.token',
+	'easynews_user', 'easynews_password',
+))
+# Meta account auth — Home props drive Meta Accounts sync-row visibility while Settings stays open.
+_META_AUTH_VISIBILITY_SETTINGS = frozenset((
+	'trakt.user', 'trakt.token', 'simkl.user', 'simkl.token',
+	'mdblist.user', 'mdblist.token',
+))
 _NEW_SETTING_VALUE_MIGRATIONS = {
 	'trakt.calendar_display': 'single_ep_display',
 	'trakt.calendar_display_widget': 'single_ep_display_widget',
@@ -293,6 +302,19 @@ class SettingsCache:
 			except: pass
 		if _properties_loaded():
 			self.set_memory_cache(setting_id, setting_value)
+			if setting_id in _SERVICE_AUTH_VISIBILITY_SETTINGS:
+				try:
+					from modules.service_expiry import publish_settings_expiry_properties
+					publish_settings_expiry_properties()
+				except: pass
+			if setting_id in _META_AUTH_VISIBILITY_SETTINGS:
+				try:
+					from modules.settings import watched_provider_options
+					opts = watched_provider_options()
+					current = str(self.read_db_value('watched_indicators') or '0')
+					label = opts.get(current) or opts.get('0', 'Red Light')
+					self.set_memory_cache('watched_indicators_name', label)
+				except: pass
 		if setting_type == 'action' and 'settings_options' in setting_info:
 			name_setting_id = '%s_name' % setting_id
 			if setting_id == 'watched_indicators':
@@ -482,6 +504,10 @@ def refresh_settings_manager_properties():
 		refresh_alert_timing_settings()
 		refresh_external_scraper_properties()
 	except: pass
+	try:
+		from modules.service_expiry import publish_settings_expiry_properties
+		publish_settings_expiry_properties()
+	except: pass
 
 def bootstrap_settings_properties(force=False):
 	db_migrated = kodi_utils.get_property(_SETTINGS_DB_MIGRATED) == 'true'
@@ -532,7 +558,7 @@ def run_deferred_setup_background_if_needed():
 _DIRECTORY_LISTING_MODES = frozenset((
 	'build_movie_list', 'build_tvshow_list', 'build_season_list', 'build_episode_list',
 	'build_in_progress_episode', 'build_recently_watched_episode', 'build_next_episode',
-	'build_my_calendar', 'build_next_episode_manager'))
+	'build_my_calendar', 'build_mdbl_calendar', 'build_next_episode_manager'))
 
 # The five settings the unified-list-sort migration reads. They are no longer in default_settings(),
 # so the obsolete-id purge in sync_settings() would delete them on the same pass that migrates them -
@@ -961,10 +987,8 @@ def set_from_list(params):
 		except: pass
 	if setting_id == 'watched_indicators' and setting_value == '2' and str(prev_value) != '2':
 		try:
-			from modules.settings import trakt_user_active, offer_trakt_import_to_simkl
-			if trakt_user_active() and not offer_trakt_import_to_simkl():
-				from apis.simkl_api import simkl_sync_activities
-				simkl_sync_activities(force_update=True)
+			from apis.simkl_api import simkl_sync_activities
+			simkl_sync_activities(force_update=True)
 		except: pass
 
 def set_source_folder_path(params):
@@ -1006,7 +1030,7 @@ def default_settings():
 {'setting_id': 'addon_icon_choice', 'setting_type': 'string', 'setting_default': 'resources/media/addon_icons/icon.png'},
 {'setting_id': 'default_addon_fanart', 'setting_type': 'path', 'setting_default': kodi_utils.addon_fanart(), 'browse_mode': '2'},
 {'setting_id': 'limit_concurrent_threads', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'max_threads', 'setting_type': 'action', 'setting_default': '60', 'min_value': '10', 'max_value': '250'},
+{'setting_id': 'max_threads', 'setting_type': 'action', 'setting_default': '20', 'min_value': '10', 'max_value': '250'},
 #==================== Window Theme
 {'setting_id': 'window_theme', 'setting_type': 'string', 'setting_default': 'CC1F2020'},
 {'setting_id': 'window_theme_opacity', 'setting_type': 'string', 'setting_default': 'CC'},
@@ -1112,7 +1136,7 @@ def default_settings():
 {'setting_id': 'widget_refresh_notification', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'widget_hide_watched', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'widget_hide_next_page', 'setting_type': 'boolean', 'setting_default': 'false'},
-#==================== Carteles de valoraciones de RPDb
+#==================== Pósteres de valoraciones de RPDb
 {'setting_id': 'rpdb_enabled', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Películas', '2': 'Series', '3': 'Ambos'}},
 {'setting_id': 'rpdb_format', 'setting_type': 'string', 'setting_default': ''},
 #==================== Menú contextual
@@ -1141,7 +1165,7 @@ def default_settings():
 {'setting_id': 'nextep.include_airdate', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'nextep.airing_today', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'nextep.include_unaired', 'setting_type': 'boolean', 'setting_default': 'false'},
-#======+============= Calendario de Trakt
+#======+============= Calendars (Trakt + MDBList)
 {'setting_id': 'trakt.flatten_episodes', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'trakt.calendar_display', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'TÍTULO: SxE - EPISODIO', '1': 'SxE - EPISODIO', '2': 'EPISODIO'}},
 {'setting_id': 'trakt.calendar_display_widget', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'TÍTULO: SxE - EPISODIO', '1': 'SxE - EPISODIO', '2': 'EPISODIO'}},
@@ -1269,6 +1293,12 @@ def default_settings():
 {'setting_id': 'provider.easynews', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'services.expiry_alert_days', 'setting_type': 'action', 'setting_default': '7', 'min_value': '0', 'max_value': '90'},
 {'setting_id': 'services.expiry_alert_state', 'setting_type': 'string', 'setting_default': '{}'},
+{'setting_id': 'services.expiry_alert.ad', 'setting_type': 'boolean', 'setting_default': 'true'},
+{'setting_id': 'services.expiry_alert.easynews', 'setting_type': 'boolean', 'setting_default': 'true'},
+{'setting_id': 'services.expiry_alert.oc', 'setting_type': 'boolean', 'setting_default': 'true'},
+{'setting_id': 'services.expiry_alert.pm', 'setting_type': 'boolean', 'setting_default': 'true'},
+{'setting_id': 'services.expiry_alert.rd', 'setting_type': 'boolean', 'setting_default': 'true'},
+{'setting_id': 'services.expiry_alert.tb', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'easynews_user', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'easynews_password', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'easynews.title_filter', 'setting_type': 'boolean', 'setting_default': 'true'},
@@ -1278,7 +1308,7 @@ def default_settings():
 {'setting_id': 'easynews.refresh_credentials', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'easynews.lang_include_unknown', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'easynews.fallback_search', 'setting_type': 'boolean', 'setting_default': 'true'},
-{'setting_id': 'easynews.search_width', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Enfocada', '1': 'Equilibrada', '2': 'Amplia'}},
+{'setting_id': 'easynews.search_width', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Enfocado', '1': 'Equilibrado', '2': 'Amplio'}},
 {'setting_id': 'check.easynews', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'autoplay.easynews', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'en.priority', 'setting_type': 'action', 'setting_default': '7', 'min_value': '1', 'max_value': '10'},
@@ -1404,10 +1434,11 @@ def default_settings():
 #===============================================================================#
 #===================================PLAYBACK====================================#
 #===============================================================================#
-#======#==================== Playback Movies
+#==================== Playback Movies
 {'setting_id': 'auto_play_movie', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'results_quality_movie', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
 {'setting_id': 'autoplay_quality_movie', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
+{'setting_id': 'autoplay.movie_size_max', 'setting_type': 'action', 'setting_default': '0', 'min_value': '0'},
 {'setting_id': 'auto_resume_movie', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Nunca', '1': 'Siempre', '2': 'Solo Reproducción Automática'}},
 {'setting_id': 'stinger_alert.show', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'stinger_alert.window_percentage', 'setting_type': 'action', 'setting_default': '90', 'min_value': '1', 'max_value': '99'},
@@ -1416,6 +1447,7 @@ def default_settings():
 {'setting_id': 'auto_play_episode', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'results_quality_episode', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
 {'setting_id': 'autoplay_quality_episode', 'setting_type': 'string', 'setting_default': 'SD, 720p, 1080p, 4K'},
+{'setting_id': 'autoplay.episode_size_max', 'setting_type': 'action', 'setting_default': '0', 'min_value': '0'},
 {'setting_id': 'autoplay_next_episode', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'autoplay_alert_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ventana', '1': 'Notificación'}},
 {'setting_id': 'autoplay_default_action', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Reproducir', '1': 'Cancelar', '2': 'Pausar y Esperar'}},
@@ -1431,7 +1463,7 @@ def default_settings():
 {'setting_id': 'auto_resume_episode', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Nunca', '1': 'Siempre', '2': 'Solo Reproducción Automática'}},
 #==================== Playback Utilities
 {'setting_id': 'playback.limit_resolve', 'setting_type': 'boolean', 'setting_default': 'false'},
-{'setting_id': 'easynews.playback_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'None', '1': 'Retry', '2': 'No Seek', '3': 'Both'}},
+{'setting_id': 'easynews.playback_method', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Ninguno', '1': 'Reintentar', '2': 'Sin búsqueda', '3': 'Ambos'}},
 {'setting_id': 'easynews.playback_method_retries', 'setting_type': 'action', 'setting_default': '1', 'min_value': '1', 'max_value': '4'},
 {'setting_id': 'easynews.playback_method_limited', 'setting_type': 'boolean', 'setting_default': 'false'},
 {'setting_id': 'playback.volumecheck_enabled', 'setting_type': 'boolean', 'setting_default': 'false'},
@@ -1440,7 +1472,7 @@ def default_settings():
 {'setting_id': 'playback.opensubs_api_key', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'playback.opensubs_username', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'playback.opensubs_password', 'setting_type': 'string', 'setting_default': 'empty_setting'},
-{'setting_id': 'playback.subs_source', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Local Subtitles', '1': 'SubMaker', '2': 'OpenSubtitles'}},
+{'setting_id': 'playback.subs_source', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Subtítulos Locales', '1': 'SubMaker', '2': 'OpenSubtitles'}},
 {'setting_id': 'playback.submaker_manifest', 'setting_type': 'string', 'setting_default': 'empty_setting'},
 {'setting_id': 'playback.submaker_language', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'English', '1': 'Arabic', '2': 'Bengali',
 '3': 'Bulgarian', '4': 'Chinese', '5': 'Croatian', '6': 'Czech', '7': 'Danish', '8': 'Dutch', '9': 'Finnish', '10': 'French', '11': 'German',

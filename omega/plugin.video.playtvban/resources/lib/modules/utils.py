@@ -32,7 +32,7 @@ class TaskPool:
 					else: target(*args)
 				except Exception as e: logger('thread queue error', str(e))
 
-	def tasks(self, _target, _list, _max_size=60, db_name=None):
+	def tasks(self, _target, _list, _max_size=20, db_name=None):
 		if not _list: return []
 		if not isinstance(_list[0], tuple): _list = [(i,) for i in _list]
 		[self._queue.put(tag) for tag in _list]
@@ -133,7 +133,8 @@ def make_day(today, date, date_format='%Y-%m-%d', use_words=True, include_date=F
 	if day_diff == -1: day = 'AYER'
 	elif day_diff == 0: day = 'HOY'
 	elif day_diff == 1: day = 'MAÑANA'
-	elif include_date or (1 < day_diff < 7):
+	# Weekday names for both past and future within ~1 week (calendars).
+	elif include_date or (1 < abs(day_diff) < 7):
 		day = date.strftime('%A').upper()
 	else:
 		return formatted

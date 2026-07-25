@@ -440,7 +440,7 @@ def trakt_reset_scrobble(params):
 		else:
 			return kodi_utils.notification('El reinicio de Scrobble solo está disponible para películas y episodios.', 3500)
 		trakt_sync_activities()
-		kodi_utils.notification('Éxito', 3000)
+		kodi_utils.notification('Correcto', 3000)
 	except:
 		kodi_utils.notification('Error', 3000)
 
@@ -468,8 +468,7 @@ def trakt_watchlist(media_type, dummy_arg):
 		current_date = get_datetime()
 		str_format = '%Y-%m-%d' if media_type in ('movie', 'movies') else '%Y-%m-%dT%H:%M:%S.%fZ'
 		data = [i for i in data if i.get('released', None) and js2date(i.get('released'), str_format, remove_time=True) <= current_date]
-	data = settings.sort_trakt_sync_list(data, 'watchlist')
-	return data
+	return list_sort.sort_source(data, 'trakt.watchlist', media_type, 'trakt_sync')
 
 def trakt_fetch_collection_watchlist(list_type, media_type):
 	def _process(params):
@@ -491,7 +490,7 @@ def add_to_list(user, slug, data):
 	result = call_trakt('/users/%s/lists/%s/items' % (user, slug), data=data)
 	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	return result
 
@@ -499,7 +498,7 @@ def remove_from_list(user, slug, data):
 	result = call_trakt('/users/%s/lists/%s/items/remove' % (user, slug), data=data)
 	if not result or result.get('deleted', {}).get('movies', 0) + result.get('deleted', {}).get('shows', 0) == 0:
 		return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	if kodi_utils.path_check('my_lists') or kodi_utils.external(): kodi_utils.kodi_refresh()
 	return result
@@ -606,7 +605,7 @@ def add_to_watchlist(data):
 	result = call_trakt('/sync/watchlist', data=data)
 	if result['existing']['movies'] + result['existing']['shows'] > 0: return kodi_utils.notification('Ya Está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['shows'] == 0: return kodi_utils.notification('Error', 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	return result
 
@@ -614,7 +613,7 @@ def remove_from_watchlist(data):
 	result = call_trakt('/sync/watchlist/remove', data=data)
 	if not result or result.get('deleted', {}).get('movies', 0) + result.get('deleted', {}).get('shows', 0) == 0:
 		return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	if kodi_utils.path_check('trakt_watchlist') or kodi_utils.external(): kodi_utils.kodi_refresh()
 	return result
@@ -623,7 +622,7 @@ def add_to_collection(data):
 	result = call_trakt('/sync/collection', data=data)
 	if result['existing']['movies'] + result['existing']['episodes'] > 0: return kodi_utils.notification('Ya está en la Lista', 3000)
 	if result['added']['movies'] + result['added']['episodes'] == 0: return kodi_utils.notification('Error', 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	return result
 
@@ -631,7 +630,7 @@ def remove_from_collection(data):
 	result = call_trakt('/sync/collection/remove', data=data)
 	if not result or result.get('deleted', {}).get('movies', 0) + result.get('deleted', {}).get('episodes', 0) == 0:
 		return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	if kodi_utils.path_check('trakt_collection') or kodi_utils.external(): kodi_utils.kodi_refresh()
 	return result
@@ -643,7 +642,7 @@ def add_to_favorites(data):
 		return kodi_utils.notification('Already In List', 3000)
 	if result.get('added', {}).get('movies', 0) + result.get('added', {}).get('shows', 0) == 0:
 		return kodi_utils.notification('Error', 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	return result
 
@@ -651,7 +650,7 @@ def remove_from_favorites(data):
 	result = call_trakt('/sync/favorites/remove', data=data)
 	if not result or result.get('deleted', {}).get('movies', 0) + result.get('deleted', {}).get('shows', 0) == 0:
 		return kodi_utils.notification(kodi_utils.LIST_ITEM_NOT_IN_LIST, 3000)
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	trakt_sync_activities()
 	if kodi_utils.path_check('trakt_favorites') or kodi_utils.external(): kodi_utils.kodi_refresh()
 	return result
@@ -770,8 +769,8 @@ def trakt_get_lists(list_type, page_no='1'):
 def get_trakt_list_selection(included_lists):
 	def default_lists():
 		return [
-		{'name': 'Movies Collection', 'display': '[B][I]MOVIES COLLECTION [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'movie'},
-		{'name': 'TV Show Collection', 'display': '[B][I]TV SHOW COLLECTION [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'show'},
+		{'name': 'Movies Library', 'display': '[B][I]MOVIES LIBRARY [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'movie'},
+		{'name': 'TV Show Library', 'display': '[B][I]TV SHOW LIBRARY [/I][/B]', 'user': 'Collection', 'slug': 'Collection', 'list_type': 'collection', 'media_type': 'show'},
 		{'name': 'Movies Watchlist', 'display': '[B][I]MOVIES WATCHLIST [/I][/B]',  'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'movie'},
 		{'name': 'TV Show Watchlist', 'display': '[B][I]TV SHOW WATCHLIST [/I][/B]',  'user': 'Watchlist', 'slug': 'Watchlist', 'list_type': 'watchlist', 'media_type': 'show'}
 		]
@@ -804,7 +803,7 @@ def make_new_trakt_list(params):
 	data = {'name': list_name, 'privacy': 'private', 'allow_comments': False}
 	call_trakt('users/me/lists', data=data)
 	trakt_sync_activities()
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	kodi_utils.kodi_refresh()
 
 def delete_trakt_list(params):
@@ -814,7 +813,7 @@ def delete_trakt_list(params):
 	url = 'users/%s/lists/%s' % (user, list_slug)
 	call_trakt(url, is_delete=True)
 	trakt_sync_activities()
-	kodi_utils.notification('Éxito', 3000)
+	kodi_utils.notification('Correcto', 3000)
 	kodi_utils.kodi_refresh()
 
 def trakt_like_a_list(params):
@@ -823,7 +822,7 @@ def trakt_like_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='post')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='post')
-		kodi_utils.notification('Éxito - Lista de Trakt Marcada como Me gusta', 3000)
+		kodi_utils.notification('Correcto - Lista de Trakt Marcada como Me gusta', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True
@@ -837,7 +836,7 @@ def trakt_unlike_a_list(params):
 	try:
 		if list_id is not None: call_trakt('/lists/%s/like' % list_id, method='delete')
 		else: call_trakt('/users/%s/lists/%s/like' % (user, list_slug), method='delete')
-		kodi_utils.notification('Éxito - Lista de Trakt Desmarcada de Me gusta', 3000)
+		kodi_utils.notification('Correcto - Lista de Trakt Desmarcada de Me gusta', 3000)
 		trakt_sync_activities()
 		if refresh: kodi_utils.kodi_refresh()
 		return True
@@ -1017,7 +1016,7 @@ def trakt_get_my_calendar(recently_aired, current_date):
 def trakt_calendar_days(recently_aired, current_date):
 	if recently_aired: start, finish = (current_date - timedelta(days=14)).strftime('%Y-%m-%d'), '14'
 	else:
-		previous_days = int(get_setting('playtvban.trakt.calendar_previous_days', '0'))
+		previous_days = int(get_setting('playtvban.trakt.calendar_previous_days', '7'))
 		future_days = int(get_setting('playtvban.trakt.calendar_future_days', '7'))
 		start = (current_date - timedelta(days=previous_days)).strftime('%Y-%m-%d')
 		finish = str(previous_days + future_days)

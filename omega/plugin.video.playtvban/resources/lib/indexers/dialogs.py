@@ -679,28 +679,28 @@ def trakt_manager_choice(params):
 	in_lists, out_lists = trakt_api.trakt_personal_lists_split_by_membership(media_type, tmdb_id, imdb_id, tvdb_id)
 	choices = []
 	if trakt_api.trakt_item_in_sync_list('watchlist', media_type, tmdb_id, imdb_id, tvdb_id):
-		choices.append(('Quitar de la [B]Lista de Seguimiento[/B]', 'remove_watchlist'))
+		choices.append(('Eliminar de [B]Seguimiento[/B]', 'remove_watchlist'))
 	else:
-		choices.append(('Añadir a la [B]Lista de Seguimiento[/B]', 'add_watchlist'))
+		choices.append(('Añadir a [B]Seguimiento[/B]', 'add_watchlist'))
 	if trakt_api.trakt_item_in_sync_list('collection', media_type, tmdb_id, imdb_id, tvdb_id):
-		choices.append(('Quitar de la [B]Colección[/B]', 'remove_collection'))
+		choices.append(('Eliminar de [B]Biblioteca[/B]', 'remove_collection'))
 	else:
-		choices.append(('Añadir a la [B]Colección[/B]', 'add_collection'))
+		choices.append(('Añadir a [B]Biblioteca[/B]', 'add_collection'))
 	if trakt_api.trakt_item_in_favorites(media_type, tmdb_id, imdb_id, tvdb_id):
-		choices.append(('Quitar de [B]Favoritos[/B]', 'remove_favorites'))
+		choices.append(('Eliminar de [B]Favoritos[/B]', 'remove_favorites'))
 	else:
 		choices.append(('Añadir a [B]Favoritos[/B]', 'add_favorites'))
 	if media_type != 'movie':
 		if trakt_api.trakt_item_is_dropped(tmdb_id):
-			choices.append(('Restaurar [B]Serie[/B]', 'undrop'))
+			choices.append(('Dejar de seguir [B]Serie[/B]', 'undrop'))
 		else:
-			choices.append(('Ocultar [B]Serie[/B]', 'drop'))
+			choices.append(('Dejar de ver [B]Serie[/B]', 'drop'))
 	if out_lists:
-		choices.append(('Añadir a una [B]Lista Personal[/B]...', 'add'))
+		choices.append(('Añadir a [B]Lista Personal[/B]...', 'add'))
 	if in_lists:
-		choices.append(('Quitar de una [B]Lista Personal[/B]...', 'remove'))
-	watchlist_label = 'Lista de Seguimiento de Películas' if list_media == 'movie' else 'Lista de Seguimiento de Series'
-	collection_label = 'Colección de Películas' if list_media == 'movie' else 'Colección de Series'
+		choices.append(('Eliminar de [B]Lista Personal[/B]...', 'remove'))
+	watchlist_label = 'Películas en Seguimiento' if list_media == 'movie' else 'Series en Seguimiento'
+	collection_label = 'Películas en Biblioteca' if list_media == 'movie' else 'Series en Biblioteca'
 	favorites_label = 'Películas Favoritas' if list_media == 'movie' else 'Series Favoritas'
 	list_mode = 'build_movie_list' if list_media == 'movie' else 'build_tvshow_list'
 	choices.extend([
@@ -708,7 +708,7 @@ def trakt_manager_choice(params):
 		('Marcar como [B]No Vista[/B]', 'mark_unwatched'),
 		('Restablecer [B]Scrobble[/B]', 'reset_scrobble'),
 		('Abrir [B]Lista de Seguimiento[/B]', 'open_watchlist'),
-		('Abrir [B]Colección[/B]', 'open_collection'),
+		('Abrir [B]Biblioteca[/B]', 'open_collection'),
 		('Abrir [B]Favoritos[/B]', 'open_favorites'),
 		('Abrir [B]Listas con Me Gusta[/B]', 'open_liked_lists'),
 		('Abrir [B]Mis Listas[/B]', 'open_my_lists'),
@@ -754,7 +754,7 @@ def trakt_manager_choice(params):
 def _trakt_list_shortcut_choice(params, list_type):
 	if not settings.trakt_user_active(): return kodi_utils.notification('No Hay Ninguna Cuenta de Trakt Activa', 3500)
 	from apis import trakt_api
-	label = 'Lista de Seguimiento' if list_type == 'watchlist' else 'Colección'
+	label = 'Lista de Seguimiento' if list_type == 'watchlist' else 'Biblioteca'
 	heading = params.get('title') or ('Trakt %s' % label)
 	in_list = trakt_api.trakt_item_in_sync_list(list_type, params['media_type'], params.get('tmdb_id'), params.get('imdb_id'), params.get('tvdb_id'))
 	text = '¿Quitar de %s?' % label if in_list else '¿Añadir a %s?' % label
@@ -1233,7 +1233,8 @@ def options_menu_choice(params, meta=None):
 	tmdb_id, content, poster = params_get('tmdb_id', None), params_get('content', None), params_get('poster', None)
 	is_external, from_extras = params_get('is_external') in (True, 'True', 'true'), params_get('from_extras', 'false') == 'true'
 	season, episode = params_get('season', ''), params_get('episode', '')
-	single_ep_list = ('episode.progress', 'episode.recently_watched', 'episode.next_trakt', 'episode.next_playtvban', 'episode.next_simkl', 'episode.trakt_recently_aired', 'episode.trakt_calendar')
+	single_ep_list = ('episode.progress', 'episode.recently_watched', 'episode.next_trakt', 'episode.next_redlight', 'episode.next_simkl', 'episode.next_mdblist',
+					'episode.trakt_recently_aired', 'episode.trakt_calendar', 'episode.mdblist_calendar')
 	if not content: content = kodi_utils.container_content()[:-1]
 	menu_type = content
 	if content.startswith('episode.'): content = 'episode'

@@ -16,13 +16,13 @@ def addon_themes_opacity():
 def random_valid_type_check():
 	return {'build_movie_list': 'movie', 'build_tvshow_list': 'tvshow', 'build_season_list': 'season', 'build_episode_list': 'episode',
 	'build_in_progress_episode': 'single_episode', 'build_recently_watched_episode': 'single_episode', 'build_next_episode': 'single_episode',
-	'build_my_calendar': 'single_episode', 'build_trakt_lists': 'trakt_list',
+	'build_my_calendar': 'single_episode', 'build_mdbl_calendar': 'single_episode', 'build_trakt_lists': 'trakt_list',
 	'trakt.list.build_trakt_list': 'trakt_list', 'build_trakt_lists_contents': 'trakt_list', 'personal_lists.build_personal_list': 'personal_list',
 	'build_personal_lists_contents': 'personal_list', 'tmdblist.build_tmdb_list': 'tmdb_list', 'build_tmdb_lists_contents': 'tmdb_list'}
 
 def random_episodes_check():
 	return {'build_in_progress_episode': 'episode.progress', 'build_recently_watched_episode': 'episode.recently_watched',
-	'build_next_episode': 'episode.next', 'build_my_calendar': 'episode.trakt'}
+	'build_next_episode': 'episode.next', 'build_my_calendar': 'episode.trakt', 'build_mdbl_calendar': 'episode.mdblist'}
 
 def extras_button_label_values():
 	return {'movie':
@@ -59,7 +59,7 @@ def context_menu_items():
 	{'name': 'Explorar Más Como Esto', 'value': 'more_like_this'}, {'name': 'Explorar Similares', 'value': 'similar'}, {'name': 'En Listas de Trakt', 'value': 'in_trakt_list'},
 	{'name': 'Gestor de MDBList', 'value': 'mdblist_manager'}, {'name': 'Lista de Seguimiento de MDBList', 'value': 'mdblist_watchlist'}, {'name': 'Biblioteca de MDBList', 'value': 'mdblist_library'},
 	{'name': 'Gestor de Listas de Simkl', 'value': 'simkl_manager'}, {'name': 'Simkl Por Ver', 'value': 'simkl_plantowatch'},
-	{'name': 'Gestor de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Lista de Seguimiento de Trakt', 'value': 'trakt_watchlist'}, {'name': 'Colección de Trakt', 'value': 'trakt_collection'},
+	{'name': 'Gestor de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Lista de Seguimiento de Trakt', 'value': 'trakt_watchlist'}, {'name': 'Biblioteca de Trakt', 'value': 'trakt_collection'},
 	{'name': 'Gestor de Listas de TMDb', 'value': 'tmdb_manager'}, {'name': 'Lista de Seguimiento de TMDb', 'value': 'tmdb_watchlist'}, {'name': 'Favoritos de TMDb', 'value': 'tmdb_favorites'},
 	{'name': 'Gestor de Listas Personales', 'value': 'personal_manager'}, {'name': 'Gestor de Favoritos', 'value': 'favorites_manager'}, {'name': 'Marcar Visto/No Visto', 'value': 'mark_watched'},
 	{'name': 'Desmarcar Episodio Visto Anterior', 'value': 'unmark_previous_episode'}, {'name': 'Salir de la Lista', 'value': 'exit'}, {'name': 'Actualizar Widgets', 'value': 'refresh'},

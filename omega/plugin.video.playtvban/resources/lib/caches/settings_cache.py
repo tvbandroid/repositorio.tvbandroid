@@ -312,7 +312,7 @@ class SettingsCache:
 					from modules.settings import watched_provider_options
 					opts = watched_provider_options()
 					current = str(self.read_db_value('watched_indicators') or '0')
-					label = opts.get(current) or opts.get('0', 'Red Light')
+					label = opts.get(current) or opts.get('0', 'Play TVBan')
 					self.set_memory_cache('watched_indicators_name', label)
 				except: pass
 		if setting_type == 'action' and 'settings_options' in setting_info:

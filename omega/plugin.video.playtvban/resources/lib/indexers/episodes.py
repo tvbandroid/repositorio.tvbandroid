@@ -32,7 +32,7 @@ def _calendar_episode_date(service_first_aired, tmdb_premiered, adjust_hours):
 	return adjust_premiered_date(tmdb_premiered, adjust_hours)
 
 def _nextep_indicator_watchlist():
-	"""Never-started shows from the active Watched Indicators service watchlist (empty for Red Light)."""
+	"""Never-started shows from the active Watched Indicators service watchlist (empty for Play TVBan)."""
 	indicators = settings.watched_indicators()
 	try:
 		if indicators == 1:

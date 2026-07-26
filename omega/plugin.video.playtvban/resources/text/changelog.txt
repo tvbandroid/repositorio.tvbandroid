@@ -1,3 +1,9 @@
+[COLOR red][B]Versión 1.4.3[/B][/COLOR]
+- [B]Offcloud[/B]: con [B]Añadir caché de Debrid resuelta a la nube = Ninguno[/B], no se elimina la solicitud de la nube antes de que Kodi abra la URL de reproducción (estos enlaces tienen un alcance de solicitud y se cerraban inmediatamente). En su lugar, las solicitudes temporales se eliminan después de que finaliza la reproducción o si falla, lo que mantiene el objetivo de limpieza de archivos residuales de la versión 2.0.4 sin interrumpir la reproducción (#160).
+
+- [B]Calendario MDBList[/B]: se corrige la carpeta de calendario vacía, se refuerzan los metadatos de los programas (etiquetas de estudio), se acepta cualquier formato de respuesta del calendario MDBList, se ignoran los errores de API/caché vacíos y se corrige el filtrado por ventana de día para que se muestren de nuevo las próximas emisiones.
+- [B]MDBList[/B]: [B]Siguiente[/B] en Mis listas > Listas MDBList (junto a Calendario) — siguientes episodios no vistos del historial de visualización de MDBList, incluso cuando Indicadores de visualización es Simkl/Trakt/Local. Utiliza la configuración compartida de la lista de Siguientes episodios.
+
 [COLOR red][B]Versión 1.4.1[/B][/COLOR]
 - [B]Rendimiento[/B]: la metacaché almacena JSON en lugar de la representación de Python; la lista de metadatos ya no se refleja a través de las propiedades de la ventana (solo la ruta de la base de datos). Las conexiones SQLite usan WAL / NORMAL síncrono. El valor predeterminado del grupo de subprocesos es [B]20[/B] (antes era 60), incluso cuando [B]Limitar subprocesos concurrentes[/B] está desactivado, para reducir la presión sobre el límite de velocidad de TMDb tras la creación más rápida de listas (gracias a Tikipeter). Cuando el límite está activado, se conserva el valor de Subprocesos activos máximos guardado previamente.
 

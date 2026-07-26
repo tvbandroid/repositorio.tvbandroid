@@ -1470,7 +1470,7 @@
                           <property name="setting_label">Mostrar Días Anteriores</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_previous_days)]</property>
-                          <property name="setting_description">Elige cuántos días anteriores se mostrarán en el Calendario MDBList y en el Calendario Trakt</property>
+                          <property name="setting_description">Elige cuántos días anteriores se mostrarán en el Calendario de Trakt. La API del Calendario de MDBList no proporciona emisiones anteriores, por lo que esta configuración no tiene efecto allí.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.calendar_previous_days)</onclick>
                       </item>
                       <item>
@@ -1478,7 +1478,7 @@
                           <property name="setting_label">Mostrar Días Futuros</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.trakt.calendar_future_days)]</property>
-                          <property name="setting_description">Elige cuántos días futuros se mostrarán en el Calendario de MDBList y en el Calendario de Trakt</property>
+                          <property name="setting_description">Elige cuántos días futuros se mostrarán en el Calendario de MDBList y en el Calendario de Trakt.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=trakt.calendar_future_days)</onclick>
                       </item>
 <!-- META ACCOUNTS 50 -->

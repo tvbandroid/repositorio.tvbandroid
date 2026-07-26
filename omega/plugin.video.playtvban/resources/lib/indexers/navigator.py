@@ -29,18 +29,18 @@ class Navigator:
 					if can_move:
 						cm_items.append(('[B]Mover[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.move', 'active_list': self.list_name, 'position': count})))
 					cm_items.extend([
-					('[B]Eliminar[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.remove', 'active_list': self.list_name, 'position': count})),
+					('[B]Quitar[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.remove', 'active_list': self.list_name, 'position': count})),
 					('[B]Añadir Contenido[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.add', 'active_list': self.list_name, 'position': count})),
 					('[B]Restaurar Menú[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.restore', 'active_list': self.list_name, 'position': count})),
-					('[B]Buscar Nuevos Elementos del Menú[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.update', 'active_list': self.list_name, 'position': count})),
+					('[B]Buscar Nuevos Elementos de Menú[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.update', 'active_list': self.list_name, 'position': count})),
 					('[B]Recargar Menú[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.reload', 'active_list': self.list_name, 'position': count})),
 					('[B]Explorar Elementos Eliminados[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.browse', 'active_list': self.list_name, 'position': count})),
-					('[B]Añadir a la Carpeta de Accesos Directos[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))])
+					('[B]Añadir a Carpeta de Acceso Directo[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': url}))])
 					icon = k.resolve_list_icon(item.get('iconImage', ''))
 					item['iconImage'] = icon
 					listitem = self.make_listitem()
 					listitem.setLabel(item.get('name', ''))
-					listitem.setArt({'icon': icon, 'poster': icon, 'thumb': icon, 'fanart': self.fanart, 'banner': icon, 'landscape': icon})
+					k.set_list_item_art(listitem, icon, fanart=self.fanart)
 					info_tag = listitem.getVideoInfoTag(True)
 					info_tag.setPlot(' ')
 					if not self.is_external: listitem.addContextMenuItems(cm_items)
@@ -53,7 +53,7 @@ class Navigator:
 		can_move = len(browse_list) > 1
 		results = sorted(list(_process()), key=lambda k: k[1])
 		if not results and browse_list:
-			k.logger('Play TVBan', 'Construcción del menú vacía para %s (se esperaban %s elementos)' % (self.list_name, len(browse_list)))
+			k.logger('Play TVBan', 'menu build empty for %s (%s items expected)' % (self.list_name, len(browse_list)))
 		handle = int(sys.argv[1])
 		if results:
 			k.add_items(handle, [i[0] for i in results])
@@ -75,7 +75,7 @@ class Navigator:
 		from modules.service_expiry import premium_menu_label
 		if s.authorized_debrid_check('ad'): self.add({'mode': 'navigator.alldebrid'}, premium_menu_label('ad', 'All Debrid'), 'alldebrid')
 		if s.easynews_authorized(): self.add({'mode': 'navigator.easynews'}, premium_menu_label('easynews', 'EasyNews'), 'easynews')
-		if s.nzb_indexer_active(): self.add({'mode': 'navigator.nzb_indexers'}, 'NZB Indexers', 'search')
+		if s.nzb_indexer_active(): self.add({'mode': 'navigator.nzb_indexers'}, 'Indexadores NZB', 'search')
 		if s.authorized_debrid_check('oc'): self.add({'mode': 'navigator.offcloud'}, premium_menu_label('oc', 'Offcloud'), 'offcloud')
 		if s.authorized_debrid_check('pm'): self.add({'mode': 'navigator.premiumize'}, premium_menu_label('pm', 'Premiumize'), 'premiumize')
 		if s.authorized_debrid_check('rd'): self.add({'mode': 'navigator.real_debrid'}, premium_menu_label('rd', 'Real Debrid'), 'realdebrid')
@@ -83,9 +83,9 @@ class Navigator:
 		self.end_directory()
 
 	def easynews(self):
-		self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar vídeos', 'search')
-		self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar imágenes', 'search')
-		self.add({'mode': 'easynews.account_info', 'isFolder': 'false'}, 'Información de la cuenta', 'easynews')
+		self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar Vídeos', 'search')
+		self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar Imágenes', 'search')
+		self.add({'mode': 'easynews.account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'easynews')
 		self.end_directory()
 
 	def nzb_indexers(self):
@@ -98,32 +98,32 @@ class Navigator:
 		self.end_directory()
 
 	def real_debrid(self):
-		self.add({'mode': 'real_debrid.rd_cloud'}, 'Almacenamiento en la nube', 'realdebrid')
+		self.add({'mode': 'real_debrid.rd_cloud'}, 'Almacenamiento en la Nube', 'realdebrid')
 		self.add({'mode': 'real_debrid.rd_downloads'}, 'Historial', 'realdebrid')
 		self.add({'mode': 'real_debrid.rd_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'realdebrid')
 		self.end_directory()
 
 	def premiumize(self):
-		self.add({'mode': 'premiumize.pm_cloud'}, 'Almacenamiento en la nube', 'premiumize')
+		self.add({'mode': 'premiumize.pm_cloud'}, 'Almacenamiento en la Nube', 'premiumize')
 		self.add({'mode': 'premiumize.pm_transfers'}, 'Historial', 'premiumize')
 		self.add({'mode': 'premiumize.pm_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'premiumize')
 		self.end_directory()
 
 	def alldebrid(self):
-		self.add({'mode': 'alldebrid.ad_cloud'}, 'Almacenamiento en la nube', 'alldebrid')
+		self.add({'mode': 'alldebrid.ad_cloud'}, 'Almacenamiento en la Nube', 'alldebrid')
 		self.add({'mode': 'alldebrid.ad_downloads'}, 'Historial', 'alldebrid')
-		self.add({'mode': 'alldebrid.ad_saved_links'}, 'Enlaces guardados', 'alldebrid')
+		self.add({'mode': 'alldebrid.ad_saved_links'}, 'Enlaces Guardados', 'alldebrid')
 		self.add({'mode': 'alldebrid.ad_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'alldebrid')
 		self.end_directory()
 
 	def offcloud(self):
-		self.add({'mode': 'offcloud.oc_cloud'}, 'Almacenamiento en la nube', 'offcloud')
+		self.add({'mode': 'offcloud.oc_cloud'}, 'Almacenamiento en la Nube', 'offcloud')
 		self.add({'mode': 'offcloud.oc_history'}, 'Historial', 'offcloud')
 		self.add({'mode': 'offcloud.oc_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'offcloud')
 		self.end_directory()
 
 	def torbox(self):
-		self.add({'mode': 'torbox.tb_cloud'}, 'Almacenamiento en la nube', 'torbox')
+		self.add({'mode': 'torbox.tb_cloud'}, 'Almacenamiento en la Nube', 'torbox')
 		self.add({'mode': 'torbox.tb_history'}, 'Historial', 'torbox')
 		self.add({'mode': 'torbox.send_webdl', 'isFolder': 'false'}, 'Enviar URL a WebDL', 'torbox')
 		self.add({'mode': 'torbox.tb_account_info', 'isFolder': 'false'}, 'Información de la Cuenta', 'torbox')
@@ -143,71 +143,71 @@ class Navigator:
 	def my_lists(self):
 		# Authorised services A–Z, then public/local discovery.
 		if s.mdblist_user_active():
-			self._safe_add({'mode': 'navigator.mdblist_lists'}, 'Listas MDBList', 'mdblist')
+			self._safe_add({'mode': 'navigator.mdblist_lists'}, 'Listas de MDBList', 'mdblist')
 		if s.simkl_user_active():
-			self._safe_add(self._simkl_lists_menu(), 'Simkl Lists', 'simkl')
-		if s.tmdblist_user_active(): self._safe_add({'mode': 'navigator.tmdb_lists_personal'}, 'Listas TMDb', 'tmdb')
-		if s.trakt_user_active(): self._safe_add({'mode': 'navigator.trakt_lists_personal'}, 'Listas Trakt', 'trakt')
-		self._safe_add({'mode': 'navigator.trakt_lists_public'}, 'Listas Públicas Trakt', 'trakt')
+			self._safe_add(self._simkl_lists_menu(), 'Listas de Simkl', 'simkl')
+		if s.tmdblist_user_active(): self._safe_add({'mode': 'navigator.tmdb_lists_personal'}, 'Listas de TMDb', 'tmdb')
+		if s.trakt_user_active(): self._safe_add({'mode': 'navigator.trakt_lists_personal'}, 'Listas de Trakt', 'trakt')
+		self._safe_add({'mode': 'navigator.trakt_lists_public'}, 'Listas Públicas de Trakt', 'trakt')
 		self._safe_add({'mode': 'personal_lists.get_personal_lists'}, 'Listas Personales', 'lists')
-		self._safe_add({'mode': 'navigator.discover_contents', 'media_type': 'movie', 'show_new': 'false'}, 'Descubrir Listas (Películas)', 'movies')
-		self._safe_add({'mode': 'navigator.discover_contents', 'media_type': 'tvshow', 'show_new': 'false'}, 'Descubrir Listas (Series)', 'tv')
+		self._safe_add({'mode': 'navigator.discover_contents', 'media_type': 'movie', 'show_new': 'false'}, 'Listas de Descubrimiento (Películas)', 'movies')
+		self._safe_add({'mode': 'navigator.discover_contents', 'media_type': 'tvshow', 'show_new': 'false'}, 'Listas de Descubrimiento (Series)', 'tv')
 		self._set_submenu_exit_params()
 		self.end_directory()
 
 	def tmdb_lists_personal(self):
 		# Shared meta-list order: Watchlist → Favorites → My Lists → Recommended.
-		self.add({'mode': 'navigator.tmdb_watchlists'}, 'Ver Más Tarde', 'tmdb')
+		self.add({'mode': 'navigator.tmdb_watchlists'}, 'Lista de Seguimiento', 'tmdb')
 		self.add({'mode': 'navigator.tmdb_favorites'}, 'Favoritos', 'tmdb')
-		self.add({'mode': 'navigator.tmdb_recommendations'}, 'Recomendaciones', 'tmdb')
 		self.add({'mode': 'tmdblist.get_tmdb_lists'}, 'Mis Listas', 'tmdb')
+		self.add({'mode': 'navigator.tmdb_recommendations'}, 'Recomendado', 'tmdb')
 		self._set_exit_params({'mode': 'navigator.my_lists'})
 		self.end_directory()
 
 	def tmdb_watchlists(self):
-		self.category_name = 'Watchlist'
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'movie', 'list_name': 'Movie Watchlist'}, 'Lista de Películas para Ver', 'tmdb',
+		self.category_name = 'Lista de Seguimiento'
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'movie', 'list_name': 'Lista de Seguimiento de Películas'}, 'Lista de Seguimiento de Películas', 'tmdb',
 					cm_items=self._sort_cm('tmdb.watchlist:movies', None, 'tmdb', fallback='default:asc'))
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'tv', 'list_name': 'TV Show Watchlist'}, 'Lista de Series para Ver', 'tmdb',
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'watchlist', 'media_type': 'tv', 'list_name': 'Lista de Seguimiento de Series'}, 'Lista de Seguimiento de Series', 'tmdb',
 					cm_items=self._sort_cm('tmdb.watchlist:shows', None, 'tmdb', fallback='default:asc'))
 		self._set_exit_params({'mode': 'navigator.tmdb_lists_personal'})
 		self.end_directory()
 
 	def tmdb_favorites(self):
-		self.category_name = 'Favorites'
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'movie', 'list_name': 'Movie Favorites'}, 'Películas Favoritas', 'tmdb',
+		self.category_name = 'Favoritos'
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'movie', 'list_name': 'Películas Favoritas'}, 'Películas Favoritas', 'tmdb',
 					cm_items=self._sort_cm('tmdb.favorites:movies', None, 'tmdb', fallback='default:asc'))
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'tv', 'list_name': 'TV Show Favorites'}, 'Series Favoritas', 'tmdb',
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'favorites', 'media_type': 'tv', 'list_name': 'Series Favoritas'}, 'Series Favoritas', 'tmdb',
 					cm_items=self._sort_cm('tmdb.favorites:shows', None, 'tmdb', fallback='default:asc'))
 		self._set_exit_params({'mode': 'navigator.tmdb_lists_personal'})
 		self.end_directory()
 
 	def tmdb_recommendations(self):
-		self.category_name = 'Recommendations'
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'movie', 'list_name': 'Movie Recommendations'}, 'Recomendaciones de Películas', 'tmdb',
+		self.category_name = 'Recomendaciones'
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'movie', 'list_name': 'Recomendaciones de Películas'}, 'Recomendaciones de Películas', 'tmdb',
 					cm_items=self._sort_cm('tmdb.recommendations:movies', None, 'tmdb', fallback='default:asc'))
-		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'tv', 'list_name': 'TV Show Recommendations'}, 'Recomendaciones de Series', 'tmdb',
+		self.add({'mode': 'tmdblist.build_tmdb_list', 'list_id': 'recommendations', 'media_type': 'tv', 'list_name': 'Recomendaciones de Series'}, 'Recomendaciones de Series', 'tmdb',
 					cm_items=self._sort_cm('tmdb.recommendations:shows', None, 'tmdb', fallback='default:asc'))
 		self._set_exit_params({'mode': 'navigator.tmdb_lists_personal'})
 		self.end_directory()
 
 	def trakt_lists_personal(self):
 		# Shared meta-list order: Watchlist → Library → Favorites → My Lists → Liked → Recommended → Calendar → Search.
-		self.add({'mode': 'navigator.trakt_watchlists'}, 'Ver Más Tarde', 'trakt')
+		self.add({'mode': 'navigator.trakt_watchlists'}, 'Lista de Seguimiento', 'trakt')
 		self.add({'mode': 'navigator.trakt_collections'}, 'Biblioteca', 'trakt')
-		self.add({'mode': 'navigator.trakt_favorites', 'category_name': 'Favorites'}, 'Favoritos', 'trakt'
-		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'my_lists', 'category_name': 'My Lists'}, 'Mis Listas', 'trakt')
-		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'liked_lists', 'category_name': 'Liked Lists'}, 'Listas que me Gustan', 'trakt')
-		self.add({'mode': 'navigator.trakt_recommendations', 'category_name': 'Recommended'}, 'Recomendados', 'trakt')
+		self.add({'mode': 'navigator.trakt_favorites', 'category_name': 'Favoritos'}, 'Favoritos', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'my_lists', 'category_name': 'Mis Listas'}, 'Mis Listas', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_lists', 'list_type': 'liked_lists', 'category_name': 'Listas que Te Gustan'}, 'Listas que Te Gustan', 'trakt')
+		self.add({'mode': 'navigator.trakt_recommendations', 'category_name': 'Recomendado'}, 'Recomendado', 'trakt')
 		self.add({'mode': 'build_my_calendar'}, 'Calendario', 'trakt')
-		if s.trakt_user_active(): self.add({'mode': 'navigator.search_history', 'action': 'trakt_my_lists'}, 'Buscar Mis Listas de Trakt', 'search')
+		if s.trakt_user_active(): self.add({'mode': 'navigator.search_history', 'action': 'trakt_my_lists'}, 'Buscar en Mis Listas de Trakt', 'search')
 		self._set_exit_params({'mode': 'navigator.my_lists'})
 		self.end_directory()
 
 	def trakt_lists_public(self):
-		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'category_name': 'Trending User Lists'}, 'Listas de Usuarios en Tendencia', 'trakt')
-		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'category_name': 'Popular User Lists'}, 'Listas de Usuarios Populares', 'trakt')
-		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Buscar Listas de Usuarios', 'search')
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'trending', 'category_name': 'Listas de Usuario en Tendencia'}, 'Listas de Usuario en Tendencia', 'trakt')
+		self.add({'mode': 'trakt.list.get_trakt_user_lists', 'list_type': 'popular', 'category_name': 'Listas de Usuario Populares'}, 'Listas de Usuario Populares', 'trakt')
+		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Buscar Listas de Usuario', 'search')
 		self._set_exit_params({'mode': 'navigator.my_lists'})
 		self.end_directory()
 
@@ -215,13 +215,13 @@ class Navigator:
 		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'movie'}, 'Listas Aleatorias de Películas', 'movies')
 		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'tvshow'}, 'Listas Aleatorias de Series', 'tv')
 		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'anime'}, 'Listas Aleatorias de Anime', 'anime')
-		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'because_you_watched'}, 'Aleatorio Porque Has Visto', 'because_you_watched')
+		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'because_you_watched'}, 'Aleatorio de Porque Viste', 'because_you_watched')
 		if s.tmdblist_user_active(): self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'tmdb_lists'}, 'Listas Aleatorias de TMDb', 'tmdb')
 		self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'personal_lists'}, 'Listas Personales Aleatorias', 'lists')
 		if s.simkl_user_active(): self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'simkl_lists'}, 'Listas Aleatorias de Simkl', 'simkl')
 		if s.trakt_user_active():
-			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_personal'}, 'Listas Aleatorias de Trakt (Personales)', 'trakt')
-			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_public'}, 'Listas Aleatorias de Trakt (Públicas)', 'trakt')
+			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_personal'}, 'Listas Aleatorias de Trakt (Personal)', 'trakt')
+			self.add({'mode': 'navigator.build_random_lists', 'menu_type': 'trakt_public'}, 'Listas Aleatorias de Trakt (Pública)', 'trakt')
 		self._set_submenu_exit_params()
 		self.end_directory()
 
@@ -239,59 +239,59 @@ class Navigator:
 		"""Flat status lists — Plan to Watch (≈ Watchlist), then active → paused → finished → dropped."""
 		self.category_name = 'Listas de Simkl'
 		for url_params, label in (
-			(self._simkl_list_link('build_movie_list', 'simkl_plantowatch', 'Películas Pendientes por Ver'), 'Películas Pendientes por Ver'),
-			(self._simkl_list_link('build_tvshow_list', 'simkl_plantowatch', 'Series Pendientes por Ver'), 'Series Pendientes por Ver'),
-			(self._simkl_list_link('build_movie_list', 'simkl_watching', 'Películas en Reproducción'), 'Películas en Reproducción'),
-			(self._simkl_list_link('build_tvshow_list', 'simkl_watching', 'Series en Reproducción'), 'Series en Reproducción'),
-			(self._simkl_list_link('build_movie_list', 'simkl_hold', 'Películas en Pausa'), 'Películas en Pausa'),
-			(self._simkl_list_link('build_tvshow_list', 'simkl_hold', 'Series en Pausa'), 'Series en Pausa'),
-			(self._simkl_list_link('build_movie_list', 'simkl_completed', 'Movies Completed'), 'Películas Completadas'),
-			(self._simkl_list_link('build_tvshow_list', 'simkl_completed', 'TV Shows Completed'), 'Series Completadas'),
+			(self._simkl_list_link('build_movie_list', 'simkl_plantowatch', 'Películas Por Ver'), 'Películas Por Ver'),
+			(self._simkl_list_link('build_tvshow_list', 'simkl_plantowatch', 'Series Por Ver'), 'Series Por Ver'),
+			(self._simkl_list_link('build_movie_list', 'simkl_watching', 'Películas Viendo'), 'Películas Viendo'),
+			(self._simkl_list_link('build_tvshow_list', 'simkl_watching', 'Series Viendo'), 'Series Viendo'),
+			(self._simkl_list_link('build_movie_list', 'simkl_hold', 'Películas En Pausa'), 'Películas En Pausa'),
+			(self._simkl_list_link('build_tvshow_list', 'simkl_hold', 'Series En Pausa'), 'Series En Pausa'),
+			(self._simkl_list_link('build_movie_list', 'simkl_completed', 'Películas Completadas'), 'Películas Completadas'),
+			(self._simkl_list_link('build_tvshow_list', 'simkl_completed', 'Series Completadas'), 'Series Completadas'),
 			(self._simkl_list_link('build_movie_list', 'simkl_dropped', 'Películas Abandonadas'), 'Películas Abandonadas'),
 			(self._simkl_list_link('build_tvshow_list', 'simkl_dropped', 'Series Abandonadas'), 'Series Abandonadas'),
 		):
 			media_type = 'movies' if url_params['mode'] == 'build_movie_list' else 'shows'
 			status = url_params['action'].replace('simkl_', '', 1)
-			self._safe_add(url_params, label, 'simkl', cm_items=self._simkl_sort_cm(media_type))
-		self._safe_add({'mode': 'navigator.search_history', 'action': 'simkl_lists'}, 'Buscar Mis Listas de Simkl', 'search')
+			self._safe_add(url_params, label, 'simkl', cm_items=self._simkl_sort_cm(media_type, status))
+		self._safe_add({'mode': 'navigator.search_history', 'action': 'simkl_lists'}, 'Buscar en Mis Listas de Simkl', 'search')
 		self.end_directory()
 
 	def simkl_watchlists(self):
-		self.category_name = 'Pendientes por Ver'
-		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_plantowatch', 'Películas Pendientes por Ver'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'plantowatch'))
-		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_plantowatch', 'Series Pendientes por Ver'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'plantowatch'))
+		self.category_name = 'Por Ver'
+		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_plantowatch', 'Películas Por Ver'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'plantowatch'))
+		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_plantowatch', 'Series Por Ver'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'plantowatch'))
 		self.end_directory()
 
 	def simkl_completed(self):
-		self.category_name = 'Completadas'
-		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_completed', 'Películas Completadas'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies'))
-		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_completed', 'Series Completadas'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows'))
+		self.category_name = 'Completado'
+		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_completed', 'Películas Completadas'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'completed'))
+		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_completed', 'Series Completadas'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'completed'))
 		self.end_directory()
 
 	def simkl_watching(self):
-		self.category_name = 'En Reproducción'
-		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_watching', 'Películas en Reproducción'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'watching'))
-		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_watching', 'Series en Reproducción'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'watching'))
+		self.category_name = 'Viendo'
+		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_watching', 'Películas Viendo'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'watching'))
+		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_watching', 'Series Viendo'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'watching'))
 		self.end_directory()
 
 	def simkl_hold(self):
 		self.category_name = 'En Pausa'
-		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_hold', 'Películas en Pausa'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'hold'))
-		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_hold', 'Series en Pausa'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'hold'))
+		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_hold', 'Películas En Pausa'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'hold'))
+		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_hold', 'Series En Pausa'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'hold'))
 		self.end_directory()
 
 	def simkl_dropped(self):
-		self.category_name = 'Abandonadas'
+		self.category_name = 'Abandonado'
 		self._safe_add(self._simkl_list_link('build_movie_list', 'simkl_dropped', 'Películas Abandonadas'), 'Películas', 'simkl', cm_items=self._simkl_sort_cm('movies', 'dropped'))
 		self._safe_add(self._simkl_list_link('build_tvshow_list', 'simkl_dropped', 'Series Abandonadas'), 'Series', 'simkl', cm_items=self._simkl_sort_cm('shows', 'dropped'))
 		self.end_directory()
 
 	def mdblist_lists(self):
-		# Shared meta-list order: Watchlist → Library → Dropped → My Lists → Liked → Popular → Calendar.
+		# Shared meta-list order: Watchlist → Library → Dropped → My Lists → Liked → Popular → Next Up → Calendar.
 		self.category_name = 'Listas de MDBList'
-		self._safe_add({'mode': 'build_movie_list', 'action': 'mdblist_watchlist', 'category_name': 'Lista de seguimiento de Películas'}, 'Lista de seguimiento de Películas', 'mdblist',
+		self._safe_add({'mode': 'build_movie_list', 'action': 'mdblist_watchlist', 'category_name': 'Lista de Seguimiento de Películas'}, 'Lista de Seguimiento de Películas', 'mdblist',
 					cm_items=self._sort_cm('mdblist.watchlist', 'movies', 'mdblist_watchlist'))
-		self._safe_add({'mode': 'build_tvshow_list', 'action': 'mdblist_watchlist', 'category_name': 'Lista de seguimiento de Series'}, 'Lista de seguimiento de Series', 'mdblist',
+		self._safe_add({'mode': 'build_tvshow_list', 'action': 'mdblist_watchlist', 'category_name': 'Lista de Seguimiento de Series'}, 'Lista de Seguimiento de Series', 'mdblist',
 					cm_items=self._sort_cm('mdblist.watchlist', 'shows', 'mdblist_watchlist'))
 		self._safe_add({'mode': 'build_movie_list', 'action': 'mdblist_collection', 'category_name': 'Biblioteca de Películas'}, 'Biblioteca de Películas', 'mdblist',
 					cm_items=self._sort_cm('mdblist.collection', 'movies', 'mdblist_collection'))
@@ -299,10 +299,11 @@ class Navigator:
 					cm_items=self._sort_cm('mdblist.collection', 'shows', 'mdblist_collection'))
 		self._safe_add({'mode': 'build_tvshow_list', 'action': 'mdblist_droplist', 'category_name': 'Series Abandonadas'}, 'Series Abandonadas', 'mdblist')
 		self._safe_add({'mode': 'mdblist.get_mdbl_lists', 'name': 'Mis Listas'}, 'Mis Listas', 'mdblist')
-		self._safe_add({'mode': 'mdblist.get_mdbl_liked_lists', 'name': 'Listas de Películas que me gustan', 'media_type': 'movie'}, 'Listas de Películas que me gustan', 'mdblist')
-		self._safe_add({'mode': 'mdblist.get_mdbl_liked_lists', 'name': 'Listas de Series que me gustan', 'media_type': 'tvshow'}, 'Listas de Series que me gustan', 'mdblist')
-		self._safe_add({'mode': 'mdblist.get_mdbl_top_lists', 'name': 'Listas Populares de MDBList'}, 'Listas Populares de MDBList', 'mdblist')
-		self._safe_add({'mode': 'build_mdbl_calendar'}, 'Calendar', 'mdblist')
+		self._safe_add({'mode': 'mdblist.get_mdbl_liked_lists', 'name': 'Listas de Películas que Te Gustan', 'media_type': 'movie'}, 'Listas de Películas que Te Gustan', 'mdblist')
+		self._safe_add({'mode': 'mdblist.get_mdbl_liked_lists', 'name': 'Listas de Series que Te Gustan', 'media_type': 'tvshow'}, 'Listas de Series que Te Gustan', 'mdblist')
+		self._safe_add({'mode': 'mdblist.get_mdbl_top_lists', 'name': 'MDBLists Populares'}, 'MDBLists Populares', 'mdblist')
+		self._safe_add({'mode': 'build_mdbl_next_up'}, 'Próximo', 'mdblist')
+		self._safe_add({'mode': 'build_mdbl_calendar'}, 'Calendario', 'mdblist')
 		self._set_exit_params({'mode': 'navigator.my_lists'})
 		self.end_directory()
 
@@ -320,10 +321,10 @@ class Navigator:
 		self.end_directory()
 
 	def trakt_watchlists(self):
-		self.category_name = 'Lista de seguimiento'
-		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist', 'category_name': 'Lista de seguimiento de Películas'}, 'Lista de seguimiento de Películas', 'trakt',
+		self.category_name = 'Lista de Seguimiento'
+		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist', 'category_name': 'Lista de Seguimiento de Películas'}, 'Lista de Seguimiento de Películas', 'trakt',
 					cm_items=self._sort_cm('trakt.watchlist', 'movies', 'trakt_sync'))
-		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist', 'category_name': 'Lista de seguimiento de Series'}, 'Lista de seguimiento de Series', 'trakt',
+		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist', 'category_name': 'Lista de Seguimiento de Series'}, 'Lista de Seguimiento de Series', 'trakt',
 					cm_items=self._sort_cm('trakt.watchlist', 'shows', 'trakt_sync'))
 		self.add({'mode': 'build_movie_list', 'action': 'trakt_watchlist_lists', 'new_page': 'recent', 'category_name': 'Películas Añadidas Recientemente'}, 'Películas Añadidas Recientemente', 'trakt')
 		self.add({'mode': 'build_tvshow_list', 'action': 'trakt_watchlist_lists', 'new_page': 'recent', 'category_name': 'Series Añadidas Recientemente'},
@@ -346,9 +347,9 @@ class Navigator:
 		self.end_directory()
 
 	def people(self):
-		self.add({'mode': 'build_tmdb_people', 'action': 'popular', 'isFolder': 'false', 'name': 'Populares'}, 'Populares', 'popular')
-		self.add({'mode': 'build_tmdb_people', 'action': 'day', 'isFolder': 'false', 'name': 'Tendencias'}, 'Tendencias', 'trending')
-		self.add({'mode': 'build_tmdb_people', 'action': 'week', 'isFolder': 'false', 'name': 'Tendencias de Esta Semana'}, 'Tendencias de Esta Semana', 'trending_recent')
+		self.add({'mode': 'build_tmdb_people', 'action': 'popular', 'isFolder': 'false', 'name': 'Popular'}, 'Popular', 'popular')
+		self.add({'mode': 'build_tmdb_people', 'action': 'day', 'isFolder': 'false', 'name': 'Tendencia'}, 'Tendencia', 'trending')
+		self.add({'mode': 'build_tmdb_people', 'action': 'week', 'isFolder': 'false', 'name': 'Tendencia Esta Semana'}, 'Tendencia Esta Semana', 'trending_recent')
 		self.end_directory()
 
 	def search(self):
@@ -359,15 +360,15 @@ class Navigator:
 		self.add({'mode': 'navigator.search_history', 'action': 'people', 'name': 'Historial de Búsqueda de Personas'}, 'Buscar Personas', 'people')
 		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_movie', 'name': 'Historial de Búsqueda de Palabras Clave (Películas)'}, 'Buscar Palabras Clave (Películas)', 'tmdb')
 		self.add({'mode': 'navigator.search_history', 'action': 'tmdb_keyword_tvshow', 'name': 'Historial de Búsqueda de Palabras Clave (Series)'}, 'Buscar Palabras Clave (Series)', 'tmdb')
-		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Buscar Listas de Usuarios de Trakt', 'trakt')
+		self.add({'mode': 'navigator.search_history', 'action': 'trakt_lists'}, 'Buscar Listas de Usuario de Trakt', 'trakt')
 		if s.easynews_authorized():
-			self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar Videos de EasyNews', 'easynews')
-			self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar Imágenes de EasyNews', 'easynews')
-		if s.nzb_indexer_active(): self.add({'mode': 'navigator.search_history', 'action': 'nzb_search'}, 'Buscar los indexadores NZB', 'search')
+			self.add({'mode': 'navigator.search_history', 'action': 'easynews_video'}, 'Buscar Vídeos en EasyNews', 'easynews')
+			self.add({'mode': 'navigator.search_history', 'action': 'easynews_image'}, 'Buscar Imágenes en EasyNews', 'easynews')
+		if s.nzb_indexer_active(): self.add({'mode': 'navigator.search_history', 'action': 'nzb_search'}, 'Buscar en Indexadores NZB', 'search')
 		self.end_directory()
 
 	def downloads(self):
-		self.add({'mode': 'downloader.manager', 'name': 'Administrador de Descargas', 'isFolder': 'false'}, 'Administrador de Descargas', 'downloads')
+		self.add({'mode': 'downloader.manager', 'name': 'Gestor de Descargas', 'isFolder': 'false'}, 'Gestor de Descargas', 'downloads')
 		self.add({'mode': 'downloader.viewer', 'folder_type': 'movie', 'name': 'Películas'}, 'Películas', 'movies')
 		self.add({'mode': 'downloader.viewer', 'folder_type': 'episode', 'name': 'Series'}, 'Series', 'tv')
 		self.add({'mode': 'downloader.viewer', 'folder_type': 'premium', 'name': 'Archivos Premium'}, 'Archivos Premium', 'premium')
@@ -375,23 +376,23 @@ class Navigator:
 		self.end_directory()
 
 	def tools(self):
-		self.add({'mode': 'open_settings', 'isFolder': 'false'}, 'Configuración', 'settings')
+		self.add({'mode': 'open_settings', 'isFolder': 'false'}, 'Ajustes', 'settings')
 		if s.configured_external_scraper_slots():
 			self.add({'mode': 'open_external_scraper_settings', 'isFolder': 'false'}, s.external_scraper_settings_tools_label(), 'settings')
 		self.add({'mode': 'navigator.tips'}, 'Consejos de Uso', 'settings2')
 		if get_setting('playtvban.use_viewtypes', 'true') == 'true' and not get_setting('playtvban.manual_viewtypes', 'false') == 'true':
-			self.add({'mode': 'navigator.set_view_modes'}, 'Configurar Vistas', 'settings2')
-		self.add({'mode': 'navigator.changelog_utils'}, 'Registro de Cambios y Utilidades de Registro', 'settings2')
-		self.add({'mode': 'build_next_episode_manager'}, 'Administrador del Progreso de Series', 'settings2')
-		self.add({'mode': 'navigator.shortcut_folders'}, 'Administrador de Carpetas de Accesos Directos', 'settings2')
+			self.add({'mode': 'navigator.set_view_modes'}, 'Establecer Vistas', 'settings2')
+		self.add({'mode': 'navigator.changelog_utils'}, 'Registro de Cambios y Utilidades de Log', 'settings2')
+		self.add({'mode': 'build_next_episode_manager'}, 'Gestor de Progreso de Series', 'settings2')
+		self.add({'mode': 'navigator.shortcut_folders'}, 'Gestor de Carpetas de Acceso Directo', 'settings2')
 		self.add({'mode': 'navigator.import_export'}, 'Importar y Exportar', 'settings2')
 		self.add({'mode': 'navigator.maintenance'}, 'Mantenimiento de Base de Datos y Caché', 'settings2')
-		self.add({'mode': 'language_invoker_choice', 'isFolder': 'false'}, 'Alternar Invocador de Idioma (¡¡AVANZADO!!)', 'settings2')
+		self.add({'mode': 'language_invoker_choice', 'isFolder': 'false'}, 'Alternar Language Invoker (¡¡AVANZADO!!)', 'settings2')
 		self.end_directory()
 
 	def import_export(self):
-		self.add({'mode': 'settings_backup.import_settings', 'isFolder': 'false'}, 'Importar Configuración de Play TVBan', 'settings')
-		self.add({'mode': 'settings_backup.export_settings', 'isFolder': 'false'}, 'Exportar Configuración de Play TVBan', 'settings')
+		self.add({'mode': 'settings_backup.import_settings', 'isFolder': 'false'}, 'Importar Ajustes de Play TVBan', 'settings')
+		self.add({'mode': 'settings_backup.export_settings', 'isFolder': 'false'}, 'Exportar Ajustes de Play TVBan', 'settings')
 		self.add({'mode': 'local_backup.import_data', 'isFolder': 'false'}, 'Importar Favoritos e Historial de Play TVBan', 'folder')
 		self.add({'mode': 'local_backup.export_data', 'isFolder': 'false'}, 'Exportar Favoritos e Historial de Play TVBan', 'folder')
 		self.add({'mode': 'kodi_favorites.import_favorites', 'isFolder': 'false'}, 'Importar Favoritos de Kodi', 'favorites')
@@ -399,49 +400,49 @@ class Navigator:
 		self.end_directory()
 
 	def maintenance(self):
-		self.add({'mode': 'check_databases_integrity_cache', 'isFolder': 'false'}, 'Comprobar Bases de Datos Dañadas', 'settings')
+		self.add({'mode': 'check_databases_integrity_cache', 'isFolder': 'false'}, 'Comprobar Bases de Datos Corruptas', 'settings')
 		self.add({'mode': 'clean_databases_cache', 'isFolder': 'false'}, 'Limpiar Bases de Datos', 'settings')
-		self.add({'mode': 'sync_settings', 'silent': 'false', 'isFolder': 'false'}, 'Reconstruir la Caché de Configuración', 'settings')
-		self.add({'mode': 'clear_all_cache', 'isFolder': 'false'}, 'Borrar Toda la Caché (Excepto Favoritos)', 'settings')
-		self.add({'mode': 'clear_favorites_choice', 'isFolder': 'false'}, 'Borrar Caché de Favoritos', 'settings')
-		self.add({'mode': 'search.clear_search', 'isFolder': 'false'}, 'Borrar Caché del Historial de Búsquedas', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'ai_functions', 'isFolder': 'false'}, 'Borrar Caché de Datos de IA', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'list', 'isFolder': 'false'}, 'Borrar Caché de Listas', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'main', 'isFolder': 'false'}, 'Borrar Caché Principal', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'meta', 'isFolder': 'false'}, 'Borrar Caché de Metadatos', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'tmdb_list', 'isFolder': 'false'}, 'Borrar Caché de Listas Personales de TMDb', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'imdb', 'isFolder': 'false'}, 'Borrar Caché de IMDb', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'mdblist', 'isFolder': 'false'}, 'Borrar Caché de MDBList', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'simkl', 'isFolder': 'false'}, 'Borrar Caché de Simkl', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'trakt', 'isFolder': 'false'}, 'Borrar Caché de Trakt', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'subtitles', 'isFolder': 'false'}, 'Borrar Caché de Subtítulos', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'easynews_scrape', 'isFolder': 'false'}, 'Borrar Caché de Scrape de EasyNews', 'settings')
-		self.add({'mode': 'search.clear_easynews_search_history', 'isFolder': 'false'}, 'Borrar Historial de Búsquedas de EasyNews', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'external_scrapers', 'isFolder': 'false'}, 'Borrar Caché de Scrapers Externos', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'internal_scrapers', 'isFolder': 'false'}, 'Borrar Caché de Scrapers Internos', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'ad_cloud', 'isFolder': 'false'}, 'Borrar Caché de All Debrid', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'oc_cloud', 'isFolder': 'false'}, 'Borrar Caché de Offcloud', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'pm_cloud', 'isFolder': 'false'}, 'Borrar Caché de Premiumize', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'rd_cloud', 'isFolder': 'false'}, 'Borrar Caché de Real Debrid', 'settings')
-		self.add({'mode': 'clear_cache', 'cache': 'tb_cloud', 'isFolder': 'false'}, 'Borrar Caché de TorBox', 'settings')
+		self.add({'mode': 'sync_settings', 'silent': 'false', 'isFolder': 'false'}, 'Rehacer Caché de Ajustes', 'settings')
+		self.add({'mode': 'clear_all_cache', 'isFolder': 'false'}, 'Vaciar Toda la Caché (Excepto Favoritos)', 'settings')
+		self.add({'mode': 'clear_favorites_choice', 'isFolder': 'false'}, 'Vaciar Caché de Favoritos', 'settings')
+		self.add({'mode': 'search.clear_search', 'isFolder': 'false'}, 'Vaciar Caché del Historial de Búsqueda', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'ai_functions', 'isFolder': 'false'}, 'Vaciar Caché de Datos de IA', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'list', 'isFolder': 'false'}, 'Vaciar Caché de Listas', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'main', 'isFolder': 'false'}, 'Vaciar Caché Principal', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'meta', 'isFolder': 'false'}, 'Vaciar Caché de Metadatos', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'tmdb_list', 'isFolder': 'false'}, 'Vaciar Caché de Listas Personales de TMDb', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'imdb', 'isFolder': 'false'}, 'Vaciar Caché de IMDb', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'mdblist', 'isFolder': 'false'}, 'Vaciar Caché de MDBList', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'simkl', 'isFolder': 'false'}, 'Vaciar Caché de Simkl', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'trakt', 'isFolder': 'false'}, 'Vaciar Caché de Trakt', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'subtitles', 'isFolder': 'false'}, 'Vaciar Caché de Subtítulos', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'easynews_scrape', 'isFolder': 'false'}, 'Vaciar Caché de Búsqueda de EasyNews', 'settings')
+		self.add({'mode': 'search.clear_easynews_search_history', 'isFolder': 'false'}, 'Vaciar Historial de Búsqueda de EasyNews', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'external_scrapers', 'isFolder': 'false'}, 'Vaciar Caché de Scrapers Externos', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'internal_scrapers', 'isFolder': 'false'}, 'Vaciar Caché de Scrapers Internos', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'ad_cloud', 'isFolder': 'false'}, 'Vaciar Caché de All Debrid', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'oc_cloud', 'isFolder': 'false'}, 'Vaciar Caché de Offcloud', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'pm_cloud', 'isFolder': 'false'}, 'Vaciar Caché de Premiumize', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'rd_cloud', 'isFolder': 'false'}, 'Vaciar Caché de Real Debrid', 'settings')
+		self.add({'mode': 'clear_cache', 'cache': 'tb_cloud', 'isFolder': 'false'}, 'Vaciar Caché de TorBox', 'settings')
 		self.end_directory()
 
 	def set_view_modes(self):
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.main', 'content': 'files', 'name': 'menus'}, 'Configurar Menús', 'folder')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.movies', 'content': 'movies'}, 'Configurar Películas', 'movies')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.tvshows', 'content': 'tvshows'}, 'Configurar Series', 'tv')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.seasons', 'content': 'seasons'}, 'Configurar Temporadas', 'ontheair')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes', 'content': 'episodes'}, 'Configurar Episodios (mostrar temporadas)', 'next_episodes')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes_single', 'content': 'episodes', 'name': 'episode lists'}, 'Configurar Listas de Episodios (Próximos Episodios, etc.)', 'calender')
-		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.premium', 'content': 'files', 'name': 'premium files'}, 'Configurar Archivos Premium', 'premium')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.main', 'content': k.MENU_FOLDER_CONTENT, 'name': 'menus'}, 'Establecer Menús', 'folder')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.movies', 'content': 'movies'}, 'Establecer Películas', 'movies')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.tvshows', 'content': 'tvshows'}, 'Establecer Series', 'tv')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.seasons', 'content': 'seasons'}, 'Establecer Temporadas', 'ontheair')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes', 'content': 'episodes'}, 'Establecer Episodios (mostrar temporadas)', 'next_episodes')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.episodes_single', 'content': 'episodes', 'name': 'episode lists'}, 'Establecer Listas de Episodios (Próximos Episodios, etc.)', 'calender')
+		self.add({'mode': 'navigator.choose_view', 'view_type': 'view.premium', 'content': k.MENU_FOLDER_CONTENT, 'name': 'premium files'}, 'Establecer Archivos Premium', 'premium')
 		self.end_directory()
 
 	def changelog_utils(self):
 		log_loc, old_log_loc = k.translate_path('special://logpath/kodi.log'), k.translate_path('special://logpath/kodi.old.log')
 		playtvban_clogpath = k.translate_path('special://home/addons/plugin.video.playtvban/resources/text/changelog.txt')
 		self.add({'mode': 'show_text', 'heading': 'Registro de Cambios', 'file': playtvban_clogpath, 'font_size': 'large', 'isFolder': 'false'}, 'Registro de Cambios', 'lists')
-		self.add({'mode': 'show_text', 'heading': 'Visor del Registro de Kodi', 'file': log_loc, 'kodi_log': 'true', 'isFolder': 'false'}, 'Visor del Registro de Kodi', 'lists')
-		self.add({'mode': 'show_text', 'heading': 'Visor del Registro de Kodi (Anterior)', 'file': old_log_loc, 'kodi_log': 'true', 'isFolder': 'false'}, 'Visor del Registro de Kodi (Anterior)', 'lists')
+		self.add({'mode': 'show_text', 'heading': 'Visor de Registro de Kodi', 'file': log_loc, 'kodi_log': 'true', 'isFolder': 'false'}, 'Visor de Registro de Kodi', 'lists')
+		self.add({'mode': 'show_text', 'heading': 'Visor de Registro de Kodi (Antiguo)', 'file': old_log_loc, 'kodi_log': 'true', 'isFolder': 'false'}, 'Visor de Registro de Kodi (Antiguo)', 'lists')
 		self.add({'mode': 'upload_logfile', 'isFolder': 'false'}, 'Subir Registro de Kodi a Pastebin', 'lists')
 		self.end_directory()
 
@@ -563,14 +564,14 @@ class Navigator:
 		setting_id, action_dict = search_mode_dict[self.list_name]
 		url_params = dict(action_dict)
 		data = main_cache.get(setting_id) or []
-		self.add(action_dict, '[B]NUEVA BÚSQUEDA...[/B]', 'new')
+		self.add(action_dict, '[B]NEW SEARCH...[/B]', 'new')
 		for i in data:
 			try:
 				key_id = unquote(i)
 				url_params['key_id'] = key_id
 				url_params['setting_id'] = setting_id
-				cm_items = [('[B]Eliminar del historial[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'search.remove', 'setting_id':setting_id, 'key_id': key_id})),
-							('[B]Borrar todo el historial[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'search.clear_all', 'setting_id':setting_id, 'refresh': 'true'}))]
+				cm_items = [('[B]Remove from history[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'search.remove', 'setting_id':setting_id, 'key_id': key_id})),
+							('[B]Clear All History[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'search.clear_all', 'setting_id':setting_id, 'refresh': 'true'}))]
 				self.add(url_params, key_id, 'calender', cm_items=cm_items)
 			except: pass
 		self.category_name = self.params_get('name') or 'Historial'
@@ -590,8 +591,8 @@ class Navigator:
 			self.add({'mode': mode, 'action': action, 'key_id': item['id'], 'iconImage': 'tmdb', 'category_name': name}, name, iconImage='tmdb')
 		if data['total_pages'] > page_no:
 			new_page = {'mode': 'navigator.keyword_results', 'key_id': key_id, 'category_name': self.category_name, 'new_page': str(data['page'] + 1)}
-			self.add(new_page, 'Página Siguiente (%s) >>' % new_page['new_page'], 'nextpage', False)
-		self.category_name = 'Resultados de búsqueda para %s' % key_id.upper()
+			self.add(new_page, 'Next Page (%s) >>' % new_page['new_page'], 'nextpage', False)
+		self.category_name = 'Resultados de Búsqueda para %s' % key_id.upper()
 		self.end_directory()
 
 	def choose_view(self):
@@ -602,7 +603,7 @@ class Navigator:
 		else:
 			content = self.params.get('content', 'files')
 		name = self.params.get('name') or content or 'menus'
-		self.add({'mode': 'navigator.set_view', 'view_type': view_type, 'name': name, 'isFolder': 'false'}, 'Configure la vista y luego haga clic aquí', 'settings')
+		self.add({'mode': 'navigator.set_view', 'view_type': view_type, 'name': name, 'isFolder': 'false'}, 'Establece la vista y luego pulsa aquí', 'settings')
 		k.set_content(handle, content)
 		k.end_directory(handle)
 		k.set_view_mode(view_type, content, False)
@@ -624,32 +625,32 @@ class Navigator:
 		if folders:
 			for i in folders:
 				name = i[0]
-				convert_sr = '[B]Quitar Aleatorio[/B]' if '[COLOR khaki][RANDOM][/COLOR]' in name else '[B]Convertir en Aleatorio[/B]'
-				cm_items = [('[B]Renombrar[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_rename'})),
-							('[B]Eliminar Carpeta[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_delete'})),
-							('[B]Crear Nueva Carpeta[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_make'})),
+				convert_sr = '[B]Remove Random[/B]' if '[COLOR red][RANDOM][/COLOR]' in name else '[B]Make Random[/B]'
+				cm_items = [('[B]Rename[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_rename'})),
+							('[B]Delete Folder[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_delete'})),
+							('[B]Make New Folder[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_make'})),
 							(convert_sr , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_convert', 'name': name}))]
 				self.add({'mode': 'navigator.build_shortcut_folder_contents', 'name': name, 'iconImage': 'folder'}, name, 'folder', cm_items=cm_items)
-		else: self.add({'mode': 'menu_editor.shortcut_folder_make', 'isFolder': 'false'}, '[I]Crear Nueva Carpeta...[/I]', 'new')
-		self.category_name = 'Carpetas de Accesos Directos'
+		else: self.add({'mode': 'menu_editor.shortcut_folder_make', 'isFolder': 'false'}, '[I]Make New Folder...[/I]', 'new')
+		self.category_name = 'Carpetas de Acceso Directo'
 		self.end_directory()
 
 	def build_shortcut_folder_contents(self):
 		list_name = self.params_get('name')
 		if not list_name:
-			k.notification('No se encontró la carpeta de accesos directos.', 2500)
+			k.notification('Carpeta de acceso directo no encontrada.', 2500)
 			return self.end_directory()
-		is_random = '[COLOR khaki][RANDOM][/COLOR]' in list_name
+		is_random = '[COLOR red][RANDOM][/COLOR]' in list_name
 		contents = nc.get_shortcut_folder_contents(list_name)
 		if not contents and not is_random:
-			random_name = '%s [COLOR khaki][RANDOM][/COLOR]' % list_name
+			random_name = '%s [COLOR red][RANDOM][/COLOR]' % list_name
 			contents = nc.get_shortcut_folder_contents(random_name)
 			if contents:
 				list_name, is_random = random_name, True
 		folder_icon = self.get_icon('folder')
 		if is_random:
 			from indexers.random_lists import random_shortcut_folders
-			return random_shortcut_folders(list_name.replace(' [COLOR khaki][RANDOM][/COLOR]', ''), contents)
+			return random_shortcut_folders(list_name.replace(' [COLOR red][RANDOM][/COLOR]', ''), contents)
 		if contents:
 			can_move = len(contents) > 1
 			for count, item in enumerate(contents):
@@ -665,13 +666,13 @@ class Navigator:
 				if can_move:
 					cm_items.append(('[B]Mover[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'move'})))
 				cm_items.extend([
-				('[B]Eliminar[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'remove'})),
-				('[B]Agregar Contenido[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name})),
-				('[B]Renombrar[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'rename'})),
-				('[B]Borrar Todo[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'clear'}))])
+				('[B]Remove[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'remove'})),
+				('[B]Add Content[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name})),
+				('[B]Rename[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'rename'})),
+				('[B]Clear All[/B]' , self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_edit', 'active_list': list_name, 'position': count, 'action': 'clear'}))])
 				self.add(item, item_get('name'), icon, original_image, cm_items=cm_items)
 		elif is_random: pass
-		else: self.add({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name, 'isFolder': 'false'}, '[I]Agregar Contenido...[/I]', 'new')
+		else: self.add({'mode': 'menu_editor.shortcut_folder_add', 'name': list_name, 'isFolder': 'false'}, '[I]Add Content...[/I]', 'new')
 		self.end_directory()
 
 	def discover_contents(self):
@@ -679,14 +680,14 @@ class Navigator:
 		action, media_type = self.params_get('action', ''), self.params_get('media_type')
 		if not action:
 			if self.params_get('show_new', 'true') == 'true':
-				self.add({'mode': 'discover_choice', 'media_type': media_type, 'isFolder': 'false'}, '[I]CREAR NUEVA LISTA DISCOVER...[/I]', 'new')
+				self.add({'mode': 'discover_choice', 'media_type': media_type, 'isFolder': 'false'}, '[I]Make New Discover List...[/I]', 'new')
 			results = discover_cache.get_all(media_type)
 			if media_type == 'movie': mode, action = 'build_movie_list', 'tmdb_movies_discover'
 			else: mode, action = 'build_tvshow_list', 'tmdb_tv_discover'
 			for item in results:
 				name, data = item['id'], item['data']
-				cm_items = [('[B]ELIMINAR DEL HISTORIAL[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.discover_contents', 'action':'delete_one', 'name': name})),
-							('[B]BORRAR TODO EL HISTORIAL[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.discover_contents', 'action':'clear_cache',
+				cm_items = [('[B]Remove from history[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.discover_contents', 'action':'delete_one', 'name': name})),
+							('[B]Clear All History[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'navigator.discover_contents', 'action':'clear_cache',
 								'media_type': media_type}))]
 				if '[random]' in data:
 					self.add({'mode': 'random.%s' % mode, 'action': action, 'name': name, 'url': data, 'new_page': 'random', 'random': 'true'},
@@ -724,9 +725,9 @@ class Navigator:
 		tips_append = tips_list.append
 		for item in files:
 			tip = item.replace('.txt', '')[4:]
-			if '!!HELP!!' in tip: tip, sort_order = tip.replace('!!HELP!!', '[COLOR crimson][B]AYUDA!![/B][/COLOR] '), 0
-			elif '!!NEW!!' in tip: tip, sort_order = tip.replace('!!NEW!!', '[COLOR chartreuse][B]NUEVO!![/B][/COLOR] '), 1
-			elif '!!SPOTLIGHT!!' in tip: tip, sort_order = tip.replace('!!SPOTLIGHT!!', '[COLOR orange][B]¡DESTACADO![/B][/COLOR] '), 2
+			if '!!HELP!!' in tip: tip, sort_order = tip.replace('!!HELP!!', '[COLOR crimson][B]HELP!!![/B][/COLOR] '), 0
+			elif '!!NEW!!' in tip: tip, sort_order = tip.replace('!!NEW!!', '[COLOR chartreuse][B]NEW!![/B][/COLOR] '), 1
+			elif '!!SPOTLIGHT!!' in tip: tip, sort_order = tip.replace('!!SPOTLIGHT!!', '[COLOR orange][B]SPOTLIGHT![/B][/COLOR] '), 2
 			else: sort_order = 3
 			params = {'mode': 'show_text', 'heading': tip, 'file': k.translate_path(tips_location % item), 'font_size': 'large', 'isFolder': 'false'}
 			tips_append((params, tip, sort_order))
@@ -767,15 +768,15 @@ class Navigator:
 		'because_you_watched': ('Listas Aleatorias de Porque Viste', nc.random_because_you_watched_lists),
 		'tmdb_lists': ('Listas Aleatorias de TMDb', nc.random_tmdb_lists),
 		'personal_lists': ('Listas Personales Aleatorias', nc.random_personal_lists),
-		'trakt_personal': ('Listas Aleatorias de Trakt (Personales)', nc.random_trakt_lists_personal),
-		'trakt_public': ('Listas Aleatorias de Trakt (Públicas)', nc.random_trakt_lists_public),
+		'trakt_personal': ('Listas Aleatorias de Trakt (Personal)', nc.random_trakt_lists_personal),
+		'trakt_public': ('Listas Aleatorias de Trakt (Pública)', nc.random_trakt_lists_public),
 		'simkl_lists': ('Listas Aleatorias de Simkl', nc.random_simkl_lists)}
 		self.category_name, function = random_list_dict[self.params_get('menu_type')]
 		func = function()
 		for item in func: self.add(item, item['name'], item['iconImage'])
 		self.end_directory()
 
-	def _sort_cm(self, list_key, media_type, adapter, label='Set Custom Sort', fallback=None):
+	def _sort_cm(self, list_key, media_type, adapter, label='Establecer Orden Personalizado', fallback=None):
 		"""Context menu entry that overrides the sort order of one mediatype split list.
 
 		list_key/adapter must match the list_sort.sort_source() call that builds the list, and a new
@@ -788,7 +789,7 @@ class Navigator:
 
 	def _safe_add(self, url_params, list_name, iconImage='folder', original_image=False, cm_items=[]):
 		try: self.add(url_params, list_name, iconImage, original_image, cm_items)
-		except Exception as e: k.logger('Play TVBan', 'Error al agregar mis listas [%s]: %s' % (list_name, e))
+		except Exception as e: k.logger('Play TVBan', 'my_lists add failed [%s]: %s' % (list_name, e))
 
 	def add(self, url_params, list_name, iconImage='folder', original_image=False, cm_items=[]):
 		isFolder = url_params.get('isFolder', 'true') == 'true'
@@ -808,7 +809,7 @@ class Navigator:
 			if isFolder:
 				shortcut_params = dict(url_params)
 				shortcut_params.update({'iconImage': iconImage, 'name': list_name})
-				folder_item = ('[B]Añadir a Carpeta de Accesos Directos[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': self.build_url(shortcut_params)}))
+				folder_item = ('[B]Añadir a Carpeta de Acceso Directo[/B]', self.run_plugin % self.build_url({'mode': 'menu_editor.shortcut_folder_add_known', 'url': self.build_url(shortcut_params)}))
 				if cm_items: cm_items.append(folder_item)
 				else: cm_items = [folder_item]
 			listitem.addContextMenuItems(cm_items)

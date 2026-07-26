@@ -89,15 +89,28 @@ def _schedule_playback_widget_refresh(from_playback):
 		schedule_playback_widget_refresh()
 
 def progress_aired_eps(meta):
-	"""Total de episodios emitidos utilizado para En Progreso / Vistos / % de progreso a nivel de serie."""
+	"""Aired episode total used for show-level In Progress / Watched / progress %."""
 	total = meta.get('total_aired_eps') or 0
 	if not settings.exclude_specials_from_progress(): return total
-	# Los totales de series aún en emisión de los metadatos ya excluyen la Temporada 0.
+	# Still-airing totals from metadata already exclude Season 0.
 	status = meta.get('status', '')
 	extra_info = meta.get('extra_info') or {}
-	if extra_info.get('last_episode_to_air') and status not in ('Ended', 'Canceled'): return total
+	last_ep = extra_info.get('last_episode_to_air')
+	if last_ep and status not in ('Ended', 'Canceled'): return total
 	season_data = meta.get('season_data') or []
 	if not season_data: return total
+	# Ended/Canceled: count through last aired only so placeholder seasons (e.g. S2E1 with no
+	# air date while last_episode_to_air is still S1 finales) do not inflate the total.
+	if last_ep and status in ('Ended', 'Canceled'):
+		try:
+			last_s, last_e = int(last_ep['season_number']), int(last_ep['episode_number'])
+			prior = sum(i.get('episode_count', 0) for i in season_data if 0 < i.get('season_number', 0) < last_s)
+			cur = next((i for i in season_data if i.get('season_number') == last_s), None)
+			cur_count = (cur or {}).get('episode_count') or 0
+			if last_e <= cur_count: return prior + last_e
+			return (prior + cur_count) or total
+		except Exception:
+			pass
 	regular = sum(i.get('episode_count', 0) for i in season_data if i.get('season_number', 0) != 0)
 	return regular if regular else total
 
@@ -373,7 +386,7 @@ def mark_tvshow(params):
 	except: tvdb_id = 0
 	watched_indicators = settings.watched_indicators()
 	progress_backround = kodi_progress_background()
-	progress_backround.create('[B]Espere por Favor..[/B]', '')
+	progress_backround.create('[B]Please Wait..[/B]', '')
 	if watched_indicators == 1:
 		if not trakt_watched_status_mark(action, 'shows', tmdb_id, tvdb_id): return notification('Error')
 		clear_trakt_collection_watchlist_data('watchlist', 'tvshow')
@@ -396,7 +409,7 @@ def mark_tvshow(params):
 			season_number = ep['season']
 			ep_number = ep['episode']
 			display = '%s - S%.2dE%.2d' % (title, int(season_number), int(ep_number))
-			progress_backround.update(int(float(count)/float(total)*100), '[B]Espere por Favor..[/B]', display)
+			progress_backround.update(int(float(count)/float(total)*100), '[B]Please Wait..[/B]', display)
 			episode_date, premiered = adjust_premiered_date(ep['premiered'], settings.date_offset())
 			if episode_date and current_date < episode_date: continue
 			insert_append(make_batch_insert(action, 'episode', tmdb_id, season_number, ep_number, last_played, title))
@@ -422,7 +435,7 @@ def mark_season(params):
 	elif watched_indicators == 3:
 		if not mdblist_watched_status_mark(action, 'season', tmdb_id, tvdb_id, season): return notification('Error')
 	progress_backround = kodi_progress_background()
-	progress_backround.create('[B]Espere por Favor..[/B]', '')
+	progress_backround.create('[B]Please Wait..[/B]', '')
 	current_date = get_datetime()
 	meta = metadata.tvshow_meta('tmdb_id', tmdb_id, settings.tmdb_api_key(), settings.mpaa_region(), get_datetime())
 	ep_data = metadata.episodes_meta(season, meta)
@@ -433,7 +446,7 @@ def mark_season(params):
 		display = '%s - S%.2dE%.2d' % (title, season_number, ep_number)
 		episode_date, premiered = adjust_premiered_date(item['premiered'], settings.date_offset())
 		if episode_date and current_date < episode_date: continue
-		progress_backround.update(int(float(count) / float(len(ep_data)) * 100), '[B]Espere por Favor..[/B]', display)
+		progress_backround.update(int(float(count) / float(len(ep_data)) * 100), '[B]Please Wait..[/B]', display)
 		insert_append(make_batch_insert(action, 'episode', tmdb_id, season_number, ep_number, last_played, title))
 	batch_watched_status_mark(watched_indicators, insert_list, action)
 	progress_backround.close()
@@ -498,8 +511,8 @@ def batch_watched_status_mark(watched_indicators, insert_list, action):
 		# clear_cache_watched_tvshow_status()
 	except: notification('Error')
 
-def get_next_episodes(nextep_content):
-	watched_db = get_database()
+def get_next_episodes(nextep_content, watched_indicators=None):
+	watched_db = get_database(watched_indicators)
 	if nextep_content == 0:
 		sql = '''WITH cte AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY media_id ORDER BY season DESC, episode DESC) rn FROM watched WHERE db_type = ?)
 				SELECT media_id, season, episode, title, last_played FROM cte WHERE rn = 1'''
@@ -511,8 +524,34 @@ def get_next_episodes(nextep_content):
 	data.sort(key=lambda x: (x['last_played']), reverse=True)
 	return data
 
-def _find_next_unwatched_episode(season, episode, watched_info, season_data):
+def _season_episode_numbers(meta, season_number):
+	"""Actual TMDb episode numbers for a season (supports absolute numbering e.g. One Piece S23E1170)."""
 	try:
+		from modules.metadata import episodes_meta
+		eps = episodes_meta(season_number, meta) or []
+		return sorted({int(e['episode']) for e in eps if e.get('episode') not in (None, '')})
+	except Exception:
+		return []
+
+def _next_season_numbers(season_data, after_season):
+	try:
+		return sorted(i['season_number'] for i in (season_data or []) if i.get('season_number', 0) > after_season)
+	except Exception:
+		return []
+
+def _find_next_unwatched_episode(season, episode, watched_info, season_data, meta=None):
+	try:
+		if meta is not None:
+			seasons = sorted({i['season_number'] for i in (season_data or []) if i.get('season_number', 0) >= season})
+			for item_season in seasons:
+				nums = _season_episode_numbers(meta, item_season)
+				if not nums: continue
+				candidates = [n for n in nums if n > episode] if item_season == season else nums
+				for n in candidates:
+					if not get_watched_status_episode(watched_info, (item_season, n)):
+						return item_season, n
+			return None, None
+		# Legacy relative 1..episode_count path (no meta).
 		relevant_seasons = [i for i in season_data if i['season_number'] >= season]
 		for item in relevant_seasons:
 			episode_count, item_season = item['episode_count'], item['season_number']
@@ -528,17 +567,35 @@ def _find_next_unwatched_episode(season, episode, watched_info, season_data):
 	except: pass
 	return None, None
 
-def get_next(season, episode, watched_info, season_data, nextep_content):
+def get_next(season, episode, watched_info, season_data, nextep_content, meta=None):
+	"""Return (season, episode) for the next episode after the given watched S/E.
+
+	When meta is provided, episode numbers come from TMDb season episode lists so shows that use
+	absolute numbering inside seasons (e.g. One Piece S23E1156+) resolve correctly. Without meta,
+	falls back to treating episodes as 1..episode_count (legacy).
+	"""
 	if episode == 0:
-		episode = 1
-	elif nextep_content == 0:
+		if meta is not None:
+			nums = _season_episode_numbers(meta, season)
+			if nums: return season, nums[0]
+		return season, 1
+	if nextep_content == 0:
 		try:
+			if meta is not None:
+				nums = _season_episode_numbers(meta, season)
+				later = [n for n in nums if n > episode]
+				if later: return season, later[0]
+				for ns in _next_season_numbers(season_data, season):
+					nnums = _season_episode_numbers(meta, ns)
+					if nnums: return ns, nnums[0]
+				return None, None
 			episode_count = next((i['episode_count'] for i in season_data if i['season_number'] == season), None)
 			season = season if episode < episode_count else season + 1
 			episode = episode + 1 if episode < episode_count else 1
-		except: pass
+		except Exception:
+			return None, None
 	else:
-		season, episode = _find_next_unwatched_episode(season, episode, watched_info, season_data)
+		season, episode = _find_next_unwatched_episode(season, episode, watched_info, season_data, meta)
 	return season, episode
 
 def _movie_progress_list(dbcon):

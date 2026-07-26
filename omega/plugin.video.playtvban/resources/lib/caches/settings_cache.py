@@ -312,7 +312,7 @@ class SettingsCache:
 					from modules.settings import watched_provider_options
 					opts = watched_provider_options()
 					current = str(self.read_db_value('watched_indicators') or '0')
-					label = opts.get(current) or opts.get('0', 'Play TVBan')
+					label = opts.get(current) or opts.get('0', 'Red Light')
 					self.set_memory_cache('watched_indicators_name', label)
 				except: pass
 		if setting_type == 'action' and 'settings_options' in setting_info:
@@ -558,7 +558,7 @@ def run_deferred_setup_background_if_needed():
 _DIRECTORY_LISTING_MODES = frozenset((
 	'build_movie_list', 'build_tvshow_list', 'build_season_list', 'build_episode_list',
 	'build_in_progress_episode', 'build_recently_watched_episode', 'build_next_episode',
-	'build_my_calendar', 'build_mdbl_calendar', 'build_next_episode_manager'))
+	'build_my_calendar', 'build_mdbl_calendar', 'build_mdbl_next_up', 'build_next_episode_manager'))
 
 # The five settings the unified-list-sort migration reads. They are no longer in default_settings(),
 # so the obsolete-id purge in sync_settings() would delete them on the same pass that migrates them -

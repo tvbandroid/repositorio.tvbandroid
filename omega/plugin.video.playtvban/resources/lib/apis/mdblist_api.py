@@ -18,11 +18,11 @@ def _mdblist_token():
 	from caches.settings_cache import settings_cache
 	token = settings_cache.read_db_value('mdblist.token')
 	if token in (None, '0', '', 'empty_setting'):
-		token = get_setting('redlight.mdblist.token', '0')
+		token = get_setting('playtvban.mdblist.token', '0')
 	return token
 
 def _mdblist_oauth_active():
-	refresh = get_setting('redlight.mdblist.refresh', '0')
+	refresh = get_setting('playtvban.mdblist.refresh', '0')
 	return refresh not in (None, '0', '', 'empty_setting')
 
 def call_mdblist(path, params=None, json_data=None, method=None):

@@ -267,13 +267,13 @@ class Movies:
 			cm_append(['more_like_this', ('[B]Explorar Más Como Esta[/B]', self.window_command % browse_more_like_this_params)])
 			if self.ai_model_active: cm_append(['similar', ('[B]Explorar Similares[/B]', self.window_command % browse_similar_params)])
 			if browse_in_trakt_list_params: cm_append(['in_trakt_list', ('[B]En Listas de Trakt[/B]', self.window_command % browse_in_trakt_list_params)])
-			if mdblist_manager_params: cm_append(['mdblist_manager', ('[B]Administrador de MDBList[/B]', 'RunPlugin(%s)' % mdblist_manager_params)])
-			if simkl_manager_params: cm_append(['simkl_manager', ('[B]Administrador de Listas de Simkl[/B]', 'RunPlugin(%s)' % simkl_manager_params)])
-			cm_append(['trakt_manager', ('[B]Administrador de Listas de Trakt[/B]', 'RunPlugin(%s)' % trakt_manager_params)])
-			cm_append(['tmdb_manager', ('[B]Administrador de Listas de TMDb[/B]', 'RunPlugin(%s)' % tmdb_manager_params)])
+			if mdblist_manager_params: cm_append(['mdblist_manager', ('[B]Gestor de MDBList[/B]', 'RunPlugin(%s)' % mdblist_manager_params)])
+			if simkl_manager_params: cm_append(['simkl_manager', ('[B]Gestor de Listas de Simkl[/B]', 'RunPlugin(%s)' % simkl_manager_params)])
+			if tmdb_manager_params: cm_append(['tmdb_manager', ('[B]Gestor de Listas de TMDb[/B]', 'RunPlugin(%s)' % tmdb_manager_params)])
+			if trakt_manager_params: cm_append(['trakt_manager', ('[B]Gestor de Listas de Trakt[/B]', 'RunPlugin(%s)' % trakt_manager_params)])
 			settings.append_list_shortcut_context_menus(cm_append, self.build_url, self.cm_sort_order, 'movie', tmdb_id, imdb_id, 'None', title, poster)
-			cm_append(['personal_manager', ('[B]Administrador de Listas Personales[/B]', 'RunPlugin(%s)' % personal_manager_params)])
-			cm_append(['favorites_manager', ('[B]Administrador de Favoritos[/B]', 'RunPlugin(%s)' % favorites_manager_params)])
+			cm_append(['personal_manager', ('[B]Gestor de Listas Personales[/B]', 'RunPlugin(%s)' % personal_manager_params)])
+			cm_append(['favorites_manager', ('[B]Gestor de Favoritos[/B]', 'RunPlugin(%s)' % favorites_manager_params)])
 			if playcount:
 				if self.widget_hide_watched: return
 				cm_append(['mark_watched', ('[B]Marcar como No Vista[/B]', 'RunPlugin(%s)' % self.build_url({'mode': 'watched_status.mark_movie', 'action': 'mark_as_unwatched',

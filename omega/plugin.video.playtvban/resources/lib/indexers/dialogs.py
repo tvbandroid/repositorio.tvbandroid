@@ -203,7 +203,7 @@ def personallists_manager_choice(params):
 	else:
 		choices = [('Agregar A La Lista Personal...', 'add'), ('Eliminar De La Lista Personal...', 'remove'), ('Agregar A La Lista Personal [B]NUEVA[/B]...', 'add_new')]
 		list_items = [{'line1': item[0], 'icon': icon} for item in choices]
-		kwargs = {'items': json.dumps(list_items), 'heading': 'Administrador De Listas Personales'}
+		kwargs = {'items': json.dumps(list_items), 'heading': 'Gestor De Listas Personales'}
 		action = kodi_utils.select_dialog([i[1] for i in choices], **kwargs)
 		if action == None: return
 	if action == 'add_new':
@@ -263,7 +263,7 @@ def _tmdblists_manager_choice(params):
 		choices.append(('Quitar de una Lista de TMDb...', 'list_remove'))
 	choices.append(('Añadir a una [B]NUEVA[/B] Lista de TMDb...', 'list_add_new'))
 	list_items = [{'line1': item[0], 'icon': icon} for item in choices]
-	kwargs = {'items': json.dumps(list_items), 'heading': 'Administrador de Listas de TMDb'}
+	kwargs = {'items': json.dumps(list_items), 'heading': 'Gestor de Listas de TMDb'}
 	action = kodi_utils.select_dialog([i[1] for i in choices], **kwargs)
 	if action == None: return
 	if action.startswith(('watchlist', 'favorites')):
@@ -719,7 +719,7 @@ def trakt_manager_choice(params):
 		('Actualizar Widgets', 'refresh'),
 	])
 	list_items = [{'line1': item[0], 'icon': icon} for item in choices]
-	kwargs = {'items': json.dumps(list_items), 'heading': 'Administrador de Listas de Trakt'}
+	kwargs = {'items': json.dumps(list_items), 'heading': 'Gestor de Listas de Trakt'}
 	choice = kodi_utils.select_dialog([i[1] for i in choices], **kwargs)
 	if choice == None: return
 	if choice == 'refresh':
@@ -1237,7 +1237,7 @@ def options_menu_choice(params, meta=None):
 	tmdb_id, content, poster = params_get('tmdb_id', None), params_get('content', None), params_get('poster', None)
 	is_external, from_extras = params_get('is_external') in (True, 'True', 'true'), params_get('from_extras', 'false') == 'true'
 	season, episode = params_get('season', ''), params_get('episode', '')
-	single_ep_list = ('episode.progress', 'episode.recently_watched', 'episode.next_trakt', 'episode.next_redlight', 'episode.next_simkl', 'episode.next_mdblist',
+	single_ep_list = ('episode.progress', 'episode.recently_watched', 'episode.next_trakt', 'episode.next_playtvban', 'episode.next_simkl', 'episode.next_mdblist',
 					'episode.trakt_recently_aired', 'episode.trakt_calendar', 'episode.mdblist_calendar')
 	if not content: content = kodi_utils.container_content()[:-1]
 	menu_type = content
@@ -1253,12 +1253,12 @@ def options_menu_choice(params, meta=None):
 	if from_extras:
 		if menu_type in ('movie', 'episode'): listing_append(('Playback Options', 'Scrapers Options', 'playback_choice'))
 	if menu_type in ('movie', 'tvshow'):
-		if settings.mdblist_user_active(): listing_append(('Administrador de MDBList', '', 'mdblist_manager'))
-		if settings.simkl_user_active(): listing_append(('Administrador de Listas de Simkl', '', 'simkl_manager'))
-		if settings.trakt_user_active(): listing_append(('Administrador de Listas de Trakt', '', 'trakt_manager'))
-		if settings.tmdblist_user_active(): listing_append(('TMDb Lists Manager', '', 'tmdblists_manager_choice'))
-		listing_append(('Administrador de Listas Personales', '', 'personallists_manager_choice'))
-		listing_append(('Administrador de Favoritos', '', 'favorites_manager_choice'))
+		if settings.mdblist_user_active(): listing_append(('Gestor de MDBList', '', 'mdblist_manager'))
+		if settings.simkl_user_active(): listing_append(('Gestor de Listas de Simkl', '', 'simkl_manager'))
+		if settings.tmdblist_user_active(): listing_append(('Gestor de Listas de TMDb', '', 'tmdblists_manager_choice'))
+		if settings.trakt_user_active(): listing_append(('Gestor de Listas de Trakt', '', 'trakt_manager'))
+		listing_append(('Gestor de Listas Personales', '', 'personallists_manager_choice'))
+		listing_append(('Gestor de Favoritos', '', 'favorites_manager_choice'))
 	if menu_type == 'tvshow': listing_append(('Reproducir Aleatoriamente', 'Basado en %s' % rootname, 'random'))
 	if menu_type in ('tvshow', 'season'):
 		listing_append(('Asignar un Grupo de Episodios a %s' % rootname, 'Actual: %s' % episode_groups_cache.get(tmdb_id).get('name', 'Ninguno'), 'episode_group'))
@@ -1287,8 +1287,8 @@ def options_menu_choice(params, meta=None):
 		if menu_type in ('movie', 'tvshow'):
 			listing_append(('Volver a Crear la Caché de %s' % ('Películas' if menu_type == 'movie' else 'Series'), 'Borrar la Caché de %s' % rootname, 'clear_media_cache'))
 		if menu_type in ('movie', 'episode') or menu_type in single_ep_list: listing_append(('Borrar Caché de Scrapers', '', 'clear_scrapers_cache'))
-		if menu_type in ('tvshow', 'season', 'episode'): listing_append(('Administrador del Progreso de Series', '', 'nextep_manager'))
-		listing_append(('Abrir Administrador de Descargas', '', 'open_download_manager'))
+		if menu_type in ('tvshow', 'season', 'episode'): listing_append(('Gestor del Progreso de Series', '', 'nextep_manager'))
+		listing_append(('Abrir Gestor de Descargas', '', 'open_download_manager'))
 		listing_append(('Abrir Herramientas', '', 'open_tools'))
 		if menu_type in ('movie', 'episode', 'tvshow', 'season') or menu_type in single_ep_list:
 			configured_scrapers = settings.configured_external_scraper_slots()
@@ -1437,7 +1437,7 @@ def sort_default_choice(params):
 	from modules import list_sort
 	media_type = params['media_type']
 	setting_id = 'sort.default.%s' % media_type
-	current = list_sort.parse_spec(get_setting('redlight.%s' % setting_id, ''))
+	current = list_sort.parse_spec(get_setting('playtvban.%s' % setting_id, ''))
 	heading = 'Orden Predeterminado Para %s' % ('Películas' if media_type == 'movies' else 'Series')
 	# No es la lista de campos de un solo adaptador: esta configuración es leída por todas las listas divididas por tipo de contenido a la vez,
 	# y un campo que uno de esos adaptadores no pueda extraer dejaría esa lista en el orden de caché sin procesar.

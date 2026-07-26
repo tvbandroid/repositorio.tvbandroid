@@ -693,7 +693,7 @@ class Sources():
 				max_size = string_to_float(get_setting('playtvban.results.%s_size_max' % self.media_type, '10000'), '10000') / 1000
 			results = [i for i in results if i['scrape_provider'] == 'folders' or i['scrape_provider'] in ('rd_cloud', 'pm_cloud', 'ad_cloud', 'oc_cloud', 'tb_cloud') or min_size <= i['size'] <= max_size]
 		if self.autoplay:
-			autoplay_max_mb = string_to_float(get_setting('redlight.autoplay.%s_size_max' % self.media_type, '0'), '0')
+			autoplay_max_mb = string_to_float(get_setting('playtvban.autoplay.%s_size_max' % self.media_type, '0'), '0')
 			if autoplay_max_mb > 0:
 				autoplay_max_size = autoplay_max_mb / 1000
 				_size_exempt = ('folders', 'rd_cloud', 'pm_cloud', 'ad_cloud', 'oc_cloud', 'tb_cloud')

@@ -755,6 +755,29 @@
                           <property name="setting_description">Seleccione esta opción y las listas individuales dentro de la ventana Extras utilizarán una barra de desplazamiento cuando sea necesario.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=extras.enable_scrollbars)</onclick>
                       </item>
+        <!-- Context Menu -->
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Context Menu</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Choose Content for the Context Menu</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Choose what content is included within the Context Menu</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=context_menu_choice)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(20)</visible>
+                          <property name="setting_label">Choose Order for the Context Menu</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Choose how the content within the Context Menu is ordered</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=context_menu_order_choice)</onclick>
+                      </item>
         <!-- Special Open Actions -->
                       <item>
                           <visible>Container(2000).HasFocus(20)</visible>
@@ -844,7 +867,7 @@
                           <property name="setting_label">[I]Ingrese las Claves API de Google/Groq para acceder.[/I]</property>
                           <property name="setting_type">info</property>
                           <property name="setting_value"></property>
-                          <property name="setting_description">Introduce las claves API de Google IA y/o Groq IA en Cuentas de Meta. Similares (IA) se utiliza en Extras > Similares, Buscar similares en el menú contextual y Porque viste cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA).</property>
+                          <property name="setting_description">Acceda a Meta Accounts para introducir sus claves API de Google IA y/o Groq IA y así acceder a esta función.</property>
                           <onclick>noop</onclick>
                       </item>
                       <item>
@@ -853,7 +876,7 @@
                           <property name="setting_label">Seleccione las Prioridades del Modelo de IA</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Elige el orden en el que se probarán los modelos de IA para Extras > Similares, Buscar similares y Porque viste (cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA)). El primero de la lista se probará primero y el último, al final. Los modelos sin una clave API se omitirán.</property>
+                          <property name="setting_description">Elige el orden en que se usarán los modelos de IA para títulos similares. El primero se usará y el último, el primero. Normalmente, querrás mantener este orden por defecto. Si no tienes una clave API para el modelo que aparece en la lista, se omitirá.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=ai_model_order_choice)</onclick>
                       </item>
                       <item>
@@ -862,7 +885,7 @@
                           <property name="setting_label">Seleccione el Máximo de Resultados Similares a los Títulos</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.ai_model.limit)]</property>
-                          <property name="setting_description">Máximo de resultados de Similares (IA) para Extras > Similares, Buscar similares y Porque viste (cuando el servicio utilizado para Porque viste es Similares (IA)).</property>
+                          <property name="setting_description">Seleccione el número máximo de resultados similares de IA que devuelve Play TVBan.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=ai_model.limit)</onclick>
                       </item>
 <!-- CONTENT 30 -->
@@ -920,7 +943,7 @@
                           <property name="setting_label">Servicio utilizado Porque lo Viste</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.recommend_service_name)]</property>
-                          <property name="setting_description">Elige qué servicio proporciona las recomendaciones de Porque viste. Más como esto (IMDb) y Recomendado (TMDb) están siempre disponibles. Relacionados (Trakt) aparece cuando Trakt está autorizado; Similares (IA) aparece cuando se ha configurado una clave de Google o Groq.</property>
+                          <property name="setting_description">Elige qué servicio proporciona las recomendaciones de Porque Has Visto. Más Como Esto (IMDb) y Recomendado (TMDb) están siempre disponibles. Similar (IA) aparece cuando se establece una clave de Google o Groq; Relacionado (Trakt) aparece cuando Trakt está autorizado.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=recommend_service)</onclick>
                       </item>
                       <item>
@@ -1134,7 +1157,7 @@
                           <property name="setting_label">Películas</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.default.movies_name)]</property>
-                          <property name="setting_description">Predeterminado para las listas de películas de la Lista de seguimiento/Biblioteca de Trakt, Simkl y MDBList. Puedes cambiar cualquier lista mediante Menú contextual > Establecer orden personalizado (en Simkl: cada sección de estado por separado). Los contenidos de TMDb no están incluidos aquí; utiliza Establecer orden personalizado en la lista de TMDb.</property>
+                          <property name="setting_description">Predeterminado para las listas de películas de MDBList, Simkl y Lista de Seguimiento/Biblioteca de Trakt. Sobrescribe cualquier lista con Menú Contextual > Establecer Orden Personalizado (Simkl: cada estantería de estado por separado). El contenido de TMDb no está incluido aquí — usa Establecer Orden Personalizado en la lista de TMDb.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=sort_default_choice&amp;media_type=movies)</onclick>
                       </item>
                       <item>
@@ -1142,7 +1165,7 @@
                           <property name="setting_label">Series</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.default.shows_name)]</property>
-                          <property name="setting_description">Predeterminado para las listas de series de la Lista de seguimiento/Biblioteca de Trakt, Simkl y MDBList. Puedes cambiar cualquier lista mediante Menú contextual > Establecer orden personalizado (en Simkl: cada sección de estado por separado). Los contenidos de TMDb no están incluidos aquí; utiliza Establecer orden personalizado en la lista de TMDb.</property>
+                          <property name="setting_description">Orden de clasificación predeterminado para las listas de series - Lista de seguimiento, Colección, Simkl y MDBList. Las listas individuales pueden modificar este orden desde su Menú Contextual.</prope <property name="setting_description">Predeterminado para las listas de series de TV de MDBList, Simkl y Lista de Seguimiento/Biblioteca de Trakt. Sobrescribe cualquier lista con Menú Contextual > Establecer Orden Personalizado (Simkl: cada estantería de estado por separado). El contenido de TMDb no está incluido aquí — usa Establecer Orden Personalizado en la lista de TMDb.</property>rty>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=sort_default_choice&amp;media_type=shows)</onclick>
                       </item>
         <!-- Listas de TMDb -->
@@ -1157,7 +1180,7 @@
                           <property name="setting_label">Orden de Visualización de Mis Listas de TMDb</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.tmdblist.list_sort_name)]</property>
-                          <property name="setting_description">Orden de los nombres de tus listas de TMDb en Mis listas únicamente; no de los títulos dentro de una lista. Ordena el contenido de las listas mediante Establecer orden personalizado en la lista (menú contextual) o Editar propiedades > Cambiar orden de clasificación.</property>
+                          <property name="setting_description">Elige el orden en que se presentan tus listas de TMDb. Esto no afecta al contenido de las listas, sino a las listas en sí.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=list_display_order_choice&amp;list_type=tmdb)</onclick>
                       </item>
         <!-- Personal Lists -->
@@ -1283,29 +1306,6 @@
                           <property name="setting_description">Elige el formato utilizado para los Carteles de RPDb. Opciones: Predeterminado, Bloques o Redondeado.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=rpdb_poster_format_choice)</onclick>
                       </item>
-        <!-- Context Menu -->
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Menu Contextual</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Seleccione Contenido para el Menu Contextual</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Elige qué contenido se incluye en el Menu Contextual.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=context_menu_choice)</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(30)</visible>
-                          <property name="setting_label">Seleccione Ordenar en el Menu Contextual.</property>
-                          <property name="setting_type">action</property>
-                          <property name="setting_value">...</property>
-                          <property name="setting_description">Elige cómo se ordena el contenido del Menu Contextual.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=context_menu_order_choice)</onclick>
-                      </item>
 <!-- SINGLE EPISODE LISTS 40 -->
         <!-- General -->
                       <item>
@@ -1391,7 +1391,7 @@
                           <property name="setting_label">Incluir Lista de Seguimiento de Trakt/Favoritos de Play TVBan</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.nextep.include_unwatched_name)]</property>
-                          <property name="setting_description">Elige qué listas se incluirán en los próximos episodios de PlayTVBans. Puedes incluir tu lista de seguimiento de Trakt, tus favoritos de Play TVBan o ambos. Se mostrarán resaltados con una VARA DORADA OSCURA.</property>
+                          <property name="setting_description">Opcionalmente incluir series que nunca se han empezado en Próximos Episodios desde tu lista de seguimiento activa de Indicadores de Vistos (Lista de Seguimiento de MDBList, Plan para Ver de Simkl o Lista de Seguimiento de Trakt) y/o Favoritos de Play TVBan. Se muestran con un resaltado DARKGOLDENROD. Cuando Indicadores de Vistos es Play TVBan, la Lista de Seguimiento no tiene fuente y solo se aplican los Favoritos.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=nextep.include_unwatched)</onclick>
                       </item>
                       <item>
@@ -1494,7 +1494,7 @@
                           <property name="setting_label">Watched Status Provider</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.watched_indicators_name)]</property>
-                          <property name="setting_description">Watched ticks, resume bars, scrobble, Next Episodes, and In Progress lists. Choose MDBList, Play TVBan (local), Simkl, or Trakt. Authorise a service below to use it.</property>
+                          <property name="setting_description">Marcas de visto, barras de reanudación, Próximos Episodios y listas En Progreso. Elige MDBList, Play TVBan (local), Simkl o Trakt. Autoriza un servicio a continuación para usarlo. WeTrakr es independiente (solo scrobble) y no es un proveedor de vistos.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=watched_indicators)</onclick>
                       </item>
         <!-- MDBList -->
@@ -1510,7 +1510,7 @@
                           <property name="setting_label">Autorizar</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Autoriza tu cuenta de MDBList. Introduce el código que aparece en pantalla o escanea el código QR — mismo proceso que Trakt y Simkl.</property>
+                          <property name="setting_description">Autoriza tu cuenta de MDBList. Introduce el código que aparece en pantalla o escanea el código QR — el mismo proceso que Simkl y Trakt.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=mdblist.mdblist_authenticate)</onclick>
                       </item>
                       <item>
@@ -1730,6 +1730,73 @@
                           <property name="setting_description">Comprueba que tu ID de cliente de Trakt (y el secreto, si está configurado) sean aceptados por Trakt antes de usar Autorizar</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=trakt_credentials_check_choice)</onclick>
                       </item>
+        <!-- WeTrakr (solo scrobble) -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">WeTrakr</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Acerca del Scrobble de WeTrakr</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Solo scrobble: autoriza WeTrakr y, a continuación, utiliza Activar Scrobbling para activar o desactivar los informes de reproducción/finalización sin revocar la autorización. No sincroniza marcas de vistos, reanudaciones, Próximos episodios ni listas con Play TVBan. Mantén el Proveedor de estado de vistos en Play TVBan (o MDBList / Simkl / Trakt) para las marcas de vistos y las listas. Si el complemento oficial de WeTrakr para Kodi está autorizado, Play TVBan le da prioridad.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=wetrakr.wetrakr_about)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.wetrakr.user),empty_setting)</visible>
+                          <property name="setting_label">Autorizar</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">...</property>
+                          <property name="setting_description">Autoriza WeTrakr solo para scrobble. Después de autorizar, utiliza Activar Scrobbling para activar o desactivar los informes. Las marcas de vistos permanecen con el Proveedor de estado de vistos (recomendado: Play TVBan). Consulta Acerca del Scrobble de WeTrakr para obtener más información.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=wetrakr.wetrakr_authenticate)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.wetrakr.user),empty_setting)</visible>
+                          <property name="setting_label">Revocar autorización</property>
+                          <property name="setting_type">action</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.wetrakr.user)]</property>
+                          <property name="setting_description">Desconecta WeTrakr de Play TVBan (borra el token). Para mantener la cuenta pero detener el scrobble, desactiva Activar Scrobbling.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=wetrakr.wetrakr_revoke_authentication)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.wetrakr.user),empty_setting)</visible>
+                          <property name="setting_label">Activar Scrobbling</property>
+                          <property name="setting_type">boolean</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.wetrakr.scrobble)]</property>
+                          <property name="setting_description">Cuando está activado, Play TVBan informa de la reproducción/pausa/finalización a WeTrakr. Cuando está desactivado, la cuenta permanece autorizada pero no se realiza scrobble. La misma idea que mantener Trakt/Simkl autorizados mientras se utiliza un Proveedor de estado de vistos diferente.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_boolean&amp;setting_id=wetrakr.scrobble)</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <visible>!String.IsEqual(Window(10000).Property(playtvban.wetrakr.user),empty_setting)</visible>
+                          <visible>String.IsEqual(Window(10000).Property(playtvban.wetrakr.scrobble),true)</visible>
+                          <property name="setting_label">    - Scrobble al % de visto</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.wetrakr.scrobble_threshold)]</property>
+                          <property name="setting_description">Marca el título como visto en WeTrakr cuando la reproducción alcanza este porcentaje (predeterminado 90, igual que la marca de visto de Play TVBan). Las marcas de vistos de Play TVBan siguen el Proveedor de estado de vistos.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=wetrakr.scrobble_threshold)</onclick>
+                      </item>
+        <!-- OMDb -->
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">OMDb</property>
+                          <property name="setting_type">separator</property>
+                          <onclick>noop</onclick>
+                      </item>
+                      <item>
+                          <visible>Container(2000).HasFocus(50)</visible>
+                          <property name="setting_label">Clave API</property>
+                          <property name="setting_type">numeric</property>
+                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.omdb_api)]</property>
+                          <property name="setting_description">Introduce aquí tu clave API de OMDb. Esto te permitirá utilizar información adicional de valoraciones en la ventana Extras de Play TVBan.</property>
+                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=omdb_api)</onclick>
+                      </item>
         <!-- TMDb API -->
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
@@ -1814,21 +1881,6 @@
                           <property name="setting_description">Revoca la autorización de tu cuenta de TMDb.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=tmdblist_api.revoke_authentication)</onclick>
                       </item>
-        <!-- OMDb -->
-                      <item>
-                          <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">OMDb</property>
-                          <property name="setting_type">separator</property>
-                          <onclick>noop</onclick>
-                      </item>
-                      <item>
-                          <visible>Container(2000).HasFocus(50)</visible>
-                          <property name="setting_label">Clave API</property>
-                          <property name="setting_type">numeric</property>
-                          <property name="setting_value">$INFO[Window(10000).Property(playtvban.omdb_api)]</property>
-                          <property name="setting_description">Introduce aquí tu Clave API de OMDb. Esto te permitirá utilizar información adicional de valoraciones en la ventana Extras de Play TVBan.</property>
-                          <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=omdb_api)</onclick>
-                      </item>
         <!-- RPDb -->
                       <item>
                           <visible>Container(2000).HasFocus(50)</visible>
@@ -1865,7 +1917,7 @@
                           <property name="setting_label">Clave API</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.google_api)]</property>
-                          <property name="setting_description">Clave API de Google Gemini/Gemma para Similares (IA). Se utiliza en tres lugares: Extras > Similares, Buscar similares (menú contextual) y Porque viste cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA).</property>
+                          <property name="setting_description">Introduce aquí tu Clave API de Gemini/Gemma AI. Esto te permitirá utilizar las funciones de IA de Play TVBan, como Explorar Similares con IA.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=google_api)</onclick>
                       </item>
         <!-- GROQ -->
@@ -1880,7 +1932,7 @@
                           <property name="setting_label">Clave API</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.groq_api)]</property>
-                          <property name="setting_description">Clave API de Groq para Similares (IA). Se utiliza en tres lugares: Extras > Similares, Buscar similares (menú contextual) y Porque viste cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA).</property>
+                          <property name="setting_description">Introduce aquí tu Clave API de Groq AI. Esto te permitirá utilizar las funciones de IA de Play TVBan, como Explorar Similares con IA.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=groq_api)</onclick>
                       </item>
 <!-- TORRENT SOURCES 61 / DIRECT SOURCES 62 -->

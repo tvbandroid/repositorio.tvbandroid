@@ -359,7 +359,7 @@ def build_single_episode(list_type, params={}):
 							'unaired': unaired, 'last_played': ep_data_get('last_played', resinsert), 'sort_order': _position, 'unwatched': ep_data_get('unwatched')})
 		except Exception as e:
 			# Silent drops blank calendars/next-ep lists; log so meta/InfoTag failures are visible.
-			try: kodi_utils.logger('Red Light', 'build_single_episode item failed (%s): %s' % (list_type, e))
+			try: kodi_utils.logger('Play TVBan', 'build_single_episode item failed (%s): %s' % (list_type, e))
 			except: pass
 	kodi_actor, make_listitem, build_url = kodi_utils.kodi_actor(), kodi_utils.make_listitem, kodi_utils.build_url
 	poster_empty, fanart_empty = kodi_utils.get_icon('box_office'), kodi_utils.addon_fanart()

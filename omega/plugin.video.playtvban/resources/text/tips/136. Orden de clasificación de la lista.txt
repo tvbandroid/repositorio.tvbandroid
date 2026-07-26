@@ -1,0 +1,16 @@
+¡¡NUEVO!!
+[B]Orden de lista[/B] (Ajustes > Contenido) establece el orden predeterminado para las listas de películas y series de televisión de MDBList, las secciones de estado de Simkl y Trakt (Lista de seguimiento/Biblioteca).
+
+[B]Anulación por lista[/B]
+Utilice el menú contextual [B]Establecer orden personalizado[/B] en una lista individual para anular el orden predeterminado solo para esa lista. [B]Usar predeterminado[/B] borra la anulación.
+
+[B]Simkl[/B]
+Cada sección de estado tiene su propio orden para Películas y para Series de TV: Planeo ver, Viendo, Completado, En espera y Abandonado.
+
+[B]TMDb[/B]
+El contenido de las listas se ordena por lista mediante [B]Configurar orden personalizado[/B] (Lista de seguimiento, Favoritos, Recomendaciones y Mis listas personalizadas). No utiliza la configuración predeterminada de Contenido > Películas/TV.
+
+[B]Orden de visualización de Mis listas de TMDb[/B] (en la misma página de Configuración) solo ordena la lista de nombres de listas en Mis listas, no los títulos dentro de cada lista.
+
+[B]Biblioteca de Trakt[/B]
+Trakt cambió el nombre de Colección a Biblioteca en su sitio web. Los menús y administradores de Play TVBan utilizan [B]Biblioteca[/B]; la ruta de la API de Trakt permanece sin cambios.

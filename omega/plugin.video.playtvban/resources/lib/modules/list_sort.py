@@ -220,7 +220,7 @@ def field_choices(adapter_name):
 	return adapter['capabilities']
 
 
-DEFAULT_SETTING_IDS = {'movies': 'redlight.sort.default.movies', 'shows': 'redlight.sort.default.shows'}
+DEFAULT_SETTING_IDS = {'movies': 'playtvban.sort.default.movies', 'shows': 'playtvban.sort.default.shows'}
 
 # The adapters the mediatype default actually governs: exactly those whose sort_source() call site
 # can pass a media type. resolve() consults DEFAULT_SETTING_IDS only when normalize_media_type()
@@ -310,8 +310,8 @@ class SortMigrationError(Exception):
 
 
 # An absent row is not "no preference" - it is the fallback the old getter hardcoded, and the list was
-# ordered by it. lists_sort_order used int(get_setting('redlight.sort.%s', '0')) -> code 0 (title), and
-# tmdblists_sort_order used get_setting('redlight.tmdbsort.%s', '4') -> code 4 (provider order). Reading
+# ordered by it. lists_sort_order used int(get_setting('playtvban.sort.%s', '0')) -> code 0 (title), and
+# tmdblists_sort_order used get_setting('playtvban.tmdbsort.%s', '4') -> code 4 (provider order). Reading
 # a missing row as '' would map to nothing, write nothing, and let the scope inherit the new global
 # default (seeded from sort.watchlist) - silently reordering the list.
 LEGACY_SETTING_FALLBACKS = {'sort.watchlist': '0', 'sort.collection': '0', 'sort.simkl': '0',

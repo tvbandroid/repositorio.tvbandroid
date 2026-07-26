@@ -1,0 +1,45 @@
+La opción Importar y Exportar se encuentra en Herramientas. Úsala para transferir Play TVBan entre dispositivos o para hacer una copia de seguridad antes de un reinicio. Hay tres pares distintos; no se reemplazan entre sí. Elige el que mejor se adapte a tus necesidades.
+
+Carpeta predeterminada
+Configura una carpeta de copia de seguridad predeterminada en Ajustes > General > Importar y Exportar. Allí se abrirán los exploradores de archivos. Después de exportar, Play TVBan podría preguntarte si deseas recordar la carpeta que acabas de usar.
+
+1) Ajustes de Play TVBan (.zip)
+
+- Exportar ajustes de Play TVBan / Importar ajustes de Play TVBan
+- Realiza una copia de seguridad de los ajustes, menús, listas personales/de descubrimiento, grupos de episodios e imágenes de listas personalizadas.
+
+- NO incluye Favoritos de Play TVBan, historial de visualización local ni Favoritos de Kodi; usa las opciones que se indican a continuación para ello.
+
+- El archivo zip puede contener claves API e información de inicio de sesión. Mantén la privacidad.
+
+- Después de importar, verifica las rutas de las carpetas si cambiaste de dispositivo o sistema operativo, y asegúrate de que tu paquete scraper siga instalado.
+- Las metacuentas que utilizan autorización (MDBList, Simkl, TMDb Lists, Trakt, WeTrakr) podrían necesitar una nueva autorización si falla la sincronización o el scrobble. Las metacuentas con clave API (Google, Groq, OMDb, RPDb, etc.) suelen conservar la configuración y funcionan correctamente.
+
+2) Favoritos e historial de Play TVBan (.json)
+
+- Exportar/Importar favoritos e historial de Play TVBan
+
+- Favoritos: Listas de favoritos de Play TVBan (Películas/Series/Anime/Personas).
+
+- Historial: Marcas de visualización locales y puntos de reanudación en curso; solo cuando el proveedor de estado de visualización es Play TVBan (local). Si los indicadores son Trakt, Simkl o MDBList, el historial de visualización no se incluye en esta copia de seguridad (estos datos se almacenan en el servicio).
+
+- Modo de importación cuando este dispositivo ya contiene datos:
+
+- Fusionar: añadir desde la copia de seguridad; conservar lo que ya existe.
+
+- Reemplazar: borrar primero los favoritos/historial locales y luego importar la copia de seguridad.
+
+3) Favoritos de Kodi (.xml)
+
+- Exportar/Importar Favoritos de Kodi
+
+- Realiza una copia de seguridad del archivo Favourites.xml de Kodi para este perfil (Favoritos de la interfaz/página de inicio), no de los Favoritos de Play TVBan.
+
+- Los favoritos de Kodi generalmente solo funcionan con el complemento que los creó.
+
+- La importación también ofrece las opciones Combinar o Reemplazar. Reemplazar guarda primero una copia de tu archivo Favourites.xml actual como Favourites.xml.playtvban.bak.
+
+- Reinicia Kodi si el menú de Favoritos no se actualiza después de la importación.
+
+Trabajo típico de migración completa:
+Exporta la configuración, luego Favoritos e historial (si usas indicadores locales) y, por último, los Favoritos de Kodi si los usas. En el nuevo dispositivo, importa en el mismo orden. Vuelve a autorizar las Cuentas Meta si es necesario y corrige las rutas de descarga/archivos multimedia.

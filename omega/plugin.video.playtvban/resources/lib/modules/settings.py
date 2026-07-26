@@ -35,6 +35,15 @@ def mdblist_user_active():
 	token = settings_cache.read_db_value('mdblist.token')
 	return user not in (None, 'empty_setting', '') and token not in (None, '0', '', 'empty_setting')
 
+def wetrakr_user_active():
+	from caches.settings_cache import settings_cache
+	user = settings_cache.read_db_value('wetrakr.user')
+	token = settings_cache.read_db_value('wetrakr.token')
+	return user not in (None, 'empty_setting', '') and token not in (None, '0', '', 'empty_setting')
+
+def wetrakr_scrobble_enabled():
+	return get_setting('playtvban.wetrakr.scrobble', 'true') == 'true'
+
 def mdblist_sync_interval():
 	setting = get_setting('playtvban.mdblist.sync_interval', '60')
 	try: interval = max(5, int(setting))
@@ -126,7 +135,7 @@ _AI_MODEL_ID_MIGRATIONS = {
 
 def ai_model_order():
 	default = 'gemini-3.1-flash-lite,llama-3.3-70b-versatile,gemma-4-31b-it,llama-3.1-8b-instant'
-	raw = get_setting('redlight.ai_model.order', default) or default
+	raw = get_setting('playtvban.ai_model.order', default) or default
 	order = [i.strip() for i in raw.split(',') if i.strip()]
 	migrated = [_AI_MODEL_ID_MIGRATIONS.get(i, i) for i in order]
 	# Drop unknown Google leftovers; keep Groq ids even if key missing (skipped at call time).
@@ -568,7 +577,7 @@ def recommend_service_options():
 	return options
 
 def recommend_service():
-	try: ind = int(get_setting('redlight.recommend_service', '0'))
+	try: ind = int(get_setting('playtvban.recommend_service', '0'))
 	except (TypeError, ValueError): ind = 0
 	opts = recommend_service_options()
 	if str(ind) in opts: return ind
@@ -759,17 +768,17 @@ def append_list_shortcut_context_menus(cm_append, build_url_fn, cm_sort_order, m
 	if simkl_user_active():
 		append_cm_if_enabled(cm_append, cm_sort_order, 'simkl_plantowatch', '[B]Simkl Por Ver[/B]',
 			'RunPlugin(%s)' % build_url_fn(dict(base, mode='simkl_plantowatch_shortcut_choice')))
-	if trakt_user_active():
-		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_watchlist', '[B]Lista de Seguimiento de Trakt[/B]',
-			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_watchlist_shortcut_choice')))
-		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_collection', '[B]Biblioteca de Trakt[/B]',
-			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_collection_shortcut_choice')))
 	if tmdblist_user_active():
 		tmdb_media = 'movie' if media_type == 'movie' else 'tv'
 		append_cm_if_enabled(cm_append, cm_sort_order, 'tmdb_watchlist', '[B]Lista de Seguimiento de TMDb[/B]',
 			'RunPlugin(%s)' % build_url_fn({'mode': 'tmdb_watchlist_shortcut_choice', 'media_type': tmdb_media, 'tmdb_id': tmdb_id, 'title': title, 'icon': poster}))
 		append_cm_if_enabled(cm_append, cm_sort_order, 'tmdb_favorites', '[B]Favoritos de TMDb[/B]',
 			'RunPlugin(%s)' % build_url_fn({'mode': 'tmdb_favorites_shortcut_choice', 'media_type': tmdb_media, 'tmdb_id': tmdb_id, 'title': title, 'icon': poster}))
+	if trakt_user_active():
+		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_watchlist', '[B]Lista de Seguimiento de Trakt[/B]',
+			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_watchlist_shortcut_choice')))
+		append_cm_if_enabled(cm_append, cm_sort_order, 'trakt_collection', '[B]Biblioteca de Trakt[/B]',
+			'RunPlugin(%s)' % build_url_fn(dict(base, mode='trakt_collection_shortcut_choice')))
 
 def append_source_shortcut_context_menus(cm_append, build_url_fn, cm_sort_order, media_type, meta, season='', episode='', playcount='0'):
 	params = {'media_type': media_type, 'meta': meta, 'playcount': playcount}
@@ -955,8 +964,8 @@ def default_all_episodes():
 	return int(get_setting('playtvban.default_all_episodes', '0'))
 
 def max_threads():
-	if not get_setting('redlight.limit_concurrent_threads', 'false') == 'true': return 20
-	return int(get_setting('redlight.max_threads', '20'))
+	if not get_setting('playtvban.limit_concurrent_threads', 'false') == 'true': return 20
+	return int(get_setting('playtvban.max_threads', '20'))
 
 def get_meta_filter():
 	return get_setting('playtvban.meta_filter', 'true')
@@ -977,9 +986,9 @@ def calendar_day_window():
 	'''Inclusive start/end dates for Trakt and MDBList calendars (Show Previous/Future Days).'''
 	from datetime import timedelta
 	from modules.utils import get_datetime
-	try: previous_days = int(get_setting('redlight.trakt.calendar_previous_days', '7'))
+	try: previous_days = int(get_setting('playtvban.trakt.calendar_previous_days', '7'))
 	except (TypeError, ValueError): previous_days = 7
-	try: future_days = int(get_setting('redlight.trakt.calendar_future_days', '7'))
+	try: future_days = int(get_setting('playtvban.trakt.calendar_future_days', '7'))
 	except (TypeError, ValueError): future_days = 7
 	previous_days = max(0, min(14, previous_days))
 	future_days = max(0, min(14, future_days))
@@ -1013,7 +1022,7 @@ def jump_to_enabled():
 
 def datetime_utc_offset():
 	'''User UTC (+/-) setting only — no TMDb air-date fudge.'''
-	try: return int(get_setting('redlight.datetime.offset', '0'))
+	try: return int(get_setting('playtvban.datetime.offset', '0'))
 	except (TypeError, ValueError): return 0
 
 def date_offset():
@@ -1123,16 +1132,19 @@ def rescrape_action_value(action, default='0'):
 
 def cm_enabled():
 	default = 'extras,options,playback_options,external_scraper_settings,browse_movie_set,browse_seasons,browse_episodes,recommended,related,more_like_this,similar,in_trakt_list,' \
-				'mdblist_manager,simkl_manager,trakt_manager,tmdb_manager,personal_manager,favorites_manager,mark_watched,unmark_previous_episode,exit,refresh,reload'
+				'mdblist_manager,simkl_manager,tmdb_manager,trakt_manager,personal_manager,favorites_manager,mark_watched,unmark_previous_episode,exit,refresh,reload'
 	setting = get_setting('playtvban.context_menu.enabled', default)
 	if setting in ('', None, 'noop', '[]'): return default.split(',')
 	return setting.split(',')
 
 def _merge_cm_order_with_enabled(order, enabled):
 	order = [i for i in order if i]
+	# Insert missing managers before the next A–Z peer (MDBList → Simkl → TMDb → Trakt).
 	manager_insert = {
-		'mdblist_manager': ('simkl_manager', 'trakt_manager'),
-		'simkl_manager': ('trakt_manager',),
+		'mdblist_manager': ('simkl_manager', 'tmdb_manager', 'trakt_manager'),
+		'simkl_manager': ('tmdb_manager', 'trakt_manager'),
+		'tmdb_manager': ('trakt_manager', 'personal_manager'),
+		'trakt_manager': ('personal_manager',),
 	}
 	for item in enabled:
 		if item in order: continue
@@ -1147,15 +1159,15 @@ def _merge_cm_order_with_enabled(order, enabled):
 
 def _normalize_cm_list_order(order):
 	order = list(order)
-	managers = ('mdblist_manager', 'simkl_manager', 'trakt_manager')
+	managers = ('mdblist_manager', 'simkl_manager', 'tmdb_manager', 'trakt_manager')
 	present = [m for m in managers if m in order]
 	if present:
 		insert_at = min(order.index(m) for m in present)
 		order = [i for i in order if i not in managers]
-		for offset, manager in enumerate([m for m in managers if m in present]):
+		for offset, manager in enumerate(present):
 			order.insert(insert_at + offset, manager)
-	if 'tmdb_manager' in order and 'personal_manager' in order:
-		ti, pi = order.index('tmdb_manager'), order.index('personal_manager')
+	if 'trakt_manager' in order and 'personal_manager' in order:
+		ti, pi = order.index('trakt_manager'), order.index('personal_manager')
 		if pi < ti: order[ti], order[pi] = order[pi], order[ti]
 	return order
 
@@ -1214,16 +1226,24 @@ def migrate_mdblist_context_menu_for_upgrade(had_existing_settings):
 	return changed
 
 def migrate_cm_manager_order_for_upgrade():
-	if get_setting('playtvban.cm_manager_order_migrated_v2', 'false') == 'true': return False
+	if get_setting('playtvban.cm_manager_order_migrated_v3', 'false') == 'true': return False
+	set_setting('cm_manager_order_migrated_v3', 'true')
 	set_setting('cm_manager_order_migrated_v2', 'true')
 	set_setting('cm_manager_order_migrated', 'true')
 	before = get_setting('playtvban.context_menu.order', '')
 	cm_current_order()
+	# Also put TMDb before Trakt in the enabled-items list when both are present.
+	enabled_raw = get_setting('playtvban.context_menu.enabled', '')
+	if enabled_raw and enabled_raw not in ('noop', '[]'):
+		parts = [p for p in enabled_raw.split(',') if p]
+		normalized = _normalize_cm_list_order(parts)
+		if normalized != parts:
+			set_setting('context_menu.enabled', ','.join(normalized))
 	return get_setting('playtvban.context_menu.order', '') != before
 
 def cm_current_order():
 	default = 'extras,options,playback_options,external_scraper_settings,browse_movie_set,browse_seasons,browse_episodes,recommended,related,more_like_this,similar,in_trakt_list,' \
-				'mdblist_manager,simkl_manager,trakt_manager,tmdb_manager,personal_manager,favorites_manager,mark_watched,unmark_previous_episode,exit,refresh,reload'
+				'mdblist_manager,simkl_manager,tmdb_manager,trakt_manager,personal_manager,favorites_manager,mark_watched,unmark_previous_episode,exit,refresh,reload'
 	setting = get_setting('playtvban.context_menu.order', default)
 	if setting in ('', None, 'noop', '[]'): order = default.split(',')
 	else: order = setting.split(',')

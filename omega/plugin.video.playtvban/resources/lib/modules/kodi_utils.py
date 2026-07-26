@@ -31,7 +31,7 @@ def extras_button_label_values():
 				'show_director': 'Director', 'show_options': 'Opciones', 'show_recommended': 'Recomendado', 'show_related': 'Relacionado', 'show_more_like_this': 'Más Como Esto',
 				'show_similar': 'Similar', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
 				'show_year': 'Más Año', 'show_genre': 'Más Géneros', 'show_network': 'Más Cadena',
-				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Listas de Simkl', 'show_trakt_manager': 'Listas de Trakt', 'show_tmdb_manager': 'Listas de TMDb', 'show_personallists_manager': 'Listas Personales',
+				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Listas de Simkl', 'show_tmdb_manager': 'Listas de Trakt', 'show_trakt_manager': 'Listas de Trakt', 'show_personallists_manager': 'Listas Personales',
 				'show_favorites_manager': 'Listas de Favoritos', 'playback_choice': 'Opciones de Reproducción', 'show_plot': 'Sinopsis', 'show_keywords': 'Palabras Clave',
 				'show_in_trakt_lists': 'En Listas de Trakt', 'close_all': 'Cerrar'},
 			'tvshow':
@@ -39,7 +39,7 @@ def extras_button_label_values():
 				'play_nextep': 'Reproducir Siguiente', 'show_options': 'Opciones', 'show_recommended': 'Recomendado', 'show_related': 'Relacionado', 'show_more_like_this': 'Más Como Esto',
 				'show_similar': 'Similar', 'show_reviews': 'Reseñas', 'show_comments': 'Comentarios', 'show_trivia': 'Curiosidades', 'show_blunders': 'Errores',
 				'show_year': 'Más Año', 'show_genre': 'Más Géneros', 'show_network': 'Más Cadena',
-				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Listas de Simkl', 'show_trakt_manager': 'Listas de Trakt', 'show_tmdb_manager': 'Listas de TMDb', 'show_personallists_manager': 'Listas Personales',
+				'show_mdblist_manager': 'MDBList', 'show_simkl_manager': 'Listas de Simkl', 'show_tmdb_manager': 'Listas de Trakt', 'show_trakt_manager': 'Listas de Trakt', 'show_personallists_manager': 'Listas Personales',
 				'show_favorites_manager': 'Listas de Favoritos', 'play_random_episode': 'Reproducir Aleatorio', 'show_plot': 'Sinopsis', 'show_keywords': 'Palabras Clave',
 				'show_in_trakt_lists': 'En Listas de Trakt', 'close_all': 'Cerrar'}}
 
@@ -60,8 +60,8 @@ def context_menu_items():
 	{'name': 'Explorar Más Como Esto', 'value': 'more_like_this'}, {'name': 'Explorar Similares', 'value': 'similar'}, {'name': 'En Listas de Trakt', 'value': 'in_trakt_list'},
 	{'name': 'Gestor de MDBList', 'value': 'mdblist_manager'}, {'name': 'Lista de Seguimiento de MDBList', 'value': 'mdblist_watchlist'}, {'name': 'Biblioteca de MDBList', 'value': 'mdblist_library'},
 	{'name': 'Gestor de Listas de Simkl', 'value': 'simkl_manager'}, {'name': 'Simkl Por Ver', 'value': 'simkl_plantowatch'},
-	{'name': 'Gestor de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Lista de Seguimiento de Trakt', 'value': 'trakt_watchlist'}, {'name': 'Biblioteca de Trakt', 'value': 'trakt_collection'},
 	{'name': 'Gestor de Listas de TMDb', 'value': 'tmdb_manager'}, {'name': 'Lista de Seguimiento de TMDb', 'value': 'tmdb_watchlist'}, {'name': 'Favoritos de TMDb', 'value': 'tmdb_favorites'},
+	{'name': 'Gestor de Listas de Trakt', 'value': 'trakt_manager'}, {'name': 'Lista de Seguimiento de Trakt', 'value': 'trakt_watchlist'}, {'name': 'Biblioteca de Trakt', 'value': 'trakt_collection'},
 	{'name': 'Gestor de Listas Personales', 'value': 'personal_manager'}, {'name': 'Gestor de Favoritos', 'value': 'favorites_manager'}, {'name': 'Marcar Visto/No Visto', 'value': 'mark_watched'},
 	{'name': 'Desmarcar Episodio Visto Anterior', 'value': 'unmark_previous_episode'}, {'name': 'Salir de la Lista', 'value': 'exit'}, {'name': 'Actualizar Widgets', 'value': 'refresh'},
 	{'name': 'Recargar Widgets', 'value': 'reload'}]
@@ -231,10 +231,10 @@ def addon_fanart():
 		or 'special://home/addons/plugin.video.playtvban/resources/media/fanart.jpg'
 	)
 
-MEDIA_GITHUB_USER = 'The-Red-Wizard'
-MEDIA_GITHUB_REPO = 'TheRedWizard.github.io'
-MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/%s/%s/main/packages/media' % (MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO)
-LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/TheRedWizard/TheRedWizard.github.io/main/packages/media'
+MEDIA_GITHUB_USER = 'tvbandroid'
+MEDIA_GITHUB_REPO = 'tvbandroid.github.io'
+MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/%s/%s/master/tvband/packages/media' % (MEDIA_GITHUB_USER, MEDIA_GITHUB_REPO)
+LEGACY_MEDIA_GITHUB_RAW = 'https://raw.githubusercontent.com/tvbandroid/tvbandroid.github.io/tree/master/tvband/packages/media'
 # Estuary WideList row icons use ListItem.Icon only for Container.Content() — not files.
 MENU_FOLDER_CONTENT = ''
 

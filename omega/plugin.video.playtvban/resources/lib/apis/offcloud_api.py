@@ -18,7 +18,7 @@ class OffcloudAPI:
 		self._sync_token()
 
 	def _sync_token(self):
-		self.token = get_setting('redlight.oc.token', 'empty_setting')
+		self.token = get_setting('playtvban.oc.token', 'empty_setting')
 
 	def _authorized(self):
 		return self.token not in ('empty_setting', '', None)

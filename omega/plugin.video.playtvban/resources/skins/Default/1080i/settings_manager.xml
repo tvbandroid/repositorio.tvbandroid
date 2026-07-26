@@ -844,7 +844,7 @@
                           <property name="setting_label">[I]Ingrese las Claves API de Google/Groq para acceder.[/I]</property>
                           <property name="setting_type">info</property>
                           <property name="setting_value"></property>
-                          <property name="setting_description">Acceda a Meta Accounts para introducir sus claves API de Google IA y/o Groq IA y así acceder a esta función.</property>
+                          <property name="setting_description">Introduce las claves API de Google IA y/o Groq IA en Cuentas de Meta. Similares (IA) se utiliza en Extras > Similares, Buscar similares en el menú contextual y Porque viste cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA).</property>
                           <onclick>noop</onclick>
                       </item>
                       <item>
@@ -853,7 +853,7 @@
                           <property name="setting_label">Seleccione las Prioridades del Modelo de IA</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">...</property>
-                          <property name="setting_description">Elige el orden en que se usarán los modelos de IA para títulos similares. El primero se usará y el último, el primero. Normalmente, querrás mantener este orden por defecto. Si no tienes una clave API para el modelo que aparece en la lista, se omitirá.</property>
+                          <property name="setting_description">Elige el orden en el que se probarán los modelos de IA para Extras > Similares, Buscar similares y Porque viste (cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA)). El primero de la lista se probará primero y el último, al final. Los modelos sin una clave API se omitirán.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=ai_model_order_choice)</onclick>
                       </item>
                       <item>
@@ -862,7 +862,7 @@
                           <property name="setting_label">Seleccione el Máximo de Resultados Similares a los Títulos</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.ai_model.limit)]</property>
-                          <property name="setting_description">Seleccione el número máximo de resultados similares de IA que devuelve Play TVBan.</property>
+                          <property name="setting_description">Máximo de resultados de Similares (IA) para Extras > Similares, Buscar similares y Porque viste (cuando el servicio utilizado para Porque viste es Similares (IA)).</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_numeric&amp;setting_id=ai_model.limit)</onclick>
                       </item>
 <!-- CONTENT 30 -->
@@ -920,7 +920,7 @@
                           <property name="setting_label">Servicio utilizado Porque lo Viste</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.recommend_service_name)]</property>
-                          <property name="setting_description">Elige el servicio que te ofrece recomendaciones para los menús de "Porque viste este vídeo". Las opciones son: Recomendado (TMDb), Más vídeos similares (IMDb) o Similares según IA (IA).</property>
+                          <property name="setting_description">Elige qué servicio proporciona las recomendaciones de Porque viste. Más como esto (IMDb) y Recomendado (TMDb) están siempre disponibles. Relacionados (Trakt) aparece cuando Trakt está autorizado; Similares (IA) aparece cuando se ha configurado una clave de Google o Groq.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_from_list&amp;setting_id=recommend_service)</onclick>
                       </item>
                       <item>
@@ -1134,7 +1134,7 @@
                           <property name="setting_label">Películas</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.default.movies_name)]</property>
-                          <property name="setting_description">Orden de clasificación predeterminado para las listas de películas - Lista de seguimiento, Colección, Simkl y MDBList. Las listas individuales pueden modificar este orden desde su Menú Contextual.</property>
+                          <property name="setting_description">Predeterminado para las listas de películas de la Lista de seguimiento/Biblioteca de Trakt, Simkl y MDBList. Puedes cambiar cualquier lista mediante Menú contextual > Establecer orden personalizado (en Simkl: cada sección de estado por separado). Los contenidos de TMDb no están incluidos aquí; utiliza Establecer orden personalizado en la lista de TMDb.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=sort_default_choice&amp;media_type=movies)</onclick>
                       </item>
                       <item>
@@ -1142,7 +1142,7 @@
                           <property name="setting_label">Series</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.sort.default.shows_name)]</property>
-                          <property name="setting_description">Orden de clasificación predeterminado para las listas de series - Lista de seguimiento, Colección, Simkl y MDBList. Las listas individuales pueden modificar este orden desde su Menú Contextual.</property>
+                          <property name="setting_description">Predeterminado para las listas de series de la Lista de seguimiento/Biblioteca de Trakt, Simkl y MDBList. Puedes cambiar cualquier lista mediante Menú contextual > Establecer orden personalizado (en Simkl: cada sección de estado por separado). Los contenidos de TMDb no están incluidos aquí; utiliza Establecer orden personalizado en la lista de TMDb.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=sort_default_choice&amp;media_type=shows)</onclick>
                       </item>
         <!-- Listas de TMDb -->
@@ -1157,7 +1157,7 @@
                           <property name="setting_label">Orden de Visualización de Mis Listas de TMDb</property>
                           <property name="setting_type">action</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.tmdblist.list_sort_name)]</property>
-                          <property name="setting_description">Elige el orden en que se presentan tus listas de TMDb. Esto no afecta al contenido de las listas, sino a las listas en sí.</property>
+                          <property name="setting_description">Orden de los nombres de tus listas de TMDb en Mis listas únicamente; no de los títulos dentro de una lista. Ordena el contenido de las listas mediante Establecer orden personalizado en la lista (menú contextual) o Editar propiedades > Cambiar orden de clasificación.</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=list_display_order_choice&amp;list_type=tmdb)</onclick>
                       </item>
         <!-- Personal Lists -->
@@ -1865,7 +1865,7 @@
                           <property name="setting_label">Clave API</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.google_api)]</property>
-                          <property name="setting_description">Introduce aquí tu Clave API de Gemini/Gemma AI. Esto te permitirá utilizar las funciones de IA de Play TVBan, como Explorar Similares con IA.</property>
+                          <property name="setting_description">Clave API de Google Gemini/Gemma para Similares (IA). Se utiliza en tres lugares: Extras > Similares, Buscar similares (menú contextual) y Porque viste cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA).</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=google_api)</onclick>
                       </item>
         <!-- GROQ -->
@@ -1880,7 +1880,7 @@
                           <property name="setting_label">Clave API</property>
                           <property name="setting_type">numeric</property>
                           <property name="setting_value">$INFO[Window(10000).Property(playtvban.groq_api)]</property>
-                          <property name="setting_description">Introduce aquí tu Clave API de Groq AI. Esto te permitirá utilizar las funciones de IA de Play TVBan, como Explorar Similares con IA.</property>
+                          <property name="setting_description">Clave API de Groq para Similares (IA). Se utiliza en tres lugares: Extras > Similares, Buscar similares (menú contextual) y Porque viste cuando en Contenido > General > Servicio utilizado para Porque viste está seleccionada la opción Similares (IA).</property>
                           <onclick>RunPlugin(plugin://plugin.video.playtvban/?mode=settings_manager.set_string&amp;setting_id=groq_api)</onclick>
                       </item>
 <!-- TORRENT SOURCES 61 / DIRECT SOURCES 62 -->

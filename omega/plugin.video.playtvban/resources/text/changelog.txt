@@ -1,10 +1,14 @@
-[COLOR red][B]Versión 1.4.3[/B][/COLOR]
+[COLOR khaki][B]Versión 1.4.4[/B][/COLOR]
+- [B]Because You Watched (IA)[/B]: deja de reintentar el mismo modelo Gemini/Groq indefinidamente tras una respuesta fallida (las filas de fallos leves se borraban inmediatamente porque [B]timeout_ends=0[/B] se consideraba caducado). No almacena en caché los resultados de IA fallidos o vacíos como una lista en blanco. Actualiza los modelos predeterminados de Google a los ID actuales ([B]gemini-3.1-flash-lite[/B], [B]gemma-4-31b-it[/B]): los ID obsoletos [B]gemini-2.5-flash-lite[/B] / [B]gemma-3[/B] devolvían un error HTTP 404.
+- [B]Configuración[/B]: en Calendarios > Mostrar días anteriores, la información indica que la API de calendario de MDBList no expone las emisiones pasadas. La información de AI Similar muestra Extras > Similares, Explorar similares y Porque viste (Contenido > General > Servicio utilizado para Porque viste). El selector de servicios de Porque viste solo muestra Similares (AI) / Relacionados (Trakt) cuando estos servicios están autorizados.
+
+[COLOR khaki][B]Versión 1.4.3[/B][/COLOR]
 - [B]Offcloud[/B]: con [B]Añadir caché de Debrid resuelta a la nube = Ninguno[/B], no se elimina la solicitud de la nube antes de que Kodi abra la URL de reproducción (estos enlaces tienen un alcance de solicitud y se cerraban inmediatamente). En su lugar, las solicitudes temporales se eliminan después de que finaliza la reproducción o si falla, lo que mantiene el objetivo de limpieza de archivos residuales de la versión 2.0.4 sin interrumpir la reproducción (#160).
 
 - [B]Calendario MDBList[/B]: se corrige la carpeta de calendario vacía, se refuerzan los metadatos de los programas (etiquetas de estudio), se acepta cualquier formato de respuesta del calendario MDBList, se ignoran los errores de API/caché vacíos y se corrige el filtrado por ventana de día para que se muestren de nuevo las próximas emisiones.
 - [B]MDBList[/B]: [B]Siguiente[/B] en Mis listas > Listas MDBList (junto a Calendario) — siguientes episodios no vistos del historial de visualización de MDBList, incluso cuando Indicadores de visualización es Simkl/Trakt/Local. Utiliza la configuración compartida de la lista de Siguientes episodios.
 
-[COLOR red][B]Versión 1.4.1[/B][/COLOR]
+[COLOR khaki][B]Versión 1.4.1[/B][/COLOR]
 - [B]Rendimiento[/B]: la metacaché almacena JSON en lugar de la representación de Python; la lista de metadatos ya no se refleja a través de las propiedades de la ventana (solo la ruta de la base de datos). Las conexiones SQLite usan WAL / NORMAL síncrono. El valor predeterminado del grupo de subprocesos es [B]20[/B] (antes era 60), incluso cuando [B]Limitar subprocesos concurrentes[/B] está desactivado, para reducir la presión sobre el límite de velocidad de TMDb tras la creación más rápida de listas (gracias a Tikipeter). Cuando el límite está activado, se conserva el valor de Subprocesos activos máximos guardado previamente.
 
 - [B]MDBList[/B]: [B]Calendario[/B] en Mis listas > Listas MDBList: emisiones de episodios de MDBList, utilizando la configuración compartida de [B]Calendarios[/B] (visualización, etiquetas de fecha, ordenación, aplanamiento, días anteriores/futuros; misma ventana que el Calendario de Trakt). Las próximas emisiones de programas en emisión ya no se descartan cuando MDBList las etiqueta con [B]release_type=watched[/B].
@@ -18,13 +22,13 @@
 
 - [B]Reanudar[/B]: Play TVBan mantiene la solicitud de reanudación (el widget/Kodi ya no pregunta primero). Los elementos en curso aún establecen la hora de reanudación + duración para [B]EndTimeResume[/B] (#116); se omite el [B]total[/B] de reanudación para que Kodi no los trate como acciones de reproducción reanudables. Use Continuar / Iniciar desde el principio después de la recopilación (o Reanudar automáticamente siempre) de Play TVBan.
 
-[COLOR red][B]Versión 1.4.0[/B][/COLOR]
+[COLOR khaki][B]Versión 1.4.0[/B][/COLOR]
 - [B]Saltar introducción[/B]: [B]Desactivado[/B] = desactivado; [B]Automático[/B] = salta sin preguntar cuando se aplica la opción Saltar introducción (reproducción automática, selección de fuente, primer episodio o posterior; se reproduce automáticamente cuando esta opción está activada); [B]Preguntar[/B] = pregunta primero (Sí salta; No o ignorar/tiempo de espera no salta). Descripción más clara para [B]También activado Reproduce automáticamente[/B].
 
-[COLOR red][B]Versión 1.3.9[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.9[/B][/COLOR]
 - [B]Rendimiento[/B]: las listas de películas y series de televisión reutilizan una conexión de metacaché SQLite por hilo de trabajo al crear los elementos de la lista (menos ciclos de apertura/cierre; gracias a Tikipeter).
 
-[COLOR red][B]Versión 1.3.8[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.8[/B][/COLOR]
 - [B]Ajustes[/B]: El [B]Proveedor de estado de visualización[/B] y las herramientas de sincronización de Trakt/Simkl/MDBList (intervalo, actualizar widgets, forzar sincronización, borrar caché) se mueven de General a [B]Cuentas meta[/B]; el proveedor aparece en la parte superior; la sincronización/caché se encuentra debajo de cada servicio cuando está autorizado.
 
 - [B]Simkl[/B]: Las listas de estado (Planear para ver / Viendo / etc.) se ordenan nuevamente por título cuando el título es el criterio de ordenación activo; la obtención de listas ya no utiliza [I]ids_only[/I], que omitía los títulos y dejaba las listas en el orden de la API.
@@ -47,23 +51,23 @@
 
 - Consejos: nuevo consejo sobre "Orden de clasificación de listas" que abarca la configuración predeterminada, el orden personalizado por lista (Simkl/TMDb) y el cambio de nombre de la biblioteca de Trakt.
 
-[COLOR red][B]Versión 1.3.6[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.6[/B][/COLOR]
 - [B]Orden de clasificación de listas[/B]: Las películas y las series ahora tienen órdenes de clasificación predeterminados independientes (Configuración → Contenido → Orden de clasificación de listas). Esto se aplica a la lista de seguimiento (Watchlist), la colección, Simkl y MDBList; las listas individuales pueden modificar esta configuración desde el menú contextual o utilizar la opción "Usar predeterminado" para restablecerla. Un modelo de clasificación único y compartido sustituye a los mecanismos anteriores que dependían de cada proveedor; se conserva el orden existente tras la actualización, aunque la clasificación por título ahora no distingue entre mayúsculas y minúsculas (gracias a JMAN730 / #40).
 
-[COLOR red][B]Versión 1.3.4[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.4[/B][/COLOR]
 - [B]Progreso[/B]: [B]Excluir Especiales del Progreso de Series[/B] (activado por defecto) — Los especiales de la Temporada 0 ya no cuentan para el progreso de series vistas, el porcentaje de progreso ni para la clasificación En curso / Vista. Independiente de [B]Mostrar Episodios Especiales Cuando Estén Disponibles[/B]. Desactívalo para restaurar el comportamiento anterior.
 - [B]Trakt[/B] / [B]Simkl[/B]: [B]Restablecer Scrobble[/B] ahora borra la base de datos de progreso del proveedor correspondiente incluso cuando hay otro proveedor de estado de reproducción activo (evita eliminar el marcador de reanudación del servicio equivocado).
 - [B]Menú Contextual[/B] / [B]Opciones[/B]: [B]Gestor de Listas de Trakt[/B], [B]En Listas de Trakt[/B] y [B]Gestor de Listas de TMDb[/B] solo aparecen cuando esa cuenta está autorizada (igual que Simkl / MDBList).
 
-[COLOR red][B]Versión 1.3.3[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.3[/B][/COLOR]
 - [B]Administrador de listas de Trakt[/B]: Agregar/Eliminar elementos de la lista de seguimiento, colección y favoritos con información de estado; Eliminar/Recuperar elementos de programas; selectores de listas personales filtrados por membresía; Marcar como visto/no visto y Reiniciar Scrobble; Abrir lista de seguimiento/colección/favoritos/listas que me gustan/mis listas y actualizar widgets (paridad con Simkl/MDBList).
 - [B]Administrador de listas de TMDb[/B]: Agregar o eliminar elementos de la lista de seguimiento/favoritos con información de estado; selectores de listas personalizadas filtrados por membresía usando el contenido de la lista en caché (estado del elemento en tiempo real solo cuando una lista no está en caché).
 
-[COLOR red][B]Versión 1.3.2[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.2[/B][/COLOR]
 - [B]Calendario Trakt[/B]: [B]Etiquetas de fecha del calendario[/B] — tres grupos en orden coincidente ([B]AAAA-MM-DD[/B], [B]MM-DD-AAAA[/B], [B]DD-MM-AAAA[/B]): [B]Palabras / …[/B] (Hoy/Mañana/día de la semana para la semana más cercana, ese formato fuera de ella; por defecto [B]Palabras / AAAA-MM-DD[/B]), solo fecha y [B]Día + …[/B] (p. ej., [B]HOY 07-20-2026[/B]). Los modos Palabra y Día + fecha mantienen la fecha fija.
 
 
-[COLOR red][B]Versión 1.3.1[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.1[/B][/COLOR]
 - [B]Acciones especiales de apertura[/B]: opcional [B]Saltar en películas en curso[/B]: al activarse, al seleccionar una película en curso, la reproducción se reanuda directamente en lugar de abrir Extras / Colección de películas (gracias a JMAN730 / #77).
 
 - [B]Acciones especiales de apertura[/B]: opcional [B]Saltar en series en curso[/B]: al activarse, al seleccionar una serie con un episodio en curso, se abren las temporadas/episodios en lugar de Extras (las series vistas parcialmente sin un punto de reanudación no se modifican; Extras permanece en el menú contextual).
@@ -76,21 +80,21 @@
 
 - [B]Reproducción aleatoria continua[/B]: se eliminó [B]Usar Still Watching con reproducción aleatoria continua[/B]: la reproducción aleatoria continua ya no utiliza [B]Comprobar Still Watching después de X[/B]; la reproducción automática del siguiente episodio Still Watching permanece sin cambios.
 
-[COLOR red][B]Versión 1.3.0[/B][/COLOR]
+[COLOR khaki][B]Versión 1.3.0[/B][/COLOR]
 - [B]Confirmar Autobúsqueda[/B]: [B]Siguiente Episodio Preparado[/B] ya no aparece en cuanto finaliza la búsqueda tras pulsar [B]Sí[/B]; ahora espera a la misma ventana de aviso que la Autobúsqueda sin confirmación, por lo que "Preparado" significa que el cambio al siguiente episodio es inminente (y no simplemente que la preparación ha finalizado).
 - [B]Confirmar Autobúsqueda[/B] / [B]Sigues Viendo?[/B] / superposiciones relacionadas con la reproducción: al cerrar el diálogo mientras el vídeo sigue reproduciéndose, se restaura la reproducción a pantalla completa en lugar de dejar visibles los widgets de Inicio o la lista de episodios (algo habitual cuando la reproducción se inicia desde un widget, especialmente en Android).
 
 [B]Versión 1.2.9[/B][/COLOR] - [B]Trakt[/B]: La búsqueda en listas de usuarios ya no devuelve una carpeta vacía; los propietarios de las listas se leen del objeto [B]usuario[/B] anidado de Trakt (igual que Populares/Tendencias), en lugar de un campo [B]nombre de usuario[/B] de nivel superior que faltaba y que omitía todos los resultados.
 
-[COLOR red][B]Versión 1.2.8[/B][/COLOR]
+[COLOR khaki][B]Versión 1.2.8[/B][/COLOR]
 - [B]Autobúsqueda del Siguiente Episodio[/B]: después de seleccionar una fuente de los resultados de la Autobúsqueda, la función [B]Siguiente Episodio[/B] permanece activada para que puedas seguir viendo automáticamente los episodios siguientes (antes se desactivaba tras esa selección, por lo que la Autobúsqueda solo funcionaba en el primer cambio de episodio).
 
-[COLOR red][B]Versión 1.2.7[/B][/COLOR]
+[COLOR khaki][B]Versión 1.2.7[/B][/COLOR]
 - [B]Calendario Trakt[/B]: formatos de visualización de títulos de episodios independientes para el complemento y los widgets, sin modificar el formato efectivo de los usuarios existentes durante la actualización (gracias a JMAN730 / #131).
 
 - [B]Subtítulos[/B]: se agregó una descripción general a [B]Herramientas > Consejos de uso[/B], que abarca las fuentes de subtítulos automáticos, las preferencias de idioma y subtítulos locales, la sincronización de alertas basadas en subtítulos, las limitaciones y el mantenimiento de la caché.
 
-[COLOR red][B]Versión 1.2.6[/B][/COLOR]
+[COLOR khaki][B]Versión 1.2.6[/B][/COLOR]
 - [B]TorBox[/B]: las transferencias temporales de resolución/exploración ahora se limpian de forma consistente cuando [B]Añadir caché Debrid resuelta a la nube[/B] está en [B]Ninguno[/B]. Play TVBan sigue creando una transferencia temporal de TorBox para solicitar enlaces reproducibles, pero las esperas fallidas de archivos, las selecciones sin coincidencias en paquetes, los fallos al resolver NZB y las resoluciones correctas no conservadas ahora intentan limpiar las transferencias que Play TVBan acaba de crear.
 - [B]Descargas[/B]: [B]Descargar archivo[/B] vuelve al comportamiento anterior a la regresión usando [B]RunPlugin[/B]. Corregido un error de diagnóstico en la resolución de nextep que provocaba un [B]AttributeError[/B] en un nuevo [B]Sources()[/B] ([B]play_type[/B] / [B]background[/B] sin definir): el registro ya no se ejecuta antes de la resolución Debrid en la ruta de descarga. [B]Descargar archivo[/B] muestra una notificación de [B]Descarga iniciada[/B] tras confirmar el título; [B]Descargar paquete[/B] ya no duplica [B]Descarga del paquete iniciada[/B] encima de [B]Descarga de paquete de varios archivos iniciada[/B].
 - [B]AIOStreams[/B]: [B]Descargar archivo[/B] sigue los enlaces de reproducción/redirección de AIO hasta la URL directa del CDN y añade las cabeceras de descarga de Premiumize / TorBox (corrige el fallo instantáneo [B]Fallido[/B] en filas AIO respaldadas por Debrid).
@@ -101,16 +105,16 @@
 - [B]Icono del addon[/B]: miniicono actualizado con canal alfa correcto para las superposiciones de las skins de Kodi (gracias a [B]OfficerKD637[/B] por avisar del problema de transparencia).
 - [B]Imágenes[/B]: [B]Descargas > Imágenes[/B] abre una cuadrícula de miniaturas cuando existen archivos; si la carpeta está vacía, se muestra el visor de imágenes con navegación de retroceso en lugar de una lista en blanco o la notificación [B]No se encontró nada[/B]. La descarga de imágenes ya no se bloquea en [B]RunPlugin[/B] cuando el cuadro de diálogo de espera se ejecuta antes de [B]download_prep[/B]; la exploración de imágenes locales crea de forma segura las carpetas que faltan.
 
-[COLOR red][B]Versión 1.2.5[/B][/COLOR]
+[COLOR khaki][B]Versión 1.2.5[/B][/COLOR]
 - [B]Mis Servicios[/B]: formato de caducidad compartido en la Información de la Cuenta para Real Debrid, Premiumize, All Debrid, EasyNews, TorBox y Offcloud ([B]Caduca[/B] como una fecha legible más [B]Días restantes[/B]).
 - [B]Mis Servicios[/B]: las etiquetas del menú muestran los días restantes en caché (por ejemplo, [B]EasyNews · 42 días[/B]) — caché de 12 horas, sin llamadas a la API en cada apertura del menú.
 - [B]Mis Servicios[/B]: [B]Avisar cuando un servicio caduque en menos de (días)[/B] en [B]General > Mis Servicios[/B] (7 por defecto; 0 = desactivado). Notificación al iniciar para las cuentas autorizadas de Debrid y EasyNews; cada número de días restantes solo avisa una vez. Corregidas las alertas repetidas en cada inicio cuando el número de días restantes no había cambiado.
 - [B]Reproducción Aleatoria Continua[/B]: opción [B]Usar ¿Sigues viendo? con Reproducción Aleatoria Continua[/B] en [B]Reproducción > Episodios[/B] (visible cuando [B]Reproducción Automática del Siguiente Episodio[/B] y [B]Comprobar ¿Sigues viendo? después de X[/B] están activados). Cuando está desactivado, las cadenas de omisión de la reproducción aleatoria continua ya no activan el aviso de ¿Sigues viendo?; la Reproducción Automática del Siguiente Episodio funciona igual (#62 seguimiento).
 
-[COLOR red][B]Versión 1.2.4[/B][/COLOR]
+[COLOR khaki][B]Versión 1.2.4[/B][/COLOR]
 - [B]Progreso de Búsqueda[/B]: el contador de resultados [B]TOTAL[/B] del diálogo de progreso de búsqueda ahora tiene su propio selector de color ([B]Color del Contador TOTAL del Progreso de Búsqueda[/B], blanco por defecto). La etiqueta [B]TOTAL[/B] permanece en gris tenue; solo el número se colorea (cuando [B]Colores del Contador del Progreso de Búsqueda[/B] está activado).
 
-[COLOR red][B]Versión 1.2.2[/B][/COLOR]
+[COLOR khaki][B]Versión 1.2.2[/B][/COLOR]
 - [B]TorBox Cloud[/B]: menú contextual de fuentes [B]Eliminar de TorBox Cloud[/B] (igual que RD Cloud): elimina la transferencia en caché de torrent / usenet / webdl de tu cuenta de TorBox.
 - [B]AIOStreams[/B]: [B]ElfHosted[/B] añadido pero desactivado en el selector de instancias (el servidor público devuelve [B]La API de Búsqueda está deshabilitada[/B]); el identificador predefinido queda reservado para poder volver a activarlo más adelante sin reasignar las demás instancias.
 - [B]Reproducción Aleatoria Continua[/B]: si un episodio no tiene resultados de búsqueda, se pasa a otro episodio aleatorio (hasta [B]25[/B] intentos) en lugar de detener el maratón; [B]Comprobar si Sigues Viendo Después de X[/B] (la misma opción que Reproducción Automática del Siguiente Episodio) ahora también se aplica a la reproducción aleatoria continua, incluidos los episodios omitidos (incluso cuando todavía no se está reproduciendo nada). Las omisiones también ignoran los avisos de [B]Acciones de Nueva Búsqueda[/B] (y tratan igual los fallos de reproducción automática en cascada), para que el maratón no se detenga preguntando si deseas volver a intentarlo (gracias JMAN730 / #62).

@@ -591,7 +591,7 @@ class Navigator:
 			self.add({'mode': mode, 'action': action, 'key_id': item['id'], 'iconImage': 'tmdb', 'category_name': name}, name, iconImage='tmdb')
 		if data['total_pages'] > page_no:
 			new_page = {'mode': 'navigator.keyword_results', 'key_id': key_id, 'category_name': self.category_name, 'new_page': str(data['page'] + 1)}
-			self.add(new_page, 'Next Page (%s) >>' % new_page['new_page'], 'nextpage', False)
+			self.add(new_page, 'Página Siguiente (%s) >>' % new_page['new_page'], 'nextpage', False)
 		self.category_name = 'Resultados de Búsqueda para %s' % key_id.upper()
 		self.end_directory()
 

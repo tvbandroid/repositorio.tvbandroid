@@ -1943,7 +1943,7 @@ provider-name="ElSupremo">
   </extension>
 </addon>
 
-<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" version="1.4.6" provider-name="[COLOR white]JoseATeba[/COLOR]">
+<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" version="1.4.7" provider-name="[COLOR white]JoseATeba[/COLOR]">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.pil" version="1.1.7"/>
@@ -1958,7 +1958,10 @@ provider-name="ElSupremo">
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <summary lang="en">[COLOR azure][COLOR deepskyblue]>Play[COLOR red]TV[COLOR white]Ban[/COLOR]</summary>
-        <description lang="en">* [COLOR khaki]Nueva versión en español.[/COLOR]
+        <description lang="en">* AIOStreams
+* EasyNews, NZB Indexadores y Carpetas Locales
+* MDBList, Simkl, TMDb Lists, Trakt and WeTrakr[/COLOR]
+* [COLOR khaki]Nueva versión en español.[/COLOR]
 *[COLOR azure]add-on de vídeo mantenido por TVBand.[/COLOR]</description>
         <platform>all</platform>
         <disclaimer lang="es">[COLOR khaki]El autor de este complemento no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido[/COLOR]</disclaimer>

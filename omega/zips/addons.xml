@@ -1943,7 +1943,7 @@ provider-name="ElSupremo">
   </extension>
 </addon>
 
-<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" version="1.4.7" provider-name="[COLOR white]JoseATeba[/COLOR]">
+<addon id="plugin.video.playtvban" name="[B][COLOR azure]Play[COLOR deepskyblue]>[COLOR red]TV[COLOR white]Ban[/COLOR][/B]" version="1.4.8" provider-name="[COLOR white]JoseATeba[/COLOR]">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.pil" version="1.1.7"/>
@@ -1958,11 +1958,11 @@ provider-name="ElSupremo">
     <extension point="xbmc.addon.metadata">
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <summary lang="en">[COLOR azure][COLOR deepskyblue]>Play[COLOR red]TV[COLOR white]Ban[/COLOR]</summary>
-        <description lang="en">* AIOStreams
-* EasyNews, NZB Indexadores y Carpetas Locales
-* MDBList, Simkl, TMDb Lists, Trakt and WeTrakr[/COLOR]
+        <description lang="en">* [COLOR khaki]AIOStreams[/COLOR]
+* [COLOR khaki]EasyNews, NZB Indexadores y Carpetas Locales[/COLOR]
+* [COLOR khaki]MDBList, Simkl, Listas TMDb, Trakt y WeTrakr[/COLOR]
 * [COLOR khaki]Nueva versión en español.[/COLOR]
-*[COLOR azure]add-on de vídeo mantenido por TVBand.[/COLOR]</description>
+* [COLOR azure]add-on de vídeo mantenido por TVBand.[/COLOR]</description>
         <platform>all</platform>
         <disclaimer lang="es">[COLOR khaki]El autor de este complemento no aloja ningún contenido y no tiene ninguna afiliación con los proveedores de contenido[/COLOR]</disclaimer>
         <license/>
@@ -3419,6 +3419,26 @@ provider-name="jurialmunkey">
 			<screenshot></screenshot>
 		</assets>
 		<news></news>
+	</extension>
+</addon>
+
+<addon id="script.module.gearsscrapers" version="1.5.0" name="Gears Scrapers" provider-name="gearsscrapers">
+	<requires>
+		<import addon="xbmc.python" version="3.0.0" />
+		<import addon="script.module.requests" />
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="lib/default.py">
+		<provides>executable</provides>
+	</extension>
+	<extension point="xbmc.service" library="lib/service.py" />
+	<extension point="xbmc.python.module" library="lib" />
+	<extension point="xbmc.addon.metadata">
+		<license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
+		<summary>gearsscrapers</summary>
+		<description>A module to query magnet providers.[CR][CR]This is a Non-profit resource, organized solely for educational purposes which is protected under the Fair-Use doctrine of the Copyright Act, Specifically section 107, which does promote freedom of expression, by permitting the unlicensed use of copyright-protected works.</description>
+		<disclaimer>The author does not host or own any content found within this addon. The author is not responsible for the content found using this addon. The author is not responsible for the use of this addon.</disclaimer>
+		<assets><icon>icon.png</icon></assets>
+		<assets><fanart>fanart.jpg</fanart></assets>
 	</extension>
 </addon>
 

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+
+<category label="General">
+    <setting type="action" label="Mostrar Registro de Cambios" action="RunPlugin(plugin://script.module.gearsscrapers/?action=ShowChangelog)" />
+</category>
+
+<category label="Proveedores">
+    <setting id="provider.aiostreams" type="bool" label="AIOStreams" default="false" />
+	<setting id="provider.torlock" type="bool" label="Torlock" default="false" />
+	<setting id="provider.torrentproject2" type="bool" label="TorrentProject" default="false" />
+    <setting id="provider.torrentz2" type="bool" label="Torrentz" default="false" />
+	<setting id="provider.meteor" type="bool" label="Meteor" default="false" />
+    <setting id="provider.1337x" type="bool" label="1337x" default="false" />
+    <setting id="provider.kickass2" type="bool" label="Kickass" default="false" />
+    <setting id="provider.piratebay" type="bool" label="PirateBay" default="false" />
+    <setting id="provider.rutor" type="bool" label="Rutor" default="false" />
+    <setting id="provider.knaben" type="bool" label="Knaben" default="false" />
+    <setting id="provider.nyaa" type="bool" label="Nyaa (Anime)" default="false" />
+	<setting id="provider.ytsmx" type="bool" label="YTS" default="false" />
+</category>
+
+<category label="Proveedores de Packs">
+    <setting id="provider.bitmagnet" type="bool" label="Bitmagnet" default="true" />
+	<setting id="provider.comet" type="bool" label="Comet" default="true" />
+	<setting id="provider.eztv" type="bool" label="EZTV (Solo Series)" default="false" />
+    <setting id="provider.torz" type="bool" label="Torz" default="true" />
+	<setting id="provider.torrentio" type="bool" label="Torrentio" default="true" />
+	<setting id="provider.zilean" type="bool" label="Zilean" default="false" />
+	<setting id="provider.mediafusion" type="bool" label="MediaFusion" default="false" />
+	<setting id="provider.torrentsdb" type="bool" label="TorrentsDB" default="true" />
+	<setting id="provider.torrentdownload" type="bool" label="TorrentDownload" default="false" />
+</category>
+
+<category label="Configuración de DMM">
+	<setting id="provider.bitsearch" type="bool" label="Bitsearch" default="false" />
+    <setting id="provider.dmm" type="bool" label="DMM" default="false" />
+	<setting id="provider.zilean" type="bool" label="Zilean" default="false" />
+</category>
+
+<category label="Prowlarr">
+    <setting label="Prowlarr" type="lsep" />
+    <setting id="provider.prowlarr" type="bool" label="PROWLARR" default="false" />
+        <setting id="prowlarr.token" type="text" label="Clave API de PROWLARR" subsetting="true" default="" visible="eq(-1,true)" />
+        <setting id="prowlarr.url" type="text" label="URL de PROWLARR" subsetting="true" default="" visible="eq(-2,true)" />
+</category>
+
+<category label="Filtros">
+    <setting id="filter.foreign.single.audio" type="bool" label="Eliminar Audio en Idioma Extranjero" default="false" />
+    <setting id="filter.undesirables" type="bool" label="Eliminar Resultados No Deseados" default="false" />
+</category>
+
+<category label="Mantenimiento">
+    <setting type="action" label="Probar Todos los Proveedores Torrent" action="RunPlugin(plugin://script.module.gearsscrapers/?action=healthCheck)" />
+    <setting type="action" label="Limpiar Archivo de Configuración" action="RunPlugin(plugin://script.module.gearsscrapers/?action=cleanSettings)" />
+</category>
+
+<category label="Avanzado">
+    <setting id="debug.enabled" type="bool" label="Activar Registro de Depuración" default="false" />
+    <setting id="debug.location" type="enum" label="Ubicación del Registro" default="0" values="Registro de Kodi|Registro del Addon" />
+</category>
+
+</settings>

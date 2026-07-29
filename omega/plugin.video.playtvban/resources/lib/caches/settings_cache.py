@@ -861,12 +861,12 @@ def sync_settings(params={}):
 		settings_cache.clear_db_cache()
 		if _properties_loaded():
 			_apply_settings_properties_from_db()
-	if not silent: kodi_utils.notification('Settings Cache Remade')
+	if not silent: kodi_utils.notification('Caché de Configuración Recreada')
 	return 'synced'
 
 def set_default(setting_ids):
 	if not isinstance(setting_ids, list): setting_ids = [setting_ids]
-	if not kodi_utils.confirm_dialog(text='Are You Sure?', ok_label='Yes', cancel_label='No', default_control=11): return
+	if not kodi_utils.confirm_dialog(text='Estás Seguro?', ok_label='Sí', cancel_label='No', default_control=11): return
 	for setting_id in setting_ids:
 		try: set_setting(setting_id, default_setting_values(setting_id)['setting_default'])
 		except: pass
@@ -886,12 +886,12 @@ def set_string(params):
 	current_value = get_setting('playtvban.%s' % setting_id)
 	current_value = current_value.replace('empty_setting', '')
 	new_value = kodi_utils.kodi_dialog().input('', defaultt=current_value)
-	if not new_value and not kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
+	if not new_value and not kodi_utils.confirm_dialog(text='Introducir un Valor en Blanco?', ok_label='Sí', cancel_label='Volver a Introducir el Valor', default_control=11):
 		return set_string(params)
 	if setting_id in _CREDENTIAL_STRING_SETTINGS:
 		new_value = normalize_credential_string(new_value)
 	if setting_id == 'tmdb_api' and new_value and looks_like_tmdb_v4_jwt(new_value):
-		kodi_utils.ok_dialog(heading='Wrong key type', text='This is a TMDb v4 Read Access Token (JWT), not the v3 API Key.[CR]Use TMDb Lists → Read Access Token for v4 tokens.')
+		kodi_utils.ok_dialog(heading='Tipo de clave incorrecto', text='Esta es un Token de Acceso de Lectura v4 de TMDb (JWT), no una Clave API v3.[CR]Usa TMDb Lists → Token de Acceso de Lectura para los tokens v4.')
 		return set_string(params)
 	if setting_id == 'playback.submaker_manifest' and new_value:
 		new_value = new_value.strip()
@@ -913,16 +913,16 @@ def set_numeric(params):
 	min_value, max_value = int(values_get('min_value', '0')), int(values_get('max_value', '100000000000000'))
 	negative_included = any((n < 0 for n in [min_value, max_value]))
 	if negative_included:
-		multiplier_values = [('Positive(+)', 1), ('Negative(-)', -1)]
+		multiplier_values = [('Positivo(+)', 1), ('Negativo(-)', -1)]
 		list_items = [{'line1': item[0]} for item in multiplier_values]
-		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true', 'heading': 'Will this be a positive or negative number?'}
+		kwargs = {'items': json.dumps(list_items), 'narrow_window': 'true', 'heading': 'Será un Número Positivo o Negativo?'}
 		multiplier = kodi_utils.select_dialog(multiplier_values, **kwargs)
 	else: multiplier = None
-	new_value = kodi_utils.kodi_dialog().input('Range [B]%s - %s[/B].' % (min_value, max_value), type=1)
+	new_value = kodi_utils.kodi_dialog().input('Rango [B]%s - %s[/B].' % (min_value, max_value), type=1)
 	if not new_value: return
 	if multiplier: new_value = str(int(float(new_value) * multiplier[1]))
 	if int(new_value) < min_value or int(new_value) > max_value:
-		kodi_utils.ok_dialog(text='Please Choose Between the Range [B]%s - %s[/B].' % (min_value, max_value))
+		kodi_utils.ok_dialog(text='Por favor, Elige un Valor dentro del Rango [B]%s - %s[/B].' % (min_value, max_value))
 		return set_numeric(params)
 	set_setting(setting_id, new_value)
 
@@ -984,26 +984,26 @@ def set_from_list(params):
 		mode_label = mode_opts.get(setting_value, '')
 		current = str(get_setting('playtvban.external_scraper.run_mode', '1'))
 		warning_text = (
-			'Many indexers are volunteer-run community resources. '
-			'[B]%s[/B] can query the same indexers multiple times. [B]Series (Fallback by Slot Order)[/B] is the recommended default.[CR][CR]'
-			'Please scrape responsibly.' % mode_label
+			'Muchos indexadores son recursos comunitarios mantenidos por voluntarios. '
+			'[B]%s[/B] puede consultar los mismos indexadores varias veces. [B]Series (Respaldo por Orden de Ranuras)[/B] es la opción predeterminada recomendada.[CR][CR]'
+			'Por favor, realiza las búsquedas de forma responsable.' % mode_label
 		)
 		if current == '1':
 			confirmed = kodi_utils.confirm_dialog(
-				heading='Search Mode',
+				heading='Modo de Búsqueda',
 				text=warning_text,
-				ok_label='Continue',
-				cancel_label='Cancel',
+				ok_label='Continuar',
+				cancel_label='Cancelar',
 				default_control=11,
 			)
 			if confirmed is None or not confirmed:
 				return
 		else:
 			confirmed = kodi_utils.confirm_dialog(
-				heading='Search Mode',
+				heading='Modo de Búsqueda',
 				text=warning_text,
-				ok_label='Series (Fallback)',
-				cancel_label='Continue',
+				ok_label='Series (Respaldo)',
+				cancel_label='Continuar',
 				default_control=10,
 			)
 			if confirmed is None:
@@ -1040,7 +1040,7 @@ def set_source_folder_path(params):
 	setting_id = params['setting_id']
 	current_setting = get_setting('playtvban.%s' % setting_id)
 	if current_setting not in (None, 'None', ''):
-		if kodi_utils.confirm_dialog(text='Enter Blank Value?', ok_label='Yes', cancel_label='Re-Enter Value', default_control=11):
+		if kodi_utils.confirm_dialog(text='Introducir un Valor en Blanco?', ok_label='Sí', cancel_label='Volver a Introducir el Valor', default_control=11):
 			return set_setting(setting_id, 'None')
 	return set_path(params)
 
@@ -1052,7 +1052,7 @@ def restore_setting_default(params):
 		setting_default = default_setting_values(setting_id)['setting_default']
 		set_setting(setting_id, setting_default)
 	except:
-		if not silent: kodi_utils.ok_dialog(text='Error restoring default setting')
+		if not silent: kodi_utils.ok_dialog(text='Error al restaurar la configuración predeterminada')
 
 def default_setting_values(setting_id):
 	if 'playtvban.' in setting_id: setting_id = setting_id.replace('playtvban.', '')

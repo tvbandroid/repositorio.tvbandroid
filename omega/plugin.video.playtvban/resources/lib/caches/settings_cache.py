@@ -1172,11 +1172,11 @@ def default_settings():
 #==================== Orden de Contenidos por Progreso Visto
 {'setting_id': 'sort.progress', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Título', '1': 'Visto Recientemente'}},
 {'setting_id': 'sort.watched', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Título', '1': 'Visto Recientemente'}},
-#==================== Orden de Contenidos Predeterminado (por tipo, todas las listas)
+#==================== Orden Predeterminado de Contenidos (por tipo, todas las listas)
 {'setting_id': 'sort.default.movies', 'setting_type': 'string', 'setting_default': 'title:asc'},
-{'setting_id': 'sort.default.movies_name', 'setting_type': 'name', 'setting_default': 'Title (ascending)'},
+{'setting_id': 'sort.default.movies_name', 'setting_type': 'name', 'setting_default': 'Título (ascendente)'},
 {'setting_id': 'sort.default.shows', 'setting_type': 'string', 'setting_default': 'title:asc'},
-{'setting_id': 'sort.default.shows_name', 'setting_type': 'name', 'setting_default': 'Title (ascending)'},
+{'setting_id': 'sort.default.shows_name', 'setting_type': 'name', 'setting_default': 'Título (ascendente)'},
 #==================== Listas Personales
 {'setting_id': 'personal_list.sort_unseen_to_top', 'setting_type': 'boolean', 'setting_default': 'true'},
 {'setting_id': 'personal_list.highlight_unseen', 'setting_type': 'boolean', 'setting_default': 'false'},
@@ -1222,9 +1222,9 @@ def default_settings():
 {'setting_id': 'trakt.calendar_display_widget', 'setting_type': 'action', 'setting_default': '1', 'settings_options': {'0': 'TÍTULO: TxE - EPISODIO', '1': 'TxE - EPISODIO', '2': 'EPISODIO'}},
 {'setting_id': 'trakt.calendar_sort_order', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {'0': 'Descendente', '1': 'Ascendente'}},
 {'setting_id': 'trakt.calendar_date_labels', 'setting_type': 'action', 'setting_default': '0', 'settings_options': {
-	'0': 'Words / YYYY-MM-DD', '7': 'Words / MM-DD-YYYY', '8': 'Words / DD-MM-YYYY',
-	'3': 'YYYY-MM-DD', '1': 'MM-DD-YYYY', '2': 'DD-MM-YYYY',
-	'6': 'Day + YYYY-MM-DD', '4': 'Day + MM-DD-YYYY', '5': 'Day + DD-MM-YYYY'}},
+	'0': 'Palabras / AAAA-MM-DD', '7': 'Palabras / MM-DD-AAAA', '8': 'Palabras / DD-MM-AAAA',
+	'3': 'AAAA-MM-DD', '1': 'MM-DD-AAAA', '2': 'DD-MM-AAAA',
+	'6': 'Día + AAAA-MM-DD', '4': 'Día + MM-DD-AAAA', '5': 'Día + DD-MM-AAAA'}},
 {'setting_id': 'trakt.calendar_previous_days', 'setting_type': 'action', 'setting_default': '7', 'min_value': '0', 'max_value': '14'},
 {'setting_id': 'trakt.calendar_future_days', 'setting_type': 'action', 'setting_default': '7', 'min_value': '0', 'max_value': '14'},
 

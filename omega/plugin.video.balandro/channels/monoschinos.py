@@ -465,7 +465,7 @@ def findvideos(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    lng = 'Vo'
+    lng = 'Vose'
 
     if 'castellano' in item.url: lng = 'Esp'
     elif 'latino' in item.url: lng = 'Lat'

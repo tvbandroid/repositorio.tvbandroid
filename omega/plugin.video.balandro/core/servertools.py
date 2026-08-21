@@ -567,7 +567,7 @@ def corregir_other(srv):
 
     elif 'streamruby' in srv or 'sruby' in srv or 'rubystream' in srv or 'stmruby' in srv or 'rubystm' in srv or 'rubyvid' in srv or 'rubyvidhub' in srv: srv = 'Streamruby'
 
-    elif 'allviid' in srv or 'cloudfile' in srv or 'cloudmail' in srv or 'dailyuploads' in srv or 'darkibox' in srv or 'dembed' in srv or 'downace' in srv or 'fastdrive' in srv or 'fastplay' in srv or 'filegram' in srv or 'gostream' in srv or 'letsupload' in srv or 'liivideo' in srv or 'myupload' in srv or 'neohd' in srv or 'oneupload' in srv or 'pandafiles' in srv or 'rovideo' in srv or 'send' in srv or 'streamable' in srv or 'streamdav' in srv or 'streamgzzz' in srv or 'streamoupload' in srv or 'turbovid' in srv or 'tusfiles' in srv or 'uploadba' in srv or 'uploadflix' in srv or 'uploadhub' in srv or 'uploady' in srv or 'upvid' in srv or 'veev' in srv or 'doods' in srv or 'veoh' in srv or 'vidbob' in srv or 'vidlook' in srv or 'vidmx' in srv or 'vidnest' in srv or 'vid' in srv or 'vidpro' in srv or 'vipss' in srv or 'vkprime' in srv or 'worlduploads' in srv or 'ztreamhub' in srv or 'amdahost' in srv or 'updown' in srv or 'videa' in srv or 'asianplay' in srv or 'swiftload' in srv or 'udrop' in srv or 'vidtube' in srv or 'bigwarp' in srv or 'bgwp' in srv or 'wecima' in srv or 'asianload' in srv or 'savefiles' in srv or 'streamhls' in srv or 'vidbasic' in srv or 'vimeos' in srv or 'bigshare' in srv or 'streamix' in srv or 'stmix' in srv or 'vidara' in srv or 'vidsonic' in srv: srv = 'Zures'
+    elif 'allviid' in srv or 'cloudfile' in srv or 'cloudmail' in srv or 'dailyuploads' in srv or 'darkibox' in srv or 'dembed' in srv or 'downace' in srv or 'fastdrive' in srv or 'fastplay' in srv or 'filegram' in srv or 'gostream' in srv or 'letsupload' in srv or 'liivideo' in srv or 'myupload' in srv or 'neohd' in srv or 'oneupload' in srv or 'pandafiles' in srv or 'rovideo' in srv or 'send' in srv or 'streamable' in srv or 'streamdav' in srv or 'streamgzzz' in srv or 'streamoupload' in srv or 'turbovid' in srv or 'tusfiles' in srv or 'uploadba' in srv or 'uploadflix' in srv or 'uploadhub' in srv or 'uploady' in srv or 'upvid' in srv or 'veev' in srv or 'doods' in srv or 'veoh' in srv or 'vidbob' in srv or 'vidlook' in srv or 'vidmx' in srv or 'vidnest' in srv or 'vid' in srv or 'vidpro' in srv or 'vipss' in srv or 'vkprime' in srv or 'worlduploads' in srv or 'ztreamhub' in srv or 'amdahost' in srv or 'updown' in srv or 'videa' in srv or 'asianplay' in srv or 'swiftload' in srv or 'udrop' in srv or 'vidtube' in srv or 'bigwarp' in srv or 'bgwp' in srv or 'wecima' in srv or 'asianload' in srv or 'savefiles' in srv or 'streamhls' in srv or 'vidbasic' in srv or 'vimeos' in srv or 'bigshare' in srv or 'streamix' in srv or 'stmix' in srv or 'vidara' in srv or 'vidsonic' in srv or 'bowfile' in srv or 'gupload' in srv: srv = 'Zures'
 
     return srv
 
@@ -634,6 +634,8 @@ def corregir_zures(srv):
     elif 'streamix' in srv or 'stmix' in srv: srv = 'streamix'
     elif 'vidara' in srv: srv = 'vidara'
     elif 'vidsonic' in srv: srv = 'vidsonic'
+    elif 'bowfile' in srv: srv = 'bowfile'
+    elif 'gupload' in srv: srv = 'gupload'
 
     return srv
 

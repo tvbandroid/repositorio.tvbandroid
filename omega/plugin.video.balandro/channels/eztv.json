@@ -3,7 +3,7 @@
   "name": "EzTv",
   "thumbnail": "eztv.jpg",
 
-  "active": true,
+  "active": false,
 
   "searchable": true,
   "search_types": ["tvshow"],
@@ -11,7 +11,7 @@
   "categories": ["tvshow", "torrent"],
   "language": ["vo"],
 
-  "clusters": ["onlyone", "notice", "torrents", "rankings"],
+  "clusters": ["onlyone", "torrents", "rankings"],
 
-  "notes": "Canal con enlaces Torrent exclusivamente. Series en Versión Original. Puede requerir el uso de proxies en función del país/operadora desde el que se accede."
+  "notes": "Web ANULADA. Canal con enlaces Torrent exclusivamente. Series en Versión Original."
 }

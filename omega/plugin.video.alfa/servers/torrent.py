@@ -750,8 +750,9 @@ def magnet2torrent(magnet, headers={}, downloadStatus=4):
 
         # Tratamos de convertir el magnet on-line (opción más rápida, pero no se puede convertir más de un magnet a la vez)
         url_list = [
-                    ('https://itorrents.net/torrent/', 5, '', '.torrent')
+                    ('https://itorrents.net/torrent/', 5, '', '.torrent')       # El servicio está corrompido y descaga un virus
                    ]                                                            # Lista de servicios on-line testeados
+        url_list = []
         for x, (url, timeout, id, sufix) in enumerate(url_list):
             if progreso: progreso.update(old_div((x * 100), len(url_list)), header_progreso, magnet_title)
             if id:

@@ -196,7 +196,11 @@ def findvideos(item):
     for url in matches:
         ses += 1
 
-        if '.mystream.' in url: continue
+        if '.youtube.' in url: continue
+ 
+        elif '.mystream.' in url: continue
+
+        elif "' + url + '" in url: continue
 
         if '/reproductor.php?v=' in url:
            _url = scrapertools.find_single_match(url, '/reproductor.php(.*?)$')

@@ -297,16 +297,21 @@ def list_all(item):
         if not next_page:
             item.page = item.page + 1
 
-            post = {'action': 'td_tvshows_loadmore', 'nonce': '422b45ce6e', 'status': 'completed', 'page': item.page, 'per_page': '12'}
+            data_nonce = do_downloadpage(item.url)
 
-            headers = {'Referer': item.url}
+            _nonce = scrapertools.find_single_match(data_nonce, "const nonce.*?'(.*?)'")
 
-            data_more = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
+            if _nonce:
+                post = {'action': 'td_tvshows_loadmore', 'nonce': _nonce, 'status': 'completed', 'page': item.page, 'per_page': '12'}
 
-            if data_more:
-                if '"success":true' in data_more:
-                    itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_more', url = item.url, page = item.page,
-                                                data_more = data_more, text_color = 'coral' ))
+                headers = {'Referer': item.url}
+
+                data_more = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post, headers = headers)
+
+                if data_more:
+                    if '"success":true' in data_more:
+                        itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_more', url = item.url, page = item.page,
+                                                    data_more = data_more, _nonce = _nonce, text_color = 'coral' ))
 
     return itemlist
 
@@ -382,7 +387,7 @@ def list_more(item):
     if itemlist:
         item.page = item.page + 1
 
-        post = {'action': 'td_tvshows_loadmore', 'nonce': '422b45ce6e', 'status': 'completed', 'page': item.page, 'per_page': '12'}
+        post = {'action': 'td_tvshows_loadmore', 'nonce': item._nonce, 'status': 'completed', 'page': item.page, 'per_page': '12'}
 
         headers = {'Referer': item.url}
 
@@ -391,7 +396,7 @@ def list_more(item):
         if data_more:
             if '"success":true' in data_more:
                 itemlist.append(item.clone( title = 'Siguientes ...', action = 'list_more', url = item.url, page = item.page,
-                                            data_more = data_more, text_color = 'coral' ))
+                                            data_more = data_more, _nonce = item._nonce, text_color = 'coral' ))
 
     return itemlist
 
@@ -580,7 +585,7 @@ def episodios(item):
         try:
            temp = int(temp)
         except:
-           temp = ''
+           pass
 
         if temp:
             if not str(temp) == str(item.contentSeason): continue
@@ -674,7 +679,9 @@ def findvideos(item):
                 ses += 1
 
                 if 'tioplayer.' in url: continue
-                elif 'tiodonghua.' in url: continue
+
+                elif 'tiodonghua.' in url:
+                   if not '.p2pstream.' in url: continue 
 
                 if location:
                     new_url = ''
@@ -694,7 +701,9 @@ def findvideos(item):
                     url = new_url
 
                     if 'tioplayer.' in url: continue
-                    elif 'tiodonghua.' in url: continue
+
+                    elif 'tiodonghua.' in url:
+                       if not '.p2pstream.' in url: continue 
 
                 if 'http:' in url: url = url.replace('http:', 'https:')
 
@@ -730,7 +739,9 @@ def findvideos(item):
 
                 if servidor == 'directo':
                     if 'tioplayer.' in url: continue
-                    elif 'tiodonghua.' in url: continue
+
+                    elif 'tiodonghua.' in url:
+                       if not '.p2pstream.' in url: continue 
 
                     elif '/csst.online' in url: continue
 
@@ -743,7 +754,6 @@ def findvideos(item):
                     elif config.get_setting('developer_mode', default=False):
                         other = url.split("/")[2]
                         other = other.replace('https:', '').strip()
-
 
                 itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vos', other = other ))
 
@@ -760,7 +770,10 @@ def findvideos(item):
         elif 'sharezweb.com' in url: continue
         elif 'videopress.com' in url: continue
         elif 'tioplayer.' in url: continue
-        elif 'tiodonghua.' in url: continue
+
+        elif 'tiodonghua.' in url:
+             if not '.p2pstream.' in url: continue 
+
         elif 'likessb.com' in url: continue
         elif '.animefenix.' in url: continue
         elif '/odysee.' in url: continue
@@ -774,11 +787,15 @@ def findvideos(item):
         if url.startswith("https://sb"): continue
         elif 'fembed' in url or  'streamsb' in url or 'playersb' in url or 'fcom' in url or 'lvturbo' in url: continue
 
-        if 'es.png' in match: lang = 'Esp'
-        elif 'mx.png' in match: lang = 'Lat'
-        elif 'br.png' in match: lang = 'Pt'
-        elif 'en.png' in match: lang = 'Vose'
-        else: lang = '?'
+        if '-sub-espanol' in item.url: lang = 'Vose'
+        else:
+            lang = '?'
+
+            if 'es.png' in match: lang = 'Esp'
+            elif 'mx.png' in match: lang = 'Lat'
+            elif 'br.png' in match: lang = 'Pt'
+            elif 'en.png' in match: lang = 'Vo'
+            elif 'sub.png' in match: lang = 'Vose'
 
         servidor = servertools.get_server_from_url(url)
 
@@ -840,7 +857,9 @@ def play(item):
     url_play = item.url
 
     if 'tioplayer.' in url_play: url_play = ''
-    elif 'tiodonghua.' in url_play: url_play = ''
+
+    elif 'tiodonghua.' in url_play:
+       if not '.p2pstream.' in url_play: url_play = ''
 
     elif '/csst.online' in url_play: url_play = ''
 

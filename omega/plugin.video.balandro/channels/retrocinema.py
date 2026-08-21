@@ -85,7 +85,7 @@ def list_all(item):
 
         if not url or not title: continue
 
-        title = title.replace('&#8211;', '').strip()
+        title = title.replace('&#8211;', '').replace('&#8230;', '').strip()
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 
@@ -123,6 +123,8 @@ def findvideos(item):
     if not matches:
         matches = scrapertools.find_multiple_matches(data, 'youtube_url(.*?)&quot;,&quot;')
 
+        if not matches: matches = scrapertools.find_multiple_matches(data, "window.open.*?'(.*?)'")
+
     ses = 0
 
     for url in matches:
@@ -131,6 +133,8 @@ def findvideos(item):
         url = url.replace('\\/', '/').replace('&quot;:&quot;','').strip()
 
         if url.startswith("//"): url = 'https:' + url
+
+        if '/dzen.ru' in url: continue
 
         servidor = servertools.get_server_from_url(url)
 
@@ -160,20 +164,24 @@ def list_search(item):
     logger.info()
     itemlist = []
 
-    post = {'Referer': host, 'Content-Disposition': 'form-data', 'action': 'zeus_ajax_search', 'nonce': '8dd2cfb37b', 'search': item.tex, 'type': 'post'}
+    data = do_downloadpage(item.url)
 
-    data = do_downloadpage(host + 'wp-admin/admin-ajax.php', post = post)
+    bloque = scrapertools.find_single_match(data, '>Resultados(.*?)>Entradas anteriores')
 
-    matches = re.compile('<li>(.*?)</li>', re.DOTALL).findall(data)
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Resultados(.*?)</main>')
 
-    num_matches = len(matches)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(bloque)
 
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="(.*?)"')
 
-        title = scrapertools.find_single_match(article, 'alt="(.*?)"')
+        title = scrapertools.find_single_match(article, 'title="(.*?)"')
 
         if not url or not title: continue
+
+        if url.endswith('-peliculas/') or url.endswith('-antiguas/'): continue
+
+        title = title.replace('&#8211;', '').replace('&#8230;', '').strip()
 
         thumb = scrapertools.find_single_match(article, ' src="(.*?)"')
 
@@ -184,9 +192,17 @@ def list_search(item):
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=title, infoLabels={'year': year} ))
 
-        if len(itemlist) >= perpage: break
-
     tmdb.set_infoLabels(itemlist)
+
+    if itemlist:
+        if '<a class="page-numbers"' in data:
+            next_page = scrapertools.find_single_match(data, '<a class="page-numbers".*?class="page-numbers current">.*?href="(.*?)"')
+
+            if not next_page: next_page = scrapertools.find_single_match(data, '<a class="page-numbers".*?href="(.*?)"')
+
+            if next_page:
+                if '/page/' in next_page:
+                    itemlist.append(item.clone( title='Siguientes ...', url = next_page, action='list_search', text_color='coral' ))
 
     return itemlist
 
@@ -194,8 +210,7 @@ def list_search(item):
 def search(item, texto):
     logger.info()
     try:
-        item.url = host + '?s='
-        item.tex = texto.replace(" ", "+")
+        item.url = host + '?s=' + texto.replace(" ", "+")
         return list_search(item)
     except:
         import sys

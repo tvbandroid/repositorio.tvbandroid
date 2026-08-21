@@ -286,7 +286,9 @@ def show_infos(item):
 
     itemlist.append(item.clone( channel='helper', action='show_channels_list_temporaries', title= ' - Canales que están [COLOR darkcyan][B]Temporalmente[/B][/COLOR] Inactivos', thumbnail=config.get_thumb('stack') ))
 
-    itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Qué canales [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas', no_searchables = True, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( channel='filters', action='no_actives', title= ' - Canales que [COLOR goldenrod][B]NO[/B][/COLOR] intervienen en las búsquedas de [COLOR gold][B]Peliculas, Series y/ó Documentales[/B][/COLOR]', no_searchables = True, thumbnail=config.get_thumb('stack') ))
+
+    itemlist.append(item.clone( channel='helper', action='show_never_searchables', title= ' - Qué canales [COLOR goldenrod][B]Nunca[/B][/COLOR] intervendrán en las búsquedas', thumbnail=config.get_thumb('stack') ))
 
     itemlist.append(item.clone( action='', title='[COLOR fuchsia][B]BUSCAR Reproducciones:[/B][/COLOR]', thumbnail=config.get_thumb('bolt') ))
 

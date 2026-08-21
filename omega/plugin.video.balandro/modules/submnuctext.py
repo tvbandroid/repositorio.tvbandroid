@@ -1219,9 +1219,7 @@ def _dominio_vigente(item):
 def _dominio_memorizado(item):
     from modules import domains
 
-    if item.from_channel == 'animeflv': domains.manto_domain_animeflv(item)
-
-    elif item.from_channel == 'animeonline': domains.manto_domain_animeonline(item)
+    if item.from_channel == 'animeonline': domains.manto_domain_animeonline(item)
 
     elif item.from_channel == 'animeyt': domains.manto_domain_animeyt(item)
 
@@ -1250,8 +1248,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'ennovelastv': domains.manto_domain_ennovelastv(item)
 
     elif item.from_channel == 'entrepeliculasyseries': domains.manto_domain_entrepeliculasyseries(item)
-
-    elif item.from_channel == 'gnula': domains.manto_domain_gnula(item)
 
     elif item.from_channel == 'grantorrent': domains.manto_domain_grantorrent(item)
 
@@ -1286,8 +1282,6 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'subtorrents': domains.manto_domain_subtorrents(item)
 
     elif item.from_channel == 'todotorrents': domains.manto_domain_todotorrents(item)
-
-    elif item.from_channel == 'veronline': domains.manto_domain_veronline(item)
 
     else:
         platformtools.dialog_notification(config.__addon_name + '[B][COLOR yellow] ' + item.from_channel.capitalize() + '[/COLOR][/B]', '[B][COLOR %s]Ajuste No Permitido[/B][/COLOR]' % color_alert)
@@ -1381,13 +1375,6 @@ def _proxies(item):
 
         if config.get_setting('channel_animeonline_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'cine24h':
-        from channels import cine24h
-        item.channel = 'cine24h'
-        cine24h.configurar_proxies(item)
-
-        if config.get_setting('channel_cine24h_proxies') is None: refrescar = False
-
     elif item.from_channel == 'cinecalidad':
         from channels import cinecalidad
         item.channel = 'cinecalidad'
@@ -1451,13 +1438,6 @@ def _proxies(item):
 
         if config.get_setting('channel_cuevanavip_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'detodo':
-        from channels import detodo
-        item.channel = 'detodo'
-        detodo.configurar_proxies(item)
-
-        if config.get_setting('channel_detodo_proxies') is None: refrescar = False
-
     elif item.from_channel == 'divxatope':
         from channels import divxatope
         item.channel = 'divxatope'
@@ -1500,13 +1480,6 @@ def _proxies(item):
 
         if config.get_setting('channel_doramasyt_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'dpeliculas':
-        from channels import dpeliculas
-        item.channel = 'dpeliculas'
-        dpeliculas.configurar_proxies(item)
-
-        if config.get_setting('channel_dpeliculas_proxies') is None: refrescar = False
-
     elif item.from_channel == 'elifilms':
         from channels import elifilms
         item.channel = 'elifilms'
@@ -1535,26 +1508,12 @@ def _proxies(item):
 
         if config.get_setting('channel_estrenoscinesaa_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'eztv':
-        from channels import eztv
-        item.channel = 'eztv'
-        eztv.configurar_proxies(item)
-
-        if config.get_setting('channel_eztv_proxies') is None: refrescar = False
-
     elif item.from_channel == 'gatotv':
         from channels import gatotv
         item.channel = 'gatotv'
         gatotv.configurar_proxies(item)
 
         if config.get_setting('channel_gatotv_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'gnula':
-        from channels import gnula
-        item.channel = 'gnula'
-        gnula.configurar_proxies(item)
-
-        if config.get_setting('channel_gnula_proxies') is None: refrescar = False
 
     elif item.from_channel == 'gnulatv':
         from channels import gnulatv
@@ -1612,13 +1571,6 @@ def _proxies(item):
 
         if config.get_setting('channel_latanime_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'lilatorrent':
-        from channels import lilatorrent
-        item.channel = 'lilatorrent'
-        lilatorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_lilatorrent_proxies') is None: refrescar = False
-
     elif item.from_channel == 'megaserie':
         from channels import megaserie
         item.channel = 'megaserie'
@@ -1653,13 +1605,6 @@ def _proxies(item):
         mundodonghuaxyz.configurar_proxies(item)
 
         if config.get_setting('channel_mundodonghuaxyz_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'naranjatorrent':
-        from channels import naranjatorrent
-        item.channel = 'naranjatorrent'
-        naranjatorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_naranjatorrent_proxies') is None: refrescar = False
 
     elif item.from_channel == 'pasateatorrent':
         from channels import pasateatorrent
@@ -1766,13 +1711,6 @@ def _proxies(item):
 
         if config.get_setting('channel_repelishd_proxies') is None: refrescar = False
 
-    elif item.from_channel == 'rojotorrent':
-        from channels import rojotorrent
-        item.channel = 'rojotorrent'
-        rojotorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_rojotorrent_proxies') is None: refrescar = False
-
     elif item.from_channel == 'seriesgato':
         from channels import seriesgato
         item.channel = 'seriesgato'
@@ -1856,20 +1794,6 @@ def _proxies(item):
         ultrapelis.configurar_proxies(item)
 
         if config.get_setting('channel_ultrapelis_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'verdetorrent':
-        from channels import verdetorrent
-        item.channel = 'verdetorrent'
-        verdetorrent.configurar_proxies(item)
-
-        if config.get_setting('channel_verdetorrent_proxies') is None: refrescar = False
-
-    elif item.from_channel == 'veronline':
-        from channels import veronline
-        item.channel = 'veronline'
-        veronline.configurar_proxies(item)
-
-        if config.get_setting('channel_veronline_proxies') is None: refrescar = False
 
     elif item.from_channel == 'zonaleros':
         from channels import zonaleros

@@ -396,6 +396,8 @@ def episodios(item):
     for match in matches[item.page * item.perpage:]:
         url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
+        if not 'http' in url: continue
+
         epis = scrapertools.find_single_match(match, '<h2 class="fs-5 mt-2 mb-1 text-light text-truncate d-flex gap-1">.*?Capitulo(.*?)<').strip()
         if not epis: epis = 1
 

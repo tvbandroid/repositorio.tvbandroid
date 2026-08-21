@@ -129,6 +129,7 @@ class AlfaChannelHelper:
         self.window = window
         self.Comment = None
         self.SEARCH_CLEAN = r'\¿|\?|\/|\$|\@|\<|\>'
+        self.dns_params = {}
 
         self.httptools = httptools
         self.response = self.httptools.build_response(HTTPResponse=True)        # crea estructura vacía de response
@@ -226,6 +227,7 @@ class AlfaChannelHelper:
         get_cached_files_('password')
 
         if "canonical" not in kwargs: kwargs["canonical"] = copy.deepcopy(self.canonical)
+        self.dns_params = kwargs.get('canonical', {}).get('dns_params', {})
         self.alfa_cached_passwords = jsontools.load(window.getProperty("alfa_cached_passwords") or '{}')
         if kwargs.get('canonical', {}).get('cf_assistant', True) is not False and IS_ASSISTANT_INSTALLED:
             kwargs_inter = copy.deepcopy(self.alfa_cached_passwords.get("cookies", {})\
@@ -277,10 +279,19 @@ class AlfaChannelHelper:
             self.KWARGS.update(kwargs)
             kwargs = copy.deepcopy(self.KWARGS)
         elif self.CACHING_DOMAINS:
-            kwargs['alfa_s']: True
+            kwargs['alfa_s'] = True
+
+        if PY3 and self.dns_params:
+            from lib.alfaresolver_py3 import dns_resolve
+            self.dns_params = dns_resolve('install', self.dns_params)
+            logger.error(self.dns_params)
 
         #logger.debug('KWARGS: %s' % kwargs)
         response = self.httptools.downloadpage(url, **kwargs)
+
+        if PY3 and self.dns_params:
+            self.dns_params = dns_resolve('install', self.dns_params)
+            logger.error(self.dns_params)
 
         self.set_preferred_proxy_ip(response, **kwargs)
 
@@ -4914,6 +4925,7 @@ class DooPlay(AlfaChannelHelper):
         self.domains_updated = jsontools.load(window.getProperty("alfa_domains_updated") or '{}')
         self.print_DEBUG = canonical.get('print_DEBUG', False)
         self.Plan_B = canonical.get('Plan_B', False)
+        self.dns_params = {}
 
 
     def list_all_matches(self, item, matches_int, **AHkwargs):

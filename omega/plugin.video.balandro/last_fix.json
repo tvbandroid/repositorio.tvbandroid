@@ -1,36 +1,42 @@
 {
-    "addon_version": "4.0.30",
+    "addon_version": "4.0.31",
     "files": {
         "channels": [
             "animeav1",
+            "animeclub",
             "animeflv",
-            "animeflvone",
-            "animejara",
             "animejl",
-            "detodo",
-            "documentalesonline",
+            "animemix",
+            "animeyt",
+            "bloghorror",
+            "cineplus",
+            "divxtotal",
             "doramaexpress",
-            "dpeliculas",
+            "doramasqueenin",
+            "doramasyt",
+            "elitetorrent",
+            "elitetorrentnz",
+            "eztv",
             "gnula",
-            "hdcinema",
-            "henaojaran",
+            "hacktorrent",
             "lamovie",
-            "megaserie",
-            "monoschinos",
-            "mundodonghua",
-            "mundodonghuaxyz",
-            "pasateatorrent",
-            "peliculasonline",
-            "pelisforte",
-            "repelishd",
+            "lilatorrent",
+            "mbstelenovelas",
+            "mitorrent",
+            "naranjatorrent",
+            "retrocinema",
             "retrotv",
-            "tioanime",
+            "rojotorrent",
+            "seriesretro",
             "tiodonghua",
-            "topdocumentaryfilms",
+            "tubehentai",
             "tubeonline",
-            "villaanimex",
-            "xmoviesforyou",
-            "yandispoiler"
+            "tubepelis",
+            "verdetorrent",
+            "veronline",
+            "vivatorrents",
+            "yandispoiler",
+            "yts"
         ],
         "core": [
             "httptools",
@@ -39,30 +45,36 @@
         ],
         "modules": [
             "actions",
+            "domains",
             "generos",
             "helper",
             "novelty",
-            "youtubetrailers"
+            "search",
+            "submnuctext",
+            "submnuteam",
+            "tester"
         ],
         "platformcode": [
             "platformtools"
+        ],
+        "resources": [
+            "Lista-proxies",
+            "settings"
         ],
         "root dir": [
             "dominios",
             "version"
         ],
         "servers": [
-            "dailymotion",
             "kinoger",
-            "mediafire",
             "mixdrop",
-            "streamtape",
+            "uqload",
             "various",
-            "yourupload",
-            "youtube",
+            "vidmoly",
+            "vk",
             "zures"
         ]
     },
-    "fix_version": 6,
-    "hash": "07741f2dbad682d0d2e5f2b4f113eddc"
+    "fix_version": 5,
+    "hash": "e081536ab485e57dbfbd154b5ad8355b"
 }

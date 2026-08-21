@@ -147,7 +147,19 @@ def list_all(item):
 
             season = scrapertools.find_single_match(match, 'alt=".*? Season (.*?)"')
 
-            if not season: season = 1
+            season = season.replace('Part', '').strip()
+
+            if not season:
+                season = 1
+
+                if '2nd' in title: season = 2
+                elif '3rd' in title: season = 3
+                elif '4th' in title: season = 4
+                elif '5th' in title: season = 5
+                elif '6th' in title: season = 6
+                elif '7th' in title: season = 7
+                elif '8th' in title: season = 8
+                elif '9th' in title: season = 9
 
             SerieName = corregir_SerieName(title)
 
@@ -354,9 +366,10 @@ def findvideos(item):
         ses += 1
 
         if '/player.' in url: continue
-        elif '/animeav1.' in url: continue
 
+        elif '/animeav1.' in url: continue
         elif '/1fichier.' in url: continue
+        elif '/transfer.' in url: continue
 
         servidor = servertools.get_server_from_url(url)
 

@@ -31,7 +31,7 @@ description="[COLOR azure][B]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/B][/COLOR] para
 # TVBANWIZAZRD #
 
 name="[B][COLOR yellowgreen]TVban matnexom [COLOR gold]Palantir [COLOR khaki]Ago.21 [COLOR white]Nuevo!![/COLOR][/B]"
-url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.PalantirAgo21.zip"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.PalantirAgo22.zip"
 icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
 fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
 adult="no"

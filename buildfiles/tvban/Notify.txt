@@ -1,4 +1,4 @@
-96
+97
 |||
 
 [COLOR yellowgreen][B]¡¡¡ BIENVENIDOS A LA [COLOR azure]BUILD TVBAN [COLOR cyan]MATNEXON [COLOR tan]- ORIGINAL !!![B][/COLOR]
@@ -22,7 +22,7 @@ Se cerrará Kodi y ya sólo nos quedará iniciar de nuevo Kodi, le damos unos mi
 
 [COLOR orange]                   ****** [COLOR red][B]¡ATENCION!: [COLOR azure]SOLO PARA USUARIOS QUE USAN [COLOR gold]PALANTIR[/B] [COLOR orange]******                 [/COLOR] 
 
-[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE!! [COLOR gold]PALANTIR [COLOR khaki]Ag.21 [COLOR white]del 21 de Agosto [COLOR gold]!!![/B][/COLOR]
+[COLOR white][B]**[COLOR gold] NUEVO [COLOR dodgerblue]PARCHE!! [COLOR gold]PALANTIR [COLOR khaki]Ago.22 [COLOR white]del 21 de Agosto [COLOR gold]!!![/B][/COLOR]
 [COLOR white][B]¤ [COLOR orange]TELEVISION [COLOR white]dentro del [COLOR tan]NUEVO ADDON creado propio de la casa [COLOR orangered]LISCA[COLOR white]TVBAND[/B][/COLOR].
 
  

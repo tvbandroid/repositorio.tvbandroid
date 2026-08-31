@@ -1,6 +1,6 @@
 
-name="TVban matnexom"
-version="1.0 Agosto"
+name="TVban matnexom Agosto"
+version="1.0"
 url="https://github.com/tvbandroid/repositorio.tvbandroid/releases/download/4/TVband.MatnexomAG31.zip"
 minor="http://"
 gui="http://"
@@ -28,7 +28,7 @@ info="http://"
 description="[B][COLOR azure]TVban [COLOR cyan]Matnexom [COLOR azure]para [COLOR teal]KODI: 21[/COLOR][/B]          [COLOR limegreen][B]Créditos:[/B][/COLOR]                                    [COLOR dodgerblue][B]Developers:[/B][/COLOR]    [B]JoseaTEBA[/B]                        [COLOR orange][B]Colaborador:[/B][/COLOR] [COLOR cyan][B]andTvban[/B][/COLOR]"
 
 name=""
-version="1.0"
+version=""
 url=""
 minor="http://"
 gui="http://"

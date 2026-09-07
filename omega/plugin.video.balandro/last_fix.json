@@ -1,46 +1,19 @@
 {
-    "addon_version": "4.0.31",
+    "addon_version": "4.0.32",
     "files": {
         "channels": [
-            "animeav1",
-            "animeclub",
-            "animeflv",
-            "animejl",
-            "animemix",
-            "animeyt",
-            "bloghorror",
-            "cineplus",
-            "divxtotal",
+            "allpeliculasse",
+            "daftsex",
             "doramaexpress",
-            "doramasqueenin",
-            "doramasyt",
-            "elitetorrent",
             "elitetorrentnz",
-            "eztv",
-            "gnula",
-            "hacktorrent",
-            "lamovie",
-            "lilatorrent",
-            "mbstelenovelas",
-            "mitorrent",
-            "naranjatorrent",
-            "retrocinema",
-            "retrotv",
-            "rojotorrent",
-            "seriesretro",
-            "tiodonghua",
-            "tubehentai",
-            "tubeonline",
-            "tubepelis",
-            "verdetorrent",
-            "veronline",
-            "vivatorrents",
-            "yandispoiler",
-            "yts"
+            "genteclic",
+            "pelis182",
+            "redtube",
+            "repelishd",
+            "sexu",
+            "tiodonghua"
         ],
         "core": [
-            "httptools",
-            "requeststools",
             "servertools"
         ],
         "modules": [
@@ -48,33 +21,27 @@
             "domains",
             "generos",
             "helper",
-            "novelty",
-            "search",
-            "submnuctext",
-            "submnuteam",
-            "tester"
+            "submnuctext"
         ],
         "platformcode": [
             "platformtools"
         ],
         "resources": [
-            "Lista-proxies",
             "settings"
         ],
         "root dir": [
+            "default",
             "dominios",
             "version"
         ],
         "servers": [
-            "kinoger",
-            "mixdrop",
-            "uqload",
+            "dailymotion",
             "various",
+            "videoapp",
             "vidmoly",
-            "vk",
             "zures"
         ]
     },
-    "fix_version": 5,
-    "hash": "e081536ab485e57dbfbd154b5ad8355b"
+    "fix_version": 1,
+    "hash": "a022b68d4aeba1fd50fe2b66d8e53a11"
 }

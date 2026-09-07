@@ -1781,6 +1781,8 @@ def show_infos_buscar(item):
 
     itemlist.append(item.clone( action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
+
     if config.get_setting('search_extra_main', default=False) or config.get_setting('channels_link_pyse', default=False):
         itemlist.append(item.clone( channel='tmdblists', action='show_help', title= ' - [COLOR green][B]Información[/B][/COLOR] Búsquedas y Listas en [COLOR violet][B]TMDB[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
@@ -2775,12 +2777,6 @@ def show_never_searchables(item):
 
     if presentar:
         txt += '[CR][COLOR hotpink][B]  Series:[/B][/COLOR] SeriesBiblicas, TvSeries'
-
-    presentar = False
-    if config.get_setting('mnu_torrents', default=True): presentar = True
-
-    if presentar:
-        txt += '[CR][COLOR blue][B]  Torrents:[/B][/COLOR] FrozenLayer'
 
     platformtools.dialog_textviewer('Canales qué Nunca intervendrán en las búsquedas', txt)
 
@@ -6557,12 +6553,6 @@ def show_help_parameters_search(item):
     if presentar:
         txt += '[CR][COLOR hotpink][B]    Series:[/B][/COLOR] SeriesBiblicas, TvSeries'
 
-    presentar = False
-    if config.get_setting('mnu_torrents', default=True): presentar = True
-
-    if presentar:
-        txt += '[CR][COLOR blue][B]    Torrents:[/B][/COLOR] FrozenLayer'
-
     if not config.get_setting('mnu_documentales', default=True): txt += '[CR][CR] - Los canales de [B][COLOR cyan]Documentales[/COLOR][/B] jamás intervendrán en las busquedas'
 
     txt += '[CR][CR] - Qué canales [B][COLOR chartreuse]Nunca[/B][/COLOR] intervendrán en las busquedas de [COLOR gold][B]Peliculas, Series y/ó Documentales[/B][/COLOR]:'
@@ -7605,6 +7595,13 @@ def show_test(item):
         if poseidonhd2_dominio:
            if tex_dom: tex_dom = tex_dom + '   PoseidonHd2: ' + poseidonhd2_dominio + '[CR]'
            else: tex_dom = '[CR]   PoseidonHd2: ' + poseidonhd2_dominio + '[CR]'
+
+    datos = channeltools.get_channel_parameters('repelishd')
+    if datos['active']:
+        repelishd_dominio = config.get_setting('channel_repelishd_dominio', default='')
+        if repelishd_dominio:
+           if tex_dom: tex_dom = tex_dom + '   RePelisHd: ' + poseidonhd2_dominio + '[CR]'
+           else: tex_dom = '[CR]   RePelisHd: ' + poseidonhd2_dominio + '[CR]'
 
     datos = channeltools.get_channel_parameters('serieskao')
     if datos['active']:

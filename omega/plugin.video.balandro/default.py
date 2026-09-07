@@ -233,11 +233,16 @@ if tipo_channel != '':
 
         release = '[COLOR goldenrod][B]' + config.get_addon_version().replace('.fix', '-Fix') + str(last_ver) + ' '
 
-        if item.channel in ['mainmenu', 'actions', 'domains', 'downloads', 'favoritos', 'filmaffinitylists', 'filters', 'generos', 'groups', 'helper', 'proxysearch', 'search', 'submnuctext', 'submnuteam', 'tester', 'tmdblists', 'tracking']:
+        if item.channel in ['mainmenu', 'actions', 'domains', 'downloads', 'favoritos', 'filmaffinitylists', 'filters', 'generos', 'groups', 'helper', 'novelty', 'proxysearch', 'search', 'submnuctext', 'submnuteam', 'tester', 'tmdblists', 'tracking', 'youtubetrailers']:
             platformtools.dialog_ok(release + ' [COLOR red][B]Error Inesperado en[/COLOR] [COLOR gold]' + item.channel.capitalize() + '[/B][/COLOR]',
                                     '[COLOR moccasin][B]Puede estar Corrupto su Fichero de [/COLOR][COLOR chocolate]Ajustes[/COLOR][COLOR goldenrod] de [/COLOR][COLOR yellow]Balandro[/B][/COLOR], Pruebe a [COLOR cyan][B]Re-Instalar el Add-On[/COLOR][COLOR goldenrod] (consulte nuestro Telegram ó Foro)[/COLOR][COLOR moccasin], ó [/COLOR][COLOR darkcyan]bien hay un Error en el Add-On/Modulo.[/COLOR] [COLOR chartreuse]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
         else:
-            platformtools.dialog_ok(release + ' [COLOR red]Error Imprevisto en[/COLOR] [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
-                                    '[COLOR moccasin][B]Puede ser un Fallo de Conexión[/COLOR], ó [COLOR cyan]la Web asociada al Canal varió su estructura[/COLOR], [COLOR moccasin]ó [/COLOR][COLOR darkcyan]Hay un Error en el Add-On.[/COLOR] [COLOR chartreuse]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
+            path = os.path.join(config.get_runtime_path(), 'channels', item.channel + ".py")
+            if not os.path.exists(path):
+                platformtools.dialog_ok(release + '  [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
+                                        '[COLOR red][B]El Canal ya NO existe ó está Inactivo[/B][/COLOR]')
+            else:
+                platformtools.dialog_ok(release + ' [COLOR red]Error Imprevisto en[/COLOR] [COLOR yellow]' + item.channel.capitalize() + '[/B][/COLOR]',
+                                        '[COLOR moccasin][B]Puede ser un Fallo de Conexión[/COLOR], ó [COLOR cyan]la Web asociada al Canal varió su estructura[/COLOR], [COLOR moccasin]ó [/COLOR][COLOR darkcyan]Hay un Error en el Add-On.[/COLOR] [COLOR chartreuse]Para más detalles, vea el Fichero Log de su Media Center en la Ayuda.[/B][/COLOR]')
 
 logger.info('[COLOR blue]Ending with %s[/COLOR]' % sys.argv[1])

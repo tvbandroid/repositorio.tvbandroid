@@ -13,14 +13,13 @@ else:
     translatePath = xbmc.translatePath
 
 
-import os, xbmc, time, binascii
+import os, xbmc, time
 
 from platformcode import config, logger, platformtools
-from core import filetools, httptools, jsontools, scrapertools
+from core import filetools, httptools, scrapertools
 
 
 espera = config.get_setting('servers_waiting', default=6)
-
 
 color_exec = config.get_setting('notification_exec_color', default='cyan')
 el_srv = ('Sin respuesta en [B][COLOR %s]') % color_exec
@@ -28,8 +27,7 @@ el_srv += ('ResolveUrl[/B][/COLOR]')
 
 
 def import_libs(module):
-    import os, sys, xbmcaddon
-    from core import filetools
+    import xbmcaddon
 
     path = os.path.join(xbmcaddon.Addon(module).getAddonInfo("path"))
     addon_xml = filetools.read(filetools.join(path, "addon.xml"))
@@ -52,77 +50,28 @@ def import_libs(module):
 
 
 def get_video_url(page_url, url_referer=''):
-    logger.info("url=" + page_url)
+    logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
     ini_page_url = page_url
 
-    if not '/kory.' in page_url:
-        if url_referer: ini_page_url = url_referer
+    data = httptools.downloadpage(page_url).data
 
-    resp = httptools.downloadpage(page_url)
-
-    if resp.code == 404:
+    if '>Contenido no encontrado<' in data:
         return 'Archivo inexistente ó eliminado'
 
-    data = resp.data
+    url = scrapertools.find_single_match(data, '<iframe id="frame" src="(.*?)"')
 
-    try:
-       import_libs('script.module.pyaes')
-
-       import pyaes
-
-       id_url = scrapertools.find_single_match(page_url, '/#(.*?)$')
-
-       if not id_url:
-           id_url = scrapertools.find_single_match(page_url, 'id=(.*?)$')
-
-       if '|Referer=' in id_url: id_url = id_url.split("|Referer=")[0]
-
-       if id_url:
-           new_url = page_url.split("/#")[0]
-
-           if not new_url: new_url = page_url.split("id=")[0]
-
-           if not '/api/v1/video?id=' in page_url:
-               new_url = new_url + '/api/v1/video?id=' + id_url
-           else:
-               new_url = page_url
-
-           data = httptools.downloadpage(new_url).data
-
-       edata = binascii.unhexlify(data[:-1])
-
-       key = b'\x6b\x69\x65\x6d\x74\x69\x65\x6e\x6d\x75\x61\x39\x31\x31\x63\x61'
-       iv = b'\x31\x32\x33\x34\x35\x36\x37\x38\x39\x30\x6f\x69\x75\x79\x74\x72'
-
-       decrypter = pyaes.Decrypter(pyaes.AESModeOfOperationCBC(key, iv))
-
-       ddata = decrypter.feed(edata)
-       ddata += decrypter.feed()
-
-       ddata = ddata.decode('utf-8')
-       ddata = jsontools.load(ddata)
-
-       url = scrapertools.find_single_match(str(ddata), "'source': '(.*?)'")
-
-       if url:
-           url += "|User-Agent={0}&Referer={1}/&Origin={1}".format(httptools.get_user_agent(), page_url)
-
-           video_urls.append(['m3u8', url])
-    except:
-        pass
-
-    if not video_urls:
+    if url:
         if xbmc.getCondVisibility('System.HasAddon("script.module.resolveurl")'):
-            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'kinoger.py'))
+            path = translatePath(os.path.join('special://home/addons/script.module.resolveurl/lib/resolveurl/plugins/', 'vimeos.py'))
 
             existe = filetools.exists(path)
             if not existe:
                 return 'El Plugin No existe en Resolveurl'
 
             if config.get_setting('servers_time', default=True):
-                platformtools.dialog_notification('Cargando [COLOR cyan][B]Kinoger[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
+                platformtools.dialog_notification('Cargando [COLOR cyan][B]Vimeos[/B][/COLOR]', 'Espera requerida de %s segundos' % espera)
                 time.sleep(int(espera))
 
             try:
@@ -132,7 +81,7 @@ def get_video_url(page_url, url_referer=''):
                     import_libs('script.module.cloudrequest')
 
                 import resolveurl
-                page_url = ini_page_url
+                page_url = url
                 resuelto = resolveurl.resolve(page_url)
 
                 if resuelto:
@@ -160,7 +109,7 @@ def get_video_url(page_url, url_referer=''):
                     if 'File Removed' in trace or 'File Not Found or' in trace or 'The requested video was not found' in trace or 'File deleted' in trace or 'No video found' in trace or 'No playable video found' in trace or 'Video cannot be located' in trace or 'file does not exist' in trace or 'Video not found' in trace:
                         return 'Archivo inexistente ó eliminado'
 
-                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace or 'No playable video found' in trace:
+                    elif 'No se ha encontrado ningún link al' in trace or 'Unable to locate link' in trace or 'Video Link Not Found' in trace:
                         return 'Fichero sin link al vídeo ó restringido'
 
                     elif 'Cloudflare challenge' in trace:
@@ -178,6 +127,7 @@ def get_video_url(page_url, url_referer=''):
                 return 'Sin Respuesta ResolveUrl'
 
         else:
-           return 'Falta ResolveUrl'
+            return 'Falta ResolveUrl'
 
     return video_urls
+

@@ -238,6 +238,7 @@ def findvideos(item):
     itemlist = []
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     links = scrapertools.find_multiple_matches(data, '<source type="video/mp4".*?src="(.*?)"')
 
@@ -249,14 +250,23 @@ def findvideos(item):
             links = scrapertools.find_multiple_matches(data, patron)
 
     if not links:
+        links = scrapertools.find_multiple_matches(data, '<div data-src="(.*?)"')
+
+    if not links:
          bloque = scrapertools.find_single_match(data, '<div class="jeg_video_container">(.*?)/div></div></div>')
 
          links = scrapertools.find_multiple_matches(bloque, 'src="(.*?)"')
          if not links: links = scrapertools.find_multiple_matches(bloque, "src='(.*?)'")
 
+         if not links: links = scrapertools.find_multiple_matches(bloque, "'(.*?)'")
+
     ses = 0
 
     for url in links:
+        if not url: continue
+
+        if url == 'iframe' or url == 'allowfullscreen' or url == 'true' or url == 'width' or url == '640' or url == 'height' or url == '360' or url == 'src' or url == 'frameborder' or url == '0' or url == 'chute' or url == 'floating_close': continue
+
         ses += 1
 
         if 'data:text' in url: continue
@@ -269,12 +279,15 @@ def findvideos(item):
 
         url = servertools.normalize_url(servidor, url)
 
-        if '.bitchute.' in url: servidor = ''
+        other = ''
+        if '.bitchute.' in url:
+            servidor = ''
+            other = 'Bitchute'
 
         lang = item.languages
         if not lang: lang = 'Lat'
 
-        itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang ))
+        itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, language = lang, other = other ))
 
     if not itemlist:
         if not ses == 0:

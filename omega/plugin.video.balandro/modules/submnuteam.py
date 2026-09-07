@@ -3466,7 +3466,7 @@ def resumen_canales(item):
 
         if config.get_setting('mnu_torrents', default=True): txt += '    ' + str(torrents) + ' [COLOR blue][B]Torrents[/B][/COLOR][CR]'
 
-        if config.get_setting('mnu_doramas', default=True): txt += '    ' + str(doramas) + '  [COLOR firebrick][B]Doramas[/B][/COLOR][CR]'
+        if config.get_setting('mnu_doramas', default=True): txt += '      ' + str(doramas) + '  [COLOR firebrick][B]Doramas[/B][/COLOR][CR]'
 
         if config.get_setting('mnu_animes', default=True):
             if not config.get_setting('descartar_anime', default=False): txt += '    ' + str(animes) + '  [COLOR springgreen][B]Animes[/B][/COLOR][CR]'

@@ -102,7 +102,7 @@ def get_video_url(page_url, url_referer=''):
     elif '/notice.php' in data:
         return 'Archivo inexistente ó eliminado'
 
-    if 'This video not found' in data:
+    elif 'This video not found' in data:
         return 'Archivo inexistente ó eliminado'
 
     url = scrapertools.find_single_match(data, "sources:.*?file:.*?'(.*?)'.*?,")

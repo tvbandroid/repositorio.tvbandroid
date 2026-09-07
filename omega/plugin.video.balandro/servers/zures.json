@@ -3,11 +3,15 @@
   "name": "Zures",
 
   "active": true,
-  "notes": "Alternative vía: Script.Module.ResolveUrl (Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  BowFile,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Gupload,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidsonic,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
+  "notes": "Alternative vía: Script.Module.ResolveUrl (Abyss,  Allviid,  Amdahost,  Asianload,  Asianplay,  Bigshare,  Bigwarp,  BowFile,  Cloudfile,  Cloudmail,  Dailyuploads,  Darkibox,  Dembed,  Downace,  Fastdrive,  Fastplay,  Filegram,  Gostream,  Gupload,  Letsupload,  Liivideo,  Myupload,  Neohd,  Oneupload,  Pandafiles,  Rovideo,  Savefiles,  Send,  Streamable,  Streamdav,  Streamcool,  Streamgzzz,  Streamix, Streamoupload,  Streamup,  SwiftLoad,  Turbovid,  Tusfiles,  Udrop,  Updown,  Uploadbaz,  Uploadflix,  Uploadhub,  Uploady,  Upvid,  Veev,  Veoh,  Vidara,  Vidbasic,  Vidbob,  Videa,  Vidlook,  Vidmx,  Vidnest, Vido,  Vidpro,  Vidsonic,  Vidstore,  Vidtube,  Vimeos,  Vipss,  Vkprime,  Wecima,  Worlduploads,  Ztreamhub)",
 
   "find_videos": {
     "ignore_urls": [],
     "patterns": [
+      {
+        "pattern": "https://abyssplayer.com/([0-9a-zA-Z_-]+)",
+        "url": "https://abyssplayer.com/\\1"
+      },
       {
         "pattern": "https://allviid.xyz/([0-9a-zA-Z]+)",
         "url": "https://allviid.xyz/\\1"
@@ -145,11 +149,15 @@
         "url": "https://uploady.io/\\1"
       },
       {
-        "pattern": "https://veev.to/(?:d/|e)([0-9a-zA-Z]+)",
+        "pattern": "https://veev.to/(?:d/|e/)([0-9a-zA-Z]+)",
         "url": "https://veev.to/e/\\1"
       },
       {
-        "pattern": "https://doods.to/(?:d/|e)([0-9a-zA-Z]+)",
+        "pattern": "https://veev.pro/(?:d/|e/)([0-9a-zA-Z]+)",
+        "url": "https://veev.to/e/\\1"
+      },
+      {
+        "pattern": "https://doods.to/(?:d/|e/)([0-9a-zA-Z]+)",
         "url": "https://veev.to/e/\\1"
       },
       {
@@ -213,7 +221,7 @@
         "url": "https://videakid.hu/\\1"
       },
       {
-        "pattern": "https://swiftload.io/(?:d/|e/|v)([0-9a-zA-Z]+)",
+        "pattern": "https://swiftload.io/(?:d/|e/|v/)([0-9a-zA-Z]+)",
         "url": "https://swiftload.io/v/\\1"
       },
       {
@@ -265,15 +273,19 @@
         "url": "https://savefiles.com/e/\\1"
       },
       {
-        "pattern": "https://savefiles.top/(?:embed-|e/|v)([0-9a-zA-Z]+)",
+        "pattern": "https://savefiles.top/(?:embed-|e/|v/)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {
-        "pattern": "https://streamhls.to/(?:embed-|e/|v)([0-9a-zA-Z]+)",
+        "pattern": "https://streamhls.to/(?:embed-|e/|v/)([0-9a-zA-Z]+)",
         "url": "https://savefiles.com/e/\\1"
       },
       {
         "pattern": "https://vidbasic.top/(?:embed/)([0-9a-zA-Z]+)",
+        "url": "https://vidbasic.top/embed/\\1"
+      },
+      {
+        "pattern": "https://vidb.top/(?:embed/)([0-9a-zA-Z]+)",
         "url": "https://vidbasic.top/embed/\\1"
       },
       {
@@ -289,11 +301,15 @@
         "url": "https://vimeos.net/embed-\\1.html"
       },
       {
+        "pattern": "https://vimeos.net/(?:e/|d/)([0-9a-zA-Z]+)",
+        "url": "https://vimeos.net/embed-\\1.html"
+      },
+      {
         "pattern": "https://vidnest.io/embed-([0-9a-zA-Z]+).html",
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
-        "pattern": "https://vidnest.io/(?:e/|d)([0-9a-zA-Z]+)",
+        "pattern": "https://vidnest.io/(?:e/|d/)([0-9a-zA-Z]+)",
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
@@ -301,7 +317,7 @@
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
-        "pattern": "https://vidnest.live/(?:e/|d)([0-9a-zA-Z]+)",
+        "pattern": "https://vidnest.live/(?:e/|d/)([0-9a-zA-Z]+)",
         "url": "https://vidnest.io/embed-\\1.html"
       },
       {
@@ -309,11 +325,11 @@
         "url": "https://bigshare.io/watch/\\1"
       },
       {
-        "pattern": "https://streamix.so/(?:e/|/v)([0-9a-zA-Z]+)",
+        "pattern": "https://streamix.so/(?:e/|v/)([0-9a-zA-Z]+)",
         "url": "https:/streamix.so/v/\\1"
       },
       {
-        "pattern": "https://stmix.io/(?:e/|/v)([0-9a-zA-Z]+)",
+        "pattern": "https://stmix.io/(?:e/|v/)([0-9a-zA-Z]+)",
         "url": "https:/streamix.so/v/\\1"
       },
       {
@@ -330,6 +346,10 @@
       },
       {
         "pattern": "https://vidsonic.net/(?:d/|e/)([0-9a-zA-Z]+)",
+        "url": "https://vidsonic.net/e/\\1"
+      },
+      {
+        "pattern": "https://vixeo.io/(?:d/|e/)([0-9a-zA-Z]+)",
         "url": "https://vidsonic.net/e/\\1"
       },
       {

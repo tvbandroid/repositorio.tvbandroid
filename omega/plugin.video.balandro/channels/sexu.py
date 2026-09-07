@@ -57,7 +57,7 @@ def categorias(item):
     data = httptools.downloadpage(item.url).data
     data = re.sub(r"\n|\r|\t|\s{2}|&nbsp;", "", data)
 
-    patron = '<a class="item" href="([^"]+)" title="([^"]+)".*?'
+    patron = '<a class="item".*?href="([^"]+)".*?title="([^"]+)".*?'
     patron += '(?:data-src|src)="([^"]+)"'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
@@ -76,6 +76,8 @@ def categorias(item):
         if next_page:
             next_page =  host[:-1] + next_page
 
+            next_page = next_page.replace('&amp;', '&')
+
             itemlist.append(item.clone( title = 'Siguientes ...', url = next_page, action = 'categorias', text_color = 'coral' ))
 
     return itemlist
@@ -88,13 +90,12 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    patron = '<a class="item__main" href="/([^"]+)/" title="([^"]+)".*?'
-    patron += '(?:data-src|src)="([^"]+)".*?'
-    patron += '<div class="item__counter">([^<]+)<'
+    patron = '<a class="item__main".*?href="/([^"]+)/".*?(?:data-src|src)="([^"]+)".*?alt="([^"]+)"'
+    patron += '.*?<div class="item__counter">([^<]+)<'
 
     matches = re.compile(patron,re.DOTALL).findall(data)
 
-    for url, title, thumb, time in matches:
+    for url, thumb, title, time in matches:
         title = title.replace('&#039;s', "'s").strip()
 
         titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
@@ -110,6 +111,8 @@ def list_all(item):
 
         if next_page:
             next_page =  host[:-1] + next_page
+
+            next_page = next_page.replace('&amp;', '&')
 
             itemlist.append(item.clone( title = 'Siguientes ...', url= next_page, action = 'list_all', text_color = 'coral' ))
 
@@ -136,12 +139,29 @@ def findvideos(item):
 
     jdata = jsontools.load(data)
 
-    for Video in jdata['sources']:
-        url = Video["src"]
-        qlty = Video["quality"]
-        if not url.startswith("http"): url = 'https:' + url 
- 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, quality = qlty, language = 'VO' ))
+    try:
+        for Video in jdata['sources']:
+            url = Video["src"]
+            qlty = Video["quality"]
+
+            if not url.startswith("http"): url = 'https:' + url 
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, quality = qlty, language = 'VO' ))
+    except:
+         pass
+
+    if not itemlist:
+        matches = scrapertools.find_multiple_matches(str(jdata), "{'src':(.*?)'video/mp4'")
+
+        for match in matches:
+            url = scrapertools.find_single_match(match, "'(.*?)'")
+            qlty = scrapertools.find_single_match(match, "'quality': '(.*?)'")
+
+            if url.startswith("http"): continue
+
+            url = 'https:' + url 
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', url = url, quality = qlty, language = 'VO' ))
 
     return itemlist
 

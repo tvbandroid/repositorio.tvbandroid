@@ -298,6 +298,8 @@ def submnu_news(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR tomato][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
 
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
+
     if config.get_setting('sub_mnu_favoritos', default=False):
         if  item.mnupral == 'main':
              itemlist.append(item.clone( channel='favoritos', action='mainlist', title='[B]Favoritos[/B]', context=context_cfg_search, thumbnail=config.get_thumb('star'), fanart=fanart, text_color='plum' ))
@@ -488,6 +490,8 @@ def submnu_special(item):
     itemlist.append(item.clone( action='', title='[B]ESPECIALES:[/B]', context=context_cfg_search, folder=False, text_color='pink' ))
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR tomato][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news'), fanart=fanart ))
+
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= '[COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
 
     if config.get_setting('sub_mnu_favoritos', default=False):
         if  item.mnupral == 'main':
@@ -1001,6 +1005,8 @@ def show_infos(item):
 
     itemlist.append(item.clone( channel='helper', action='show_help_audios', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR cyan][B]Idiomas[/B][/COLOR] en los Audios de los Vídeos', thumbnail=config.get_thumb('news') ))
 
+    itemlist.append(item.clone( channel='helper', action='show_ratings', title= ' - [COLOR green][B]Información[/B][/COLOR] [COLOR khaki][B]Ratings[/B][/COLOR] (valoración Películas ó Series)', thumbnail=config.get_thumb('news') ))
+
     if config.get_setting('mnu_torrents', default=True):
         itemlist.append(item.clone( channel='helper', action='show_help_semillas', title= ' - [COLOR green][B]Información[/B][/COLOR] archivos Torrent [COLOR gold][B]Semillas[/B][/COLOR]', thumbnail=config.get_thumb('news') ))
 
@@ -1272,6 +1278,8 @@ def _dominio_memorizado(item):
     elif item.from_channel == 'pelisplushdnz': domains.manto_domain_pelisplushdnz(item)
 
     elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
+
+    elif item.from_channel == 'repelishd': domains.manto_domain_repelishd(item)
 
     elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 

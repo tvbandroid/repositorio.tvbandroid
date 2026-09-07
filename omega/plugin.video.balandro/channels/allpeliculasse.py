@@ -90,6 +90,11 @@ def do_downloadpage(url, post=None, headers=None):
                 else:
                     data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
+    if '<title>Just a moment...</title>' in data:
+        if not '/search?' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -815,6 +820,9 @@ def play(item):
 
         elif '/acortalink.' in url:
            return 'Tiene [COLOR plum]Acortador[/COLOR] del enlace'
+
+        if url == 'https://la.movie/embed.html?v=1':
+            return 'Contenido [COLOR goldenrod]Aún No Disponible[/COLOR]'
 
         if servidor == 'directo':
             new_server = servertools.corregir_other(url).lower()

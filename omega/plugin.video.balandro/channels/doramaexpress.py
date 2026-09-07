@@ -52,7 +52,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     return itemlist
@@ -72,7 +73,8 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', search_type = 'tvshow' ))
+
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'tvshow' ))
 
     return itemlist
@@ -94,7 +96,7 @@ def idiomas(item):
     return itemlist
 
 
-def generos(item):
+def categorias(item):
     logger.info()
     itemlist = []
 
@@ -104,18 +106,14 @@ def generos(item):
     data = do_downloadpage(host)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '>Géneros(.*?)</main>')
+    bloque = scrapertools.find_single_match(data, '>Categorias(.*?)<script>')
 
-    matches = scrapertools.find_multiple_matches(bloque, '<div id="item-.*?href="(.*?)".*?title="(.*?)"')
+    matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?title="(.*?)"')
 
     for url, tit in matches:
-        tit = tit.replace('&amp;', '&')
-
-        url = host + url
-
         itemlist.append(item.clone( title = tit, url = url, action = 'list_all', text_color = text_color ))
 
-    return itemlist
+    return sorted(itemlist,key=lambda x: x.title)
 
 
 def anios(item):
@@ -491,8 +489,6 @@ def findvideos(item):
             elif '/hgbazooka.' in url: continue
             elif '.tickcounter.' in url: continue
             elif '/zuvioeb.' in url: continue
-
-            elif '/abyssplayer.' in url: continue
             elif '.abyssplayer.' in url: continue
 
             url = url.replace('/Mivalyo.com/', '/mivalyo.com/')
@@ -531,8 +527,6 @@ def findvideos(item):
         ses += 1
 
         if '/short.' in url: continue
-
-        elif '/abyssplayer.' in url: continue
         elif '.abyssplayer.' in url: continue
 
         servidor = servertools.get_server_from_url(url)

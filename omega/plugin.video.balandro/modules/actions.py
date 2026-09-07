@@ -510,8 +510,9 @@ def manto_params(item):
         config.set_setting('channel_pelispanda_dominio', '')
         config.set_setting('channel_pelisplushdlat_dominio', '')
         config.set_setting('channel_pelisplushdnz_dominio', '')
-
         config.set_setting('channel_poseidonhd2_dominio', '')
+
+        config.set_setting('channel_repelishd_dominio', '')
 
         config.set_setting('channel_serieskao_dominio', '')
         config.set_setting('channel_seriespapayato_dominio', '')
@@ -589,7 +590,7 @@ def manto_params(item):
         config.set_setting('channels_repeat', '30')
         config.set_setting('servers_waiting', '6')
 
-        config.set_setting('chrome_last_version', '152.0.7977.42')  # ~ 14/8/26
+        config.set_setting('chrome_last_version', '153.0.8010.12')  # ~ 28/8/26
 
         config.set_setting('debug', '0')
 
@@ -1807,6 +1808,10 @@ def opciones_poseidonhd2(item):
     item.from_channel = 'poseidonhd2'
     opciones_domains_common(item)
 
+def opciones_repelishd(item):
+    item.from_channel = 'repelishd'
+    opciones_domains_common(item)
+
 def opciones_serieskao(item):
     item.from_channel = 'serieskao'
     opciones_domains_common(item)
@@ -1931,6 +1936,8 @@ def opciones_domains_common(item):
 
             elif item.from_channel == 'poseidonhd2': domains.manto_domain_poseidonhd2(item)
 
+            elif item.from_channel == 'repelishd': domains.manto_domain_repelishd(item)
+
             elif item.from_channel == 'serieskao': domains.manto_domain_serieskao(item)
 
             elif item.from_channel == 'seriespapayato': domains.manto_domain_seriespapayato(item)
@@ -1996,6 +2003,8 @@ def opciones_domains_common(item):
             elif item.from_channel == 'pelisplushdnz': domains.test_domain_pelisplushdnz(item)
 
             elif item.from_channel == 'poseidonhd2': domains.test_domain_poseidonhd2(item)
+
+            elif item.from_channel == 'repelishd': domains.test_domain_repelishd(item)
 
             elif item.from_channel == 'serieskao': domains.test_domain_serieskao(item)
 

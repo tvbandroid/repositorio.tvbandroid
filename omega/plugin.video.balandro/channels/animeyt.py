@@ -422,7 +422,6 @@ def findvideos(item):
                 elif '.fembed.' in url: continue
                 elif 'petardas.online' in url: continue
 
-                elif '/abyssplayer.' in url: continue
                 elif '.abyssplayer.' in url: continue
 
                 if '/mytsumi.' in url:
@@ -448,10 +447,7 @@ def findvideos(item):
                             elif '/short.' in link: continue
 
                             elif '.fireload.' in link: continue
-
                             elif 'terabox.' in link: continue
-
-                            elif '/abyssplayer.' in link: continue
                             elif '.abyssplayer.' in link: continue
 
                             url = link
@@ -462,6 +458,7 @@ def findvideos(item):
 
                             other = ''
                             if servidor == 'various': other = servertools.corregir_other(url)
+                            elif servidor == 'zures': other = servertools.corregir_zures(url)
                             else:
                                if '/mytsumi.' in url: other = 'Mytsumi'
 
@@ -482,7 +479,6 @@ def findvideos(item):
                 elif '/new/redirector.php?' in url: continue
                 elif '/v/descarga.php?' in url: continue
 
-                elif '/abyssplayer.' in url: continue
                 elif '.abyssplayer.' in url: continue
 
                 url = url.replace('/altamina.online/', '/filemoon.sx/')
@@ -497,6 +493,7 @@ def findvideos(item):
 
                 other = ''
                 if servidor == 'various': other = servertools.corregir_other(url)
+                elif servidor == 'zures': other = servertools.corregir_zures(url)
 
                 if other == '':
                     if servidor == 'directo':
@@ -631,7 +628,7 @@ def play(item):
 
     elif '.fireload.' in url: url = ''
 
-    elif '/abyssplayer.' in url or '.abyssplayer.' in url: url = ''
+    elif '.abyssplayer.' in url: url = ''
 
     if url:
         if not url.startswith("http"): url = "https:" + url

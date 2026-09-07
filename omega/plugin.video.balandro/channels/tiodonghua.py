@@ -180,6 +180,8 @@ def list_all(item):
 
     bloque = scrapertools.find_single_match(data, '>Recently added<(.*?)Top Cultivadores<')
 
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Recently added<(.*?)>SALON DE LA FAMA<')
+
     if not bloque: bloque = data
 
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
@@ -217,6 +219,15 @@ def list_all(item):
         elif '>T8' in match: season = 8
         elif '>T9' in match: season = 9
 
+        elif '>S2' in match: season = 2
+        elif '>S3' in match: season = 3
+        elif '>S4' in match: season = 4
+        elif '>S5' in match: season = 5
+        elif '>S6' in match: season = 6
+        elif '>S7' in match: season = 7
+        elif '>S8' in match: season = 8
+        elif '>S9' in match: season = 9
+
         elif 'Temporada 2' in match: season = 2
         elif 'Temporada 3' in match: season = 3
         elif 'Temporada 4' in match: season = 4
@@ -230,7 +241,7 @@ def list_all(item):
             if not '/peliculas/' in url: continue
 
             titulo = title
- 
+
             if 'Película Completa' in titulo: titulo = titulo.split("Película Completa")[0]
             if 'Sub Español' in titulo: titulo = titulo.split("Sub Español")[0]
             if '- Portada' in titulo: titulo = titulo.split("- Portada")[0]
@@ -254,7 +265,11 @@ def list_all(item):
 
         elif item.group == 'last' or 'Episodio' in title or 'EPISODIO' in title:
             epi = scrapertools.find_single_match(match, '>Episodio(.*?)</span>').strip()
+            if not epi: epi = scrapertools.find_single_match(match, '>Episodio(.*?)</a>').strip()
+
             if not epi: epi = scrapertools.find_single_match(url, '-episodio-(.*?)-').strip()
+
+            if '</a>' in epi: epi = epi.split("</a>")[0]
 
             if not epi: epi = 1
 
@@ -263,7 +278,7 @@ def list_all(item):
 
             if '- Portada Oficial' in title: title = title.split("- Portada Oficial")[0]
 
-            titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(epi) + ' ' + title.replace('Episodio ' + str(epi), '') + title.replace('Episodio ', '').strip()
+            titulo = '[COLOR goldenrod]Epis. [/COLOR]' + str(season) + 'x' + str(epi) + ' ' + title
 
             titulo = titulo.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('Temporada', '[COLOR tan]Temp.[/COLOR]')
 
@@ -363,6 +378,15 @@ def list_more(item):
         elif '>T8' in match: season = 8
         elif '>T9' in match: season = 9
 
+        elif '>S2' in match: season = 2
+        elif '>S3' in match: season = 3
+        elif '>S4' in match: season = 4
+        elif '>S5' in match: season = 5
+        elif '>S6' in match: season = 6
+        elif '>S7' in match: season = 7
+        elif '>S8' in match: season = 8
+        elif '>S9' in match: season = 9
+
         elif 'Temporada 2' in match: season = 2
         elif 'Temporada 3' in match: season = 3
         elif 'Temporada 4' in match: season = 4
@@ -410,6 +434,8 @@ def list_last(item):
 
     bloque = scrapertools.find_single_match(data, '>Recently added<(.*?)Top Cultivadores<')
 
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Recently added<(.*?)>SALON DE LA FAMA<')
+
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
@@ -442,6 +468,15 @@ def list_last(item):
         elif '>T8' in match: season = 8
         elif '>T9' in match: season = 9
 
+        elif '>S2' in match: season = 2
+        elif '>S3' in match: season = 3
+        elif '>S4' in match: season = 4
+        elif '>S5' in match: season = 5
+        elif '>S6' in match: season = 6
+        elif '>S7' in match: season = 7
+        elif '>S8' in match: season = 8
+        elif '>S9' in match: season = 9
+
         elif 'Temporada 2' in match: season = 2
         elif 'Temporada 3' in match: season = 3
         elif 'Temporada 4' in match: season = 4
@@ -453,7 +488,7 @@ def list_last(item):
 
         title = title.replace('Season', '[COLOR tan]Temp.[/COLOR]').replace('season', '[COLOR tan]Temp.[/COLOR]')
 
-        itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb,
+        itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb,
                                     contentType='tvshow', contentSerieName=SerieName, contentSeason = season, infoLabels={'year': year} ))
 
     if itemlist:
@@ -480,6 +515,8 @@ def temporadas(item):
     if not temporadas: temporadas = re.compile("<span class='title'>Season(.*?)<", re.DOTALL).findall(data)
 
     for tempo in temporadas:
+        if '&lt;' in tempo: tempo = tempo.split("&lt;")[0]
+
         tempo = tempo.strip()
 
         title = 'Temporada ' + tempo
@@ -695,6 +732,8 @@ def findvideos(item):
 
                     if 'location' in resp.headers:
                         new_url = resp.headers['location']
+                    else:
+                        new_url = url
 
                     if not new_url: continue
 
@@ -891,6 +930,8 @@ def list_search(item):
 
     bloque = scrapertools.find_single_match(data, '>Results found(.*?)Top Cultivadores<')
 
+    if not bloque: bloque = scrapertools.find_single_match(data, '>Results found(.*?)>SALON DE LA FAMA<')
+
     matches = scrapertools.find_multiple_matches(bloque, '<article(.*?)</article>')
 
     for match in matches:
@@ -919,6 +960,15 @@ def list_search(item):
         elif '>T7' in match: season = 7
         elif '>T8' in match: season = 8
         elif '>T9' in match: season = 9
+
+        elif '>S2' in match: season = 2
+        elif '>S3' in match: season = 3
+        elif '>S4' in match: season = 4
+        elif '>S5' in match: season = 5
+        elif '>S6' in match: season = 6
+        elif '>S7' in match: season = 7
+        elif '>S8' in match: season = 8
+        elif '>S9' in match: season = 9
 
         elif 'Temporada 2' in match: season = 2
         elif 'Temporada 3' in match: season = 3

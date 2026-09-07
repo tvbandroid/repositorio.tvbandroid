@@ -26,8 +26,8 @@ channels_currents = [
         'hdfull', 'homecine',
         'mejortorrentapp', 'mitorrent',
         'peliculaspro', 
-        'pelisforte', 'pelismart', 'pelispanda', 'pelisplushdlat', 'pelisplushdnz',
-        'poseidonhd2',
+        'pelisforte', 'pelismart', 'pelispanda', 'pelisplushdlat', 'pelisplushdnz', 'poseidonhd2',
+        'repelishd',
         'serieskao', 'seriespapayato', 'srnovelas', 'subtorrents',
         'todotorrents'
         ]
@@ -1851,6 +1851,52 @@ def test_domain_poseidonhd2(item):
         platformtools.dialog_notification(config.__addon_name + ' - PoseidonHd2', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
 
 
+def manto_domain_repelishd(item):
+    logger.info()
+
+    channel_json = 'repelishd.json'
+    filename_json = os.path.join(config.get_runtime_path(), 'channels', channel_json)
+
+    data = filetools.read(filename_json)
+    params = jsontools.load(data)
+
+    try:
+       data = filetools.read(filename_json)
+       params = jsontools.load(data)
+    except:
+       el_canal = ('Falta [B][COLOR %s]' + channel_json) % color_alert
+       platformtools.dialog_notification(config.__addon_name, el_canal + '[/COLOR][/B]')
+       return
+
+    id = params['id']
+    name = params['name']
+
+    if params['active'] == False:
+        el_canal = ('[B][COLOR %s] ' + name) % color_avis
+        platformtools.dialog_notification(config.__addon_name, el_canal + '[COLOR %s] inactivo [/COLOR][/B]' % color_alert)
+        return
+
+    platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Comprobando RePelisHd[/B][/COLOR]' % color_exec)
+
+    manto_domain_common(item, id, name)
+
+
+def test_domain_repelishd(item):
+    logger.info()
+
+    datos = channeltools.get_channel_parameters('repelishd')
+    if not datos['active']:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]El canal está Inactivo[/B][/COLOR]' % color_avis)
+        return
+
+    config.set_setting('developer_test_channels', '')
+
+    try:
+        tester.test_channel('RePelisHd')
+    except:
+        platformtools.dialog_notification(config.__addon_name + ' - RePelisHd', '[B][COLOR %s]Error comprobación, Reintentelo de Nuevo[/B][/COLOR]' % color_alert)
+
+
 def manto_domain_serieskao(item):
     logger.info()
 
@@ -2403,6 +2449,16 @@ def manto_domain_common(item, id, name):
 
         if new_domain is None: return
         elif new_domain == 'https://': return
+
+    elif id == 'repelishd':
+        config.set_setting('user_test_channel', '')
+
+        if not domain: domain = 'https://repelishd.'
+
+        new_domain = platformtools.dialog_input(default=domain, heading='Indicar dominio RePelisHd  -->  [COLOR %s]https://repelishd.???/[/COLOR]' % color_avis)
+
+        if new_domain is None: return
+        elif new_domain == 'https://repelishd.': return
 
     elif id == 'serieskao':
         config.set_setting('user_test_channel', '')

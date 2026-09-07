@@ -475,7 +475,8 @@ def episodios(item):
     logger.info()
     itemlist = []
 
-    page = item.page
+    page = 1
+    if item.page: page = item.page
 
     _id = item._id
 
@@ -513,10 +514,10 @@ def episodios(item):
     tmdb.set_infoLabels(itemlist)
 
     try:
-        pagination = data_json['data']['pagination']
+        pagination = jdata['data']['pagination']
 
         if pagination['next_page_url']:
-            itemlist.append(item.clone (action = 'episodios`', title = 'Siguientes ...',
+            itemlist.append(item.clone (action = 'episodios', title = 'Siguientes ...', id = item._id, season = item.contentSeason,
                                         contentType='season', contentSeason=item.contentSeason, page = page + 1, text_color='coral'))  
     except:
         pass

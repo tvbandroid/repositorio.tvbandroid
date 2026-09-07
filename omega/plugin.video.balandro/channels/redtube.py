@@ -59,19 +59,22 @@ def canales(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron  = '<li class="channel-box channel-box-layout-shift">.*?<a href="([^"]+)".*?alt="([^"]+)".*?data-src="([^"]+)"'
+    bloque = scrapertools.find_single_match(data, '<ul class="channels_listing_grid"(.*?)<div id="related_searches">')
 
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    matches = re.compile('<li class="channel-card-wrapper">.*?<a href="([^"]+)".*?<img src="(.*?)".*?alt="(.*?)"', re.DOTALL).findall(bloque)
 
-    for url, title, thumb in matches:
+    for url, thumb, title in matches:
          url = host[:-1] + url
 
          itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'violet' ))
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<a id="wp_navNext".*?href="([^"]+)">')
+        next_page = scrapertools.find_single_match(data, 'id="wp_navNext".*?href="([^"]+)">')
+
         if next_page:
             next_page = host[:-1] + next_page
+
+            next_page = next_page.replace('&amp;', '&')
 
             itemlist.append(item.clone (action='canales', title='Siguientes ...', url=next_page, text_color = 'coral') )
 
@@ -95,6 +98,7 @@ def categorias(item):
          if title == 'Alta Definición': continue
 
          if title == 'Árabe': title = 'Arabe'
+         elif title == 'Ébano': title = 'Ebano'
 
          url = host[:-1] + url
 
@@ -110,7 +114,7 @@ def pornstars(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|&nbsp;|<br>', '', data)
 
-    patron  = '<li id="recommended_pornstars_block_ps_.*?'
+    patron = '<li id="recommended_pornstars_block_ps_.*?'
 
     patron += 'href="([^"]+)".*?data-src\s*=\s*"([^"]+)".*?alt="([^"]+)"'
 
@@ -122,9 +126,12 @@ def pornstars(item):
          itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='orange' ))
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data, '<a id="wp_navNext".*?href="([^"]+)">')
+        next_page = scrapertools.find_single_match(data, 'id="wp_navNext".*?href="([^"]+)">')
+
         if next_page:
             next_page = host[:-1] + next_page
+
+            next_page = next_page.replace('&amp;', '&')
 
             itemlist.append(item.clone (action='pornstars', title='Siguientes ...', url=next_page, text_color = 'coral') )
 
@@ -161,10 +168,12 @@ def list_all(item):
         itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
-        next_page = scrapertools.find_single_match(data,'<a id="wp_navNext".*?href="([^"]+)">').replace("amp;", "")
+        next_page = scrapertools.find_single_match(data,'id="wp_navNext".*?href="([^"]+)">')
 
         if next_page:
             next_page = host[:-1] + next_page
+
+            next_page = next_page.replace('&amp;', '&')
 
             itemlist.append(item.clone (action='list_all', title='Siguientes ...', url=next_page, text_color = 'coral') )
 

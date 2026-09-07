@@ -1,0 +1,21 @@
+{
+  "id": "videoapp",
+  "name": "Videoapp",
+
+  "active": true,
+
+  "find_videos": {
+    "ignore_urls": [],
+    "patterns": [
+      {
+        "pattern": "https://videoapp.zip/e/movie/([A-z0-9]+)",
+        "url": "https://videoapp.zip/e/movie/\\1"
+      },
+      {
+        "pattern": "https://videoapp.zip/e/tv/([A-z0-9]+)",
+        "url": "https://videoapp.zip/e/tv/\\1"
+      }
+    ]
+  }
+
+}

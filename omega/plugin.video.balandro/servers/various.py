@@ -73,7 +73,7 @@ def get_video_url(page_url, url_referer=''):
     elif 'dropload' in page_url:
           txt_server = 'Dropload'
 
-          page_url = page_url.replace('/dropload.tv/', '/dropload.io/')
+          page_url = page_url.replace('/dropload.io/', '/dr0pstream.com/')
 
           page_url = page_url.replace('/embed-', '/')
 

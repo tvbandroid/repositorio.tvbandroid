@@ -331,8 +331,9 @@
         <setting id="opc_pelipanda" type="action" label="[COLOR gold]PelisPanda[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelispanda)"/>
         <setting id="opc_pelisplushdlat" type="action" label="[COLOR gold]PelisPlusHdLat[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushdlat)"/>
         <setting id="opc_pelisplushdnz" type="action" label="[COLOR gold]PelisPlusHdNz[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_pelisplushdnz)"/>
-
         <setting id="opc_poseidonhd2" type="action" label="[COLOR gold]PoseidonHd2[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_poseidonhd2)"/>
+
+        <setting id="opc_repelishd" type="action" label="[COLOR gold]RePelisHd[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_repelishd)"/>
 
         <setting id="opc_serieskao" type="action" label="[COLOR gold]SeriesKao[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_serieskao)"/>
         <setting id="opc_seriespapayato" type="action" label="[COLOR gold]SeriesPapayaTo[/COLOR]" action="RunPlugin(plugin://plugin.video.balandro/?channel=actions&action=opciones_seriespapayato)"/>

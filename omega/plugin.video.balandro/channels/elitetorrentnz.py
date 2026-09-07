@@ -32,6 +32,14 @@ def do_downloadpage(url, post=None, headers=None):
 
     data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
 
+    if not data:
+        if not '/?s=' in url:
+            if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('EliteTorrentNz', '[COLOR cyan]Re-Intentando acceso[/COLOR]')
+
+            timeout = config.get_setting('channels_repeat', default=30)
+
+            data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
     return data
 
 
@@ -140,7 +148,7 @@ def generos(item):
 
     data = do_downloadpage(host)
 
-    bloque = scrapertools.find_single_match(data, '<ul id=cab-categorias>(.*?)</ul>')
+    bloque = scrapertools.find_single_match(data, '<ul id=cab-categorias(.*?)</ul>')
 
     matches = scrapertools.find_multiple_matches(bloque, 'href="(.*?)".*?title=.*?">(.*?)</a>')
 

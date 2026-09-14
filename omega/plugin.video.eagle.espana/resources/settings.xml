@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><settings>
+    <category label="General">
+    </category><category label="Configuración del servidor">
+    <setting id="server_check_enabled" type="bool" label="Verificación automática del estado de los servidores (ON/OFF) al iniciar" default="false" />
+</category>
+
+<category label="Configuración EPG">
+    <setting id="epg_enabled" type="bool" label="Activar EPG (Guía Electrónica de Programas)" default="false" />
+    <setting id="epg_cache_duration" type="number" label="Duración de la caché EPG (minutos)" default="30" />
+</category>
+
+<category label="Configuración de reproducción">
+    <setting id="live_auto_reconnect" type="bool" label="Reconexión automática para transmisiones en vivo" default="true" />
+    <setting id="live_max_reconnect_attempts" type="number" label="Máximo de intentos de reconexión" default="3" />
+    <setting id="live_reconnect_delay" type="number" label="Retraso antes de reconectar (segundos)" default="2" />
+    <setting id="live_startup_timeout" type="number" label="Tiempo de espera inicial antes de reintentar (segundos)" default="12" />
+    <setting id="live_retry_on_stopped" type="bool" label="Reintentar en paradas ambiguas (puede reiniciar tras detener manualmente)" default="false" />
+</category>
+
+</settings>

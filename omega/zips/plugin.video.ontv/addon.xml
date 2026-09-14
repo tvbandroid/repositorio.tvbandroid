@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.ontv" name="OnTV" version="1.0.7" provider-name="OnTV">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+    <import addon="script.module.requests" version="2.27.1" optional="true"/>
+    <import addon="inputstream.adaptive" version="2.0.0" optional="true"/>
+    <import addon="inputstream.ffmpegdirect" version="1.0.0" optional="true"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py" start="login"/>
+  <extension point="xbmc.addon.metadata">
+    <platform>all</platform>
+    <summary lang="en">OnTV</summary>
+    <summary lang="pt">OnTV</summary>
+    <description lang="en">Streams Portal — Xtream, Stalker/MAC, M3U. Supports Live TV, Movies and Series.</description>
+    <description lang="pt">Portal de Streams — Xtream, Stalker/MAC, M3U. Suporta TV ao Vivo, Filmes e Séries.</description>
+    <news>v1.0.7 — ffmpegdirect modo catchup para streams Xtream (elimina rollback inicial); proxy local para streams nao-Xtream; servidores actualizam ao reiniciar Kodi.</news>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.png</fanart>
+    </assets>
+  </extension>
+</addon>

@@ -1,6 +1,6 @@
 # TVBANWIZAZRD #
-name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]Sep.24 [COLOR white]Nuevo!![/COLOR][/B]"
-url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.MatnexomSep24.zip"
+name="[B][COLOR yellowgreen]TVban matnexom [COLOR khaki]Sept.25 [COLOR white]Nuevo!![/COLOR][/B]"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.MatnexomSept25.zip"
 icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
 fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
 
@@ -46,8 +46,8 @@ description="[COLOR azure][B]TVBAN[/COLOR] [COLOR cyan]MATNEXOM[/B][/COLOR] para
 
 # TVBANWIZAZRD #
 
-name="[B][COLOR yellowgreen]TVban matnexom [COLOR gold]Palantir [COLOR khaki]Sep.14 [COLOR white]Nuevo!![/COLOR][/B]"
-url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.PalantirSep14.zip"
+name="[B][COLOR yellowgreen]TVban matnexom [COLOR gold]Palantir [COLOR khaki]Sept.25 [COLOR white]Nuevo!![/COLOR][/B]"
+url="https://github.com/tvbandroid/tvbandroid.github.io/releases/download/1.1/P.TVban.PalantirSept25.zip"
 icon="https://andtv.github.io/tvban/wizard/wizardFI/ICParche.jpg"
 fanart="https://andtv.github.io/tvban/wizard/wizardFI/FABuild.jpg"
 adult="no"

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0F1216">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>EKHorus</title>
+  <link rel="icon" href="/media/icono_aces_horus.png">
+  <link rel="apple-touch-icon" href="/media/icono_aces_horus.png">
+  <link rel="stylesheet" href="/estilo.css">
+</head>
+
+<body>
+
+  <header id="cabecera">
+    <div class="barra">
+      <div class="marca">
+        <img src="/media/icono_aces_horus.png" alt="">
+        <span><b>EK</b>Horus</span>
+      </div>
+      <div class="estado" id="estado">
+        <span class="punto" id="punto"></span>
+        <span id="estado_txt">Conectando…</span>
+      </div>
+      <button class="icono" id="btn_mas" title="Más opciones" aria-label="Más opciones">⋯</button>
+    </div>
+
+    <div class="buscador">
+      <input id="buscar" type="search" inputmode="search" autocomplete="off"
+             placeholder="Buscar entre los canales">
+      <button class="limpiar" id="btn_limpiar" aria-label="Limpiar búsqueda" hidden>✕</button>
+    </div>
+
+    <nav class="facetas" id="facetas" aria-label="Filtros"></nav>
+    <div class="chips" id="chips"></div>
+  </header>
+
+  <main id="principal">
+    <div id="aviso" class="aviso" hidden></div>
+    <div id="rejilla" class="rejilla"></div>
+    <div id="centinela"></div>
+    <div id="vacio" class="vacio" hidden></div>
+  </main>
+
+  <!-- What the television is playing. It only shows up when there is something. -->
+  <div id="tele_barra" class="tele_barra" hidden>
+    <span class="tele_icono">📺</span>
+    <span class="tele_txt" id="tele_txt"></span>
+    <button id="btn_tele_parar">Parar</button>
+  </div>
+
+  <!-- Sheet of one channel -->
+  <div id="ficha" class="capa" hidden>
+    <div class="hoja" role="dialog" aria-modal="true" aria-labelledby="ficha_nombre">
+      <div class="asa"></div>
+      <div class="ficha_cabeza">
+        <div id="ficha_logo" class="logo grande"></div>
+        <div>
+          <h2 id="ficha_nombre"></h2>
+          <p id="ficha_pista"></p>
+        </div>
+      </div>
+      <button class="accion principal" id="btn_aqui">
+        <span>▶</span> Ver aquí, en este aparato
+      </button>
+      <button class="accion" id="btn_tele">
+        <span>📺</span> Ver en la tele
+      </button>
+      <button class="accion tenue" id="btn_vlc">
+        <span>🎞</span> Copiar enlace para VLC
+      </button>
+      <button class="accion tenue" id="btn_cerrar_ficha">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Player -->
+  <div id="reproductor" class="capa negra" hidden>
+    <video id="video" playsinline controls autoplay></video>
+    <div class="repro_barra">
+      <span id="repro_nombre"></span>
+      <button id="btn_cerrar_video" aria-label="Cerrar">✕</button>
+    </div>
+    <div id="repro_aviso" class="repro_aviso" hidden></div>
+  </div>
+
+  <!-- More options -->
+  <div id="mas" class="capa" hidden>
+    <div class="hoja" role="dialog" aria-modal="true" aria-label="Más opciones">
+      <div class="asa"></div>
+      <h2>Opciones</h2>
+
+      <div class="dato">
+        <span class="clave">Canales</span>
+        <span class="valor" id="mas_total">—</span>
+      </div>
+      <!-- Only shown when something is wrong; see mirarEstado(). -->
+      <div class="dato" id="fila_fallo" hidden>
+        <span class="clave">Problema</span>
+        <span class="valor" id="mas_fallo">—</span>
+      </div>
+
+      <button class="accion" id="btn_actualizar">
+        <span>⟳</span> Actualizar la lista de canales
+      </button>
+
+      <p class="nota">La lista entera, para abrirla en VLC, en la tele o en IPTV Simple:</p>
+      <div class="enlace" id="enlace_m3u"></div>
+      <button class="accion tenue" id="btn_copiar_m3u">Copiar esa dirección</button>
+
+      <button class="accion tenue" id="btn_cerrar_mas">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="aviso_flotante" class="flotante" hidden></div>
+
+  <script src="/app.js"></script>
+</body>
+
+</html>

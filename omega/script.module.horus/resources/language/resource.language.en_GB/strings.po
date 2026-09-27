@@ -1,7 +1,7 @@
 # Kodi Media Center language file
 # Addon Name: EKHorus
 # Addon id: script.module.horus
-# Addon Provider: CaperucitaFeroz, RubénSDFA1laberot
+# Addon Provider: Caperucitaferoz, RubénSDFA1laberot
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
@@ -81,7 +81,7 @@ msgid "The ID is not in a valid format"
 msgstr ""
 
 msgctxt "#30016"
-msgid "We were unable to start the Acestream engine.\nMake sure it is started before continuing.\nMore information at https://t.me/KodiManiac"
+msgid "We were unable to start the Acestream engine.\nMake sure it is started before continuing.\nMore information at https://t.me/espakodi"
 msgstr ""
 
 msgctxt "#30017"
@@ -117,7 +117,7 @@ msgid "AceStream Engine IP address"
 msgstr ""
 
 msgctxt "#30025"
-msgid "AceStream Engine port"
+msgid "AceStream engine port"
 msgstr ""
 
 msgctxt "#30026"
@@ -165,7 +165,7 @@ msgid "Stop Acestream Engine"
 msgstr ""
 
 msgctxt "#30037"
-msgid "Playback history"
+msgid "History"
 msgstr ""
 
 msgctxt "#30038"
@@ -206,4 +206,518 @@ msgstr ""
 
 msgctxt "#30047"
 msgid "Redirect external calls to StreamNinja"
+msgstr ""
+
+msgctxt "#30048"
+msgid "Remove from history"
+msgstr ""
+
+msgctxt "#30049"
+msgid "Clear the whole history"
+msgstr ""
+
+msgctxt "#30050"
+msgid "Could not download the Acestream engine. Check your connection and try again."
+msgstr ""
+
+msgctxt "#30051"
+msgid "Clear the whole history?\n\nIt cannot be undone. My favourites stay as they are."
+msgstr ""
+
+# --- APK download menu and EspaKodi addons menu (ported from 1.3.5) ---
+# NOTE: in 1.3.5 these labels used 30048-30052, which here are already the history
+# context menu and the engine download error. They are renumbered to 30082+
+
+msgctxt "#30053"
+msgid "Choose the folder to save %s"
+msgstr ""
+
+msgctxt "#30054"
+msgid "Downloading %s..."
+msgstr ""
+
+msgctxt "#30055"
+msgid "APK downloaded to:\n%s\n\nTo install it:\n1) Open a file manager on your device (on Fire TV, the \"Downloader\" app; on mobile, \"Files\" or \"My Files\").\n2) Go to that folder and tap the APK.\n3) If Android asks for permission to install unknown apps, grant it to THAT app (the file manager), not to Kodi."
+msgstr ""
+
+msgctxt "#30056"
+msgid "%s already exists in that folder.\n\nDo you want to download it again and overwrite it?"
+msgstr ""
+
+msgctxt "#30057"
+msgid "Download cancelled"
+msgstr ""
+
+msgctxt "#30058"
+msgid "%s could not be downloaded.\n\n%s"
+msgstr ""
+
+msgctxt "#30060"
+msgid "%s\n\nThis file is an Android installer (APK), so it can only be installed on Android devices (Fire TV, Android TV, phones...).\n\nIt has been saved to:\n%s"
+msgstr ""
+
+msgctxt "#30061"
+msgid "Install now"
+msgstr ""
+
+msgctxt "#30062"
+msgid "Install manually (any device)"
+msgstr ""
+
+msgctxt "#30063"
+msgid "Open unknown sources settings"
+msgstr ""
+
+msgctxt "#30064"
+msgid "Close"
+msgstr ""
+
+msgctxt "#30065"
+msgid "EKHorus: installation"
+msgstr ""
+
+msgctxt "#30066"
+msgid "Preparing the APK for the installer..."
+msgstr ""
+
+msgctxt "#30067"
+msgid "Cannot write to this folder:\n%s\n\nChoose another one."
+msgstr ""
+
+msgctxt "#30068"
+msgid "Install now (root / Kodi as a system app)"
+msgstr ""
+
+msgctxt "#30069"
+msgid "APK installed successfully."
+msgstr ""
+
+msgctxt "#30070"
+msgid "It could not be installed automatically: this requires root or Kodi running as a system app.\n\nInstall it manually from a file manager instead."
+msgstr ""
+
+msgctxt "#30071"
+msgid "%s is already being downloaded"
+msgstr ""
+
+msgctxt "#30072"
+msgid "Could not write to disk. The device may be out of free space."
+msgstr ""
+
+msgctxt "#30073"
+msgid "%s could not be prepared for the installer.\n\n%s"
+msgstr ""
+
+msgctxt "#30074"
+msgid "[COLOR yellow]32 or 64 bits?[/COLOR] - press to find out which one to download"
+msgstr ""
+
+msgctxt "#30075"
+msgid "Some apps on this list come in two versions, 32-bit (armeabi-v7a) and 64-bit (arm64-v8a).\n\nThe 32-bit one is for the Fire TV Stick and most TV boxes, and nearly every 64-bit device installs it too without any issue; only a few newer ones, mostly phones, have dropped 32-bit apps. The 64-bit one is for those.\n\nIf in doubt, try the 32-bit one. If the system won't install it, your device is 64-bit only, so download the 64-bit one.\n\nMore apps and help:\n- EspaKodi on Telegram https://t.me/espakodi\n- https://espakodi.github.io/apk/"
+msgstr ""
+
+msgctxt "#30076"
+msgid "Download again"
+msgstr ""
+
+msgctxt "#30077"
+msgid "Use the existing one"
+msgstr ""
+
+msgctxt "#30078"
+msgid "The copy of %s you already had is damaged or incomplete.\n\nIt will be downloaded again."
+msgstr ""
+
+msgctxt "#30079"
+msgid "%s finished downloading, but the file is damaged or incomplete.\n\nPlease try again."
+msgstr ""
+
+msgctxt "#30080"
+msgid "%s downloaded correctly, but it could not be saved into the chosen folder.\n\nTry another folder."
+msgstr ""
+
+msgctxt "#30081"
+msgid "EspaKodi Addons"
+msgstr ""
+
+msgctxt "#30082"
+msgid "Download APKs"
+msgstr ""
+
+msgctxt "#30083"
+msgid "AceStream (32-bit)"
+msgstr ""
+
+msgctxt "#30084"
+msgid "AceServe (32-bit)"
+msgstr ""
+
+msgctxt "#30085"
+msgid "VLC (32-bit)"
+msgstr ""
+
+msgctxt "#30086"
+msgid "EspaKodi Warp (32-bit)"
+msgstr ""
+
+# --- 1.6.0: per-engine port and detection of which one answers ---
+# NOTE: 30059 has been skipped since 1.5.0, do not reuse it.
+
+msgctxt "#30087"
+msgid "AceServe engine port (empty = same as AceStream)"
+msgstr ""
+
+msgctxt "#30088"
+msgid "%s is answering on port %s. Check the Ace Engine setting."
+msgstr ""
+
+msgctxt "#30089"
+msgid "Something that is not the ace engine is listening on port %s.\n\nAceServe pins that port and does not start while it is taken. Close the other application, or change the port in the Control panel."
+msgstr ""
+
+msgctxt "#30090"
+msgid "Opening the engine. Come back to Kodi once it has started."
+msgstr ""
+
+msgctxt "#30091"
+msgid "The ace engine could not be opened.\n\nIf you do not have it installed, you will find AceStream and AceServe in the Download APKs menu."
+msgstr ""
+
+# --- 1.6.0: control panel ---
+
+msgctxt "#30092"
+msgid "Control panel"
+msgstr ""
+
+msgctxt "#30093"
+msgid "Choose the engine, change its address and port, switch the external player on or off, and see live which engine is answering."
+msgstr ""
+
+msgctxt "#30094"
+msgid "EKHorus guide"
+msgstr ""
+
+msgctxt "#30095"
+msgid "The complete guide to EKHorus, AceStream and AceServe: read it here or open it in your browser."
+msgstr ""
+# --- 1.6.0: menu with icons, Universo EspaKodi and classic interface ---
+
+msgctxt "#30096"
+msgid "EspaKodi Universe"
+msgstr ""
+
+msgctxt "#30097"
+msgid "AceStream, AceServe, VLC, EspaKodi, VPNs and more as APK files, for Fire TV, TV boxes and phones, without leaving Kodi."
+msgstr ""
+
+msgctxt "#30098"
+msgid "Every add-on in the EspaKodi ecosystem."
+msgstr ""
+
+msgctxt "#30099"
+msgid "Paste an acestream identifier, a magnet link or the address of a torrent and play it right away."
+msgstr ""
+
+msgctxt "#30100"
+msgid "Search channels by name, or open a list of links from an address."
+msgstr ""
+
+msgctxt "#30101"
+msgid "Everything you have opened, wherever it came from: channels, searches, pasted identifiers, the phone page and other add-ons. The last 300."
+msgstr ""
+
+msgctxt "#30102"
+msgid "Stops the AceStream engine on this machine, whether EKHorus started it or not."
+msgstr ""
+
+msgctxt "#30103"
+msgid "The add-on settings, the same ones the control panel changes."
+msgstr ""
+
+msgctxt "#30104"
+msgid "Links to the whole EspaKodi ecosystem."
+msgstr ""
+
+msgctxt "#30105"
+msgid "Classic interface (plain Kodi lists)"
+msgstr ""
+
+msgctxt "#30106"
+msgid "The window could not be opened. Falling back to the usual list."
+msgstr ""
+
+msgctxt "#30107"
+msgid "Engine"
+msgstr ""
+
+msgctxt "#30108"
+msgid "Playback"
+msgstr ""
+
+msgctxt "#30109"
+msgid "Interface"
+msgstr ""
+
+msgctxt "#30110"
+msgid "Choose the file to play"
+msgstr ""
+
+msgctxt "#30115"
+msgid "Channels"
+msgstr ""
+
+msgctxt "#30116"
+msgid "Live TV channels, by category, country and language, with the state of every link."
+msgstr ""
+
+msgctxt "#30117"
+msgid "Show adult categories"
+msgstr ""
+
+msgctxt "#30118"
+msgid "Refresh the channel list after (hours, 0 = never)"
+msgstr ""
+
+msgctxt "#30119"
+msgid "Also search the channel list"
+msgstr ""
+
+msgctxt "#30120"
+msgid "QR with the engine address instead of the acestream:// link"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Audio transcoding"
+msgstr ""
+
+msgctxt "#30122"
+msgid "Do not touch it"
+msgstr ""
+
+msgctxt "#30123"
+msgid "AC3 to stereo"
+msgstr ""
+
+msgctxt "#30124"
+msgid "Everything to AAC"
+msgstr ""
+
+msgctxt "#30125"
+msgid "Watch on your phone"
+msgstr ""
+
+msgctxt "#30126"
+msgid "The whole channel list on a phone, a tablet or a PC. You can watch a channel right there, in the browser with nothing installed, or send it to this Kodi from the page, which works as a remote control."
+msgstr ""
+
+msgctxt "#30127"
+msgid "Port of the web interface"
+msgstr ""
+
+msgctxt "#30128"
+msgid "Experimental"
+msgstr ""
+
+msgctxt "#30129"
+msgid "What is still being tried out: the web page for your phone, and taking the channels to the TV section of the main menu."
+msgstr ""
+
+# --- 1.9.0: History and My favourites ---
+# NOTE: 30130-30132 were the 2.0 notice, taken out. Kodi keeps an addon's strings until it
+# restarts, so reusing those ids would paint the old notice in these rows. Do not reuse them.
+
+msgctxt "#30133"
+msgid "My favourites"
+msgstr ""
+
+msgctxt "#30134"
+msgid "The links you keep from the History or from Channels, under the name you give them."
+msgstr ""
+
+msgctxt "#30135"
+msgid "Add to My favourites"
+msgstr ""
+
+msgctxt "#30136"
+msgid "Remove from My favourites"
+msgstr ""
+
+msgctxt "#30137"
+msgid "Rename"
+msgstr ""
+
+msgctxt "#30138"
+msgid "Added to My favourites"
+msgstr ""
+
+msgctxt "#30139"
+msgid "Name of the favourite"
+msgstr ""
+
+msgctxt "#30140"
+msgid "Pre-buffering is slow (seeds: %s). If it does not start, try another link."
+msgstr ""
+
+msgctxt "#30141"
+msgid "The link has not started in %s seconds. Try another one."
+msgstr ""
+
+# --- 1.9.0: the other links of a channel ---
+
+msgctxt "#30142"
+msgid "This link does not start. Trying another one of the same channel (%s of %s)."
+msgstr ""
+
+msgctxt "#30143"
+msgid "None of the %s links of the channel has started."
+msgstr ""
+
+msgctxt "#30144"
+msgid "link %s of %s"
+msgstr ""
+
+# --- 1.9.0: keeping and taking out from the lists ---
+
+msgctxt "#30145"
+msgid "Removed from My favourites"
+msgstr ""
+
+msgctxt "#30146"
+msgid "Already in My favourites"
+msgstr ""
+
+msgctxt "#30147"
+msgid "No longer in My favourites"
+msgstr ""
+
+# --- 1.9.0: the slow notice on the last link of a channel ---
+
+msgctxt "#30148"
+msgid "Pre-buffering is slow (seeds: %s). This is the channel's last link."
+msgstr ""
+
+# --- 1.9.0: opening magnets and .torrent with Elementum ---
+
+msgctxt "#30149"
+msgid "Open with Elementum"
+msgstr ""
+
+msgctxt "#30150"
+msgid "Elementum is not installed. It can be installed from EspaKodi Addons."
+msgstr ""
+
+msgctxt "#30151"
+msgid "Open with"
+msgstr ""
+
+msgctxt "#30152"
+msgid "The AceStream engine"
+msgstr ""
+
+# --- 1.9.0: the engine on another device, and starting it without playing ---
+
+msgctxt "#30153"
+msgid "No engine answers at %s:%s.\n\nStart it on that device or check the address in the Control panel."
+msgstr ""
+
+msgctxt "#30154"
+msgid "Start Acestream engine"
+msgstr ""
+
+msgctxt "#30155"
+msgid "Starts the engine on this machine without playing anything. Channels and the phone page need it."
+msgstr ""
+
+msgctxt "#30156"
+msgid "Acestream engine running"
+msgstr ""
+
+msgctxt "#30157"
+msgid "This device has little memory, so the page is better opened from a phone or tablet on the same wifi. In a browser on this device it sometimes works, but with the browser in front Android may close Kodi to free memory, and the page with it, or the video may cut out."
+msgstr ""
+
+# --- 1.9.0: typing with the remote or with the phone ---
+
+msgctxt "#30158"
+msgid "Type with"
+msgstr ""
+
+msgctxt "#30159"
+msgid "Ask every time"
+msgstr ""
+
+msgctxt "#30160"
+msgid "The TV remote"
+msgstr ""
+
+msgctxt "#30161"
+msgid "The phone (with loiolink technology)"
+msgstr ""
+
+msgctxt "#30162"
+msgid "Open %s"
+msgstr ""
+
+msgctxt "#30163"
+msgid "Opens %s, the app that works as the engine on this device, without playing anything. Channels and the phone page need it."
+msgstr ""
+
+msgctxt "#30164"
+msgid "EspaKodi GTA Soundtrack (background music)"
+msgstr ""
+
+msgctxt "#30165"
+msgid "Address of the track (empty, the one it comes with)"
+msgstr ""
+
+msgctxt "#30166"
+msgid "You can turn it off in Settings > Interface"
+msgstr ""
+
+msgctxt "#30167"
+msgid "Save in %s"
+msgstr ""
+
+msgctxt "#30168"
+msgid "Choose another folder"
+msgstr ""
+
+msgctxt "#30169"
+msgid "Take the channels to the TV section"
+msgstr ""
+
+msgctxt "#30170"
+msgid "Puts the channels you choose in the TV section of the main menu, the one with live channels: My favourites, the ones in Channels or AceServe's list, in groups and with their logos. Pressing one plays it through EKHorus, as from here. It installs IPTV Simple if it is missing, does not touch the lists you already have and, if the TV entry is hidden, offers to show it. Press here again to update them or take them away."
+msgstr ""
+
+msgctxt "#30171"
+msgid "Save in the History every AceStream link played in Kodi"
+msgstr ""
+
+msgctxt "#30172"
+msgid "Move up"
+msgstr ""
+
+msgctxt "#30173"
+msgid "Move down"
+msgstr ""
+
+msgctxt "#30174"
+msgid "Move to the top"
+msgstr ""
+
+msgctxt "#30175"
+msgid "Engine found on port %s"
+msgstr ""
+
+msgctxt "#30176"
+msgid "Close engine"
+msgstr ""
+
+msgctxt "#30177"
+msgid "An engine is answering on this device. Android lets no app close another, so this takes you to where you can stop it yourself."
+msgstr ""
+
+msgctxt "#30178"
+msgid " Looking for the engine on other ports of this device..."
 msgstr ""

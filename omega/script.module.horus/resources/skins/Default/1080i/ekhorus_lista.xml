@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window type="dialog">
+    <!-- It points at the X: when the window loads the list is still empty and takes no
+         focus. onInit moves it as soon as there are rows. -->
+    <defaultcontrol>100</defaultcontrol>
+    <controls>
+
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>1080</height>
+            <aspectratio>scale</aspectratio>
+            <texture background="true" fallback="special://home/addons/script.module.horus/icon.png">special://home/addons/script.module.horus/fanart.jpg</texture>
+        </control>
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>1080</height>
+            <texture colordiffuse="F20F1216">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>0</left><top>0</top><width>320</width><height>1080</height>
+            <texture colordiffuse="CC0B0F14">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>320</left><top>0</top><width>320</width><height>1080</height>
+            <texture colordiffuse="880B0F14">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+
+        <!-- Header. Nothing clickable goes past x=1824: on a curved-screen phone the
+             last 96 px of the skin space already fall on the curve. -->
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>104</height>
+            <texture colordiffuse="EE0B0F14">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>0</left><top>104</top><width>1920</width><height>2</height>
+            <texture colordiffuse="FFD9A520">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>96</left><top>24</top><width>56</width><height>56</height>
+            <aspectratio>keep</aspectratio>
+            <texture>special://home/addons/script.module.horus/resources/media/icono_aces_horus.png</texture>
+        </control>
+        <control type="label">
+            <left>168</left><top>26</top><width>560</width><height>52</height>
+            <font>font37</font>
+            <textcolor>FFF0F0F0</textcolor>
+            <aligny>center</aligny>
+            <label>$INFO[Window.Property(pl_titulo)]</label>
+        </control>
+        <control type="label">
+            <left>744</left><top>26</top><width>376</width><height>52</height>
+            <font>font12</font>
+            <textcolor>FF8A97A5</textcolor>
+            <aligny>center</aligny>
+            <label>$INFO[Window.Property(pl_sub)]</label>
+        </control>
+
+        <!-- Right panel: the explanation of the focused row, read straight from the list item.
+             No Python follows the focus: a thread doing that froze every Python of Kodi while
+             Kodi installed an addon modally (see list_screen._pintar). -->
+        <control type="image">
+            <left>1000</left><top>136</top><width>824</width><height>816</height>
+            <texture border="18" colordiffuse="B2080B0F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+        </control>
+        <!-- One line. Kodi does not keep a wrapping label inside its height, so a second line
+             was drawn over the rule and the text. A longer name ends in dots, and the screens
+             that can carry one start the text below with it whole. -->
+        <control type="label">
+            <left>1032</left><top>160</top><width>760</width><height>56</height>
+            <font>font36_title</font>
+            <textcolor>FFF0F0F0</textcolor>
+            <label>$INFO[Container(200).ListItem.Label]</label>
+        </control>
+        <control type="image">
+            <left>1032</left><top>226</top><width>760</width><height>2</height>
+            <texture colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="textbox">
+            <left>1032</left><top>248</top><width>740</width><height>672</height>
+            <font>font12</font>
+            <textcolor>FFD8DDE3</textcolor>
+            <pagecontrol>300</pagecontrol>
+            <label>$INFO[Container(200).ListItem.Property(f_plot)]</label>
+        </control>
+        <control type="scrollbar" id="300">
+            <left>1792</left><top>248</top><width>20</width><height>672</height>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+            <!-- Until its text first changes, the textbox never tells the bar how long it is, and
+                 Kodi starts the bar at 100 items in pages of 10. A panel empty from the start
+                 showed a bar with nothing to scroll. -->
+            <visible>!String.IsEmpty(Container(200).ListItem.Property(f_plot))</visible>
+            <texturesliderbackground border="8" colordiffuse="18FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturesliderbackground>
+            <texturesliderbar border="8" colordiffuse="99D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturesliderbar>
+            <texturesliderbarfocus border="8" colordiffuse="FFD9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturesliderbarfocus>
+            <textureslidernib>special://home/addons/script.module.horus/resources/media/transparent.png</textureslidernib>
+            <textureslidernibfocus>special://home/addons/script.module.horus/resources/media/transparent.png</textureslidernibfocus>
+            <onleft>200</onleft>
+            <onright>300</onright>
+            <onup>300</onup>
+            <ondown>300</ondown>
+        </control>
+
+        <!-- A textbox takes no focus, so what turns the pages with the remote is this
+             invisible button on top of the text, as in DialogTextViewer. -->
+        <control type="button" id="301">
+            <left>1032</left><top>248</top><width>740</width><height>672</height>
+            <label></label>
+            <texturefocus>special://home/addons/script.module.horus/resources/media/transparent.png</texturefocus>
+            <texturenofocus>special://home/addons/script.module.horus/resources/media/transparent.png</texturenofocus>
+            <onclick>PageDown(300)</onclick>
+            <onup>PageUp(300)</onup>
+            <ondown>PageDown(300)</ondown>
+            <onleft>200</onleft>
+            <onright>301</onright>
+        </control>
+        <control type="image">
+            <left>1000</left><top>136</top><width>824</width><height>816</height>
+            <texture border="18" colordiffuse="FFD9A520">special://home/addons/script.module.horus/resources/media/pill_borde.png</texture>
+            <visible>Control.HasFocus(301)</visible>
+        </control>
+
+        <!-- Status bar and remote legend -->
+        <control type="image">
+            <left>0</left><top>968</top><width>1920</width><height>2</height>
+            <texture colordiffuse="33D9A520">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="label">
+            <left>96</left><top>986</top><width>1130</width><height>44</height>
+            <font>font14</font>
+            <textcolor>FFB8C2CE</textcolor>
+            <aligny>center</aligny>
+            <label>$INFO[Window.Property(pl_estado)]</label>
+        </control>
+        <control type="label">
+            <left>1250</left><top>986</top><width>574</width><height>44</height>
+            <font>font12</font>
+            <textcolor>FF8A97A5</textcolor>
+            <align>right</align>
+            <aligny>center</aligny>
+            <label>$INFO[Window.Property(pl_pista)]</label>
+            <visible>!Control.HasFocus(301)</visible>
+        </control>
+        <control type="label">
+            <left>1150</left><top>986</top><width>674</width><height>44</height>
+            <font>font12</font>
+            <textcolor>FF8A97A5</textcolor>
+            <align>right</align>
+            <aligny>center</aligny>
+            <label>[B]Arriba[/B] y [B]Abajo[/B] pasan página    ·    [B]Izquierda[/B] vuelve</label>
+            <visible>Control.HasFocus(301)</visible>
+        </control>
+
+        <!-- List. 116 px rows: they can be pressed with a finger without aiming. -->
+        <control type="list" id="200">
+            <left>96</left><top>136</top><width>856</width><height>816</height>
+            <orientation>vertical</orientation>
+            <pagecontrol>-1</pagecontrol>
+            <scrolltime tween="cubic" easing="out">240</scrolltime>
+            <onup condition="Control.IsVisible(103)">103</onup>
+            <onup condition="!Control.IsVisible(103)">100</onup>
+            <ondown>200</ondown>
+            <onleft>200</onleft>
+            <onright>301</onright>
+            <animation effect="fade" start="0" end="100" time="300">WindowOpen</animation>
+            <animation effect="slide" start="-40,0" end="0,0" time="320" tween="cubic" easing="out">WindowOpen</animation>
+
+            <itemlayout width="856" height="116">
+                <control type="image">
+                    <left>0</left><top>6</top><width>856</width><height>104</height>
+                    <texture border="18" colordiffuse="12FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep)</visible>
+                </control>
+                <control type="image">
+                    <left>32</left><top>34</top><width>48</width><height>48</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>$INFO[ListItem.Property(f_icono)]</texture>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep)</visible>
+                </control>
+                <!-- A row with no pill and no value on the right gives its name and its hint that
+                     width too, so a pasted identifier or a torrent name is not cut at 400 px. -->
+                <control type="label">
+                    <left>104</left><top>26</top><width>400</width><height>34</height>
+                    <font>font14</font>
+                    <textcolor>FFD8DDE3</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + [!String.IsEmpty(ListItem.Property(f_pastilla)) | !String.IsEmpty(ListItem.Label2)]</visible>
+                </control>
+                <control type="label">
+                    <left>104</left><top>26</top><width>720</width><height>34</height>
+                    <font>font14</font>
+                    <textcolor>FFD8DDE3</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + String.IsEmpty(ListItem.Property(f_pastilla)) + String.IsEmpty(ListItem.Label2)</visible>
+                </control>
+                <control type="label">
+                    <left>104</left><top>60</top><width>400</width><height>28</height>
+                    <font>font12</font>
+                    <textcolor>FF6E7A88</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pista)]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + [!String.IsEmpty(ListItem.Property(f_pastilla)) | !String.IsEmpty(ListItem.Label2)]</visible>
+                </control>
+                <control type="label">
+                    <left>104</left><top>60</top><width>720</width><height>28</height>
+                    <font>font12</font>
+                    <textcolor>FF6E7A88</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pista)]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + String.IsEmpty(ListItem.Property(f_pastilla)) + String.IsEmpty(ListItem.Label2)</visible>
+                </control>
+                <control type="label">
+                    <left>520</left><top>32</top><width>304</width><height>52</height>
+                    <font>font14</font>
+                    <textcolor>FFB8C2CE</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+
+                <control type="image">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <texture border="18" colordiffuse="FF3E9E63">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),on)</visible>
+                </control>
+                <control type="image">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <texture border="18" colordiffuse="FFB4463A">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),off)</visible>
+                </control>
+                <control type="image">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),gris)</visible>
+                </control>
+                <control type="label">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pastilla)]</label>
+                </control>
+
+                <!-- Section separator: no card, the title centred and two rules -->
+                <control type="label">
+                    <left>0</left><top>34</top><width>856</width><height>48</height>
+                    <font>font12</font>
+                    <textcolor>FFD9A520</textcolor>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                    <visible>String.IsEqual(ListItem.Property(f_tipo),sep)</visible>
+                </control>
+            </itemlayout>
+
+            <focusedlayout width="856" height="116">
+                <control type="image">
+                    <left>0</left><top>6</top><width>856</width><height>104</height>
+                    <texture border="18" colordiffuse="3AD9A520">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep)</visible>
+                </control>
+                <control type="image">
+                    <left>0</left><top>30</top><width>8</width><height>56</height>
+                    <texture border="4" colordiffuse="FFFFB70F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep)</visible>
+                </control>
+                <control type="image">
+                    <left>32</left><top>34</top><width>48</width><height>48</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture>$INFO[ListItem.Property(f_icono)]</texture>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep)</visible>
+                </control>
+                <control type="label">
+                    <left>104</left><top>26</top><width>400</width><height>34</height>
+                    <font>font14</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <aligny>center</aligny>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + [!String.IsEmpty(ListItem.Property(f_pastilla)) | !String.IsEmpty(ListItem.Label2)]</visible>
+                </control>
+                <control type="label">
+                    <left>104</left><top>26</top><width>720</width><height>34</height>
+                    <font>font14</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <aligny>center</aligny>
+                    <scroll>true</scroll>
+                    <label>$INFO[ListItem.Label]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + String.IsEmpty(ListItem.Property(f_pastilla)) + String.IsEmpty(ListItem.Label2)</visible>
+                </control>
+                <control type="label">
+                    <left>104</left><top>60</top><width>400</width><height>28</height>
+                    <font>font12</font>
+                    <textcolor>FFB8C2CE</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pista)]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + [!String.IsEmpty(ListItem.Property(f_pastilla)) | !String.IsEmpty(ListItem.Label2)]</visible>
+                </control>
+                <control type="label">
+                    <left>104</left><top>60</top><width>720</width><height>28</height>
+                    <font>font12</font>
+                    <textcolor>FFB8C2CE</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pista)]</label>
+                    <visible>!String.IsEqual(ListItem.Property(f_tipo),sep) + String.IsEmpty(ListItem.Property(f_pastilla)) + String.IsEmpty(ListItem.Label2)</visible>
+                </control>
+                <control type="label">
+                    <left>520</left><top>32</top><width>304</width><height>52</height>
+                    <font>font14</font>
+                    <textcolor>FFFFB70F</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+
+                <control type="image">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <texture border="18" colordiffuse="FF3E9E63">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),on)</visible>
+                </control>
+                <control type="image">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <texture border="18" colordiffuse="FFB4463A">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),off)</visible>
+                </control>
+                <control type="image">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),gris)</visible>
+                </control>
+                <control type="label">
+                    <left>564</left><top>32</top><width>260</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pastilla)]</label>
+                </control>
+
+                <control type="label">
+                    <left>0</left><top>34</top><width>856</width><height>48</height>
+                    <font>font12</font>
+                    <textcolor>FFFFB70F</textcolor>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                    <visible>String.IsEqual(ListItem.Property(f_tipo),sep)</visible>
+                </control>
+                <animation effect="zoom" start="100" end="102" center="428,58" time="180" tween="quadratic" easing="out">Focus</animation>
+                <animation effect="zoom" start="102" end="100" center="428,58" time="180" tween="quadratic" easing="out">UnFocus</animation>
+            </focusedlayout>
+        </control>
+
+        <!-- Header buttons. They only show if whoever opens the window asks for them.
+             The text margin is set here and not left to the skin: EspaKodi's puts 7 px on
+             each side, and "Última versión web" (272 px in font13) no longer fit in 276 and
+             ended in dots on any 16:9 screen. -->
+        <control type="button" id="103">
+            <left>1136</left><top>22</top><width>300</width><height>60</height>
+            <font>font13</font>
+            <textoffsetx>6</textoffsetx>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FFB8C2CE</textcolor>
+            <focusedcolor>FFFFFFFF</focusedcolor>
+            <label>$INFO[Window.Property(pl_b1)]</label>
+            <texturefocus border="18" colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturefocus>
+            <texturenofocus border="18" colordiffuse="14FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturenofocus>
+            <visible>!String.IsEmpty(Window.Property(pl_b1))</visible>
+            <onup>103</onup>
+            <ondown>200</ondown>
+            <onleft>103</onleft>
+            <onright condition="Control.IsVisible(104)">104</onright>
+            <onright condition="!Control.IsVisible(104)">100</onright>
+        </control>
+        <control type="button" id="104">
+            <left>1444</left><top>22</top><width>300</width><height>60</height>
+            <font>font13</font>
+            <textoffsetx>6</textoffsetx>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FFB8C2CE</textcolor>
+            <focusedcolor>FFFFFFFF</focusedcolor>
+            <label>$INFO[Window.Property(pl_b2)]</label>
+            <texturefocus border="18" colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturefocus>
+            <texturenofocus border="18" colordiffuse="14FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturenofocus>
+            <visible>!String.IsEmpty(Window.Property(pl_b2))</visible>
+            <onup>104</onup>
+            <ondown>200</ondown>
+            <onleft>103</onleft>
+            <onright>100</onright>
+        </control>
+
+        <!-- The X goes last on purpose: if Kodi could not focus the default control,
+             the focus is taken by the first one that does accept it. -->
+        <control type="button" id="100">
+            <left>1752</left><top>22</top><width>72</width><height>60</height>
+            <font>font32</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FF8A97A5</textcolor>
+            <focusedcolor>FFFFB70F</focusedcolor>
+            <label>X</label>
+            <texturefocus border="18" colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturefocus>
+            <texturenofocus border="18" colordiffuse="14FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturenofocus>
+            <onup>100</onup>
+            <ondown>200</ondown>
+            <onleft condition="Control.IsVisible(104)">104</onleft>
+            <onleft condition="!Control.IsVisible(104)">103</onleft>
+            <onright>100</onright>
+        </control>
+
+    </controls>
+</window>

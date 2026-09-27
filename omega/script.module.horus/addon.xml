@@ -1,51 +1,307 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.horus" name="EKHorus" version="1.3.2" provider-name="Caperucitaferoz, RubénSDFA1laberot">
+<addon id="script.module.horus" name="EKHorus" version="2.0.1" provider-name="RubénSDFA1laberot">
     <requires>
-        <import addon="script.module.six" />
+        <import addon="xbmc.python" version="3.0.0" />
         <import addon="script.module.pyqrcode" />
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>executable</provides>
     </extension>
+    <!-- Behind the plugin on purpose: Kodi takes the addon's type and library from the first
+         extension, and with the service first every plugin://script.module.horus address would
+         run the service. With "Guardar todo" off it ends at once (lib/playback_watch.py). -->
+    <extension point="xbmc.service" library="service.py"/>
     <extension point="xbmc.addon.metadata">
-        <description>EKHorus: modificación de Horus adaptada a EspaKodi.
+        <summary lang="es_ES">Reproductor AceStream para Kodi</summary>
+        <summary lang="en_GB">AceStream player for Kodi</summary>
+        <description>EKHorus: reproductor AceStream para Kodi, basado en Horus (Caperucitaferoz) y adaptado para EspaKodi por RubénSDFA1laberot (pulsa para ver los cambios).
 
 "Señor de sus ojos"
 "Unificador de las dos tierras"
 "Señor de las estrellas circumpolares"
 "El de los dos ojos"
         </description>
-        <disclaimer>En Horus no vais a encontrar ningún tipo de contenido: ni películas, ni series ni eventos deportivos.</disclaimer>
+        <disclaimer>EKHorus no incluye, no aloja y no distribuye ningún enlace ni ningún contenido. Es un reproductor.
+
+El catálogo de canales que se ve dentro del addon no es de EKHorus ni de EspaKodi. Lo publica el motor que cada usuario tenga instalado en su aparato, sea la aplicación oficial de AceStream o sea AceServe, y es ese motor quien lo mantiene, lo actualiza y lo sirve. EKHorus se limita a mostrar lo que el motor le contesta: ni EKHorus ni EspaKodi eligen qué canales aparecen ahí, ni pueden quitarlos, ni responden de ellos. Lo mismo vale para la lista propia de AceServe y para las listas y enlaces que aporte cada usuario.
+
+La tecnología AceStream es legal. La legalidad de un contenido concreto depende de sus derechos de emisión y es responsabilidad de quien lo reproduce.</disclaimer>
+        <license>GPL-3.0-or-later</license>
         <platform>all</platform>
         <assets>
               <icon>icon.png</icon>
               <fanart>fanart.jpg</fanart>
         </assets>
         <news>
-            EKHorus: diferencias respecto al Horus original de Caperucitaferoz (1.1.9).
+            EKHorus para Kodi: reproductor AceStream basado en Horus (Caperucitaferoz), adaptado para EspaKodi por RubénSDFA1laberot.
 
-            Enlaces y búsqueda:
-            - Soporte de enlaces ass:// (se resuelven por DNS sobre elcano.top y se decodifican en base64/gzip, incluyendo listas anidadas).
-            - Búsqueda directa por texto, sin URL, en acestreamsearch.net y search-ace.stream.
-            - Buscar varias fuentes a la vez separando las direcciones con ; (fusiona y elimina duplicados).
-            - Nuevos formatos de lista reconocidos: pastebin/.txt (nombre e ID por líneas), elcano y páginas vercel.app / netlify.app.
+            Novedades de EKHorus 2.0.1:
 
-            Motor AceStream (Android):
-            - Segundo motor org.free.aceserve (aceserve) seleccionable con el ajuste Motor ace, con sus propias rutas de caché e intents de lanzamiento y reproducción.
+            AceStream en Android
+            - Con el reproductor externo, el canal se abre directamente en la aplicación de AceStream, que lo reproduce con su propio motor. Ya no hay cuenta atrás ni sale el aviso de error que aparecía dentro de la aplicación.
+            - Si tienes AceServe instalado, la aplicación de AceStream puede haberse pasado a otro puerto al encontrar el suyo ocupado, y no vuelve al de siempre. Ahora, cuando en el puerto que tienes puesto no contesta nadie, EKHorus lo busca por el aparato, se queda con el que encuentra y te dice cuál es, así que no hace falta cambiar el puerto a mano. Funciona en Canales, en el cuadro de mandos, en el asistente y al reproducir dentro de Kodi.
+            - Abrir la aplicación de AceStream desde EKHorus sin reproducir nada ya no deja ningún aviso de error dentro de ella. Vale para la fila Abrir AceStream del menú principal, para Canales y para el cuadro de mandos.
+            - Con AceServe en Kodi 20 o posterior, abrir el motor ya no obliga a esperar hasta un minuto. AceServe devuelve la pantalla a Kodi en cuanto arranca.
+            - En Android, mientras el motor esté en marcha, el menú principal enseña la fila Cerrar motor, que lleva a la ficha de la aplicación en los ajustes de Android. El sistema no deja pararlo de otra forma.
 
-            Reproducción e interfaz:
-            - Ajuste Mostrar QR: genera un código QR del enlace acestream:// como carátula del elemento (dependencia nueva: script.module.pyqrcode).
-            - Listitems con la API moderna getVideoInfoTag en lugar de setInfo.
-            - Al introducir un ID a mano exige un hash de 40 caracteres y avisa si no es válido (el original aceptaba el texto tal cual).
-            - Ya no fuerza el refresco del contenedor tras reproducir.
+            Novedades de EKHorus 2.0.0:
 
-            Integración con otros addons:
-            - Ajuste Redirigir a StreamNinja las llamadas de otros addons: reenvía las llamadas externas al reproductor de StreamNinja, con protección anti-bucle.
+            Canales
+            - Entrada nueva en el menú principal, justo debajo del cuadro de mandos: unos 1800 canales que se recorren por categoría, por país o por idioma, con el número de canales en cada grupo y una muestra de los que hay dentro antes de entrar.
+            - Cada país y cada idioma llevan su bandera, que va dentro del addon para que la lista no tenga que bajar nada al abrirse. Y cada canal, su logo oficial cuando lo hay.
+            - Los canales salen ordenados por lo que más importa: primero los enlaces sanos, luego los que están en el idioma de tu Kodi, y después el resto. Con Kodi en español la lista abre con canales en español en vez de con el primero por orden alfabético, que suele estar en cirílico.
+            - Los enlaces dudosos no se esconden, pero van al final y llevan una etiqueta. Así se sabe antes de pulsar que ese puede no arrancar.
+            - Las categorías de adultos vienen ocultas. Hay un ajuste para verlas.
+            - La lista se guarda y se reutiliza, así que solo se espera la primera vez. Se puede actualizar a mano desde la propia pantalla, y caduca sola a las 24 horas, que también se puede cambiar.
+            - Con AceServe hay además una entrada para su lista propia, repartida por grupos, y sus canales recuperan el logo cruzándolos con los demás.
+            - Si el enlace de un canal no arranca, o se queda atascado en la precarga, y el canal trae otro, se prueba el siguiente sin que tengas que hacer nada y un aviso lo dice. Pocos canales traen más de un enlace, y con el reproductor externo no funciona, porque no hay forma de saber si el vídeo ha arrancado.
+            - Necesita AceServe o AceStream arrancado. Si no responde ninguno, EKHorus lo dice y te lleva a instalarlo.
+            - Cuando el motor contesta pero no consigue la lista, el aviso lo dice tal cual y propone probar con una VPN, porque suele ser cosa de la operadora. Esa lista se la pide el motor a AceStream, y hay redes desde las que no le llega. Antes ese caso salía como que el motor era demasiado antiguo, que solo es cierto en los anteriores a la serie 3.2.
 
-            Identidad:
-            - Renombrado a EKHorus (adaptación para EspaKodi), con RubénSDFA1laberot como coautor. El id sigue siendo script.module.horus para no romper las llamadas de otros addons. Dependencia añadida: script.module.pyqrcode.
+            Mis favoritos
+            - Entrada nueva en el menú principal, justo debajo de Canales, con los enlaces que quieras tener a mano.
+            - Se guardan desde Canales y desde el Historial con la tecla Menú del mando o manteniendo pulsado, y de la misma forma se renombran y se quitan.
+            - Se pueden ordenar: el menú de cada uno tiene Subir, Bajar y Mover al principio. Es también el orden en que salen en la sección TV si los llevas allí.
+            - Van en su propio fichero, así que borrar el historial, o que llegue a su tope, no se lleva ninguno.
+
+            Historial
+            - Está siempre en el menú principal, debajo de Mis favoritos, aunque todavía no hayas abierto nada.
+            - Guarda los 300 últimos enlaces que se abren, vengan de donde vengan: Canales, Buscar enlaces, Reproducir identificador, la página del móvil y las llamadas de otros addons.
+            - Se anota al pedir el enlace y no a los tres minutos de verlo, así que entran también los canales que se ven fuera de Kodi con el reproductor externo y los que no llegan a arrancar.
+            - Cada fila dice de dónde vino y cuándo se abrió por última vez. Si vuelves a abrir uno, sube arriba sin repetirse.
+            - Botón para borrarlo todo, que pregunta antes y deja Mis favoritos como están. Una sola fila se borra con la tecla Menú o manteniendo pulsado.
+            - Un identificador pegado a mano, que no trae nombre, se queda con el que da el motor al arrancar, también en Mis favoritos si lo guardaste sin nombre.
+            - El historial que ya tenías se conserva.
+            - Si tienes Elementum instalado, los magnets y los .torrent se pueden abrir también con él: desde el menú del Historial y de Mis favoritos, y al pegar uno en Reproducir identificador, que pregunta con cuál abrirlo.
+            - Botón nuevo arriba, Guardar todo, apagado de serie. Encendido, el historial guarda todos los enlaces de AceStream que se reproducen en Kodi, también los que no se abren desde EKHorus, como los canales de la sección TV o los de otros addons. Salen como Sección TV o Fuera de EKHorus, y al pulsarlos se abren por EKHorus. Lo que StreamNinja abre sin nombre se guarda con el nombre que le da el motor (si el motor no contesta, sale como Canal de StreamNinja hasta que se abre desde el Historial), y lo que EKHorus le pasa a StreamNinja sale una sola vez. Apagado, no se queda nada en marcha. Está también en Ajustes, en Reproducción, y en la lista clásica es la primera fila.
+            - Los canales de la sección TV que se abren con EKHorus, como las listas KODI de HaP, se guardan con su nombre, su logo y como Sección TV, con el botón encendido o apagado.
+
+            Buscar enlaces
+            - La búsqueda por texto mira también en la lista de canales, además de en las dos webs de siempre. Esas webs fallan a menudo, y esto responde en décimas y sin salir de tu red.
+            - Si no hay motor arrancado, la búsqueda no se alarga: tiene su propio límite de cuatro segundos.
+            - Se puede apagar en los ajustes y todo vuelve a funcionar como antes.
+
+            Escribir con el móvil
+            - Reproducir identificador y Buscar enlaces preguntan si quieres escribir con el mando o con el móvil. Con el mando sale el teclado de siempre. Con el móvil sale un código QR que se abre con la cámara; en la página que aparece se pega el identificador, el magnet o la búsqueda y se pulsa Enviar a la tele. Con la tecnología de loiolink.
+            - La caja de la página viene vacía, para que se pueda pegar sin arrastrar nada de antes, y la pantalla de la tele se cierra sola en cuanto llega el texto. El teclado de la tele sí sigue trayendo lo último que escribiste.
+            - El servidor de esa página solo vive mientras el QR está en pantalla y se apaga solo a los cinco minutos si no llega nada. Si el aparato no está en la red, lo avisa y abre el teclado.
+            - Ajuste nuevo en Interfaz, Escribir con, para no preguntar y usar siempre el mando o siempre el móvil.
+
+            Configurarlo la primera vez
+            - Asistente nuevo la primera vez que se abre el addon. Pregunta dónde está el motor y deja puestos la dirección, el puerto y, en Android, qué aplicación hace de motor.
+            - Si el motor está en otro aparato de la red, EKHorus lo busca él. Recorre las direcciones de tu red preguntando por el motor y te enseña los que encuentre con su versión, para elegir sin tener que saberte ninguna dirección IP.
+            - Se puede repetir cuando se quiera desde el cuadro de mandos.
+
+            Cuadro de mandos
+            - Pantalla nueva, la primera del menú, que reúne en seis botones grandes lo que hay que tocar: qué aplicación hace de motor, dónde se ve el vídeo, la dirección, el puerto, la comprobación del motor y la redirección a StreamNinja. Cada uno se explica en el panel de al lado con solo pasar por encima, sin pulsar nada.
+            - En vez de un desplegable con dos códigos, AceStream y AceServe se eligen en un selector con los dos nombres, el elegido en ámbar, y al lado la explicación de qué es cada uno, qué hay que instalar y cuándo hace falta VLC.
+            - El reproductor externo es un interruptor que se ve verde o rojo desde lejos. Si se apaga teniendo AceServe elegido, avisa de que dentro de Kodi la imagen arranca y se corta a los pocos segundos.
+            - Arriba hay un indicador por motor. El círculo verde señala cuál está contestando ahora mismo y el nombre en ámbar, cuál tienes elegido. Al pulsarlo vuelve a comprobarlo y, si ese motor no responde, ofrece abrir su aplicación.
+            - La dirección y el puerto se cambian sin entrar en los ajustes. Si pegas una dirección con el puerto incluido, se ofrece aplicarlo en vez de descartarlo en silencio. Cada motor guarda su propio puerto.
+            - Botón nuevo para cerrar el motor. En Windows y en Linux lo detiene; en Android lleva a la ficha de la app en los ajustes del sistema, que es lo único que se puede hacer, porque Android no deja que una aplicación cierre a otra y la API del motor no trae ninguna orden para apagarse. Si no contesta ningún motor, lo dice en vez de fingir que ha hecho algo.
+            - En Windows y Linux no se pintan las filas que solo funcionan en Android; en su sitio se explica que ahí el motor lo pone EKHorus.
+            - Los ajustes de siempre siguen donde estaban y con lo mismo dentro; esta pantalla escribe sobre ellos.
+
+            La guía, dentro de Kodi
+            - Entrada nueva en el menú principal. Pregunta si abrir la guía en el navegador o leerla sin salir de Kodi.
+            - La versión de dentro dice exactamente lo mismo que la web, repartida en un índice de diez apartados que se despliegan, con el texto del apartado elegido a la derecha.
+            - El texto se recorre con el mando y, en pantalla táctil, deslizando el dedo sobre él.
+
+            EspaKodi Addons y Descargar APKs
+            - Las dos pasan a tener pantalla propia, con la misma forma que el cuadro de mandos: la lista a la izquierda y la explicación de lo que tengas elegido a la derecha.
+            - EspaKodi Addons queda repartido en secciones y añade EKGames, Gamesek, InputStream Adaptive y ResolveURL. Cada addon lleva una pastilla que dice si está instalado, deshabilitado o no está.
+            - Acceso nuevo al portal de EspaKodi.
+            - El repositorio de Elementum ya no viaja dentro de EKHorus. Se baja de GitHub al instalar Elementum, y el addon pesa 56 KB menos.
+            - Descargar APKs deja de repetirse dentro de EspaKodi Addons: ya estaba en el menú principal.
+            - Descargar APKs pasa de cuatro APK a dieciséis, pensados también para el móvil: tres AceStream (una sin anuncios con el motor dentro, la EK limpiada por EspaKodi y un mod más nuevo con premium), AceServe, VLC, EspaKodi Venom, EspaKodi LaRoja y tres VPN, Cloudflare WARP, PrivadoVPN y Windscribe. AceStream, AceServe, EspaKodi y LaRoja vienen en 32 y en 64 bits, y cada APK trae al lado su explicación.
+            - EspaKodi Warp deja su sitio a EspaKodi Venom, que se instala encima sin perder favoritos, addons ni ajustes.
+            - Si GitHub no responde, cada APK se baja de su copia en archive.org, salvo AceServe de 64 bits, que solo está en GitHub; y si la lista no llega, se usa la copia que trae el addon. Una descarga que llega cortada o que no coincide con su huella se repite desde archive.org; si lo que falla es el disco, porque se ha llenado, avisa sin repetirla.
+            - Mientras llega la lista sale la rueda de espera de Kodi. Antes la pantalla se quedaba quieta unos segundos, y en un aparato lento o con mala conexión parecía colgada.
+            - Botón nuevo, Borrar descargas, al lado de Última versión web. Enseña los APK bajados desde aquí y las descargas que se quedaron a medias, con lo que ocupa cada uno y todos marcados, para recuperar el espacio una vez instalados, que en un Fire TV o un TV box va justo. Solo busca los de la lista, así que no toca ningún otro archivo de la carpeta.
+
+            El menú principal
+            - Cada entrada tiene su propio icono en vez del logo del addon repetido en todas, y una línea que dice qué hace.
+            - Ajustes pasa a ser la penúltima entrada y se estrena Universo EspaKodi, con los enlaces del ecosistema.
+            - Fanart nuevo, el ojo de Horus sobre una pared de jeroglíficos de los addons de EspaKodi, que sale detrás del menú principal.
+
+            Música en los menús
+            - Los menús de EKHorus tienen música de fondo, la EspaKodi GTA Soundtrack. Son seis canciones seguidas y cada vez empieza por una distinta, nunca a mitad de una. Suena solo mientras estás en el addon, se para al salir o al abrir un canal, y si ya sonaba otra cosa no la pisa.
+            - La primera vez suena desde internet y se guarda una copia en el aparato (18 MB). A partir de ahí arranca al momento, sin rueda de espera y sin frenar el menú.
+            - Se quita en Ajustes, apartado Interfaz, y un aviso lo recuerda la primera vez que suena. Al quitarla se borra también la copia. Debajo hay un campo para poner otra pista por su dirección.
+            - Tras 4 minutos y 18 segundos sin tocar nada, lo que dura la canción más larga, se calla. Así pueden saltar el salvapantallas y el apagado de la pantalla, que Kodi no activa mientras suena música, y en Android no sigue sonando mucho rato si sales con el botón de inicio sin cerrar Kodi. La siguiente tecla, o un toque en la pantalla, la trae donde se había quedado.
+            - Cuando EKHorus abre otra aplicación (el navegador, el instalador de APK, los ajustes de Android o la app del motor), la música se aparta al momento y vuelve donde estaba con la primera tecla o el primer toque de vuelta en Kodi.
+            - En Android, Kodi se queda el audio al empezar a sonar, y la música de otras apps, como Spotify, se pausa. Es cosa de Kodi; si molesta, se quita con el mismo ajuste.
+
+            Ajustes
+            - Repartidos en cuatro apartados: Motor, Reproducción, Interfaz y Canales.
+            - Opción nueva de interfaz clásica, que apaga las pantallas propias y devuelve las listas de siempre. Es la salida de emergencia por si alguna fallara en un aparato concreto; si una ventana no llega a abrirse, el addon se pasa solo a la lista clásica y avisa.
+            - Instalar StreamNinja desde el cuadro de mandos ya no enciende la redirección por su cuenta.
+
+            Experimental
+            - Apartado nuevo en el menú, justo antes de Ajustes, con lo que todavía está en pruebas: Ver en el móvil y Llevar los canales a la sección TV.
+            - Ver en el móvil enciende una página web en este Kodi y enseña su dirección con un código QR. Desde el móvil, la tablet o el ordenador de casa se ve la lista entera de canales con su buscador y sus filtros, se puede ver un canal en el propio navegador sin instalar nada, y se puede mandar a esta tele como si el móvil fuera el mando. Sin cuenta y sin contraseña, solo estando en la misma red.
+            - El servidor vive mientras Kodi esté abierto y se apaga desde la misma pantalla. Usa el puerto 8099 y, si está ocupado, prueba los siete siguientes. En Interfaz hay un ajuste para cambiarlo.
+            - En aparatos con poca memoria, como un Fire TV Stick, abrir la página en un navegador del mismo aparato no es fiable. Con el navegador delante, Kodi queda en segundo plano y Android puede cerrarlo para liberar memoria; el servidor se apaga con él y el navegador dice que no puede conectar, o el vídeo se corta a mitad. En esos aparatos conviene dejar Kodi abierto en la tele, que sigue haciendo de servidor, y abrir la dirección o el QR desde el móvil, la tablet o el ordenador. Si el aparato es un Android con menos de 3 GB de memoria, la fila Ver en el móvil lo recuerda y el botón Abrir aquí en el navegador pregunta antes de abrirlo.
+            - Llevar los canales a la sección TV pone tus canales en esa sección del menú principal, la de los canales en directo, como las listas de HaP: Mis favoritos, los de Canales o la lista de AceServe, lo que elijas, por grupos y con sus logos. Al pulsar uno se abre por EKHorus, como desde el propio addon, y en Android va a la app del motor si tienes puesto el reproductor externo.
+            - Si falta IPTV Simple, el addon de Kodi que lleva las listas a la sección TV, se instala del repositorio oficial. Los canales van en una lista aparte y no se toca ninguna de las que ya tengas. Desde la misma fila se actualizan o se quitan, y al quitarlos se ofrece desactivar IPTV Simple si se queda sin listas.
+            - Si la entrada TV del menú principal está oculta, como en EspaKodi, se ofrece enseñarla.
+            - En Kodi 19, donde IPTV Simple solo admite una lista, se deja la lista hecha y se explica dónde ponerla.
+
+            Universo EspaKodi
+            - Entrada nueva al final del menú, con los enlaces del ecosistema sobre estrellas que caen.
+
+            Correcciones
+            - Cuando la precarga tardaba, el diálogo seguía dando vueltas sin decir si merecía la pena esperar, y si el enlace no llegaba a arrancar se cerraba sin explicación. Ahora, pasado el tiempo máximo de los ajustes, un aviso dice cuántas semillas tiene el enlace, y otro avisa cuando no ha arrancado.
+            - Los torrents con varios vídeos dentro, una temporada entera por ejemplo, no se reproducían. El addon se quedaba esperando medio minuto y terminaba diciendo que el motor no había arrancado, con el motor funcionando perfectamente. Lo que pasaba es que el motor contesta con la lista de ficheros para que elijas, y esa respuesta no se entendía. Ahora sale un selector con los nombres, y el título del vídeo es el del capítulo que elijas y no el del primero.
+            - EKHorus adivinaba cuál de los dos motores estaba respondiendo por su número de versión, y esa regla ya no valía: la aplicación oficial ha pasado a la serie 3.2, que es donde estaba AceServe. Ahora se lo pregunta al motor. El indicador del cuadro de mandos llevaba tiempo pudiendo equivocarse.
+            - La caché de la aplicación oficial de AceStream no se borraba nunca en Android. El nombre del paquete había cambiado y, además, desde Android 10 las aplicaciones guardan sus datos en otro sitio. Las dos cosas corregidas, y se siguen probando las rutas antiguas para los aparatos viejos.
+            - Cuando el motor responde pero se ha quedado sin internet, el cuadro de mandos lo dice. Antes se veía verde y los canales no arrancaban, y era fácil culpar al enlace.
+            - En Kodi 19 el addon no llegaba a pintar ni el menú principal, porque las filas se escribían con funciones que solo existen desde Kodi 20. Ahora cada versión de Kodi usa las suyas, y en Kodi 20 y posteriores no cambia nada.
+            - Si el motor moría, o cerraba la sesión por su cuenta, antes de parar la reproducción, el hilo que le pide las estadísticas se quedaba vivo el resto de la sesión, y Kodi tardaba cinco segundos más en cerrar. Ahora se para siempre.
+            - Buscar enlaces dejaba de abrirse cuando la última búsqueda guardada era un número, o "true"; la caja vuelve a abrir con lo escrito.
+            - La página del móvil, apagada desde su propia pantalla, dejaba su puerto ocupado hasta cerrar Kodi y la siguiente vez salía en otro puerto; y con la página encendida, Kodi tardaba cinco segundos en cerrar. Ahora el puerto se libera en el momento y el servidor se apaga solo al cerrar Kodi.
+            - El asistente comprobaba el puerto de AceStream aunque se hubiera elegido AceServe con un puerto propio.
+            - Pegar la dirección de un .torrent que no se puede leer, o un magnet sin identificador, no decía nada. Ahora avisa, como con un identificador inválido.
+            - En Windows y Linux el motor se descarga la primera vez que hace falta, al reproducir algo o al arrancarlo desde el menú, y no al abrir el addon. Antes se bajaba antes de que el asistente preguntara dónde estaba el motor, y si la descarga fallaba el aviso salía en cada pulsación del menú.
+            - Cancelar durante la descarga del motor la corta de verdad. Antes el botón estaba y no hacía nada.
+            - Entrada nueva en el menú de Windows y Linux, Arrancar motor Acestream, donde antes solo estaba la de detenerlo. Y Canales sin motor ofrece arrancarlo y se abre sola cuando contesta. Antes había que reproducir algo para que el motor arrancara.
+            - En Android, cuando el motor elegido no contesta, el menú principal estrena una fila para abrirlo, Abrir AceServe o Abrir AceStream según el que tengas puesto. Desaparece en cuanto el motor responde, y no sale si está en otro aparato.
+            - En Android el código QR salía como un cuadrado blanco hasta que se reiniciaba Kodi. Le pasaba a las carátulas QR de las listas de enlaces y a las pantallas que lo enseñan, y ya se pinta a la primera.
+            - Con el motor en otro aparato, EKHorus ya no arranca el suyo ni abre la app de Android cuando aquel no contesta: espera y dice en qué dirección no responde nadie. La dirección propia del aparato cuenta como local. Y el menú ya no ofrece detener un motor que está en otra máquina, que desde aquí no se podía.
+            - Esperando a un motor remoto apagado, Cancelar responde al momento. Antes tardaba hasta diez segundos, y otros diez pasaban entre pulsar el canal y ver el diálogo.
+            - Dos pulsaciones seguidas ya no arrancan dos motores ni descargan dos veces el mismo zip.
+            - Cerrar Kodi con el motor arrancado por EKHorus ya no tarda cinco segundos de más. Y en Windows, un motor que muere al arrancar avisa al momento en vez de esperar medio minuto y callar.
+            - Cancelar la búsqueda de motores en la red, en el asistente, ya no dice que no se ha encontrado ninguno.
+            - La página del móvil rechaza las órdenes que lleguen desde otra web abierta en el navegador: reproducir, parar o apagar el servidor.
+            - Con la página del móvil abierta en un navegador, cerrar Kodi ya no se retrasa hasta treinta segundos. Las conexiones que el navegador deja abiertas se sueltan en cuanto se apaga el servidor.
+            - Un magnet con el hash en base32 se reproduce. Antes se mandaba al motor recortado.
+            - Un APK guardado en /sdcard/Download se borraba al pasárselo al instalador de Android. Esa carpeta es /storage/emulated/0/Download con otro nombre, y copiarlo allí empezaba por borrar el destino, que era el propio APK.
+            - Cancelar el diálogo de la carpeta al bajar un APK lo descargaba igual en la carpeta de la última vez, porque Kodi, al cancelar, devuelve la carpeta en la que abrió el diálogo. Ahora se pregunta antes si guardarlo ahí o elegir otra, y Atrás no descarga nada.
+            - EKHorus ya no escribe en el log de Kodi los enlaces ni los nombres de lo que abre, ni los de las llamadas de otros addons. Solo apunta qué hace.
+            - La protección contra el bucle con StreamNinja se quedaba corta. StreamNinja puede tardar 17 segundos en devolver un enlace que no consigue abrir, y pasados los 15 de la protección se lo volvían a pasar una y otra vez. Ahora espera 30, y un identificador que llega en mayúsculas también se reconoce a la vuelta.
+
+            Ajustes nuevos
+            - Transcodificar el audio, para los canales que se ven pero no se oyen, con dos modos: AC3 a estéreo, que es lo que suele arreglar el sonido en un Fire TV o en una caja Android barata, y todo a AAC. Cambia la reproducción a HLS, así que viene en No tocarlo.
+            - El código QR puede llevar la dirección del motor en vez del enlace acestream://. Así lo abre cualquier móvil con VLC, sin tener que instalar AceStream.
+            - Guardar en el historial todos los enlaces de AceStream que se reproducen en Kodi, en Reproducción. Es el mismo interruptor que el botón Guardar todo del Historial, y viene apagado.
+
+            El código
+            - EKHorus se ha desarrollado en español porque no estaba previsto que fuera internacional. Sin embargo, para que todo el mundo pueda entenderlo, se han traducido al inglés los comentarios del código y casi todos los nombres de los módulos, y los nombres de las variables se están traduciendo poco a poco.
+
+            Novedades de EKHorus 1.6.0:
+
+            Los dos motores y el puerto 6878
+            - AceStream y AceServe usan el mismo puerto y no pueden funcionar a la vez. Ahora EKHorus mira cuál de los dos está respondiendo y avisa, una sola vez por sesión, si no es el que has elegido en los ajustes. Antes se conectaba a lo que contestara sin saber cuál era.
+            - Si el arranque del motor se agota, el aviso explica el motivo. Cuando el puerto lo tiene ocupado otra cosa lo dice, y cuando no hay ningún motor instalado remite al menú de descarga de APKs.
+            - Ajuste nuevo para dar a AceServe un puerto propio, pensado para quien lo haya movido con root. Dejándolo vacío se usa el mismo que AceStream, así que al actualizar nadie pierde lo que tenía configurado.
+            - Al reproducir un enlace desde otro addon en Android ya no se pregunta si abrir el motor. Se abre directamente, con un aviso que no corta el paso, y se da más margen para volver a Kodi desde la aplicación del motor.
+            - Con el reproductor externo, el vídeo ya no se envía antes de que el motor esté escuchando. Antes VLC podía abrirse con un error de conexión.
+            - La apertura de AceServe funciona también en Kodi 19, donde el nombre de clase del intent no se tiene en cuenta.
+            - En Android, las instalaciones nuevas vienen ya con AceStream como motor y con el reproductor externo activado, que es como mejor funciona. Quien ya tenga sus ajustes puestos no los pierde.
+
+            Limpieza de caché
+            - Se limpian las carpetas de los dos motores, no solo la del que está seleccionado. Al alternar entre AceStream y AceServe, la caché del que dejabas de usar crecía sin límite.
+            - Se borra también lo que quedaba dentro de subcarpetas, que hasta ahora se iba acumulando.
+            - Nunca se toca la carpeta de perfil del motor, que es donde viven su configuración y su base de datos.
+            - Si el otro motor está sirviendo vídeo a otro aparato de la red, su caché se deja en paz para no cortarle la reproducción.
+
+            Descarga de APKs
+            - La lista de APKs se lee de un archivo publicado en el repositorio. Así, cuando se cae el alojamiento, se arregla sin publicar una versión nueva del addon. Si no se puede leer, se usa la lista que viene dentro.
+            - Las descargas solo se aceptan por HTTPS y desde dominios conocidos, y se comprueba la huella del archivo cuando la lista la incluye.
+            - Dentro de la aplicación EspaKodi, los APK ya se instalan desde la propia aplicación. Antes hacía falta Kodi 22 o tener el aparato rooteado, y si no, tocaba instalarlos a mano desde un gestor de archivos. Fuera de EspaKodi todo sigue igual.
+
+            Otras correcciones
+            - La información del motor en pantalla ya no se queda pegada cuando el vídeo se corta antes de empezar.
+            - Los códigos QR guardados en la carpeta temporal se borran cuando llevan más de un mes sin usarse.
+            - La dirección que se pasa al reproductor externo se construye igual que el resto, así que una IP con el puerto pegado ya no produce una dirección inválida.
+
+            Novedades de EKHorus 1.5.0:
+
+            Menú principal
+            - Ajustes pasa a ser la primera entrada, seguida de dos menús nuevos, Descargar APKs y EspaKodi Addons.
+
+            Descargar APKs
+            - Menú nuevo para descargar e instalar AceStream, AceServe, VLC y EspaKodi Warp, los APK que hacen falta en un Fire TV o un TV box, donde pasar ficheros al aparato es un engorro. Se bajan a la carpeta del dispositivo que elijas cada vez. Son versiones de 32 bits, las que instalan casi todos estos aparatos, y un aviso en el propio menú lo explica y enlaza a las de 64 bits.
+            - Antes de empezar se comprueba que se pueda escribir en la carpeta, no cuando ya llevas 100 MB descargados. El archivo solo pasa a llamarse .apk si la descarga termina entera, y luego se comprueba que no esté corrupto. Si el disco se queda sin espacio a mitad, la descarga avisa en lugar de dejar un APK truncado que parece bueno.
+            - El botón Cancelar detiene la descarga y no deja archivos a medias en la carpeta.
+            - Si el APK ya estaba descargado, se ofrece reutilizarlo en vez de bajarlo otra vez. Si el que había estaba dañado, se descarga de nuevo sin preguntar. Dos pulsaciones seguidas ya no se pisan entre ellas.
+            - En Android se ofrece instalar el APK directamente. En Kodi 22 o posterior abre el instalador del sistema, y con root puede usar pm install. Cuando el sistema no lo permite, se dan las instrucciones para instalarlo a mano desde un gestor de archivos, con un acceso directo a los ajustes de orígenes desconocidos.
+
+            EspaKodi Addons
+            - Menú nuevo con el ecosistema de addons de EspaKodi (EspaTV, EspaDaily, AtresDaily, StreamNinja, TopZilla, loiolog, Flow FavManager, loiolink, Elementum y youtube-dl), que muestra cuáles tienes instalados, cuáles deshabilitados y cuáles no.
+            - Los instala solos. Descarga el repositorio, lo registra y lanza la instalación, con reintentos y descarga directa del zip si Kodi se atasca. Si aun así falla, muestra las instrucciones para hacerlo a mano.
+            - Incluye el repositorio de Elementum, así que no hace falta añadir ninguna fuente. También se instala youtube-dl, desde el repositorio oficial de Kodi.
+            - Accesos al repositorio unificado y a la última versión del APK de EspaKodi.
+            - El menú comprueba qué addons hay instalados sin dejar un error en el registro de Kodi por cada uno que falte.
+            - Los repositorios que se descargan se validan antes de extraerse, y se rechaza cualquier ZIP con rutas manipuladas que intentara escribir fuera de la carpeta de addons.
+
+            Ajustes y descargas
+            - En los ajustes, los tres controles más usados (redirección a StreamNinja, reproductor externo y motor ace) pasan a estar los primeros.
+            - Arreglada la barra de progreso de las descargas, que saltaba al 100% al instante y se quedaba clavada. Afectaba también a la instalación del motor AceStream.
+
+            Novedades de EKHorus 1.4.0:
+
+            Seguridad
+            - Eliminado el uso de eval() en todo el addon. Antes, una lista de canales cargada desde una web podía ejecutar código arbitrario en el equipo, porque lo descargado se interpretaba como código Python. Ahora se interpreta como datos (JSON o literales) y nunca se ejecuta. Esto también afectaba a las cabeceras que llegan de otros addons, a los ajustes guardados y a los parámetros de las llamadas externas.
+
+            Cuelgues y rendimiento
+            - Todas las peticiones de red tienen ya un tiempo límite. Antes, un motor AceStream inalcanzable (IP mal configurada, equipo apagado) o una web de listas que no respondiera dejaban Kodi congelado.
+            - Las descargas tienen un tope de tamaño, así que una dirección que devolviera gigabytes ya no puede agotar la memoria del equipo.
+            - La limpieza de caché ya no recorre el disco entero. Antes, si no encontraba la carpeta de caché, escaneaba C:\ (o toda la memoria en Android) al terminar cada reproducción. Ahora comprueba las rutas conocidas y como mucho busca dentro de la carpeta del motor.
+            - La versión del motor se consulta una sola vez, no en cada comprobación, así que el menú principal y el arranque de la reproducción van bastante más rápido.
+            - Los códigos QR se generan una única vez y se reutilizan. Antes se reescribía un PNG por canal cada vez que se pintaba la lista.
+            - Pintar una lista larga ya no relee los ajustes una vez por canal, ni reescribe el fichero de configuración al terminar cada reproducción.
+
+            Integridad de los datos
+            - El historial se escribe de forma atómica, así que si Kodi se cierra a mitad el fichero anterior queda intacto en vez de corromperse. Y si aun así apareciera dañado, el addon lo ignora en vez de fallar al abrir el historial.
+            - Un código QR a medio escribir ya no queda cacheado como válido, se regenera.
+
+            Compatibilidad
+            - Eliminado distutils y las llamadas a setDaemon(), ambos retirados en Python 3.12. El addon habría dejado de arrancar en las próximas versiones de Kodi.
+            - Eliminada la dependencia script.module.six (compatibilidad con Python 2, ya innecesaria) y declarada la dependencia de xbmc.python 3.0.0.
+            - Los ajustes internos del addon (último ID, última búsqueda, ruta de la caché) ya se declaran como es debido. En Kodi 19 y posteriores podían no llegar a guardarse, y por eso "recordar el último ID" fallaba entre sesiones.
+
+            Correcciones
+            - Al reenviar un enlace a StreamNinja ya no aparece un aviso de "reproducción fallida" fantasma encima del vídeo que sí se estaba abriendo.
+            - Un .torrent o un magnet inválido enviado por otro addon ya avisa en vez de no hacer absolutamente nada.
+            - Los enlaces sin nombre ya no impiden reproducir. Antes, si el motor no daba título, la reproducción moría en silencio antes de empezar.
+            - En OSMC, LibreELEC y Raspberry el motor podía darse por no arrancado y agotar la espera aunque ya estuviera funcionando.
+            - El motor arranca aunque esté instalado en una ruta con espacios (por ejemplo un usuario de Windows llamado "Juan Pérez"). Antes no arrancaba nunca.
+            - Si en la dirección del motor hay algo raro (esquema, barra final, espacios, un puerto pegado) ahora se entiende igual, en vez de dejar el addon mudo.
+            - Un servicio que no sea AceStream respondiendo en la dirección configurada (un router, por ejemplo) ya no provoca un error interno.
+            - El OSD ya no impide reproducir con skins que no declaran su resolución. Antes, con uno de esos, no arrancaba ningún vídeo.
+            - Se acabaron las notificaciones de error por duplicado. Al fallar el arranque de un enlace se mostraba un segundo error inventado por el intento de parar un stream que nunca llegó a existir.
+            - El menú del addon abre al instante aunque el motor esté configurado en un equipo remoto apagado. Antes se quedaba bloqueado hasta diez segundos en cada apertura.
+            - Reproducir desde el historial conserva el título, la carátula y la sinopsis. Antes se perdían y la entrada se degradaba a un código.
+            - Una búsqueda sin resultados (o cancelada) ya no deja una lista fantasma con solo los encabezados de origen.
+            - Al buscar por texto, si uno de los dos buscadores está caído ya no se pierde también el otro. Antes un fallo en el primero anulaba la búsqueda entera.
+            - Una entrada defectuosa dentro de una lista ya no descarta la lista completa, se ignora esa y se cargan las demás.
+            - Si la instalación del motor quedó a medias, intentar reproducir mostraba un fallo interno en vez del aviso correspondiente.
+            - Los enlaces ass:// ya no dependen en exclusiva de Google DNS. Si está bloqueado, se prueba con Cloudflare.
+            - Los fallos de búsqueda ya no se silencian. Si una lista falla por red o por formato queda registrado en el log, en vez de aparecer siempre como "no se han encontrado enlaces".
+            - El historial reordena, lo último visto vuelve al principio. Se amplía a 20 elementos y ahora se puede borrar, entero o elemento a elemento, desde el menú contextual (vaciarlo del todo pide confirmación).
+            - Las listas que traen carátula propia vuelven a mostrarla. Hasta ahora se descartaba y se ponía el icono del addon.
+            - Detener el motor es ahora fiable. Se ha corregido un fallo que podía saltar si el motor terminaba justo en ese momento, y en Linux ya no se queda a medias cuando el sistema no admite el método habitual.
+            - En Windows, cerrar el motor ya no abre una consola negra encima de Kodi.
+            - La instalación del motor ya no se queda colgada para siempre si el servidor de descarga no responde, y ahora avisa si la descarga falla en vez de terminar en silencio.
+            - Corregida la etiqueta de velocidad de descarga del OSD, que mostraba el texto de "Estado".
+            - Un vídeo que se cortaba nada más arrancar dejaba un error interno y de paso no llegaba a limpiar la caché del motor.
+            - El diálogo de progreso ya no se queda colgado en pantalla si algo falla mientras se abre el enlace.
+            - Los mensajes de error del motor se muestran limpios, sin los símbolos sueltos que arrastraban.
+            - El código QR solo se genera para los enlaces de verdad, no para los encabezados de origen de las listas.
+            - Un valor mal escrito en la IP o el puerto del motor ya no impide que el addon arranque, se usa el puerto por omisión en vez de dejar de cargar.
+            - Al vaciar el historial desde el menú contextual, la lista se refresca en el acto. Antes se quedaba en pantalla la lista ya borrada.
+            - Las llamadas de otros addons ya no fallan si algún parámetro contiene el carácter '='.
+
+            Novedades de EKHorus 1.3.2:
+            - Redirección a StreamNinja: ajuste nuevo que reenvía las llamadas de otros addons a horus al reproductor de StreamNinja, con protección anti-bucle.
+            - Arreglado un fallo que impedía cargar el addon: el QR ahora usa pyqrcode (dependencia disponible) y es opcional.
+            - Recuperado el diálogo de confirmación antes de abrir el motor AceStream en Android.
+            - Cancelar la búsqueda ya no deja una entrada vacía.
+            - Aviso al introducir un ID no válido, en vez de fallar en silencio.
+            - Renombrado a EKHorus (adaptación para EspaKodi): nombre y enlaces de la comunidad. El id sigue siendo script.module.horus para no romper las llamadas de otros addons. Dependencia añadida: script.module.pyqrcode.
         </news>
-        <forum>https://t.me/espakodi
-        https://espatv.github.io/ekstreaming</forum>
+        <forum>https://t.me/espakodi</forum>
+        <website>https://espatv.github.io/ekstreaming</website>
     </extension>
 </addon>

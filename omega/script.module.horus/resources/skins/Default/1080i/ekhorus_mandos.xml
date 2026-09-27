@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window type="dialog">
+    <!-- It points at the X and not at the list: when the window loads the list is still
+         empty and takes no focus, so Kodi left an error in the log on every opening. The
+         focus is set by onInit as soon as there are rows. -->
+    <defaultcontrol>100</defaultcontrol>
+    <controls>
+
+        <!-- Addon background, veil and stepped gradient towards the left: the text in the
+             list has to be readable on top of any fanart -->
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>1080</height>
+            <aspectratio>scale</aspectratio>
+            <texture background="true" fallback="special://home/addons/script.module.horus/icon.png">special://home/addons/script.module.horus/fanart.jpg</texture>
+        </control>
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>1080</height>
+            <texture colordiffuse="F20F1216">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>0</left><top>0</top><width>320</width><height>1080</height>
+            <texture colordiffuse="CC0B0F14">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>320</left><top>0</top><width>320</width><height>1080</height>
+            <texture colordiffuse="880B0F14">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+
+        <!-- Header. Nothing clickable goes past x=1824: on a curved-screen phone the
+             last 96 px of the skin space already fall on the curve. -->
+        <control type="image">
+            <left>0</left><top>0</top><width>1920</width><height>104</height>
+            <texture colordiffuse="EE0B0F14">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>0</left><top>104</top><width>1920</width><height>2</height>
+            <texture colordiffuse="FFD9A520">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="image">
+            <left>96</left><top>24</top><width>56</width><height>56</height>
+            <aspectratio>keep</aspectratio>
+            <texture>special://home/addons/script.module.horus/resources/media/icono_aces_horus.png</texture>
+        </control>
+        <control type="label">
+            <left>168</left><top>26</top><width>560</width><height>52</height>
+            <font>font37</font>
+            <textcolor>FFF0F0F0</textcolor>
+            <aligny>center</aligny>
+            <label>[COLOR FFFFB70F][B]EK[/B][/COLOR]Horus[COLOR FF8A97A5]   ·   [/COLOR]Cuadro de mandos</label>
+        </control>
+        <control type="label">
+            <left>744</left><top>26</top><width>200</width><height>52</height>
+            <font>font12</font>
+            <textcolor>FF8A97A5</textcolor>
+            <aligny>center</aligny>
+            <label>$INFO[Window.Property(cm_version)]</label>
+        </control>
+
+        <!-- Right panel: the explanation of whatever holds the focus -->
+        <control type="image">
+            <left>1000</left><top>136</top><width>824</width><height>816</height>
+            <texture border="18" colordiffuse="B2080B0F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+        </control>
+        <control type="label">
+            <left>1032</left><top>160</top><width>760</width><height>56</height>
+            <font>font36_title</font>
+            <textcolor>FFF0F0F0</textcolor>
+            <wrapmultiline>true</wrapmultiline>
+            <label>$INFO[Window.Property(cm_titulo)]</label>
+        </control>
+        <control type="image">
+            <left>1032</left><top>226</top><width>760</width><height>2</height>
+            <texture colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <!-- Explanation and requirements in the same column. Splitting it into two boxes
+             of fixed height cut long text mid-line and left the bottom half empty when
+             the row had no requirements. -->
+        <control type="textbox">
+            <left>1032</left><top>248</top><width>740</width><height>672</height>
+            <font>font12</font>
+            <textcolor>FFD8DDE3</textcolor>
+            <pagecontrol>300</pagecontrol>
+            <label>$INFO[Window.Property(cm_plot)]</label>
+        </control>
+        <control type="scrollbar" id="300">
+            <left>1792</left><top>248</top><width>20</width><height>672</height>
+            <orientation>vertical</orientation>
+            <showonepage>false</showonepage>
+            <texturesliderbackground border="8" colordiffuse="18FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturesliderbackground>
+            <texturesliderbar border="8" colordiffuse="99D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturesliderbar>
+            <texturesliderbarfocus border="8" colordiffuse="FFD9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturesliderbarfocus>
+            <textureslidernib>special://home/addons/script.module.horus/resources/media/transparent.png</textureslidernib>
+            <textureslidernibfocus>special://home/addons/script.module.horus/resources/media/transparent.png</textureslidernibfocus>
+            <onleft>200</onleft>
+            <onright>300</onright>
+            <onup>300</onup>
+            <ondown>300</ondown>
+        </control>
+
+        <!-- A textbox takes no focus, so what turns the pages with the remote is this
+             invisible button on top of the text, as in DialogTextViewer. -->
+        <control type="button" id="301">
+            <left>1032</left><top>248</top><width>740</width><height>672</height>
+            <label></label>
+            <texturefocus>special://home/addons/script.module.horus/resources/media/transparent.png</texturefocus>
+            <texturenofocus>special://home/addons/script.module.horus/resources/media/transparent.png</texturenofocus>
+            <onclick>PageDown(300)</onclick>
+            <onup>PageUp(300)</onup>
+            <ondown>PageDown(300)</ondown>
+            <onleft>200</onleft>
+            <onright>301</onright>
+        </control>
+        <control type="image">
+            <left>1000</left><top>136</top><width>824</width><height>816</height>
+            <texture border="18" colordiffuse="FFD9A520">special://home/addons/script.module.horus/resources/media/pill_borde.png</texture>
+            <visible>Control.HasFocus(301)</visible>
+        </control>
+
+        <!-- Engine status bar and remote legend -->
+        <control type="image">
+            <left>0</left><top>968</top><width>1920</width><height>2</height>
+            <texture colordiffuse="33D9A520">special://home/addons/script.module.horus/resources/media/white.png</texture>
+        </control>
+        <control type="label">
+            <left>96</left><top>986</top><width>1130</width><height>44</height>
+            <font>font14</font>
+            <textcolor>FFB8C2CE</textcolor>
+            <aligny>center</aligny>
+            <label>$INFO[Window.Property(cm_estado)]</label>
+        </control>
+        <control type="label">
+            <left>1250</left><top>986</top><width>574</width><height>44</height>
+            <font>font12</font>
+            <textcolor>FF8A97A5</textcolor>
+            <align>right</align>
+            <aligny>center</aligny>
+            <label>[B]OK[/B] cambia    ·    [B]Derecha[/B] lee    ·    [B]Atrás[/B] cierra</label>
+            <visible>!Control.HasFocus(301)</visible>
+        </control>
+        <control type="label">
+            <left>1150</left><top>986</top><width>674</width><height>44</height>
+            <font>font12</font>
+            <textcolor>FF8A97A5</textcolor>
+            <align>right</align>
+            <aligny>center</aligny>
+            <label>[B]Arriba[/B] y [B]Abajo[/B] pasan página    ·    [B]Izquierda[/B] vuelve</label>
+            <visible>Control.HasFocus(301)</visible>
+        </control>
+
+        <!-- Control list. 136 px rows: they can be pressed with a finger without aiming.
+             The text column is 480 px because "Probar suerte en StreamNinja" takes 468 in
+             Estuary's font14; the switch shrank to 220 px to make room, and DESACTIVADO,
+             its longest text, takes 169 in font12. -->
+        <control type="list" id="200">
+            <left>96</left><top>136</top><width>856</width><height>816</height>
+            <orientation>vertical</orientation>
+            <pagecontrol>-1</pagecontrol>
+            <scrolltime tween="cubic" easing="out">240</scrolltime>
+            <onup>101</onup>
+            <ondown>200</ondown>
+            <onleft>200</onleft>
+            <onright>301</onright>
+            <animation effect="fade" start="0" end="100" time="300">WindowOpen</animation>
+            <animation effect="slide" start="-40,0" end="0,0" time="320" tween="cubic" easing="out">WindowOpen</animation>
+
+            <itemlayout width="856" height="116">
+                <control type="image">
+                    <left>0</left><top>6</top><width>856</width><height>104</height>
+                    <texture border="18" colordiffuse="12FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                </control>
+                <control type="image">
+                    <left>32</left><top>34</top><width>48</width><height>48</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture colordiffuse="FF8A97A5">$INFO[ListItem.Property(f_icono)]</texture>
+                </control>
+                <control type="label">
+                    <left>104</left><top>26</top><width>480</width><height>34</height>
+                    <font>font14</font>
+                    <textcolor>FFD8DDE3</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>104</left><top>60</top><width>480</width><height>28</height>
+                    <font>font12</font>
+                    <textcolor>FF6E7A88</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pista)]</label>
+                </control>
+                <control type="label">
+                    <left>520</left><top>32</top><width>304</width><height>52</height>
+                    <font>font14</font>
+                    <textcolor>FFB8C2CE</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+                <!-- Result of the probe. It is written by a thread, which can only touch
+                     window properties; the row just says that this text goes here. -->
+                <control type="label">
+                    <left>520</left><top>32</top><width>304</width><height>52</height>
+                    <font>font14</font>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Window.Property(cm_resultado)]</label>
+                    <visible>!String.IsEmpty(ListItem.Property(f_resultado))</visible>
+                </control>
+
+                <!-- Switch. The text colour travels inside the property, so a single
+                     label is enough for the three states. -->
+                <control type="image">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <texture border="18" colordiffuse="FF3E9E63">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),on)</visible>
+                </control>
+                <control type="image">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <texture border="18" colordiffuse="FFB4463A">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),off)</visible>
+                </control>
+                <control type="image">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),gris)</visible>
+                </control>
+                <control type="label">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pastilla)]</label>
+                </control>
+
+                <!-- Engine selector: the chosen one in gold, the other dimmed -->
+                <control type="image">
+                    <left>516</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FFFFB70F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),ace)</visible>
+                </control>
+                <control type="image">
+                    <left>516</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),serve)</visible>
+                </control>
+                <control type="image">
+                    <left>676</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FFFFB70F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),serve)</visible>
+                </control>
+                <control type="image">
+                    <left>676</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),ace)</visible>
+                </control>
+                <control type="label">
+                    <left>516</left><top>32</top><width>148</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_ace)]</label>
+                </control>
+                <control type="label">
+                    <left>676</left><top>32</top><width>148</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_serve)]</label>
+                </control>
+            </itemlayout>
+
+            <focusedlayout width="856" height="116">
+                <control type="image">
+                    <left>0</left><top>6</top><width>856</width><height>104</height>
+                    <texture border="18" colordiffuse="3AD9A520">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                </control>
+                <control type="image">
+                    <left>0</left><top>30</top><width>8</width><height>56</height>
+                    <texture border="4" colordiffuse="FFFFB70F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                </control>
+                <control type="image">
+                    <left>32</left><top>34</top><width>48</width><height>48</height>
+                    <aspectratio>keep</aspectratio>
+                    <texture colordiffuse="FFFFB70F">$INFO[ListItem.Property(f_icono)]</texture>
+                </control>
+                <control type="label">
+                    <left>104</left><top>26</top><width>480</width><height>34</height>
+                    <font>font14</font>
+                    <textcolor>FFFFFFFF</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label]</label>
+                </control>
+                <control type="label">
+                    <left>104</left><top>60</top><width>480</width><height>28</height>
+                    <font>font12</font>
+                    <textcolor>FFB8C2CE</textcolor>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pista)]</label>
+                </control>
+                <control type="label">
+                    <left>520</left><top>32</top><width>304</width><height>52</height>
+                    <font>font14</font>
+                    <textcolor>FFFFB70F</textcolor>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Label2]</label>
+                </control>
+                <!-- Result of the probe. It is written by a thread, which can only touch
+                     window properties; the row just says that this text goes here. -->
+                <control type="label">
+                    <left>520</left><top>32</top><width>304</width><height>52</height>
+                    <font>font14</font>
+                    <align>right</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[Window.Property(cm_resultado)]</label>
+                    <visible>!String.IsEmpty(ListItem.Property(f_resultado))</visible>
+                </control>
+
+                <!-- Switch. The text colour travels inside the property, so a single
+                     label is enough for the three states. -->
+                <control type="image">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <texture border="18" colordiffuse="FF3E9E63">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),on)</visible>
+                </control>
+                <control type="image">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <texture border="18" colordiffuse="FFB4463A">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),off)</visible>
+                </control>
+                <control type="image">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_estado),gris)</visible>
+                </control>
+                <control type="label">
+                    <left>604</left><top>32</top><width>220</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_pastilla)]</label>
+                </control>
+
+                <!-- Engine selector: the chosen one in gold, the other dimmed -->
+                <control type="image">
+                    <left>516</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FFFFB70F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),ace)</visible>
+                </control>
+                <control type="image">
+                    <left>516</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),serve)</visible>
+                </control>
+                <control type="image">
+                    <left>676</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FFFFB70F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),serve)</visible>
+                </control>
+                <control type="image">
+                    <left>676</left><top>32</top><width>148</width><height>52</height>
+                    <texture border="18" colordiffuse="FF262E36">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+                    <visible>String.IsEqual(ListItem.Property(f_motor),ace)</visible>
+                </control>
+                <control type="label">
+                    <left>516</left><top>32</top><width>148</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_ace)]</label>
+                </control>
+                <control type="label">
+                    <left>676</left><top>32</top><width>148</width><height>52</height>
+                    <font>font12</font>
+                    <align>center</align>
+                    <aligny>center</aligny>
+                    <label>$INFO[ListItem.Property(f_serve)]</label>
+                </control>
+                <animation effect="zoom" start="100" end="102" center="428,58" time="180" tween="quadratic" easing="out">Focus</animation>
+                <animation effect="zoom" start="102" end="100" center="428,58" time="180" tween="quadratic" easing="out">UnFocus</animation>
+            </focusedlayout>
+        </control>
+
+        <!-- On desktop the list stops at four rows and half a column is left over. Rather
+             than leaving it empty, it holds what on Android is two buttons and here does
+             not exist. With six rows the list reaches the bottom and this is not painted. -->
+        <control type="image">
+            <left>96</left><top>736</top><width>856</width><height>210</height>
+            <texture border="18" colordiffuse="99080B0F">special://home/addons/script.module.horus/resources/media/pill.png</texture>
+            <visible>Integer.IsLess(Container(200).NumItems,6)</visible>
+        </control>
+        <control type="label">
+            <left>128</left><top>752</top><width>792</width><height>32</height>
+            <font>font12</font>
+            <textcolor>FFFFB70F</textcolor>
+            <label>[B]¿Y EL MOTOR?[/B]</label>
+            <visible>Integer.IsLess(Container(200).NumItems,6)</visible>
+        </control>
+        <control type="textbox">
+            <left>128</left><top>790</top><width>792</width><height>148</height>
+            <font>font12</font>
+            <textcolor>FFB8C2CE</textcolor>
+            <label>En Windows y en Linux lo pone EKHorus: lo descarga, lo arranca y lo detiene solo, y si ya tienes uno corriendo en esa dirección lo aprovecha. Elegir entre AceStream y AceServe, y mandar el vídeo a otro reproductor, son cosas de Android.</label>
+            <visible>Integer.IsLess(Container(200).NumItems,6)</visible>
+        </control>
+
+        <!-- Engine indicators. The circle says who is answering right now; the name, in
+             gold, which one is chosen. They take focus to read their explanation. -->
+        <control type="button" id="101">
+            <left>1200</left><top>22</top><width>248</width><height>60</height>
+            <font>font13</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FFB8C2CE</textcolor>
+            <focusedcolor>FFFFFFFF</focusedcolor>
+            <label>$INFO[Window.Property(cm_ace)]</label>
+            <texturefocus border="18" colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturefocus>
+            <texturenofocus border="18" colordiffuse="14FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturenofocus>
+            <onup>101</onup>
+            <ondown>200</ondown>
+            <onleft>101</onleft>
+            <onright condition="Control.IsVisible(102)">102</onright>
+            <onright condition="!Control.IsVisible(102)">100</onright>
+        </control>
+        <control type="button" id="102">
+            <left>1464</left><top>22</top><width>248</width><height>60</height>
+            <font>font13</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FFB8C2CE</textcolor>
+            <focusedcolor>FFFFFFFF</focusedcolor>
+            <label>$INFO[Window.Property(cm_serve)]</label>
+            <texturefocus border="18" colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturefocus>
+            <texturenofocus border="18" colordiffuse="14FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturenofocus>
+            <visible>!String.IsEmpty(Window.Property(cm_serve))</visible>
+            <onup>102</onup>
+            <ondown>200</ondown>
+            <onleft>101</onleft>
+            <onright>100</onright>
+        </control>
+
+        <!-- The X goes last on purpose: if Kodi could not focus the default control,
+             the focus is taken by the first one that does accept it. -->
+        <control type="button" id="100">
+            <left>1740</left><top>22</top><width>84</width><height>60</height>
+            <font>font32</font>
+            <align>center</align>
+            <aligny>center</aligny>
+            <textcolor>FF8A97A5</textcolor>
+            <focusedcolor>FFFFB70F</focusedcolor>
+            <!-- A keyboard X and not a typographic cross: the Estuary font does not carry
+                 every symbol and an empty box on the close button is fatal -->
+            <label>X</label>
+            <texturefocus border="18" colordiffuse="66D9A520">special://home/addons/script.module.horus/resources/media/pill.png</texturefocus>
+            <texturenofocus border="18" colordiffuse="14FFFFFF">special://home/addons/script.module.horus/resources/media/pill.png</texturenofocus>
+            <onup>100</onup>
+            <ondown>200</ondown>
+            <onleft condition="Control.IsVisible(102)">102</onleft>
+            <onleft condition="!Control.IsVisible(102)">101</onleft>
+            <onright>100</onright>
+        </control>
+
+    </controls>
+</window>

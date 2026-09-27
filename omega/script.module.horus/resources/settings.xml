@@ -1,22 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <settings>
-    <category label="EKHorus">
+    <!-- Old format on purpose. The eq(-1)/eq(-2) conditions below are POSITIONAL and Kodi
+         resolves them INSIDE the same category, so splitting the options into sections is
+         safe as long as install_acestream, stop_acestream and the install button stay
+         together and in that order. -->
+    <category label="30107">
+        <setting id="ace_engine" type="select" label="30045" values="org.acestream.----|org.free.aceserve" default="org.acestream.----" visible="System.Platform.Android"/>
         <setting id="ip_addr" type="text" label="30024" default="127.0.0.1" />
         <setting id="ace_port" type="text" label="30025" default="6878" />
+        <setting id="aceserve_port" type="text" label="30087" default="" visible="System.Platform.Android"/>
         <setting id="time_limit" type="slider" label="30026" default="30" range="10,2,120" option="int" />
-        <setting id="show_osd" type="bool" label="30043" default="true"/>
-        <setting id="remerber_last_id" type="bool" label="30044" default="true"/>
-        <setting id="show_qr_codes" type="bool" label="30046" default="false"/>
-        <setting id="redirect_streamninja" type="bool" label="30047" default="false" visible="System.HasAddon(plugin.video.streamninja)"/>
-        <!-- Android -->
-        <setting id="reproductor_externo" type="bool" label="30039" default="false" visible="System.Platform.Android"/>
-        <setting id="ace_engine" type="select" label="30045" values="org.acestream.----|org.free.aceserve" default="org.acestream.----" visible="System.Platform.Android"/>
-        
-        <!--Windows y linux no ubuntu -->
+
+        <!--Windows and linux other than ubuntu -->
+        <!-- These three go together and in this order. stop_acestream and the button below
+             point at install_acestream by counting positions with eq(-1) and eq(-2) -->
         <setting id="install_acestream" type="text" default="false" visible="false"/>
         <setting id="stop_acestream" type="bool" label="30042" default="false" visible="!eq(-1,false)+!System.Platform.Android"/>
         <setting label="30028" type="action"  action="RunPlugin(plugin://script.module.horus?action=install_acestream)"
                      visible="!eq(-2,false)+!System.Platform.Android" option="close"/>
 
+        <!-- Internal settings the addon writes by itself. Since Kodi 19, setSetting()
+             discards ids not declared here. They go AFTER the button on purpose: the
+             eq(-1)/eq(-2) conditions above are POSITIONAL and would break if anything
+             were inserted above them. -->
+        <setting id="last_id" type="text" default="" visible="false"/>
+        <setting id="last_search" type="text" default="" visible="false"/>
+        <setting id="acestream_cachefolder" type="text" default="" visible="false"/>
+        <setting id="cmd_stop_acestream" type="text" default="" visible="false"/>
+        <setting id="linux_id" type="text" default="" visible="false"/>
+        <setting id="last_apk_folder" type="text" default="" visible="false"/>
+        <setting id="asistente_hecho" type="bool" default="false" visible="false"/>
+        <!-- Where the official Ace Stream app turned out to answer on Android when it was not
+             on ace_port, and the ace_port it was found under: with ace_port typed over, the
+             find is ignored (engine_port). Written by the addon, never shown. -->
+        <setting id="ace_port_hallado" type="text" default="" visible="false"/>
+        <setting id="ace_port_hallado_base" type="text" default="" visible="false"/>
+    </category>
+
+    <category label="30108">
+        <!-- On Android it goes out to the engine app by default: AceStream plays in its
+             own and AceServe needs a separate player. Inside Kodi it gives trouble. -->
+        <setting id="reproductor_externo" type="bool" label="30039" default="true" visible="System.Platform.Android"/>
+        <setting id="redirect_streamninja" type="bool" label="30047" default="false" visible="System.HasAddon(plugin.video.streamninja)"/>
+        <setting id="show_osd" type="bool" label="30043" default="true"/>
+        <!-- Switches playback to HLS, which is where the engine accepts these parameters.
+             Off by default: it only pays off when one particular channel sounds bad. -->
+        <setting id="transcode_audio" type="enum" label="30121" lvalues="30122|30123|30124" default="0"/>
+        <!-- Off by default: on, the service looks at every video Kodi starts. The History has a
+             button for it too. -->
+        <setting id="anotar_fuera" type="bool" label="30171" default="false"/>
+    </category>
+
+    <category label="30109">
+        <!-- Emergency exit: with this none of the addon's own windows opens and everything
+             goes back to being a Kodi listing. -->
+        <setting id="interfaz_clasica" type="bool" label="30105" default="false"/>
+        <setting id="remerber_last_id" type="bool" label="30044" default="true"/>
+        <!-- These two go together and in this order: qr_formato's eq(-1) is POSITIONAL and
+             points at show_qr_codes, so the format cannot show with no QR to format. -->
+        <setting id="show_qr_codes" type="bool" label="30046" default="false"/>
+        <setting id="qr_formato" type="bool" label="30120" default="false" visible="!eq(-1,false)"/>
+        <!-- Below the QR pair, because the eq(-1) above is POSITIONAL and anything inserted over
+             it would leave the QR format hanging off the wrong setting. The server walks eight
+             ports up from this one, so a busy port fixes itself. -->
+        <setting id="webapp_puerto" type="text" label="30127" default="8099"/>
+        <!-- How Reproducir identificador and Buscar enlaces ask for their text. Last, for the
+             same reason. An enum keeps the index, so it survives a change of language. -->
+        <setting id="escribir_con" type="enum" label="30158" lvalues="30159|30160|30161" default="0"/>
+        <!-- Last of the category, for the same reason. These two go together and in this
+             order: musica_url's eq(-1) is POSITIONAL and points at musica_fondo. Empty
+             address means the one the addon comes with. -->
+        <setting id="musica_fondo" type="bool" label="30164" default="true"/>
+        <setting id="musica_url" type="text" label="30165" default="" visible="!eq(-1,false)"/>
+        <!-- Which song it started at the time before, so the next opening picks another one.
+             Written by the addon, never shown. -->
+        <setting id="musica_ultima" type="text" default="" visible="false"/>
+        <!-- Whether the notice saying where to switch the music off has been shown already. -->
+        <setting id="musica_avisada" type="bool" default="false" visible="false"/>
+    </category>
+
+    <!-- New category, and at the end: it is the only area where inserting cannot affect
+         the first one's eq(-1)/eq(-2) conditions, which count positions. -->
+    <category label="30115">
+        <setting id="buscar_en_motor" type="bool" label="30119" default="true"/>
+        <setting id="mostrar_adultos" type="bool" label="30117" default="false"/>
+        <setting id="catalogo_ttl_horas" type="slider" label="30118" default="24" range="0,6,168" option="int"/>
     </category>
 </settings>

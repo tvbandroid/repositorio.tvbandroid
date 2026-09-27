@@ -1,0 +1,129 @@
+[
+    {
+        "filename": "AcS-3.2.22.3-armv7.apk",
+        "label": "AceStream 3.2.22.3 Premium mod (32 bits)",
+        "note": "Mod de la AceStream más nueva de la lista, sin anuncios y con el premium activado.\n\nLa de 32 bits vale para Fire TV Stick, TV box y casi cualquier aparato.\n\nNo se instala encima de otra AceStream Pro distinta. Si ya tienes una, desinstálala antes.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/AcS-3.2.22.3-armv7.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FAcS-3.2.22.3-armv7.apk",
+        "sha256": "d455cdbd03fce3aaca9ea15bfea79519cdb1dc594b6aecc84ce27ff1c858b9ae"
+    },
+    {
+        "filename": "AcS-3.2.22.3-armv8_64.apk",
+        "label": "AceStream 3.2.22.3 Premium mod (64 bits)",
+        "note": "Mod de la AceStream más nueva de la lista, sin anuncios y con el premium activado.\n\nLa de 64 bits es para móviles y aparatos que no instalan apps de 32 bits.\n\nNo se instala encima de otra AceStream Pro distinta. Si ya tienes una, desinstálala antes.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/AcS-3.2.22.3-armv8_64.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FAcS-3.2.22.3-armv8_64.apk",
+        "sha256": "76c7b17e7c52d1a9f696ae93fc12fd0b29b3c6087d120699a708d36258556459"
+    },
+    {
+        "filename": "AcS-3.2.19.7-armv7a-SinAnun+Mtr.apk",
+        "label": "AceStream 3.2.19.7 sin anuncios (32 bits)",
+        "note": "Ace Stream Pro sin anuncios y con el motor dentro, así que funciona sin descargar nada más. Va en cualquier aparato, también en móviles con los servicios de Google.\n\nSu reproductor, Ace Player, no tiene límite; los externos (VLC, MX) se cortan a los 5 minutos.\n\nNo se instala encima de otra AceStream Pro distinta. Si ya tienes una, desinstálala antes.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/AcS-3.2.19.7-armv7a-SinAnun%2BMtr.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FAcS-3.2.19.7-armv7a-SinAnun%2BMtr.apk",
+        "sha256": "63bf8ea7fb1d36eb267b0d493d8f467381cc4ccfaaa542f138e438f73507f4c6"
+    },
+    {
+        "filename": "AcS-3.2.19.7-arm64-SinAnun+Mtr.apk",
+        "label": "AceStream 3.2.19.7 sin anuncios (64 bits)",
+        "note": "Ace Stream Pro sin anuncios y con el motor dentro, así que funciona sin descargar nada más. Va en cualquier aparato, también en móviles con los servicios de Google.\n\nSu reproductor, Ace Player, no tiene límite; los externos (VLC, MX) se cortan a los 5 minutos.\n\nNo se instala encima de otra AceStream Pro distinta. Si ya tienes una, desinstálala antes.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/AcS-3.2.19.7-arm64-SinAnun%2BMtr.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FAcS-3.2.19.7-arm64-SinAnun%2BMtr.apk",
+        "sha256": "52ccdc6ccc3d53413891f54cc940dc8093657359dcc557e17013802fca7f643f"
+    },
+    {
+        "filename": "AcSEK-32bits_v3.apk",
+        "label": "AceStream EK v3 (32 bits)",
+        "note": "La mejor opción para Fire TV Stick. Es una versión limpia de AceStream 3.2.18 hecha por EspaKodi y muy probada; en los foros, la 3.2.18 es la versión de AceStream que más se recomienda para el Fire TV Stick. No tiene el anuncio al abrir ni los avisos de actualizar, no envía estadísticas y no puede instalar apps por su cuenta.\n\nTambién funciona en muchos TV box. No va en aparatos con chip de seguridad, porque con él AceStream puede comprobar que la app está modificada. Google exige ese chip a los que traen sus servicios oficiales, por eso casi nunca va en móviles. Los Fire TV y la mayoría de TV box chinos no lo tienen, y en estos, aunque lleven apps de Google, lo mejor es probar.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/AcSEK-32bits_v3.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FAcSEK-32bits_v3.apk",
+        "sha256": "4032a3e4d2e18fdea536c40f6f2b52e560604d9a18cd2924c982f9e1308473cf"
+    },
+    {
+        "filename": "AcSEK-64bits_v3.apk",
+        "label": "AceStream EK v3 (64 bits)",
+        "note": "Versión limpia de AceStream 3.2.18 hecha por EspaKodi, sin anuncios, sin avisos de actualizar y sin envío de estadísticas. En el cajón de apps se llama AceEK64 y puede convivir con las AceStream Pro de esta lista.\n\nPensada para TV box de 64 bits. No va en aparatos con chip de seguridad, porque con él AceStream puede comprobar que la app está modificada. Google exige ese chip a los que traen sus servicios oficiales, por eso casi nunca va en móviles. La mayoría de TV box chinos no lo tienen, y en estos, aunque lleven apps de Google, lo mejor es probar.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/AcSEK-64bits_v3.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FAcSEK-64bits_v3.apk",
+        "sha256": "be50a52df17c9bb98a777edf36b491b46e2ec47b71754221daa846f23c964915"
+    },
+    {
+        "filename": "Acserv-1.5.7-armeabi-v7a.apk",
+        "label": "AceServe 1.5.7 (32 bits)",
+        "note": "Motor de AceStream sin anuncios ni premium. No trae reproductor y dentro de Kodi falla, por eso necesita VLC, que también está en esta lista. En los ajustes de EKHorus elige AceServe en Motor ace y deja encendido Reproductor externo.\n\nUsa el mismo puerto que AceStream, así que no tengas los dos abiertos a la vez.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/Acserv-1.5.7-armeabi-v7a.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FAcserv-1.5.7-armeabi-v7a.apk",
+        "sha256": "50f8bf71e7dfa93068f064f53af0a9a53efc279ab031332a40d5dda8b0c40d24"
+    },
+    {
+        "filename": "Acserv-1.5.7-arm64-v8a.apk",
+        "label": "AceServe 1.5.7 (64 bits)",
+        "note": "Motor de AceStream sin anuncios ni premium. No trae reproductor y dentro de Kodi falla, por eso necesita VLC. En los ajustes de EKHorus elige AceServe en Motor ace y deja encendido Reproductor externo.\n\nLa de 64 bits es para móviles y aparatos que no instalan apps de 32 bits. En esos, el VLC de esta lista, que es de 32 bits, tampoco se instala; bájalo de la tienda de aplicaciones.\n\nUsa el mismo puerto que AceStream, así que no tengas los dos abiertos a la vez.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/Acserv-1.5.7-arm64-v8a.apk",
+        "sha256": "3e4232a039c633cda332c9cf180539a8de11bc060336f39a0f04f330a1bed9c5"
+    },
+    {
+        "filename": "VLCrepr-3.6.5-armeabi-v7a.apk",
+        "label": "VLC 3.6.5 (32 bits)",
+        "note": "El reproductor VLC de VideoLAN. Con AceServe es obligatorio, porque AceServe no trae reproductor y dentro de Kodi falla; los canales se ven en VLC. Para eso deja encendido Reproductor externo en los ajustes de EKHorus.\n\nTambién sirve para casi cualquier otro vídeo.\n\nEs de 32 bits y va en Fire TV Stick, TV box y la mayoría de aparatos de 64 bits.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/VLCrepr-3.6.5-armeabi-v7a.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FVLCrepr-3.6.5-armeabi-v7a.apk",
+        "sha256": "ce1c025ed804a6ae87ebbc2bf1cfc61f1a7d0ddfdddfb2ce6ac9bfbbf13925c4"
+    },
+    {
+        "filename": "EKdi-0.1.2-armeabi-v7a.apk",
+        "label": "EspaKodi 0.1.2 Venom (32 bits)",
+        "note": "Kodi en español con los addons de EspaKodi ya puestos: EKHorus, EspaDaily, AtresDaily, EspaTV, StreamNinja, TopZilla, YouTube, LoioLink y más. Convive con el Kodi oficial.\n\nSe instala encima de la versión anterior y de EspaKodi Warp sin perder favoritos, addons ni ajustes, pero no encima de LaRoja.\n\nLa de 32 bits es la de Fire TV Stick y TV box. También trae la cruceta en pantalla, pero desactivada de fábrica, porque está pensada para usarla con mando.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/EKdi-0.1.2-armeabi-v7a.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FEKdi-0.1.2-armeabi-v7a.apk",
+        "sha256": "a27beae6199fd15082689a91aea8c53ac45d2606e24d80b387732e7d505f0912"
+    },
+    {
+        "filename": "EKdi-0.1.2-arm64-v8a.apk",
+        "label": "EspaKodi 0.1.2 Venom (64 bits)",
+        "note": "Kodi en español con los addons de EspaKodi ya puestos: EKHorus, EspaDaily, AtresDaily, EspaTV, StreamNinja, TopZilla, YouTube, LoioLink y más. Convive con el Kodi oficial.\n\nSe instala encima de la versión anterior y de EspaKodi Warp sin perder favoritos, addons ni ajustes, pero no encima de LaRoja.\n\nLa de 64 bits es para el móvil y trae la cruceta en pantalla para moverte donde no llega el dedo.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/EKdi-0.1.2-arm64-v8a.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FEKdi-0.1.2-arm64-v8a.apk",
+        "sha256": "9f9666c694b5ac88c2e68056e813e5e8659f60e2e47f2ba7cfe3d25aab481d52"
+    },
+    {
+        "filename": "EKlRoja-0.0.3_32bits.apk",
+        "label": "EspaKodi LaRoja 0.0.3 (32 bits)",
+        "note": "Kodi ligero basado en EspaKodi Warp y vestido de selección, con tema rojo y amarillo, la foto de España levantando la copa de fondo y sonido de tambor al moverte con el mando. El botón de apagar cierra Kodi del todo y no deja la pantalla negra al volver a entrar. Trae EKHorus.\n\nPuede convivir con EspaKodi y con Warp. La de 32 bits está pensada para usarla con mando y no lleva cruceta en pantalla.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/EKlRoja-0.0.3_32bits.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FEKlRoja-0.0.3_32bits.apk",
+        "sha256": "e806fe28e6608223e7aba505ecaa73b57ab40b7407ca11c6d6b5cdd58b3a1f0c"
+    },
+    {
+        "filename": "EKlRoja-0.0.3_64bits.apk",
+        "label": "EspaKodi LaRoja 0.0.3 (64 bits)",
+        "note": "Kodi ligero basado en EspaKodi Warp y vestido de selección, con tema rojo y amarillo, la foto de España levantando la copa de fondo y sonido de tambor al moverte con el mando. El botón de apagar cierra Kodi del todo y no deja la pantalla negra al volver a entrar. Trae EKHorus.\n\nPuede convivir con EspaKodi y con Warp. La de 64 bits lleva la cruceta en pantalla de EspaKodi Venom, para el móvil.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/EKlRoja-0.0.3_64bits.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FEKlRoja-0.0.3_64bits.apk",
+        "sha256": "b9b2aa7364ac7a72b566bc1705fb14c290b1d58fe64d1c41578fd368bf43386c"
+    },
+    {
+        "filename": "1111War.6.38.8Mand0.apk",
+        "label": "Cloudflare WARP 1.1.1.1 6.38.8",
+        "note": "Cloudflare WARP gratis, en una versión arreglada para que se vea y se maneje bien con el mando en la tele. No la ha modificado EspaKodi y no tiene nada que ver con EspaKodi Warp.\n\nFunciona como una VPN y sirve para saltarse bloqueos y proteger tus datos casi sin perder velocidad, pero no deja elegir país. Durante los partidos las operadoras bloquean la red de Cloudflare y a veces se queda colgado; para eso va mejor una VPN que salga por otro país.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/1111War.6.38.8Mand0.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2F1111War.6.38.8Mand0.apk",
+        "sha256": "3c2eac4231d65d52f09c805ac958d4b3280073e56afb5d146db5f5bdc5642268"
+    },
+    {
+        "filename": "PriVP.apk",
+        "label": "PrivadoVPN 4.2.14",
+        "note": "VPN con 10 GB gratis al mes y salida por otros países, útil cuando las operadoras bloquean durante los partidos. Es la app oficial y tiene versión para Android TV, así que se maneja con el mando.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/PriVP.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FPriVP.apk",
+        "sha256": "5aa28f02e6d22baf4d741d012e410647b331dc2b34bb003606eda2af5bce678d"
+    },
+    {
+        "filename": "Wndsbe-4.2.apk",
+        "label": "Windscribe VPN 4.2",
+        "note": "VPN con hasta 10 GB gratis al mes y salida por otros países, útil cuando las operadoras bloquean durante los partidos.",
+        "url": "https://github.com/espakodi/misappsfavoritas/releases/download/v0.0.1test/Wndsbe-4.2.apk",
+        "backup": "https://archive.org/download/ekh_20260918/ekh.zip/ekh%2FWndsbe-4.2.apk",
+        "sha256": "b17989f252f501fe6ea56c5d66a948a403f5f777d550adc118b2d82349c91931"
+    }
+]

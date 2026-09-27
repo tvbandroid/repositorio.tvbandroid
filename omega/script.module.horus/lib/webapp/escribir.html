@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0F1216">
+  <title>EKHorus</title>
+  <link rel="icon" href="/media/icono_aces_horus.png">
+  <link rel="stylesheet" href="/estilo.css">
+  <!-- Served by lib/webapp/receiver.py and never by the phone page's server, which is why this
+       file is not in static/. The colours and the box come from the phone page's stylesheet. -->
+  <style>
+    main {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 22px 16px calc(28px + env(safe-area-inset-bottom));
+    }
+
+    h1 { margin: 0 0 8px; font-size: 20px; }
+    .pista { margin: 0 0 18px; color: var(--tenue); font-size: 14px; line-height: 1.5; }
+
+    /* 16px: with less, iOS zooms the whole page in as soon as the box gets the focus. */
+    .buscador { margin: 0 0 14px; }
+    .buscador input { height: 48px; border-radius: 14px; font-size: 16px; }
+    .limpiar { top: 10px; }
+
+    .accion:disabled { opacity: .55; }
+    .aviso { margin: 14px 0 0; }
+    .aviso.bien { border-color: var(--verde); }
+    .aviso.mal { border-color: var(--rojo); }
+
+    .firma { margin: 28px 0 0; text-align: center; color: var(--tenue); font-size: 12px; }
+    .firma b { color: var(--texto); font-weight: 600; }
+  </style>
+</head>
+
+<body>
+
+  <header id="cabecera">
+    <div class="barra">
+      <div class="marca">
+        <img src="/media/icono_aces_horus.png" alt="">
+        <span><b>EK</b>Horus</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <h1>{{ENCABEZADO}}</h1>
+    <p class="pista">{{PISTA}}</p>
+
+    <form id="formulario" autocomplete="off">
+      <div class="buscador">
+        <!-- Empty on purpose. With the last identifier already in, a paste lands next to it and
+             the television picks up the old one. What is typed must arrive exactly as it is,
+             so the phone neither capitalises nor corrects it. -->
+        <input id="texto" type="text" autocomplete="off" autocapitalize="none" autocorrect="off"
+               spellcheck="false" enterkeyhint="send" aria-label="Texto para la tele"
+               placeholder="Escribe o pega aquí">
+        <button class="limpiar" id="btn_limpiar" type="button" aria-label="Vaciar" hidden>✕</button>
+      </div>
+      <button class="accion principal" id="btn_enviar" type="submit">Enviar a la tele</button>
+    </form>
+
+    <div id="aviso" class="aviso" role="status" hidden></div>
+
+    <p class="firma">Con la tecnología de <b>loiolink</b></p>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      // How long the button stays off after a send. A second tap straight away would find the
+      // server the television has just closed, and "sent" would turn into an error.
+      var PAUSA_MS = 3000;
+
+      var MENSAJES = {
+        400: 'Escribe algo antes de enviarlo.',
+        409: 'La tele ya había recibido otro texto.',
+        410: 'La tele ya no estaba esperando. Vuelve a abrir la pantalla del QR y envíalo otra vez.',
+        413: 'Es demasiado largo para mandarlo a la tele.'
+      };
+      var NO_ACEPTADO = 'La tele no lo ha aceptado. Vuelve a abrir la pantalla del QR y prueba otra vez.';
+      var NO_LLEGA = 'No llega a la tele. Comprueba que el QR sigue en pantalla y que estás en la misma red.';
+
+      var formulario = document.getElementById('formulario');
+      var caja = document.getElementById('texto');
+      var limpiar = document.getElementById('btn_limpiar');
+      var enviar = document.getElementById('btn_enviar');
+      var aviso = document.getElementById('aviso');
+
+      // The attribute and not the hidden property, which old Android browsers do not have.
+      function mostrar(elemento, visible) {
+        if (visible) {
+          elemento.removeAttribute('hidden');
+        } else {
+          elemento.setAttribute('hidden', '');
+        }
+      }
+
+      function avisar(texto, clase) {
+        aviso.textContent = texto;
+        aviso.className = 'aviso ' + clase;
+        mostrar(aviso, true);
+      }
+
+      function mirarLimpiar() {
+        mostrar(limpiar, caja.value !== '');
+      }
+
+      caja.addEventListener('input', mirarLimpiar);
+      limpiar.addEventListener('click', function () {
+        caja.value = '';
+        mirarLimpiar();
+        caja.focus();
+      });
+
+      formulario.addEventListener('submit', function (evento) {
+        evento.preventDefault();
+        if (enviar.disabled) {
+          return;
+        }
+
+        var texto = caja.value.trim();
+        if (!texto) {
+          avisar(MENSAJES[400], 'mal');
+          caja.focus();
+          return;
+        }
+
+        enviar.disabled = true;
+
+        // XMLHttpRequest and not fetch, which phones from before 2017 do not have.
+        var peticion = new XMLHttpRequest();
+        peticion.open('POST', '/texto');
+        peticion.setRequestHeader('Content-Type', 'application/json');
+        peticion.timeout = 15000;
+
+        peticion.onload = function () {
+          if (peticion.status === 200) {
+            caja.blur();
+            avisar('Enviado. Mira la tele.', 'bien');
+            // The text stays in the box: if the television could not use it, it is fixed here
+            // and sent again once the QR screen is open again.
+            setTimeout(function () { enviar.disabled = false; }, PAUSA_MS);
+            return;
+          }
+          enviar.disabled = false;
+          avisar(MENSAJES[peticion.status] || NO_ACEPTADO, 'mal');
+        };
+
+        peticion.onerror = peticion.ontimeout = function () {
+          enviar.disabled = false;
+          avisar(NO_LLEGA, 'mal');
+        };
+
+        peticion.send(JSON.stringify({ texto: texto }));
+      });
+    })();
+  </script>
+</body>
+
+</html>

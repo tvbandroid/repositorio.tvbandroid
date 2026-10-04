@@ -1,0 +1,975 @@
+# Kodi Media Center language file
+# Addon Name: Rivulet
+# Addon id: plugin.video.rivulet
+# Addon Provider: M0Rf30
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.rivulet\n"
+"Report-Msgid-Bugs-To: https://github.com/M0Rf30/plugin.video.rivulet/issues\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: M0Rf30\n"
+"Language-Team: Korean (한국어)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ko_KR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Discover"
+msgstr "탐색"
+
+msgctxt "#30001"
+msgid "Search"
+msgstr "검색"
+
+msgctxt "#30002"
+msgid "Library"
+msgstr "라이브러리"
+
+msgctxt "#30003"
+msgid "Addons"
+msgstr "애드온"
+
+msgctxt "#30004"
+msgid "Settings"
+msgstr "설정"
+
+msgctxt "#30010"
+msgid "Install addon from URL"
+msgstr "URL에서 애드온 설치"
+
+msgctxt "#30011"
+msgid "Remove addon"
+msgstr "애드온 제거"
+
+msgctxt "#30012"
+msgid "Addon installed"
+msgstr "애드온 설치됨"
+
+msgctxt "#30013"
+msgid "Addon removed"
+msgstr "애드온 제거됨"
+
+msgctxt "#30014"
+msgid "Invalid addon manifest"
+msgstr "잘못된 애드온 매니페스트"
+
+msgctxt "#30020"
+msgid "Login to Stremio"
+msgstr "Stremio에 로그인"
+
+msgctxt "#30021"
+msgid "Logout"
+msgstr "로그아웃"
+
+msgctxt "#30022"
+msgid "Logged in as %s"
+msgstr "%s로 로그인됨"
+
+msgctxt "#30023"
+msgid "Login failed"
+msgstr "로그인 실패"
+
+msgctxt "#30024"
+msgid "Stremio email"
+msgstr "Stremio 이메일"
+
+msgctxt "#30025"
+msgid "Password"
+msgstr "비밀번호"
+
+msgctxt "#30026"
+msgid "Showcase"
+msgstr "쇼케이스"
+
+msgctxt "#30030"
+msgid "No streams found"
+msgstr "스트림을 찾을 수 없음"
+
+msgctxt "#30031"
+msgid "Streaming server unavailable"
+msgstr "스트리밍 서버를 사용할 수 없음"
+
+msgctxt "#30032"
+msgid "Something went wrong"
+msgstr "문제가 발생했습니다"
+
+msgctxt "#30033"
+msgid "Loading…"
+msgstr "불러오는 중…"
+
+msgctxt "#30034"
+msgid "Addons synced"
+msgstr "애드온 동기화됨"
+
+msgctxt "#30035"
+msgid "Addon sync failed"
+msgstr "애드온 동기화 실패"
+
+msgctxt "#30036"
+msgid "Sync addons now"
+msgstr "지금 애드온 동기화"
+
+msgctxt "#30040"
+msgid "Next page"
+msgstr "다음 페이지"
+
+msgctxt "#30041"
+msgid "Streams"
+msgstr "스트림"
+
+msgctxt "#30042"
+msgid "New search…"
+msgstr "새 검색…"
+
+msgctxt "#30043"
+msgid "Type a new query"
+msgstr "새 검색어를 입력하세요"
+
+msgctxt "#30044"
+msgid "Clear search history"
+msgstr "검색 기록 지우기"
+
+msgctxt "#30045"
+msgid "Search again"
+msgstr "다시 검색"
+
+msgctxt "#30046"
+msgid "Remove every saved search?"
+msgstr "저장된 모든 검색을 삭제하시겠습니까?"
+
+msgctxt "#30100"
+msgid "General"
+msgstr "일반"
+
+msgctxt "#30101"
+msgid "Streaming server"
+msgstr "스트리밍 서버"
+
+msgctxt "#30102"
+msgid "Server URL"
+msgstr "서버 URL"
+
+msgctxt "#30103"
+msgid "Run embedded server"
+msgstr "내장 서버 실행"
+
+msgctxt "#30104"
+msgid "Server binary path"
+msgstr "서버 바이너리 경로"
+
+msgctxt "#30105"
+msgid "Account"
+msgstr "계정"
+
+msgctxt "#30050"
+msgid "Subtitles"
+msgstr "자막"
+
+msgctxt "#30051"
+msgid "Enable addon subtitles"
+msgstr "애드온 자막 사용"
+
+msgctxt "#30052"
+msgid "Preferred subtitle language"
+msgstr "선호하는 자막 언어"
+
+msgctxt "#30060"
+msgid "Download stremio-server binary"
+msgstr "stremio-server 바이너리 다운로드"
+
+msgctxt "#30061"
+msgid "Downloading stremio-server"
+msgstr "stremio-server 다운로드 중"
+
+msgctxt "#30062"
+msgid "Server binary installed (%s)"
+msgstr "서버 바이너리 설치됨 (%s)"
+
+msgctxt "#30063"
+msgid "Download failed"
+msgstr "다운로드 실패"
+
+msgctxt "#30064"
+msgid "No release asset for this platform"
+msgstr "이 플랫폼용 릴리스 파일이 없음"
+
+msgctxt "#30070"
+msgid "Playback"
+msgstr "재생"
+
+msgctxt "#30071"
+msgid "Pre-buffer torrents"
+msgstr "토렌트 사전 버퍼링"
+
+msgctxt "#30072"
+msgid "Pre-buffer size (MB)"
+msgstr "사전 버퍼 크기 (MB)"
+
+msgctxt "#30073"
+msgid "Sort streams by"
+msgstr "스트림 정렬 기준"
+
+msgctxt "#30074"
+msgid "Quality"
+msgstr "품질"
+
+msgctxt "#30075"
+msgid "Size"
+msgstr "크기"
+
+msgctxt "#30076"
+msgid "Seeders"
+msgstr "시더"
+
+msgctxt "#30065"
+msgid "Install recommended advancedsettings.xml"
+msgstr "권장 advancedsettings.xml 설치"
+
+msgctxt "#30066"
+msgid "advancedsettings.xml installed - restart Kodi to apply"
+msgstr "advancedsettings.xml 설치됨 - 적용하려면 Kodi를 재시작하세요"
+
+msgctxt "#30067"
+msgid "advancedsettings.xml already exists - merge changes manually"
+msgstr "advancedsettings.xml이 이미 존재함 - 수동으로 변경 사항을 병합하세요"
+
+msgctxt "#30068"
+msgid "Failed to install advancedsettings.xml"
+msgstr "advancedsettings.xml 설치 실패"
+
+msgctxt "#30069"
+msgid "Setting up streaming server…"
+msgstr "스트리밍 서버 설정 중…"
+
+msgctxt "#30080"
+msgid "Preparing stream"
+msgstr "스트림 준비 중"
+
+msgctxt "#30081"
+msgid "Buffering: %s of %s"
+msgstr "버퍼링: %s / %s"
+
+msgctxt "#30082"
+msgid "%s/s — %d peers"
+msgstr "%s/초 — 피어 %d개"
+
+msgctxt "#30083"
+msgid "Buffering timed out, starting anyway"
+msgstr "버퍼링 시간 초과, 그래도 시작함"
+
+msgctxt "#30084"
+msgid "No peers available for this stream"
+msgstr "이 스트림에 사용 가능한 피어가 없음"
+
+msgctxt "#30085"
+msgid "Session expired - please log in again"
+msgstr "세션이 만료되었습니다 - 다시 로그인해 주세요"
+
+msgctxt "#30086"
+msgid "Connecting to streaming server…"
+msgstr "스트리밍 서버에 연결 중…"
+
+msgctxt "#30087"
+msgid "Resolving stream…"
+msgstr "스트림 확인 중…"
+
+msgctxt "#30088"
+msgid "Fetching torrent metadata…"
+msgstr "토렌트 메타데이터 가져오는 중…"
+
+msgctxt "#30089"
+msgid "Warming torrent engine…"
+msgstr "토렌트 엔진 준비 중…"
+
+msgctxt "#30090"
+msgid "attempt %d of %d"
+msgstr "%d/%d번째 시도"
+
+msgctxt "#30091"
+msgid "Embedded server is not supported on Android - set Server URL to a server running elsewhere"
+msgstr "내장 서버는 Android에서 지원되지 않습니다 – 서버 URL을 다른 곳에서 실행 중인 서버로 설정하세요"
+
+msgctxt "#30092"
+msgid "Installed server binary cannot be executed on this device"
+msgstr "설치된 서버 바이너리를 이 장치에서 실행할 수 없습니다"
+
+msgctxt "#30110"
+msgid "BitTorrent"
+msgstr "BitTorrent"
+
+msgctxt "#30111"
+msgid "Server resources"
+msgstr "서버 리소스"
+
+msgctxt "#30112"
+msgid "Server proxy"
+msgstr "서버 프록시"
+
+msgctxt "#30113"
+msgid "Server add-ons"
+msgstr "서버 애드온"
+
+msgctxt "#30114"
+msgid "Server diagnostics"
+msgstr "서버 진단"
+
+msgctxt "#30115"
+msgid "BitTorrent listen port"
+msgstr "BitTorrent 수신 포트"
+
+msgctxt "#30116"
+msgid "Peers per torrent"
+msgstr "토렌트당 피어 수"
+
+msgctxt "#30117"
+msgid "Idle torrent timeout (seconds)"
+msgstr "유휴 토렌트 시간 초과 (초)"
+
+msgctxt "#30118"
+msgid "BitTorrent encryption"
+msgstr "BitTorrent 암호화"
+
+msgctxt "#30119"
+msgid "Prefer"
+msgstr "선호"
+
+msgctxt "#30120"
+msgid "Require"
+msgstr "필수"
+
+msgctxt "#30121"
+msgid "Disable"
+msgstr "사용 안 함"
+
+msgctxt "#30122"
+msgid "Anonymous mode"
+msgstr "익명 모드"
+
+msgctxt "#30123"
+msgid "Disable trackers"
+msgstr "트래커 사용 안 함"
+
+msgctxt "#30124"
+msgid "BitTorrent proxy (SOCKS/HTTP URL)"
+msgstr "BitTorrent 프록시 (SOCKS/HTTP URL)"
+
+msgctxt "#30125"
+msgid "Disable WebTorrent/WebRTC peers"
+msgstr "WebTorrent/WebRTC 피어 사용 안 함"
+
+msgctxt "#30126"
+msgid "Max trackers per torrent"
+msgstr "토렌트당 최대 트래커 수"
+
+msgctxt "#30127"
+msgid "Custom tracker list URL"
+msgstr "사용자 지정 트래커 목록 URL"
+
+msgctxt "#30128"
+msgid "Extra DHT bootstrap nodes"
+msgstr "추가 DHT 부트스트랩 노드"
+
+msgctxt "#30129"
+msgid "Memory cache size (MB, 0 = disk only)"
+msgstr "메모리 캐시 크기 (MB, 0 = 디스크만 사용)"
+
+msgctxt "#30130"
+msgid "Soft memory limit (MB, 0 = unlimited)"
+msgstr "소프트 메모리 제한 (MB, 0 = 무제한)"
+
+msgctxt "#30131"
+msgid "Proxy pre-buffer (segments)"
+msgstr "프록시 사전 버퍼 (세그먼트)"
+
+msgctxt "#30132"
+msgid "Proxy segment cache TTL (seconds)"
+msgstr "프록시 세그먼트 캐시 TTL (초)"
+
+msgctxt "#30133"
+msgid "Proxy password"
+msgstr "프록시 비밀번호"
+
+msgctxt "#30134"
+msgid "Proxy IP allow-list"
+msgstr "프록시 IP 허용 목록"
+
+msgctxt "#30135"
+msgid "Proxy public URL"
+msgstr "프록시 공개 URL"
+
+msgctxt "#30136"
+msgid "Proxy upstream URL"
+msgstr "프록시 업스트림 URL"
+
+msgctxt "#30137"
+msgid "Proxy signing secret"
+msgstr "프록시 서명 비밀 키"
+
+msgctxt "#30138"
+msgid "Enable DLNA casting"
+msgstr "DLNA 캐스팅 사용"
+
+msgctxt "#30139"
+msgid "Local IMDB resolution"
+msgstr "로컬 IMDB 확인"
+
+msgctxt "#30140"
+msgid "Metadata addon URL (blank = Cinemeta, \"off\" to disable)"
+msgstr "메타데이터 애드온 URL (공백 = Cinemeta, \"off\"로 비활성화)"
+
+msgctxt "#30141"
+msgid "Bitmagnet indexer URL"
+msgstr "Bitmagnet 인덱서 URL"
+
+msgctxt "#30142"
+msgid "Torznab indexer URL"
+msgstr "Torznab 인덱서 URL"
+
+msgctxt "#30143"
+msgid "Torznab API key"
+msgstr "Torznab API 키"
+
+msgctxt "#30144"
+msgid "Web UI location"
+msgstr "웹 UI 위치"
+
+msgctxt "#30145"
+msgid "HTTPS port (0 = disabled)"
+msgstr "HTTPS 포트 (0 = 사용 안 함)"
+
+msgctxt "#30146"
+msgid "pprof diagnostics address"
+msgstr "pprof 진단 주소"
+
+msgctxt "#30147"
+msgid "Stremio account auth key (HTTPS auto-cert)"
+msgstr "Stremio 계정 인증 키 (HTTPS 자동 인증서)"
+
+msgctxt "#30148"
+msgid "Browse catalogs from your installed addons"
+msgstr "설치된 애드온의 카탈로그 찾아보기"
+
+msgctxt "#30149"
+msgid "Search across every installed addon"
+msgstr "설치된 모든 애드온에서 검색"
+
+msgctxt "#30150"
+msgid "Your saved titles"
+msgstr "저장한 콘텐츠"
+
+msgctxt "#30151"
+msgid "Manage installed Stremio addons"
+msgstr "설치된 Stremio 애드온 관리"
+
+msgctxt "#30152"
+msgid "Configure Rivulet"
+msgstr "Rivulet 설정"
+
+msgctxt "#30170"
+msgid "Sync playback progress to your Stremio account"
+msgstr "재생 진행 상황을 Stremio 계정에 동기화"
+
+msgctxt "#30171"
+msgid "Ask to resume"
+msgstr "이어보기 확인"
+
+msgctxt "#30172"
+msgid "Resume playback?"
+msgstr "재생을 이어서 하시겠습니까?"
+
+msgctxt "#30173"
+msgid "Resume from %s?"
+msgstr "%s부텀 이어서 재생할까요?"
+
+msgctxt "#30174"
+msgid "Resume"
+msgstr "이어보기"
+
+msgctxt "#30175"
+msgid "Start from beginning"
+msgstr "처음부텀 시작"
+
+msgctxt "#30160"
+msgid "This stream can only be opened in the Stremio app"
+msgstr "이 스트림은 Stremio 앱에서만 열 수 있습니다"
+
+msgctxt "#30180"
+msgid "Play the next episode automatically"
+msgstr "다음 에피소드 자동 재생"
+
+msgctxt "#30181"
+msgid "Auto-play countdown (seconds)"
+msgstr "자동 재생 카운트다운(초)"
+
+msgctxt "#30182"
+msgid "Next episode"
+msgstr "다음 에피소드"
+
+msgctxt "#30183"
+msgid "Playing %s in %d s"
+msgstr "%s를 %d초 후에 재생"
+
+msgctxt "#30184"
+msgid "Updated to version %s"
+msgstr "버전 %s(으)로 업데이트됨"
+
+msgctxt "#30185"
+msgid "Loading more sources..."
+msgstr "추가 소스를 불러오는 중..."
+
+msgctxt "#30186"
+msgid "Searching %s..."
+msgstr "%s 검색 중..."
+
+msgctxt "#30187"
+msgid "Checking %s..."
+msgstr "%s 확인 중..."
+
+msgctxt "#30188"
+msgid "Season %d"
+msgstr "시즌 %d"
+
+msgctxt "#30189"
+msgid "Specials"
+msgstr "스페셜"
+
+msgctxt "#30190"
+msgid "Not logged in"
+msgstr "로그인되지 않음"
+
+msgctxt "#30191"
+msgid "This addon is protected and cannot be removed"
+msgstr "이 애드온은 보호되어 있어 제거할 수 없습니다"
+
+msgctxt "#30192"
+msgid "Add a Stremio addon by manifest URL"
+msgstr "매니페스트 URL로 Stremio 애드온 추가"
+
+msgctxt "#30194"
+msgid "Filter"
+msgstr "필터"
+
+msgctxt "#30196"
+msgid "Cast & crew"
+msgstr "출연진 및 제작진"
+
+msgctxt "#30197"
+msgid "No cast or crew information"
+msgstr "출연진 또는 제작진 정보 없음"
+
+msgctxt "#30198"
+msgid "All"
+msgstr "전체"
+
+msgctxt "#30199"
+msgid "search only"
+msgstr "검색 전용"
+
+msgctxt "#30200"
+msgid "%d SOURCE"
+msgstr "%d 소스"
+
+msgctxt "#30201"
+msgid "%d SOURCES"
+msgstr "%d 소스"
+
+msgctxt "#30202"
+msgid "%d ADDON"
+msgstr "%d 애드온"
+
+msgctxt "#30203"
+msgid "%d ADDONS"
+msgstr "%d 애드온"
+
+msgctxt "#30204"
+msgid "%d SEASON"
+msgstr "%d 시즌"
+
+msgctxt "#30205"
+msgid "%d SEASONS"
+msgstr "%d 시즌"
+
+msgctxt "#30206"
+msgid "%d EPISODE"
+msgstr "%d 에피소드"
+
+msgctxt "#30207"
+msgid "%d EPISODES"
+msgstr "%d 에피소드"
+
+msgctxt "#30208"
+msgid "%d CACHED"
+msgstr "%d 캐시됨"
+
+msgctxt "#30209"
+msgid "select"
+msgstr "선택"
+
+msgctxt "#30210"
+msgid "back"
+msgstr "뒤로"
+
+msgctxt "#30211"
+msgid "exit"
+msgstr "종료"
+
+msgctxt "#30212"
+msgid "%d%% WATCHED"
+msgstr "%d%% 시청함"
+
+msgctxt "#30213"
+msgid "Movies"
+msgstr "영화"
+
+msgctxt "#30214"
+msgid "Series"
+msgstr "시리즈"
+
+msgctxt "#30215"
+msgid "Anime"
+msgstr "애니메이션"
+
+msgctxt "#30216"
+msgid "Browse movie catalogs"
+msgstr "영화 카탈로그 탐색"
+
+msgctxt "#30217"
+msgid "Browse series and TV catalogs"
+msgstr "시리즈 및 TV 카탈로그 탐색"
+
+msgctxt "#30218"
+msgid "Browse anime catalogs"
+msgstr "애니메이션 카탈로그 탐색"
+
+msgctxt "#30219"
+msgid "Home screen"
+msgstr "홈 화면"
+
+msgctxt "#30220"
+msgid "Show Movies"
+msgstr "영화 표시"
+
+msgctxt "#30221"
+msgid "Show Series"
+msgstr "시리즈 표시"
+
+msgctxt "#30222"
+msgid "Show Anime"
+msgstr "애니메이션 표시"
+
+msgctxt "#30223"
+msgid "cancel"
+msgstr "취소"
+
+msgctxt "#30224"
+msgid "cancels"
+msgstr "취소함"
+
+msgctxt "#30225"
+msgid "plays now"
+msgstr "지금 재생함"
+
+msgctxt "#30227"
+msgid "Other"
+msgstr "기타"
+
+msgctxt "#30228"
+msgid "Browse catalogs that aren't film, series or anime"
+msgstr "영화, 시리즈 또는 애니메이션이 아닌 카탈로그 탐색"
+
+msgctxt "#30229"
+msgid "Show Other"
+msgstr "기타 표시"
+
+msgctxt "#30230"
+msgid "Open Rivulet automatically on Kodi startup"
+msgstr "Kodi 시작 시 Rivulet 자동으로 열기"
+
+msgctxt "#30232"
+msgid "Resume, next up, and your library"
+msgstr "이어보기, 다음 화, 내 라이브러리"
+
+msgctxt "#30234"
+msgid "now"
+msgstr "현재"
+
+msgctxt "#30241"
+msgid "Continue"
+msgstr "이어보기"
+
+msgctxt "#30242"
+msgid "NEXT UP"
+msgstr "다음 화"
+
+msgctxt "#30243"
+msgid "WATCHED"
+msgstr "시청 완료"
+
+msgctxt "#30244"
+msgid "Show Continue"
+msgstr "이어보기 표시"
+
+msgctxt "#30245"
+msgid "Continue watching"
+msgstr "이어서 시청"
+
+msgctxt "#30246"
+msgid "Recently watched"
+msgstr "최근 시청"
+
+msgctxt "#30247"
+msgid "Your library"
+msgstr "내 라이브러리"
+
+msgctxt "#30248"
+msgid "Disable"
+msgstr "사용 안 함"
+
+msgctxt "#30249"
+msgid "Enable"
+msgstr "사용"
+
+msgctxt "#30250"
+msgid "Remove"
+msgstr "제거"
+
+msgctxt "#30251"
+msgid "Disabled"
+msgstr "사용 안 함"
+
+msgctxt "#30252"
+msgid "Enabled"
+msgstr "사용 중"
+
+msgctxt "#30270"
+msgid "Move up"
+msgstr "위로 이동"
+
+msgctxt "#30271"
+msgid "Move down"
+msgstr "아래로 이동"
+
+msgctxt "#30272"
+msgid "Addon no longer installed"
+msgstr "애드온이 더 이상 설치되어 있지 않습니다"
+
+msgctxt "#30293"
+msgid "Add to library"
+msgstr "라이브러리에 추가"
+
+msgctxt "#30294"
+msgid "Remove from library"
+msgstr "라이브러리에서 제거"
+
+msgctxt "#30295"
+msgid "Mark as watched"
+msgstr "시청함으로 표시"
+
+msgctxt "#30296"
+msgid "Mark as unwatched"
+msgstr "시청 안 함으로 표시"
+
+msgctxt "#30297"
+msgid "Added to library"
+msgstr "라이브러리에 추가됨"
+
+msgctxt "#30298"
+msgid "Removed from library"
+msgstr "라이브러리에서 제거됨"
+
+msgctxt "#30299"
+msgid "Marked as watched"
+msgstr "시청함으로 표시됨"
+
+msgctxt "#30300"
+msgid "Marked as unwatched"
+msgstr "시청 안 함으로 표시됨"
+
+msgctxt "#30301"
+msgid "Failed to update library"
+msgstr "라이브러리를 업데이트하지 못했습니다"
+
+msgctxt "#30302"
+msgid "Failed to check library status"
+msgstr "라이브러리 상태를 확인하지 못했습니다"
+
+msgctxt "#30253"
+msgid "Minimum quality"
+msgstr "최소 화질"
+
+msgctxt "#30254"
+msgid "Any"
+msgstr "모두"
+
+msgctxt "#30255"
+msgid "480p"
+msgstr "480p"
+
+msgctxt "#30256"
+msgid "720p"
+msgstr "720p"
+
+msgctxt "#30257"
+msgid "1080p"
+msgstr "1080p"
+
+msgctxt "#30258"
+msgid "2160p"
+msgstr "2160p"
+
+msgctxt "#30259"
+msgid "Maximum size (GB, 0 = unlimited)"
+msgstr "최대 크기 (GB, 0 = 무제한)"
+
+msgctxt "#30260"
+msgid "Exclude CAM/TS sources"
+msgstr "CAM/TS 소스 제외"
+
+msgctxt "#30261"
+msgid "Cached only"
+msgstr "캐시된 항목만"
+
+msgctxt "#30262"
+msgid "%d source hidden by filters"
+msgstr "필터로 인해 소스 %d개 숨김"
+
+msgctxt "#30263"
+msgid "%d sources hidden by filters"
+msgstr "필터로 인해 소스 %d개 숨김"
+
+msgctxt "#30264"
+msgid "Filters matched nothing - showing all sources"
+msgstr "필터와 일치하는 항목이 없어 모든 소스를 표시합니다"
+
+msgctxt "#30313"
+msgid "New Episodes"
+msgstr "새 에피소드"
+
+msgctxt "#30314"
+msgid "Show new episodes under Series"
+msgstr "시리즈에 새 에피소드 표시"
+
+msgctxt "#30315"
+msgid "%d new episode ready to watch"
+msgstr "새 에피소드 %d개 시청 가능"
+
+msgctxt "#30316"
+msgid "%d new episodes ready to watch"
+msgstr "새 에피소드 %d개 시청 가능"
+
+msgctxt "#30317"
+msgid "New episodes"
+msgstr "새 에피소드"
+
+msgctxt "#30318"
+msgid "NEW"
+msgstr "신규"
+
+msgctxt "#30280"
+msgid "Hide adult content"
+msgstr "성인 콘텐츠 숨기기"
+
+
+
+msgctxt "#30335"
+msgid "Installed"
+msgstr "설치됨"
+
+msgctxt "#30336"
+msgid "Update available"
+msgstr "업데이트 사용 가능"
+
+msgctxt "#30337"
+msgid "Needs configuration"
+msgstr "구성 필요"
+
+msgctxt "#30338"
+msgid "%s is already installed"
+msgstr "%s은(는) 이미 설치되어 있습니다"
+
+msgctxt "#30339"
+msgid "No addon catalogs found. Install an addon that publishes one, such as Cinemeta."
+msgstr "애드온 카탈로그를 찾을 수 없습니다. Cinemeta처럼 카탈로그를 게시하는 애드온을 설치하세요."
+
+msgctxt "#30340"
+msgid "Could not load %s's addon catalog"
+msgstr "%s의 애드온 카탈로그를 불러올 수 없습니다"
+
+msgctxt "#30341"
+msgid "%s needs configuration. Open %s in a browser, configure it, then paste the resulting manifest URL"
+msgstr "%s에는 구성이 필요합니다. 브라우저에서 %s를 열어 구성한 다음, 생성된 매니페스트 URL을 붙여넣으세요"
+
+msgctxt "#30342"
+msgid "Install this addon?"
+msgstr "이 애드온을 설치하시겠습니까?"
+
+msgctxt "#30343"
+msgid "Addon catalogs"
+msgstr "애드온 카탈로그"
+
+msgctxt "#30344"
+msgid "Browse addon catalogs"
+msgstr "애드온 카탈로그 찾아보기"
+
+msgctxt "#30345"
+msgid "Install from URL"
+msgstr "URL에서 설치"
+
+msgctxt "#30346"
+msgid "Search addon catalogs"
+msgstr "애드온 카탈로그 검색"
+
+msgctxt "#30347"
+msgid "Clear search"
+msgstr "검색 지우기"
+
+msgctxt "#30348"
+msgid "Showing %d of %d"
+msgstr "표시 중: %d / %d"
+
+msgctxt "#30349"
+msgid "No addons match your search"
+msgstr "검색과 일치하는 애드온이 없습니다"
+
+msgctxt "#30350"
+msgid "Add addons"
+msgstr "애드온 추가"
+
+msgctxt "#30351"
+msgid "Browse catalogs, or install from a manifest URL"
+msgstr "카탈로그를 찾아보거나 매니페스트 URL로 설치"
+
+msgctxt "#30360"
+msgid "New episodes: %d"
+msgstr "새 에피소드: %d"
+
+msgctxt "#30361"
+msgid "Source slower than playback bitrate; expect buffering"
+msgstr "소스 속도가 재생 비트레이트보다 느립니다. 버퍼링이 발생할 수 있습니다"
+
+msgctxt "#30362"
+msgid "Force library mode (Android)"
+msgstr "라이브러리 모드 강제 사용 (Android)"
+
+msgctxt "#30363"
+msgid "Run the streaming server as an in-process library instead of a separate executable. Enable this only if the embedded server fails to start (e.g. on an SELinux-enforcing Android device)."
+msgstr "스트리밍 서버를 별도의 실행 파일 대신 프로세스 내 라이브러리로 실행합니다. 내장 서버가 시작되지 않는 경우에만 활성화하세요 (예: SELinux가 enforcing 모드인 Android 기기)."
+
+msgctxt "#30371"
+msgid "Stream4Me bridge"
+msgstr "Stream4Me 브리지"
+
+msgctxt "#30372"
+msgid "Enable Stream4Me bridge"
+msgstr "Stream4Me 브리지 활성화"
+
+msgctxt "#30373"
+msgid "Bridge port"
+msgstr "브리지 포트"
+
+msgctxt "#30374"
+msgid "Channels (comma-separated, blank = every active channel)"
+msgstr "채널(쉼표로 구분, 비워두면 모든 활성 채널)"

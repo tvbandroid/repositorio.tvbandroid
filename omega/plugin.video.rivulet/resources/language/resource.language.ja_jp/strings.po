@@ -1,0 +1,975 @@
+# Kodi Media Center language file
+# Addon Name: Rivulet
+# Addon id: plugin.video.rivulet
+# Addon Provider: M0Rf30
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.rivulet\n"
+"Report-Msgid-Bugs-To: https://github.com/M0Rf30/plugin.video.rivulet/issues\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: M0Rf30\n"
+"Language-Team: Japanese (日本語)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ja_JP\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Discover"
+msgstr "見つける"
+
+msgctxt "#30001"
+msgid "Search"
+msgstr "検索"
+
+msgctxt "#30002"
+msgid "Library"
+msgstr "ライブラリ"
+
+msgctxt "#30003"
+msgid "Addons"
+msgstr "アドオン"
+
+msgctxt "#30004"
+msgid "Settings"
+msgstr "設定"
+
+msgctxt "#30010"
+msgid "Install addon from URL"
+msgstr "URLからアドオンをインストール"
+
+msgctxt "#30011"
+msgid "Remove addon"
+msgstr "アドオンを削除"
+
+msgctxt "#30012"
+msgid "Addon installed"
+msgstr "アドオンをインストールしました"
+
+msgctxt "#30013"
+msgid "Addon removed"
+msgstr "アドオンを削除しました"
+
+msgctxt "#30014"
+msgid "Invalid addon manifest"
+msgstr "無効なアドオンマニフェスト"
+
+msgctxt "#30020"
+msgid "Login to Stremio"
+msgstr "Stremioにログイン"
+
+msgctxt "#30021"
+msgid "Logout"
+msgstr "ログアウト"
+
+msgctxt "#30022"
+msgid "Logged in as %s"
+msgstr "%s としてログイン中"
+
+msgctxt "#30023"
+msgid "Login failed"
+msgstr "ログインに失敗しました"
+
+msgctxt "#30024"
+msgid "Stremio email"
+msgstr "Stremioのメールアドレス"
+
+msgctxt "#30025"
+msgid "Password"
+msgstr "パスワード"
+
+msgctxt "#30026"
+msgid "Showcase"
+msgstr "ショーケース"
+
+msgctxt "#30030"
+msgid "No streams found"
+msgstr "ストリームが見つかりません"
+
+msgctxt "#30031"
+msgid "Streaming server unavailable"
+msgstr "ストリーミングサーバーを利用できません"
+
+msgctxt "#30032"
+msgid "Something went wrong"
+msgstr "問題が発生しました"
+
+msgctxt "#30033"
+msgid "Loading…"
+msgstr "読み込み中…"
+
+msgctxt "#30034"
+msgid "Addons synced"
+msgstr "アドオンを同期しました"
+
+msgctxt "#30035"
+msgid "Addon sync failed"
+msgstr "アドオンの同期に失敗しました"
+
+msgctxt "#30036"
+msgid "Sync addons now"
+msgstr "今すぐアドオンを同期"
+
+msgctxt "#30040"
+msgid "Next page"
+msgstr "次のページ"
+
+msgctxt "#30041"
+msgid "Streams"
+msgstr "ストリーム"
+
+msgctxt "#30042"
+msgid "New search…"
+msgstr "新しい検索…"
+
+msgctxt "#30043"
+msgid "Type a new query"
+msgstr "検索語を入力してください"
+
+msgctxt "#30044"
+msgid "Clear search history"
+msgstr "検索履歴を消去"
+
+msgctxt "#30045"
+msgid "Search again"
+msgstr "再検索"
+
+msgctxt "#30046"
+msgid "Remove every saved search?"
+msgstr "保存された検索をすべて削除しますか?"
+
+msgctxt "#30100"
+msgid "General"
+msgstr "一般"
+
+msgctxt "#30101"
+msgid "Streaming server"
+msgstr "ストリーミングサーバー"
+
+msgctxt "#30102"
+msgid "Server URL"
+msgstr "サーバーURL"
+
+msgctxt "#30103"
+msgid "Run embedded server"
+msgstr "内蔵サーバーを実行"
+
+msgctxt "#30104"
+msgid "Server binary path"
+msgstr "サーバー実行ファイルのパス"
+
+msgctxt "#30105"
+msgid "Account"
+msgstr "アカウント"
+
+msgctxt "#30050"
+msgid "Subtitles"
+msgstr "字幕"
+
+msgctxt "#30051"
+msgid "Enable addon subtitles"
+msgstr "アドオン字幕を有効にする"
+
+msgctxt "#30052"
+msgid "Preferred subtitle language"
+msgstr "優先する字幕言語"
+
+msgctxt "#30060"
+msgid "Download stremio-server binary"
+msgstr "stremio-server実行ファイルをダウンロード"
+
+msgctxt "#30061"
+msgid "Downloading stremio-server"
+msgstr "stremio-serverをダウンロード中"
+
+msgctxt "#30062"
+msgid "Server binary installed (%s)"
+msgstr "サーバー実行ファイルをインストールしました (%s)"
+
+msgctxt "#30063"
+msgid "Download failed"
+msgstr "ダウンロードに失敗しました"
+
+msgctxt "#30064"
+msgid "No release asset for this platform"
+msgstr "このプラットフォーム用のリリース資産がありません"
+
+msgctxt "#30070"
+msgid "Playback"
+msgstr "再生"
+
+msgctxt "#30071"
+msgid "Pre-buffer torrents"
+msgstr "トレントを事前バッファリング"
+
+msgctxt "#30072"
+msgid "Pre-buffer size (MB)"
+msgstr "事前バッファサイズ (MB)"
+
+msgctxt "#30073"
+msgid "Sort streams by"
+msgstr "ストリームの並び替え基準"
+
+msgctxt "#30074"
+msgid "Quality"
+msgstr "画質"
+
+msgctxt "#30075"
+msgid "Size"
+msgstr "サイズ"
+
+msgctxt "#30076"
+msgid "Seeders"
+msgstr "シーダー数"
+
+msgctxt "#30065"
+msgid "Install recommended advancedsettings.xml"
+msgstr "推奨のadvancedsettings.xmlをインストール"
+
+msgctxt "#30066"
+msgid "advancedsettings.xml installed - restart Kodi to apply"
+msgstr "advancedsettings.xmlをインストールしました - 適用するにはKodiを再起動してください"
+
+msgctxt "#30067"
+msgid "advancedsettings.xml already exists - merge changes manually"
+msgstr "advancedsettings.xmlは既に存在します - 変更を手動でマージしてください"
+
+msgctxt "#30068"
+msgid "Failed to install advancedsettings.xml"
+msgstr "advancedsettings.xmlのインストールに失敗しました"
+
+msgctxt "#30069"
+msgid "Setting up streaming server…"
+msgstr "ストリーミングサーバーを設定中…"
+
+msgctxt "#30080"
+msgid "Preparing stream"
+msgstr "ストリームを準備中"
+
+msgctxt "#30081"
+msgid "Buffering: %s of %s"
+msgstr "バッファリング中: %s / %s"
+
+msgctxt "#30082"
+msgid "%s/s — %d peers"
+msgstr "%s/秒 — %d ピア"
+
+msgctxt "#30083"
+msgid "Buffering timed out, starting anyway"
+msgstr "バッファリングがタイムアウトしました。そのまま開始します"
+
+msgctxt "#30084"
+msgid "No peers available for this stream"
+msgstr "このストリームに利用可能なピアがありません"
+
+msgctxt "#30085"
+msgid "Session expired - please log in again"
+msgstr "セッションが期限切れです - 再度ログインしてください"
+
+msgctxt "#30086"
+msgid "Connecting to streaming server…"
+msgstr "ストリーミングサーバーに接続中…"
+
+msgctxt "#30087"
+msgid "Resolving stream…"
+msgstr "ストリームを解決中…"
+
+msgctxt "#30088"
+msgid "Fetching torrent metadata…"
+msgstr "トレントのメタデータを取得中…"
+
+msgctxt "#30089"
+msgid "Warming torrent engine…"
+msgstr "トレントエンジンを準備中…"
+
+msgctxt "#30090"
+msgid "attempt %d of %d"
+msgstr "%d回目の試行 (全%d回)"
+
+msgctxt "#30091"
+msgid "Embedded server is not supported on Android - set Server URL to a server running elsewhere"
+msgstr "内蔵サーバーはAndroidではサポートされていません – Server URLを他の場所で実行されているサーバーに設定してください"
+
+msgctxt "#30092"
+msgid "Installed server binary cannot be executed on this device"
+msgstr "インストールされたサーバーバイナリはこのデバイスで実行できません"
+
+msgctxt "#30110"
+msgid "BitTorrent"
+msgstr "BitTorrent"
+
+msgctxt "#30111"
+msgid "Server resources"
+msgstr "サーバーリソース"
+
+msgctxt "#30112"
+msgid "Server proxy"
+msgstr "サーバープロキシ"
+
+msgctxt "#30113"
+msgid "Server add-ons"
+msgstr "サーバーアドオン"
+
+msgctxt "#30114"
+msgid "Server diagnostics"
+msgstr "サーバー診断"
+
+msgctxt "#30115"
+msgid "BitTorrent listen port"
+msgstr "BitTorrentリスニングポート"
+
+msgctxt "#30116"
+msgid "Peers per torrent"
+msgstr "トレントごとのピア数"
+
+msgctxt "#30117"
+msgid "Idle torrent timeout (seconds)"
+msgstr "アイドルトレントのタイムアウト (秒)"
+
+msgctxt "#30118"
+msgid "BitTorrent encryption"
+msgstr "BitTorrent暗号化"
+
+msgctxt "#30119"
+msgid "Prefer"
+msgstr "優先"
+
+msgctxt "#30120"
+msgid "Require"
+msgstr "必須"
+
+msgctxt "#30121"
+msgid "Disable"
+msgstr "無効"
+
+msgctxt "#30122"
+msgid "Anonymous mode"
+msgstr "匿名モード"
+
+msgctxt "#30123"
+msgid "Disable trackers"
+msgstr "トラッカーを無効にする"
+
+msgctxt "#30124"
+msgid "BitTorrent proxy (SOCKS/HTTP URL)"
+msgstr "BitTorrentプロキシ (SOCKS/HTTP URL)"
+
+msgctxt "#30125"
+msgid "Disable WebTorrent/WebRTC peers"
+msgstr "WebTorrent/WebRTCピアを無効にする"
+
+msgctxt "#30126"
+msgid "Max trackers per torrent"
+msgstr "トレントごとの最大トラッカー数"
+
+msgctxt "#30127"
+msgid "Custom tracker list URL"
+msgstr "カスタムトラッカーリストのURL"
+
+msgctxt "#30128"
+msgid "Extra DHT bootstrap nodes"
+msgstr "追加のDHTブートストラップノード"
+
+msgctxt "#30129"
+msgid "Memory cache size (MB, 0 = disk only)"
+msgstr "メモリキャッシュサイズ (MB、0 = ディスクのみ)"
+
+msgctxt "#30130"
+msgid "Soft memory limit (MB, 0 = unlimited)"
+msgstr "ソフトメモリ上限 (MB、0 = 無制限)"
+
+msgctxt "#30131"
+msgid "Proxy pre-buffer (segments)"
+msgstr "プロキシの事前バッファ (セグメント数)"
+
+msgctxt "#30132"
+msgid "Proxy segment cache TTL (seconds)"
+msgstr "プロキシセグメントキャッシュのTTL (秒)"
+
+msgctxt "#30133"
+msgid "Proxy password"
+msgstr "プロキシパスワード"
+
+msgctxt "#30134"
+msgid "Proxy IP allow-list"
+msgstr "プロキシIP許可リスト"
+
+msgctxt "#30135"
+msgid "Proxy public URL"
+msgstr "プロキシの公開URL"
+
+msgctxt "#30136"
+msgid "Proxy upstream URL"
+msgstr "プロキシのアップストリームURL"
+
+msgctxt "#30137"
+msgid "Proxy signing secret"
+msgstr "プロキシの署名シークレット"
+
+msgctxt "#30138"
+msgid "Enable DLNA casting"
+msgstr "DLNAキャストを有効にする"
+
+msgctxt "#30139"
+msgid "Local IMDB resolution"
+msgstr "ローカルIMDB解決"
+
+msgctxt "#30140"
+msgid "Metadata addon URL (blank = Cinemeta, \"off\" to disable)"
+msgstr "メタデータアドオンのURL (空欄 = Cinemeta、\"off\"で無効化)"
+
+msgctxt "#30141"
+msgid "Bitmagnet indexer URL"
+msgstr "BitmagnetインデクサーのURL"
+
+msgctxt "#30142"
+msgid "Torznab indexer URL"
+msgstr "TorznabインデクサーのURL"
+
+msgctxt "#30143"
+msgid "Torznab API key"
+msgstr "Torznab APIキー"
+
+msgctxt "#30144"
+msgid "Web UI location"
+msgstr "Web UIの場所"
+
+msgctxt "#30145"
+msgid "HTTPS port (0 = disabled)"
+msgstr "HTTPSポート (0 = 無効)"
+
+msgctxt "#30146"
+msgid "pprof diagnostics address"
+msgstr "pprof診断用アドレス"
+
+msgctxt "#30147"
+msgid "Stremio account auth key (HTTPS auto-cert)"
+msgstr "Stremioアカウント認証キー (HTTPS自動証明書)"
+
+msgctxt "#30148"
+msgid "Browse catalogs from your installed addons"
+msgstr "インストール済みアドオンのカタログを閲覧"
+
+msgctxt "#30149"
+msgid "Search across every installed addon"
+msgstr "インストール済みのすべてのアドオンを検索"
+
+msgctxt "#30150"
+msgid "Your saved titles"
+msgstr "保存したタイトル一覧"
+
+msgctxt "#30151"
+msgid "Manage installed Stremio addons"
+msgstr "インストール済みのStremioアドオンを管理"
+
+msgctxt "#30152"
+msgid "Configure Rivulet"
+msgstr "Rivuletを設定"
+
+msgctxt "#30170"
+msgid "Sync playback progress to your Stremio account"
+msgstr "再生の進行度をStremioアカウントに同期する"
+
+msgctxt "#30171"
+msgid "Ask to resume"
+msgstr "再生の再開を確認する"
+
+msgctxt "#30172"
+msgid "Resume playback?"
+msgstr "再生を再開しますか？"
+
+msgctxt "#30173"
+msgid "Resume from %s?"
+msgstr "%s から再開しますか？"
+
+msgctxt "#30174"
+msgid "Resume"
+msgstr "再開"
+
+msgctxt "#30175"
+msgid "Start from beginning"
+msgstr "最初から再生"
+
+msgctxt "#30160"
+msgid "This stream can only be opened in the Stremio app"
+msgstr "このストリームは Stremio アプリでのみ開くことができます"
+
+msgctxt "#30180"
+msgid "Play the next episode automatically"
+msgstr "次のエピソードを自動再生する"
+
+msgctxt "#30181"
+msgid "Auto-play countdown (seconds)"
+msgstr "自動再生までのカウントダウン（秒）"
+
+msgctxt "#30182"
+msgid "Next episode"
+msgstr "次のエピソード"
+
+msgctxt "#30183"
+msgid "Playing %s in %d s"
+msgstr "%sを%d秒後に再生"
+
+msgctxt "#30184"
+msgid "Updated to version %s"
+msgstr "バージョン %s に更新されました"
+
+msgctxt "#30185"
+msgid "Loading more sources..."
+msgstr "他のソースを読み込み中..."
+
+msgctxt "#30186"
+msgid "Searching %s..."
+msgstr "%sを検索中..."
+
+msgctxt "#30187"
+msgid "Checking %s..."
+msgstr "%sを確認中..."
+
+msgctxt "#30188"
+msgid "Season %d"
+msgstr "シーズン %d"
+
+msgctxt "#30189"
+msgid "Specials"
+msgstr "特別編"
+
+msgctxt "#30190"
+msgid "Not logged in"
+msgstr "ログインしていません"
+
+msgctxt "#30191"
+msgid "This addon is protected and cannot be removed"
+msgstr "このアドオンは保護されているため削除できません"
+
+msgctxt "#30192"
+msgid "Add a Stremio addon by manifest URL"
+msgstr "マニフェストURLでStremioアドオンを追加"
+
+msgctxt "#30194"
+msgid "Filter"
+msgstr "フィルター"
+
+msgctxt "#30196"
+msgid "Cast & crew"
+msgstr "キャスト・スタッフ"
+
+msgctxt "#30197"
+msgid "No cast or crew information"
+msgstr "キャストまたはスタッフの情報がありません"
+
+msgctxt "#30198"
+msgid "All"
+msgstr "すべて"
+
+msgctxt "#30199"
+msgid "search only"
+msgstr "検索専用"
+
+msgctxt "#30200"
+msgid "%d SOURCE"
+msgstr "%d ソース"
+
+msgctxt "#30201"
+msgid "%d SOURCES"
+msgstr "%d ソース"
+
+msgctxt "#30202"
+msgid "%d ADDON"
+msgstr "%d アドオン"
+
+msgctxt "#30203"
+msgid "%d ADDONS"
+msgstr "%d アドオン"
+
+msgctxt "#30204"
+msgid "%d SEASON"
+msgstr "%d シーズン"
+
+msgctxt "#30205"
+msgid "%d SEASONS"
+msgstr "%d シーズン"
+
+msgctxt "#30206"
+msgid "%d EPISODE"
+msgstr "%d エピソード"
+
+msgctxt "#30207"
+msgid "%d EPISODES"
+msgstr "%d エピソード"
+
+msgctxt "#30208"
+msgid "%d CACHED"
+msgstr "%d キャッシュ済み"
+
+msgctxt "#30209"
+msgid "select"
+msgstr "選択"
+
+msgctxt "#30210"
+msgid "back"
+msgstr "戻る"
+
+msgctxt "#30211"
+msgid "exit"
+msgstr "終了"
+
+msgctxt "#30212"
+msgid "%d%% WATCHED"
+msgstr "%d%% 視聴済み"
+
+msgctxt "#30213"
+msgid "Movies"
+msgstr "映画"
+
+msgctxt "#30214"
+msgid "Series"
+msgstr "シリーズ"
+
+msgctxt "#30215"
+msgid "Anime"
+msgstr "アニメ"
+
+msgctxt "#30216"
+msgid "Browse movie catalogs"
+msgstr "映画カタログを見る"
+
+msgctxt "#30217"
+msgid "Browse series and TV catalogs"
+msgstr "シリーズ・TVカタログを見る"
+
+msgctxt "#30218"
+msgid "Browse anime catalogs"
+msgstr "アニメカタログを見る"
+
+msgctxt "#30219"
+msgid "Home screen"
+msgstr "ホーム画面"
+
+msgctxt "#30220"
+msgid "Show Movies"
+msgstr "映画を表示"
+
+msgctxt "#30221"
+msgid "Show Series"
+msgstr "シリーズを表示"
+
+msgctxt "#30222"
+msgid "Show Anime"
+msgstr "アニメを表示"
+
+msgctxt "#30223"
+msgid "cancel"
+msgstr "キャンセル"
+
+msgctxt "#30224"
+msgid "cancels"
+msgstr "キャンセルする"
+
+msgctxt "#30225"
+msgid "plays now"
+msgstr "今すぐ再生"
+
+msgctxt "#30227"
+msgid "Other"
+msgstr "その他"
+
+msgctxt "#30228"
+msgid "Browse catalogs that aren't film, series or anime"
+msgstr "映画・シリーズ・アニメ以外のカタログを見る"
+
+msgctxt "#30229"
+msgid "Show Other"
+msgstr "その他を表示"
+
+msgctxt "#30230"
+msgid "Open Rivulet automatically on Kodi startup"
+msgstr "Kodi の起動時に Rivulet を自動的に開く"
+
+msgctxt "#30232"
+msgid "Resume, next up, and your library"
+msgstr "再開、次のエピソード、ライブラリ"
+
+msgctxt "#30234"
+msgid "now"
+msgstr "現在"
+
+msgctxt "#30241"
+msgid "Continue"
+msgstr "続きを見る"
+
+msgctxt "#30242"
+msgid "NEXT UP"
+msgstr "次のエピソード"
+
+msgctxt "#30243"
+msgid "WATCHED"
+msgstr "視聴済み"
+
+msgctxt "#30244"
+msgid "Show Continue"
+msgstr "「続きを見る」を表示"
+
+msgctxt "#30245"
+msgid "Continue watching"
+msgstr "続きを見る"
+
+msgctxt "#30246"
+msgid "Recently watched"
+msgstr "最近見た作品"
+
+msgctxt "#30247"
+msgid "Your library"
+msgstr "ライブラリ"
+
+msgctxt "#30248"
+msgid "Disable"
+msgstr "無効にする"
+
+msgctxt "#30249"
+msgid "Enable"
+msgstr "有効にする"
+
+msgctxt "#30250"
+msgid "Remove"
+msgstr "削除"
+
+msgctxt "#30251"
+msgid "Disabled"
+msgstr "無効"
+
+msgctxt "#30252"
+msgid "Enabled"
+msgstr "有効"
+
+msgctxt "#30270"
+msgid "Move up"
+msgstr "上に移動"
+
+msgctxt "#30271"
+msgid "Move down"
+msgstr "下に移動"
+
+msgctxt "#30272"
+msgid "Addon no longer installed"
+msgstr "アドオンはもうインストールされていません"
+
+msgctxt "#30293"
+msgid "Add to library"
+msgstr "ライブラリに追加"
+
+msgctxt "#30294"
+msgid "Remove from library"
+msgstr "ライブラリから削除"
+
+msgctxt "#30295"
+msgid "Mark as watched"
+msgstr "視聴済みにする"
+
+msgctxt "#30296"
+msgid "Mark as unwatched"
+msgstr "未視聴にする"
+
+msgctxt "#30297"
+msgid "Added to library"
+msgstr "ライブラリに追加しました"
+
+msgctxt "#30298"
+msgid "Removed from library"
+msgstr "ライブラリから削除しました"
+
+msgctxt "#30299"
+msgid "Marked as watched"
+msgstr "視聴済みにしました"
+
+msgctxt "#30300"
+msgid "Marked as unwatched"
+msgstr "未視聴にしました"
+
+msgctxt "#30301"
+msgid "Failed to update library"
+msgstr "ライブラリを更新できませんでした"
+
+msgctxt "#30302"
+msgid "Failed to check library status"
+msgstr "ライブラリの状態を確認できませんでした"
+
+msgctxt "#30253"
+msgid "Minimum quality"
+msgstr "最低画質"
+
+msgctxt "#30254"
+msgid "Any"
+msgstr "指定なし"
+
+msgctxt "#30255"
+msgid "480p"
+msgstr "480p"
+
+msgctxt "#30256"
+msgid "720p"
+msgstr "720p"
+
+msgctxt "#30257"
+msgid "1080p"
+msgstr "1080p"
+
+msgctxt "#30258"
+msgid "2160p"
+msgstr "2160p"
+
+msgctxt "#30259"
+msgid "Maximum size (GB, 0 = unlimited)"
+msgstr "最大サイズ (GB、0 = 無制限)"
+
+msgctxt "#30260"
+msgid "Exclude CAM/TS sources"
+msgstr "CAM/TS ソースを除外"
+
+msgctxt "#30261"
+msgid "Cached only"
+msgstr "キャッシュ済みのみ"
+
+msgctxt "#30262"
+msgid "%d source hidden by filters"
+msgstr "フィルターにより %d 件のソースが非表示"
+
+msgctxt "#30263"
+msgid "%d sources hidden by filters"
+msgstr "フィルターにより %d 件のソースが非表示"
+
+msgctxt "#30264"
+msgid "Filters matched nothing - showing all sources"
+msgstr "フィルター条件に一致するものがありません。すべてのソースを表示します"
+
+msgctxt "#30313"
+msgid "New Episodes"
+msgstr "新しいエピソード"
+
+msgctxt "#30314"
+msgid "Show new episodes under Series"
+msgstr "シリーズに新しいエピソードを表示"
+
+msgctxt "#30315"
+msgid "%d new episode ready to watch"
+msgstr "%d件の新しいエピソードを視聴できます"
+
+msgctxt "#30316"
+msgid "%d new episodes ready to watch"
+msgstr "%d件の新しいエピソードを視聴できます"
+
+msgctxt "#30317"
+msgid "New episodes"
+msgstr "新しいエピソード"
+
+msgctxt "#30318"
+msgid "NEW"
+msgstr "新着"
+
+msgctxt "#30280"
+msgid "Hide adult content"
+msgstr "アダルトコンテンツを非表示にする"
+
+
+
+msgctxt "#30335"
+msgid "Installed"
+msgstr "インストール済み"
+
+msgctxt "#30336"
+msgid "Update available"
+msgstr "アップデートあり"
+
+msgctxt "#30337"
+msgid "Needs configuration"
+msgstr "設定が必要"
+
+msgctxt "#30338"
+msgid "%s is already installed"
+msgstr "%s はすでにインストールされています"
+
+msgctxt "#30339"
+msgid "No addon catalogs found. Install an addon that publishes one, such as Cinemeta."
+msgstr "アドオンカタログが見つかりません。Cinemeta のようにカタログを公開するアドオンをインストールしてください。"
+
+msgctxt "#30340"
+msgid "Could not load %s's addon catalog"
+msgstr "%s のアドオンカタログを読み込めませんでした"
+
+msgctxt "#30341"
+msgid "%s needs configuration. Open %s in a browser, configure it, then paste the resulting manifest URL"
+msgstr "%s には設定が必要です。ブラウザで %s を開いて設定し、生成されたマニフェスト URL を貼り付けてください"
+
+msgctxt "#30342"
+msgid "Install this addon?"
+msgstr "このアドオンをインストールしますか？"
+
+msgctxt "#30343"
+msgid "Addon catalogs"
+msgstr "アドオンカタログ"
+
+msgctxt "#30344"
+msgid "Browse addon catalogs"
+msgstr "アドオンカタログを閲覧"
+
+msgctxt "#30345"
+msgid "Install from URL"
+msgstr "URL からインストール"
+
+msgctxt "#30346"
+msgid "Search addon catalogs"
+msgstr "アドオンカタログを検索"
+
+msgctxt "#30347"
+msgid "Clear search"
+msgstr "検索をクリア"
+
+msgctxt "#30348"
+msgid "Showing %d of %d"
+msgstr "表示中: %d / %d"
+
+msgctxt "#30349"
+msgid "No addons match your search"
+msgstr "検索に一致するアドオンはありません"
+
+msgctxt "#30350"
+msgid "Add addons"
+msgstr "アドオンを追加"
+
+msgctxt "#30351"
+msgid "Browse catalogs, or install from a manifest URL"
+msgstr "カタログを閲覧、またはマニフェスト URL からインストール"
+
+msgctxt "#30360"
+msgid "New episodes: %d"
+msgstr "新しいエピソード: %d"
+
+msgctxt "#30361"
+msgid "Source slower than playback bitrate; expect buffering"
+msgstr "ソースが再生ビットレートより遅いため、バッファリングが発生する可能性があります"
+
+msgctxt "#30362"
+msgid "Force library mode (Android)"
+msgstr "ライブラリモードを強制 (Android)"
+
+msgctxt "#30363"
+msgid "Run the streaming server as an in-process library instead of a separate executable. Enable this only if the embedded server fails to start (e.g. on an SELinux-enforcing Android device)."
+msgstr "ストリーミングサーバーを独立した実行ファイルではなく、プロセス内ライブラリとして実行します。組み込みサーバーが起動しない場合のみ有効にしてください （例: SELinux が enforcing モードの Android デバイス）。"
+
+msgctxt "#30371"
+msgid "Stream4Me bridge"
+msgstr "Stream4Me ブリッジ"
+
+msgctxt "#30372"
+msgid "Enable Stream4Me bridge"
+msgstr "Stream4Me ブリッジを有効にする"
+
+msgctxt "#30373"
+msgid "Bridge port"
+msgstr "ブリッジのポート"
+
+msgctxt "#30374"
+msgid "Channels (comma-separated, blank = every active channel)"
+msgstr "チャンネル（カンマ区切り、空欄 = すべてのアクティブなチャンネル）"

@@ -1,0 +1,975 @@
+# Kodi Media Center language file
+# Addon Name: Rivulet
+# Addon id: plugin.video.rivulet
+# Addon Provider: M0Rf30
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.rivulet\n"
+"Report-Msgid-Bugs-To: https://github.com/M0Rf30/plugin.video.rivulet/issues\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: M0Rf30\n"
+"Language-Team: Portuguese-Brazil (Português)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Discover"
+msgstr "Descobrir"
+
+msgctxt "#30001"
+msgid "Search"
+msgstr "Buscar"
+
+msgctxt "#30002"
+msgid "Library"
+msgstr "Biblioteca"
+
+msgctxt "#30003"
+msgid "Addons"
+msgstr "Complementos"
+
+msgctxt "#30004"
+msgid "Settings"
+msgstr "Configurações"
+
+msgctxt "#30010"
+msgid "Install addon from URL"
+msgstr "Instalar complemento a partir da URL"
+
+msgctxt "#30011"
+msgid "Remove addon"
+msgstr "Remover complemento"
+
+msgctxt "#30012"
+msgid "Addon installed"
+msgstr "Complemento instalado"
+
+msgctxt "#30013"
+msgid "Addon removed"
+msgstr "Complemento removido"
+
+msgctxt "#30014"
+msgid "Invalid addon manifest"
+msgstr "Manifesto do complemento inválido"
+
+msgctxt "#30020"
+msgid "Login to Stremio"
+msgstr "Entrar no Stremio"
+
+msgctxt "#30021"
+msgid "Logout"
+msgstr "Sair"
+
+msgctxt "#30022"
+msgid "Logged in as %s"
+msgstr "Conectado como %s"
+
+msgctxt "#30023"
+msgid "Login failed"
+msgstr "Falha ao entrar"
+
+msgctxt "#30024"
+msgid "Stremio email"
+msgstr "E-mail do Stremio"
+
+msgctxt "#30025"
+msgid "Password"
+msgstr "Senha"
+
+msgctxt "#30026"
+msgid "Showcase"
+msgstr "Destaques"
+
+msgctxt "#30030"
+msgid "No streams found"
+msgstr "Nenhum stream encontrado"
+
+msgctxt "#30031"
+msgid "Streaming server unavailable"
+msgstr "Servidor de streaming indisponível"
+
+msgctxt "#30032"
+msgid "Something went wrong"
+msgstr "Algo deu errado"
+
+msgctxt "#30033"
+msgid "Loading…"
+msgstr "Carregando…"
+
+msgctxt "#30034"
+msgid "Addons synced"
+msgstr "Complementos sincronizados"
+
+msgctxt "#30035"
+msgid "Addon sync failed"
+msgstr "Falha ao sincronizar complementos"
+
+msgctxt "#30036"
+msgid "Sync addons now"
+msgstr "Sincronizar complementos agora"
+
+msgctxt "#30040"
+msgid "Next page"
+msgstr "Próxima página"
+
+msgctxt "#30041"
+msgid "Streams"
+msgstr "Streams"
+
+msgctxt "#30042"
+msgid "New search…"
+msgstr "Nova busca…"
+
+msgctxt "#30043"
+msgid "Type a new query"
+msgstr "Digite uma nova consulta"
+
+msgctxt "#30044"
+msgid "Clear search history"
+msgstr "Limpar histórico de busca"
+
+msgctxt "#30045"
+msgid "Search again"
+msgstr "Buscar novamente"
+
+msgctxt "#30046"
+msgid "Remove every saved search?"
+msgstr "Remover todas as buscas salvas?"
+
+msgctxt "#30100"
+msgid "General"
+msgstr "Geral"
+
+msgctxt "#30101"
+msgid "Streaming server"
+msgstr "Servidor de streaming"
+
+msgctxt "#30102"
+msgid "Server URL"
+msgstr "URL do servidor"
+
+msgctxt "#30103"
+msgid "Run embedded server"
+msgstr "Executar servidor embutido"
+
+msgctxt "#30104"
+msgid "Server binary path"
+msgstr "Caminho do binário do servidor"
+
+msgctxt "#30105"
+msgid "Account"
+msgstr "Conta"
+
+msgctxt "#30050"
+msgid "Subtitles"
+msgstr "Legendas"
+
+msgctxt "#30051"
+msgid "Enable addon subtitles"
+msgstr "Ativar legendas do complemento"
+
+msgctxt "#30052"
+msgid "Preferred subtitle language"
+msgstr "Idioma preferido das legendas"
+
+msgctxt "#30060"
+msgid "Download stremio-server binary"
+msgstr "Baixar binário do stremio-server"
+
+msgctxt "#30061"
+msgid "Downloading stremio-server"
+msgstr "Baixando o stremio-server"
+
+msgctxt "#30062"
+msgid "Server binary installed (%s)"
+msgstr "Binário do servidor instalado (%s)"
+
+msgctxt "#30063"
+msgid "Download failed"
+msgstr "Falha no download"
+
+msgctxt "#30064"
+msgid "No release asset for this platform"
+msgstr "Nenhum arquivo de lançamento para esta plataforma"
+
+msgctxt "#30070"
+msgid "Playback"
+msgstr "Reprodução"
+
+msgctxt "#30071"
+msgid "Pre-buffer torrents"
+msgstr "Pré-armazenar torrents em buffer"
+
+msgctxt "#30072"
+msgid "Pre-buffer size (MB)"
+msgstr "Tamanho do pré-buffer (MB)"
+
+msgctxt "#30073"
+msgid "Sort streams by"
+msgstr "Ordenar streams por"
+
+msgctxt "#30074"
+msgid "Quality"
+msgstr "Qualidade"
+
+msgctxt "#30075"
+msgid "Size"
+msgstr "Tamanho"
+
+msgctxt "#30076"
+msgid "Seeders"
+msgstr "Seeders"
+
+msgctxt "#30065"
+msgid "Install recommended advancedsettings.xml"
+msgstr "Instalar advancedsettings.xml recomendado"
+
+msgctxt "#30066"
+msgid "advancedsettings.xml installed - restart Kodi to apply"
+msgstr "advancedsettings.xml instalado - reinicie o Kodi para aplicar"
+
+msgctxt "#30067"
+msgid "advancedsettings.xml already exists - merge changes manually"
+msgstr "advancedsettings.xml já existe - mescle as alterações manualmente"
+
+msgctxt "#30068"
+msgid "Failed to install advancedsettings.xml"
+msgstr "Falha ao instalar advancedsettings.xml"
+
+msgctxt "#30069"
+msgid "Setting up streaming server…"
+msgstr "Configurando servidor de streaming…"
+
+msgctxt "#30080"
+msgid "Preparing stream"
+msgstr "Preparando stream"
+
+msgctxt "#30081"
+msgid "Buffering: %s of %s"
+msgstr "Armazenando em buffer: %s de %s"
+
+msgctxt "#30082"
+msgid "%s/s — %d peers"
+msgstr "%s/s — %d peers"
+
+msgctxt "#30083"
+msgid "Buffering timed out, starting anyway"
+msgstr "O buffer expirou, iniciando mesmo assim"
+
+msgctxt "#30084"
+msgid "No peers available for this stream"
+msgstr "Nenhum peer disponível para este stream"
+
+msgctxt "#30085"
+msgid "Session expired - please log in again"
+msgstr "Sessão expirada - faça login novamente"
+
+msgctxt "#30086"
+msgid "Connecting to streaming server…"
+msgstr "Conectando ao servidor de streaming…"
+
+msgctxt "#30087"
+msgid "Resolving stream…"
+msgstr "Resolvendo stream…"
+
+msgctxt "#30088"
+msgid "Fetching torrent metadata…"
+msgstr "Buscando metadados do torrent…"
+
+msgctxt "#30089"
+msgid "Warming torrent engine…"
+msgstr "Preparando mecanismo de torrent…"
+
+msgctxt "#30090"
+msgid "attempt %d of %d"
+msgstr "tentativa %d de %d"
+
+msgctxt "#30091"
+msgid "Embedded server is not supported on Android - set Server URL to a server running elsewhere"
+msgstr "Servidor embutido não é suportado no Android – configure a URL do servidor em um servidor em execução em outro lugar"
+
+msgctxt "#30092"
+msgid "Installed server binary cannot be executed on this device"
+msgstr "O binário do servidor instalado não pode ser executado neste dispositivo"
+
+msgctxt "#30110"
+msgid "BitTorrent"
+msgstr "BitTorrent"
+
+msgctxt "#30111"
+msgid "Server resources"
+msgstr "Recursos do servidor"
+
+msgctxt "#30112"
+msgid "Server proxy"
+msgstr "Proxy do servidor"
+
+msgctxt "#30113"
+msgid "Server add-ons"
+msgstr "Complementos do servidor"
+
+msgctxt "#30114"
+msgid "Server diagnostics"
+msgstr "Diagnóstico do servidor"
+
+msgctxt "#30115"
+msgid "BitTorrent listen port"
+msgstr "Porta de escuta do BitTorrent"
+
+msgctxt "#30116"
+msgid "Peers per torrent"
+msgstr "Peers por torrent"
+
+msgctxt "#30117"
+msgid "Idle torrent timeout (seconds)"
+msgstr "Tempo limite de torrent inativo (segundos)"
+
+msgctxt "#30118"
+msgid "BitTorrent encryption"
+msgstr "Criptografia do BitTorrent"
+
+msgctxt "#30119"
+msgid "Prefer"
+msgstr "Preferir"
+
+msgctxt "#30120"
+msgid "Require"
+msgstr "Exigir"
+
+msgctxt "#30121"
+msgid "Disable"
+msgstr "Desativar"
+
+msgctxt "#30122"
+msgid "Anonymous mode"
+msgstr "Modo anônimo"
+
+msgctxt "#30123"
+msgid "Disable trackers"
+msgstr "Desativar trackers"
+
+msgctxt "#30124"
+msgid "BitTorrent proxy (SOCKS/HTTP URL)"
+msgstr "Proxy do BitTorrent (URL SOCKS/HTTP)"
+
+msgctxt "#30125"
+msgid "Disable WebTorrent/WebRTC peers"
+msgstr "Desativar peers WebTorrent/WebRTC"
+
+msgctxt "#30126"
+msgid "Max trackers per torrent"
+msgstr "Máximo de trackers por torrent"
+
+msgctxt "#30127"
+msgid "Custom tracker list URL"
+msgstr "URL de lista de trackers personalizada"
+
+msgctxt "#30128"
+msgid "Extra DHT bootstrap nodes"
+msgstr "Nós de inicialização DHT extras"
+
+msgctxt "#30129"
+msgid "Memory cache size (MB, 0 = disk only)"
+msgstr "Tamanho do cache de memória (MB, 0 = somente disco)"
+
+msgctxt "#30130"
+msgid "Soft memory limit (MB, 0 = unlimited)"
+msgstr "Limite flexível de memória (MB, 0 = ilimitado)"
+
+msgctxt "#30131"
+msgid "Proxy pre-buffer (segments)"
+msgstr "Pré-buffer do proxy (segmentos)"
+
+msgctxt "#30132"
+msgid "Proxy segment cache TTL (seconds)"
+msgstr "TTL do cache de segmentos do proxy (segundos)"
+
+msgctxt "#30133"
+msgid "Proxy password"
+msgstr "Senha do proxy"
+
+msgctxt "#30134"
+msgid "Proxy IP allow-list"
+msgstr "Lista de IPs permitidos do proxy"
+
+msgctxt "#30135"
+msgid "Proxy public URL"
+msgstr "URL pública do proxy"
+
+msgctxt "#30136"
+msgid "Proxy upstream URL"
+msgstr "URL de upstream do proxy"
+
+msgctxt "#30137"
+msgid "Proxy signing secret"
+msgstr "Segredo de assinatura do proxy"
+
+msgctxt "#30138"
+msgid "Enable DLNA casting"
+msgstr "Ativar transmissão DLNA"
+
+msgctxt "#30139"
+msgid "Local IMDB resolution"
+msgstr "Resolução local do IMDB"
+
+msgctxt "#30140"
+msgid "Metadata addon URL (blank = Cinemeta, \"off\" to disable)"
+msgstr "URL do complemento de metadados (vazio = Cinemeta, \"off\" para desativar)"
+
+msgctxt "#30141"
+msgid "Bitmagnet indexer URL"
+msgstr "URL do indexador Bitmagnet"
+
+msgctxt "#30142"
+msgid "Torznab indexer URL"
+msgstr "URL do indexador Torznab"
+
+msgctxt "#30143"
+msgid "Torznab API key"
+msgstr "Chave de API do Torznab"
+
+msgctxt "#30144"
+msgid "Web UI location"
+msgstr "Local da interface web"
+
+msgctxt "#30145"
+msgid "HTTPS port (0 = disabled)"
+msgstr "Porta HTTPS (0 = desativado)"
+
+msgctxt "#30146"
+msgid "pprof diagnostics address"
+msgstr "Endereço de diagnóstico do pprof"
+
+msgctxt "#30147"
+msgid "Stremio account auth key (HTTPS auto-cert)"
+msgstr "Chave de autenticação da conta Stremio (certificado HTTPS automático)"
+
+msgctxt "#30148"
+msgid "Browse catalogs from your installed addons"
+msgstr "Explorar os catálogos dos seus complementos instalados"
+
+msgctxt "#30149"
+msgid "Search across every installed addon"
+msgstr "Buscar em todos os complementos instalados"
+
+msgctxt "#30150"
+msgid "Your saved titles"
+msgstr "Seus títulos salvos"
+
+msgctxt "#30151"
+msgid "Manage installed Stremio addons"
+msgstr "Gerenciar os complementos do Stremio instalados"
+
+msgctxt "#30152"
+msgid "Configure Rivulet"
+msgstr "Configurar Rivulet"
+
+msgctxt "#30170"
+msgid "Sync playback progress to your Stremio account"
+msgstr "Sincronizar o progresso de reprodução com sua conta Stremio"
+
+msgctxt "#30171"
+msgid "Ask to resume"
+msgstr "Perguntar se deseja continuar"
+
+msgctxt "#30172"
+msgid "Resume playback?"
+msgstr "Continuar reprodução?"
+
+msgctxt "#30173"
+msgid "Resume from %s?"
+msgstr "Continuar a partir de %s?"
+
+msgctxt "#30174"
+msgid "Resume"
+msgstr "Continuar"
+
+msgctxt "#30175"
+msgid "Start from beginning"
+msgstr "Começar do início"
+
+msgctxt "#30160"
+msgid "This stream can only be opened in the Stremio app"
+msgstr "Este stream só pode ser aberto no aplicativo Stremio"
+
+msgctxt "#30180"
+msgid "Play the next episode automatically"
+msgstr "Reproduzir o próximo episódio automaticamente"
+
+msgctxt "#30181"
+msgid "Auto-play countdown (seconds)"
+msgstr "Contagem regressiva para reprodução automática (segundos)"
+
+msgctxt "#30182"
+msgid "Next episode"
+msgstr "Próximo episódio"
+
+msgctxt "#30183"
+msgid "Playing %s in %d s"
+msgstr "Reproduzindo %s em %d s"
+
+msgctxt "#30184"
+msgid "Updated to version %s"
+msgstr "Atualizado para a versão %s"
+
+msgctxt "#30185"
+msgid "Loading more sources..."
+msgstr "Carregando mais fontes..."
+
+msgctxt "#30186"
+msgid "Searching %s..."
+msgstr "Buscando em %s..."
+
+msgctxt "#30187"
+msgid "Checking %s..."
+msgstr "Verificando %s..."
+
+msgctxt "#30188"
+msgid "Season %d"
+msgstr "Temporada %d"
+
+msgctxt "#30189"
+msgid "Specials"
+msgstr "Especiais"
+
+msgctxt "#30190"
+msgid "Not logged in"
+msgstr "Não conectado"
+
+msgctxt "#30191"
+msgid "This addon is protected and cannot be removed"
+msgstr "Este complemento está protegido e não pode ser removido"
+
+msgctxt "#30192"
+msgid "Add a Stremio addon by manifest URL"
+msgstr "Adicionar um complemento do Stremio pelo URL do manifesto"
+
+msgctxt "#30194"
+msgid "Filter"
+msgstr "Filtro"
+
+msgctxt "#30196"
+msgid "Cast & crew"
+msgstr "Elenco e equipe técnica"
+
+msgctxt "#30197"
+msgid "No cast or crew information"
+msgstr "Nenhuma informação de elenco ou equipe"
+
+msgctxt "#30198"
+msgid "All"
+msgstr "Todos"
+
+msgctxt "#30199"
+msgid "search only"
+msgstr "somente busca"
+
+msgctxt "#30200"
+msgid "%d SOURCE"
+msgstr "%d FONTE"
+
+msgctxt "#30201"
+msgid "%d SOURCES"
+msgstr "%d FONTES"
+
+msgctxt "#30202"
+msgid "%d ADDON"
+msgstr "%d COMPLEMENTO"
+
+msgctxt "#30203"
+msgid "%d ADDONS"
+msgstr "%d COMPLEMENTOS"
+
+msgctxt "#30204"
+msgid "%d SEASON"
+msgstr "%d TEMPORADA"
+
+msgctxt "#30205"
+msgid "%d SEASONS"
+msgstr "%d TEMPORADAS"
+
+msgctxt "#30206"
+msgid "%d EPISODE"
+msgstr "%d EPISÓDIO"
+
+msgctxt "#30207"
+msgid "%d EPISODES"
+msgstr "%d EPISÓDIOS"
+
+msgctxt "#30208"
+msgid "%d CACHED"
+msgstr "%d EM CACHE"
+
+msgctxt "#30209"
+msgid "select"
+msgstr "selecionar"
+
+msgctxt "#30210"
+msgid "back"
+msgstr "voltar"
+
+msgctxt "#30211"
+msgid "exit"
+msgstr "sair"
+
+msgctxt "#30212"
+msgid "%d%% WATCHED"
+msgstr "%d%% VISTO"
+
+msgctxt "#30213"
+msgid "Movies"
+msgstr "Filmes"
+
+msgctxt "#30214"
+msgid "Series"
+msgstr "Séries"
+
+msgctxt "#30215"
+msgid "Anime"
+msgstr "Anime"
+
+msgctxt "#30216"
+msgid "Browse movie catalogs"
+msgstr "Navegar catálogos de filmes"
+
+msgctxt "#30217"
+msgid "Browse series and TV catalogs"
+msgstr "Navegar catálogos de séries e TV"
+
+msgctxt "#30218"
+msgid "Browse anime catalogs"
+msgstr "Navegar catálogos de anime"
+
+msgctxt "#30219"
+msgid "Home screen"
+msgstr "Tela inicial"
+
+msgctxt "#30220"
+msgid "Show Movies"
+msgstr "Mostrar Filmes"
+
+msgctxt "#30221"
+msgid "Show Series"
+msgstr "Mostrar Séries"
+
+msgctxt "#30222"
+msgid "Show Anime"
+msgstr "Mostrar Anime"
+
+msgctxt "#30223"
+msgid "cancel"
+msgstr "cancelar"
+
+msgctxt "#30224"
+msgid "cancels"
+msgstr "cancela"
+
+msgctxt "#30225"
+msgid "plays now"
+msgstr "reproduz agora"
+
+msgctxt "#30227"
+msgid "Other"
+msgstr "Outros"
+
+msgctxt "#30228"
+msgid "Browse catalogs that aren't film, series or anime"
+msgstr "Navegar catálogos que não são filmes, séries ou anime"
+
+msgctxt "#30229"
+msgid "Show Other"
+msgstr "Mostrar Outros"
+
+msgctxt "#30230"
+msgid "Open Rivulet automatically on Kodi startup"
+msgstr "Abrir o Rivulet automaticamente ao iniciar o Kodi"
+
+msgctxt "#30232"
+msgid "Resume, next up, and your library"
+msgstr "Retomar, próximo e sua biblioteca"
+
+msgctxt "#30234"
+msgid "now"
+msgstr "hoje"
+
+msgctxt "#30241"
+msgid "Continue"
+msgstr "Continuar"
+
+msgctxt "#30242"
+msgid "NEXT UP"
+msgstr "PRÓXIMO"
+
+msgctxt "#30243"
+msgid "WATCHED"
+msgstr "ASSISTIDO"
+
+msgctxt "#30244"
+msgid "Show Continue"
+msgstr "Mostrar Continuar"
+
+msgctxt "#30245"
+msgid "Continue watching"
+msgstr "Continuar assistindo"
+
+msgctxt "#30246"
+msgid "Recently watched"
+msgstr "Assistidos recentemente"
+
+msgctxt "#30247"
+msgid "Your library"
+msgstr "Sua biblioteca"
+
+msgctxt "#30248"
+msgid "Disable"
+msgstr "Desativar"
+
+msgctxt "#30249"
+msgid "Enable"
+msgstr "Ativar"
+
+msgctxt "#30250"
+msgid "Remove"
+msgstr "Remover"
+
+msgctxt "#30251"
+msgid "Disabled"
+msgstr "Desativado"
+
+msgctxt "#30252"
+msgid "Enabled"
+msgstr "Ativado"
+
+msgctxt "#30270"
+msgid "Move up"
+msgstr "Mover para cima"
+
+msgctxt "#30271"
+msgid "Move down"
+msgstr "Mover para baixo"
+
+msgctxt "#30272"
+msgid "Addon no longer installed"
+msgstr "O complemento não está mais instalado"
+
+msgctxt "#30293"
+msgid "Add to library"
+msgstr "Adicionar à biblioteca"
+
+msgctxt "#30294"
+msgid "Remove from library"
+msgstr "Remover da biblioteca"
+
+msgctxt "#30295"
+msgid "Mark as watched"
+msgstr "Marcar como visto"
+
+msgctxt "#30296"
+msgid "Mark as unwatched"
+msgstr "Marcar como não visto"
+
+msgctxt "#30297"
+msgid "Added to library"
+msgstr "Adicionado à biblioteca"
+
+msgctxt "#30298"
+msgid "Removed from library"
+msgstr "Removido da biblioteca"
+
+msgctxt "#30299"
+msgid "Marked as watched"
+msgstr "Marcado como visto"
+
+msgctxt "#30300"
+msgid "Marked as unwatched"
+msgstr "Marcado como não visto"
+
+msgctxt "#30301"
+msgid "Failed to update library"
+msgstr "Não foi possível atualizar a biblioteca"
+
+msgctxt "#30302"
+msgid "Failed to check library status"
+msgstr "Não foi possível verificar o status da biblioteca"
+
+msgctxt "#30253"
+msgid "Minimum quality"
+msgstr "Qualidade mínima"
+
+msgctxt "#30254"
+msgid "Any"
+msgstr "Qualquer"
+
+msgctxt "#30255"
+msgid "480p"
+msgstr "480p"
+
+msgctxt "#30256"
+msgid "720p"
+msgstr "720p"
+
+msgctxt "#30257"
+msgid "1080p"
+msgstr "1080p"
+
+msgctxt "#30258"
+msgid "2160p"
+msgstr "2160p"
+
+msgctxt "#30259"
+msgid "Maximum size (GB, 0 = unlimited)"
+msgstr "Tamanho máximo (GB, 0 = ilimitado)"
+
+msgctxt "#30260"
+msgid "Exclude CAM/TS sources"
+msgstr "Excluir fontes CAM/TS"
+
+msgctxt "#30261"
+msgid "Cached only"
+msgstr "Somente em cache"
+
+msgctxt "#30262"
+msgid "%d source hidden by filters"
+msgstr "%d fonte oculta pelos filtros"
+
+msgctxt "#30263"
+msgid "%d sources hidden by filters"
+msgstr "%d fontes ocultas pelos filtros"
+
+msgctxt "#30264"
+msgid "Filters matched nothing - showing all sources"
+msgstr "Os filtros não encontraram resultados; exibindo todas as fontes"
+
+msgctxt "#30313"
+msgid "New Episodes"
+msgstr "Novos episódios"
+
+msgctxt "#30314"
+msgid "Show new episodes under Series"
+msgstr "Mostrar novos episódios em Séries"
+
+msgctxt "#30315"
+msgid "%d new episode ready to watch"
+msgstr "%d novo episódio disponível"
+
+msgctxt "#30316"
+msgid "%d new episodes ready to watch"
+msgstr "%d novos episódios disponíveis"
+
+msgctxt "#30317"
+msgid "New episodes"
+msgstr "Novos episódios"
+
+msgctxt "#30318"
+msgid "NEW"
+msgstr "NOVO"
+
+msgctxt "#30280"
+msgid "Hide adult content"
+msgstr "Ocultar conteúdo adulto"
+
+
+
+msgctxt "#30335"
+msgid "Installed"
+msgstr "Instalado"
+
+msgctxt "#30336"
+msgid "Update available"
+msgstr "Atualização disponível"
+
+msgctxt "#30337"
+msgid "Needs configuration"
+msgstr "Requer configuração"
+
+msgctxt "#30338"
+msgid "%s is already installed"
+msgstr "%s já está instalado"
+
+msgctxt "#30339"
+msgid "No addon catalogs found. Install an addon that publishes one, such as Cinemeta."
+msgstr "Nenhum catálogo de addons encontrado. Instale um addon que publique um, como o Cinemeta."
+
+msgctxt "#30340"
+msgid "Could not load %s's addon catalog"
+msgstr "Não foi possível carregar o catálogo de addons de %s"
+
+msgctxt "#30341"
+msgid "%s needs configuration. Open %s in a browser, configure it, then paste the resulting manifest URL"
+msgstr "%s precisa de configuração. Abra %s num navegador, configure-o e depois cole o URL do manifesto resultante"
+
+msgctxt "#30342"
+msgid "Install this addon?"
+msgstr "Instalar este addon?"
+
+msgctxt "#30343"
+msgid "Addon catalogs"
+msgstr "Catálogos de addons"
+
+msgctxt "#30344"
+msgid "Browse addon catalogs"
+msgstr "Explorar catálogos de addons"
+
+msgctxt "#30345"
+msgid "Install from URL"
+msgstr "Instalar de URL"
+
+msgctxt "#30346"
+msgid "Search addon catalogs"
+msgstr "Pesquisar catálogos de addons"
+
+msgctxt "#30347"
+msgid "Clear search"
+msgstr "Limpar pesquisa"
+
+msgctxt "#30348"
+msgid "Showing %d of %d"
+msgstr "Exibindo %d de %d"
+
+msgctxt "#30349"
+msgid "No addons match your search"
+msgstr "Nenhum addon corresponde à pesquisa"
+
+msgctxt "#30350"
+msgid "Add addons"
+msgstr "Adicionar addons"
+
+msgctxt "#30351"
+msgid "Browse catalogs, or install from a manifest URL"
+msgstr "Explore catálogos ou instale de uma URL de manifesto"
+
+msgctxt "#30360"
+msgid "New episodes: %d"
+msgstr "Novos episódios: %d"
+
+msgctxt "#30361"
+msgid "Source slower than playback bitrate; expect buffering"
+msgstr "Fonte mais lenta que a taxa de bits de reprodução; buffering esperado"
+
+msgctxt "#30362"
+msgid "Force library mode (Android)"
+msgstr "Forçar modo biblioteca (Android)"
+
+msgctxt "#30363"
+msgid "Run the streaming server as an in-process library instead of a separate executable. Enable this only if the embedded server fails to start (e.g. on an SELinux-enforcing Android device)."
+msgstr "Executa o servidor de streaming como uma biblioteca no mesmo processo em vez de um executável separado. Ative somente se o servidor incorporado não iniciar (por exemplo, em um dispositivo Android com SELinux em modo enforcing)."
+
+msgctxt "#30371"
+msgid "Stream4Me bridge"
+msgstr "Ponte Stream4Me"
+
+msgctxt "#30372"
+msgid "Enable Stream4Me bridge"
+msgstr "Ativar ponte Stream4Me"
+
+msgctxt "#30373"
+msgid "Bridge port"
+msgstr "Porta da ponte"
+
+msgctxt "#30374"
+msgid "Channels (comma-separated, blank = every active channel)"
+msgstr "Canais (separados por vírgula, vazio = todos os canais ativos)"

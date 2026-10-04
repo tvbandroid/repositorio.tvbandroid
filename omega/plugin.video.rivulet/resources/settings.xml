@@ -1,0 +1,608 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings version="1">
+    <section id="plugin.video.rivulet">
+        <category id="home" label="30219">
+            <group id="1">
+                <setting id="home_show_mystuff" type="boolean" label="30244">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="home_show_new_episodes" type="boolean" label="30314">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="home_show_movies" type="boolean" label="30220">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="home_show_series" type="boolean" label="30221">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="home_show_anime" type="boolean" label="30222">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="home_show_other" type="boolean" label="30229">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="home_hide_adult" type="boolean" label="30280">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="startup_autoload" type="boolean" label="30230">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="server" label="30101">
+            <group id="1">
+                <!-- server_enable FIRST, server_url after it: a category's
+                     first setting is the one Kodi auto-focuses when the
+                     dialog opens, and an `edit` control entered that way
+                     goes straight into text-input mode - which then eats
+                     the arrow keys, so with nothing to arrow to the user
+                     is stuck in the field and Back is the only way out.
+                     server_url used to be a category of its own (the old
+                     "General"), i.e. exactly that dead end. Keep a
+                     non-edit control first here, and never give an `edit`
+                     setting a category to itself. -->
+                <setting id="server_enable" type="boolean" label="30103">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="server_url" type="string" label="30102">
+                    <level>0</level>
+                    <default>http://127.0.0.1:11470</default>
+                    <constraints>
+                        <allowempty>false</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30102</heading>
+                    </control>
+                </setting>
+                <setting id="server_binary" type="path" label="30104">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <writable>false</writable>
+                        <masking>executable</masking>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="file">
+                        <heading>30104</heading>
+                    </control>
+                </setting>
+                <setting id="server_download" type="action" label="30060">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.rivulet/?action=server_download)</data>
+                    <control type="button" format="action"/>
+                </setting>
+                <setting id="server_force_library" type="boolean" label="30362">
+                    <level>1</level>
+                    <default>false</default>
+                    <help>30363</help>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="playback" label="30070">
+            <group id="1">
+                <setting id="buffer_enable" type="boolean" label="30071">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="buffer_mb" type="integer" label="30072">
+                    <level>0</level>
+                    <default>20</default>
+                    <constraints>
+                        <minimum>5</minimum>
+                        <step>5</step>
+                        <maximum>100</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="stream_sort" type="string" label="30073">
+                    <level>0</level>
+                    <default>quality</default>
+                    <constraints>
+                        <options>
+                            <option label="30074">quality</option>
+                            <option label="30075">size</option>
+                            <option label="30076">seeders</option>
+                        </options>
+                        <allowempty>false</allowempty>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30073</heading>
+                    </control>
+                </setting>
+                <setting id="advancedsettings_install" type="action" label="30065">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.rivulet/?action=advancedsettings_install)</data>
+                    <control type="button" format="action"/>
+                </setting>
+                <setting id="sync_progress" type="boolean" label="30170">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="resume_ask" type="boolean" label="30171">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="binge_enable" type="boolean" label="30180">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="binge_countdown" type="integer" label="30181">
+                    <level>0</level>
+                    <default>10</default>
+                    <constraints>
+                        <minimum>3</minimum>
+                        <step>1</step>
+                        <maximum>60</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="playback_min_quality" type="string" label="30253">
+                    <level>0</level>
+                    <default>any</default>
+                    <constraints>
+                        <options>
+                            <option label="30254">any</option>
+                            <option label="30255">480p</option>
+                            <option label="30256">720p</option>
+                            <option label="30257">1080p</option>
+                            <option label="30258">2160p</option>
+                        </options>
+                        <allowempty>false</allowempty>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30253</heading>
+                    </control>
+                </setting>
+                <setting id="playback_max_size_gb" type="integer" label="30259">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <step>1</step>
+                        <maximum>200</maximum>
+                    </constraints>
+                    <control type="slider" format="integer">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="playback_exclude_cam" type="boolean" label="30260">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="playback_cached_only" type="boolean" label="30261">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="server_bittorrent" label="30110">
+            <group id="1">
+                <setting id="bt_listen_port" type="integer" label="30115">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30115</heading>
+                    </control>
+                </setting>
+                <setting id="peers_per_torrent" type="integer" label="30116">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30116</heading>
+                    </control>
+                </setting>
+                <setting id="torrent_idle_timeout" type="integer" label="30117">
+                    <level>0</level>
+                    <default>300</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30117</heading>
+                    </control>
+                </setting>
+                <setting id="bt_encryption" type="string" label="30118">
+                    <level>0</level>
+                    <default>prefer</default>
+                    <constraints>
+                        <options>
+                            <option label="30119">prefer</option>
+                            <option label="30120">require</option>
+                            <option label="30121">disable</option>
+                        </options>
+                        <allowempty>false</allowempty>
+                    </constraints>
+                    <control type="list" format="string">
+                        <heading>30118</heading>
+                    </control>
+                </setting>
+                <setting id="bt_anonymous" type="boolean" label="30122">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="disable_trackers" type="boolean" label="30123">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="bt_proxy" type="string" label="30124">
+                    <level>1</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30124</heading>
+                    </control>
+                </setting>
+                <setting id="disable_webtorrent" type="boolean" label="30125">
+                    <level>1</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="trackers_max" type="integer" label="30126">
+                    <level>1</level>
+                    <default>5</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30126</heading>
+                    </control>
+                </setting>
+                <setting id="trackers_url" type="string" label="30127">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30127</heading>
+                    </control>
+                </setting>
+                <setting id="dht_bootstrap" type="string" label="30128">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30128</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="server_resources" label="30111">
+            <group id="1">
+                <setting id="memory_cache_size_mb" type="integer" label="30129">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30129</heading>
+                    </control>
+                </setting>
+                <setting id="mem_limit_mb" type="integer" label="30130">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30130</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="server_proxy" label="30112">
+            <group id="1">
+                <setting id="proxy_prebuffer" type="integer" label="30131">
+                    <level>1</level>
+                    <default>3</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30131</heading>
+                    </control>
+                </setting>
+                <setting id="proxy_seg_cache_ttl" type="integer" label="30132">
+                    <level>1</level>
+                    <default>300</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30132</heading>
+                    </control>
+                </setting>
+                <setting id="proxy_password" type="string" label="30133">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30133</heading>
+                    </control>
+                </setting>
+                <setting id="proxy_ip_acl" type="string" label="30134">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30134</heading>
+                    </control>
+                </setting>
+                <setting id="proxy_public_url" type="string" label="30135">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30135</heading>
+                    </control>
+                </setting>
+                <setting id="proxy_upstream" type="string" label="30136">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30136</heading>
+                    </control>
+                </setting>
+                <setting id="proxy_secret" type="string" label="30137">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30137</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="server_addons" label="30113">
+            <group id="1">
+                <setting id="enable_dlna" type="boolean" label="30138">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="local_imdb" type="boolean" label="30139">
+                    <level>1</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="metadata_url" type="string" label="30140">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30140</heading>
+                    </control>
+                </setting>
+                <setting id="bitmagnet_url" type="string" label="30141">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30141</heading>
+                    </control>
+                </setting>
+                <setting id="torznab_url" type="string" label="30142">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30142</heading>
+                    </control>
+                </setting>
+                <setting id="torznab_apikey" type="string" label="30143">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30143</heading>
+                    </control>
+                </setting>
+                <setting id="web_ui_location" type="string" label="30144">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30144</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="server_diagnostics" label="30114">
+            <group id="1">
+                <setting id="https_port" type="integer" label="30145">
+                    <level>1</level>
+                    <default>12470</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30145</heading>
+                    </control>
+                </setting>
+                <setting id="pprof_addr" type="string" label="30146">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30146</heading>
+                    </control>
+                </setting>
+                <setting id="cert_authkey" type="string" label="30147">
+                    <level>2</level>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30147</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="account" label="30105">
+            <group id="1">
+                <setting id="login" type="action" label="30020">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.rivulet/?action=login)</data>
+                    <control type="button" format="action"/>
+                </setting>
+                <setting id="logout" type="action" label="30021">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.rivulet/?action=logout)</data>
+                    <control type="button" format="action"/>
+                </setting>
+                <setting id="sync_addons_now" type="action" label="30036">
+                    <level>0</level>
+                    <data>RunPlugin(plugin://plugin.video.rivulet/?action=sync_addons_now)</data>
+                    <control type="button" format="action"/>
+                </setting>
+            </group>
+        </category>
+        <category id="subtitles" label="30050">
+            <group id="1">
+                <setting id="subs_enable" type="boolean" label="30051">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="subs_language" type="string" label="30052">
+                    <level>0</level>
+                    <default>en</default>
+                    <constraints>
+                        <allowempty>false</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30052</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="s4me" label="30371">
+            <group id="1">
+                <!-- s4me_enable FIRST, same reasoning as server_enable above:
+                     a toggle first in the category avoids Kodi auto-focusing
+                     an edit control and trapping the arrow keys. On by
+                     default: lib/service_runner.py only runs the bridge for
+                     Italian users with Stream4Me installed, and these
+                     settings are hidden from everyone else. The visibility
+                     check can only match the English language name, so the
+                     audio-language fallback is enforced in code alone. -->
+                <setting id="s4me_enable" type="boolean" label="30372">
+                    <level>0</level>
+                    <default>true</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <and>
+                                <condition on="property" name="InfoBool">System.HasAddon(plugin.video.s4me)</condition>
+                                <condition on="property" name="InfoBool">String.IsEqual(System.Language,Italian)</condition>
+                            </and>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="s4me_port" type="integer" label="30373">
+                    <level>1</level>
+                    <dependencies>
+                        <dependency type="visible">
+                            <and>
+                                <condition on="property" name="InfoBool">System.HasAddon(plugin.video.s4me)</condition>
+                                <condition on="property" name="InfoBool">String.IsEqual(System.Language,Italian)</condition>
+                            </and>
+                        </dependency>
+                    </dependencies>
+                    <default>11480</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <maximum>65535</maximum>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30373</heading>
+                    </control>
+                </setting>
+                <setting id="s4me_channels" type="string" label="30374">
+                    <level>1</level>
+                    <dependencies>
+                        <dependency type="visible">
+                            <and>
+                                <condition on="property" name="InfoBool">System.HasAddon(plugin.video.s4me)</condition>
+                                <condition on="property" name="InfoBool">String.IsEqual(System.Language,Italian)</condition>
+                            </and>
+                        </dependency>
+                    </dependencies>
+                    <default></default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30374</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+    </section>
+</settings>

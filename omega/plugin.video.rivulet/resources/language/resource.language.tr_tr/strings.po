@@ -1,0 +1,975 @@
+# Kodi Media Center language file
+# Addon Name: Rivulet
+# Addon id: plugin.video.rivulet
+# Addon Provider: M0Rf30
+msgid ""
+msgstr ""
+"Project-Id-Version: plugin.video.rivulet\n"
+"Report-Msgid-Bugs-To: https://github.com/M0Rf30/plugin.video.rivulet/issues\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: M0Rf30\n"
+"Language-Team: Turkish (Türkçe)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr_TR\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30000"
+msgid "Discover"
+msgstr "Keşfet"
+
+msgctxt "#30001"
+msgid "Search"
+msgstr "Ara"
+
+msgctxt "#30002"
+msgid "Library"
+msgstr "Kitaplık"
+
+msgctxt "#30003"
+msgid "Addons"
+msgstr "Eklentiler"
+
+msgctxt "#30004"
+msgid "Settings"
+msgstr "Ayarlar"
+
+msgctxt "#30010"
+msgid "Install addon from URL"
+msgstr "URL'den eklenti yükle"
+
+msgctxt "#30011"
+msgid "Remove addon"
+msgstr "Eklentiyi kaldır"
+
+msgctxt "#30012"
+msgid "Addon installed"
+msgstr "Eklenti yüklendi"
+
+msgctxt "#30013"
+msgid "Addon removed"
+msgstr "Eklenti kaldırıldı"
+
+msgctxt "#30014"
+msgid "Invalid addon manifest"
+msgstr "Geçersiz eklenti manifest dosyası"
+
+msgctxt "#30020"
+msgid "Login to Stremio"
+msgstr "Stremio'ya giriş yap"
+
+msgctxt "#30021"
+msgid "Logout"
+msgstr "Çıkış yap"
+
+msgctxt "#30022"
+msgid "Logged in as %s"
+msgstr "%s olarak giriş yapıldı"
+
+msgctxt "#30023"
+msgid "Login failed"
+msgstr "Giriş başarısız"
+
+msgctxt "#30024"
+msgid "Stremio email"
+msgstr "Stremio e-posta"
+
+msgctxt "#30025"
+msgid "Password"
+msgstr "Şifre"
+
+msgctxt "#30026"
+msgid "Showcase"
+msgstr "Vitrin"
+
+msgctxt "#30030"
+msgid "No streams found"
+msgstr "Yayın bulunamadı"
+
+msgctxt "#30031"
+msgid "Streaming server unavailable"
+msgstr "Yayın sunucusuna erişilemiyor"
+
+msgctxt "#30032"
+msgid "Something went wrong"
+msgstr "Bir sorun oluştu"
+
+msgctxt "#30033"
+msgid "Loading…"
+msgstr "Yükleniyor…"
+
+msgctxt "#30034"
+msgid "Addons synced"
+msgstr "Eklentiler senkronize edildi"
+
+msgctxt "#30035"
+msgid "Addon sync failed"
+msgstr "Eklenti senkronizasyonu başarısız"
+
+msgctxt "#30036"
+msgid "Sync addons now"
+msgstr "Eklentileri şimdi senkronize et"
+
+msgctxt "#30040"
+msgid "Next page"
+msgstr "Sonraki sayfa"
+
+msgctxt "#30041"
+msgid "Streams"
+msgstr "Yayınlar"
+
+msgctxt "#30042"
+msgid "New search…"
+msgstr "Yeni arama…"
+
+msgctxt "#30043"
+msgid "Type a new query"
+msgstr "Yeni bir sorgu girin"
+
+msgctxt "#30044"
+msgid "Clear search history"
+msgstr "Arama geçmişini temizle"
+
+msgctxt "#30045"
+msgid "Search again"
+msgstr "Yeniden ara"
+
+msgctxt "#30046"
+msgid "Remove every saved search?"
+msgstr "Kaydedilen tüm aramalar kaldırılsın mı?"
+
+msgctxt "#30100"
+msgid "General"
+msgstr "Genel"
+
+msgctxt "#30101"
+msgid "Streaming server"
+msgstr "Yayın sunucusu"
+
+msgctxt "#30102"
+msgid "Server URL"
+msgstr "Sunucu URL'si"
+
+msgctxt "#30103"
+msgid "Run embedded server"
+msgstr "Gömülü sunucuyu çalıştır"
+
+msgctxt "#30104"
+msgid "Server binary path"
+msgstr "Sunucu ikili dosya yolu"
+
+msgctxt "#30105"
+msgid "Account"
+msgstr "Hesap"
+
+msgctxt "#30050"
+msgid "Subtitles"
+msgstr "Altyazılar"
+
+msgctxt "#30051"
+msgid "Enable addon subtitles"
+msgstr "Eklenti altyazılarını etkinleştir"
+
+msgctxt "#30052"
+msgid "Preferred subtitle language"
+msgstr "Tercih edilen altyazı dili"
+
+msgctxt "#30060"
+msgid "Download stremio-server binary"
+msgstr "stremio-server ikili dosyasını indir"
+
+msgctxt "#30061"
+msgid "Downloading stremio-server"
+msgstr "stremio-server indiriliyor"
+
+msgctxt "#30062"
+msgid "Server binary installed (%s)"
+msgstr "Sunucu ikili dosyası yüklendi (%s)"
+
+msgctxt "#30063"
+msgid "Download failed"
+msgstr "İndirme başarısız"
+
+msgctxt "#30064"
+msgid "No release asset for this platform"
+msgstr "Bu platform için yayın dosyası bulunamadı"
+
+msgctxt "#30070"
+msgid "Playback"
+msgstr "Oynatma"
+
+msgctxt "#30071"
+msgid "Pre-buffer torrents"
+msgstr "Torrentleri önceden arabelleğe al"
+
+msgctxt "#30072"
+msgid "Pre-buffer size (MB)"
+msgstr "Ön arabellek boyutu (MB)"
+
+msgctxt "#30073"
+msgid "Sort streams by"
+msgstr "Yayınları şuna göre sırala"
+
+msgctxt "#30074"
+msgid "Quality"
+msgstr "Kalite"
+
+msgctxt "#30075"
+msgid "Size"
+msgstr "Boyut"
+
+msgctxt "#30076"
+msgid "Seeders"
+msgstr "Kaynak sağlayanlar"
+
+msgctxt "#30065"
+msgid "Install recommended advancedsettings.xml"
+msgstr "Önerilen advancedsettings.xml dosyasını yükle"
+
+msgctxt "#30066"
+msgid "advancedsettings.xml installed - restart Kodi to apply"
+msgstr "advancedsettings.xml yüklendi - uygulamak için Kodi'yi yeniden başlatın"
+
+msgctxt "#30067"
+msgid "advancedsettings.xml already exists - merge changes manually"
+msgstr "advancedsettings.xml zaten mevcut - değişiklikleri manuel olarak birleştirin"
+
+msgctxt "#30068"
+msgid "Failed to install advancedsettings.xml"
+msgstr "advancedsettings.xml yüklenemedi"
+
+msgctxt "#30069"
+msgid "Setting up streaming server…"
+msgstr "Yayın sunucusu ayarlanıyor…"
+
+msgctxt "#30080"
+msgid "Preparing stream"
+msgstr "Yayın hazırlanıyor"
+
+msgctxt "#30081"
+msgid "Buffering: %s of %s"
+msgstr "Arabelleğe alınıyor: %s / %s"
+
+msgctxt "#30082"
+msgid "%s/s — %d peers"
+msgstr "%s/s — %d eş"
+
+msgctxt "#30083"
+msgid "Buffering timed out, starting anyway"
+msgstr "Arabelleğe alma zaman aşımına uğradı, yine de başlatılıyor"
+
+msgctxt "#30084"
+msgid "No peers available for this stream"
+msgstr "Bu yayın için eş bulunamadı"
+
+msgctxt "#30085"
+msgid "Session expired - please log in again"
+msgstr "Oturum süresi doldu - lütfen yeniden giriş yapın"
+
+msgctxt "#30086"
+msgid "Connecting to streaming server…"
+msgstr "Yayın sunucusuna bağlanılıyor…"
+
+msgctxt "#30087"
+msgid "Resolving stream…"
+msgstr "Yayın çözümleniyor…"
+
+msgctxt "#30088"
+msgid "Fetching torrent metadata…"
+msgstr "Torrent meta verisi alınıyor…"
+
+msgctxt "#30089"
+msgid "Warming torrent engine…"
+msgstr "Torrent motoru ısıtılıyor…"
+
+msgctxt "#30090"
+msgid "attempt %d of %d"
+msgstr "deneme %d / %d"
+
+msgctxt "#30091"
+msgid "Embedded server is not supported on Android - set Server URL to a server running elsewhere"
+msgstr "Gömülü sunucu Android'de desteklenmiyor – Sunucu URL'sini başka bir yerde çalışan bir sunucuya ayarlayın"
+
+msgctxt "#30092"
+msgid "Installed server binary cannot be executed on this device"
+msgstr "Yüklü sunucu ikili dosyası bu cihazda çalıştırılamaz"
+
+msgctxt "#30110"
+msgid "BitTorrent"
+msgstr "BitTorrent"
+
+msgctxt "#30111"
+msgid "Server resources"
+msgstr "Sunucu kaynakları"
+
+msgctxt "#30112"
+msgid "Server proxy"
+msgstr "Sunucu proxy"
+
+msgctxt "#30113"
+msgid "Server add-ons"
+msgstr "Sunucu eklentileri"
+
+msgctxt "#30114"
+msgid "Server diagnostics"
+msgstr "Sunucu tanılama"
+
+msgctxt "#30115"
+msgid "BitTorrent listen port"
+msgstr "BitTorrent dinleme portu"
+
+msgctxt "#30116"
+msgid "Peers per torrent"
+msgstr "Torrent başına eş sayısı"
+
+msgctxt "#30117"
+msgid "Idle torrent timeout (seconds)"
+msgstr "Boşta torrent zaman aşımı (saniye)"
+
+msgctxt "#30118"
+msgid "BitTorrent encryption"
+msgstr "BitTorrent şifreleme"
+
+msgctxt "#30119"
+msgid "Prefer"
+msgstr "Tercih et"
+
+msgctxt "#30120"
+msgid "Require"
+msgstr "Zorunlu tut"
+
+msgctxt "#30121"
+msgid "Disable"
+msgstr "Devre dışı bırak"
+
+msgctxt "#30122"
+msgid "Anonymous mode"
+msgstr "Anonim mod"
+
+msgctxt "#30123"
+msgid "Disable trackers"
+msgstr "İzleyicileri devre dışı bırak"
+
+msgctxt "#30124"
+msgid "BitTorrent proxy (SOCKS/HTTP URL)"
+msgstr "BitTorrent proxy (SOCKS/HTTP URL)"
+
+msgctxt "#30125"
+msgid "Disable WebTorrent/WebRTC peers"
+msgstr "WebTorrent/WebRTC eşlerini devre dışı bırak"
+
+msgctxt "#30126"
+msgid "Max trackers per torrent"
+msgstr "Torrent başına maksimum izleyici"
+
+msgctxt "#30127"
+msgid "Custom tracker list URL"
+msgstr "Özel izleyici listesi URL'si"
+
+msgctxt "#30128"
+msgid "Extra DHT bootstrap nodes"
+msgstr "Ek DHT önyükleme düğümleri"
+
+msgctxt "#30129"
+msgid "Memory cache size (MB, 0 = disk only)"
+msgstr "Bellek önbellek boyutu (MB, 0 = sadece disk)"
+
+msgctxt "#30130"
+msgid "Soft memory limit (MB, 0 = unlimited)"
+msgstr "Yumuşak bellek sınırı (MB, 0 = sınırsız)"
+
+msgctxt "#30131"
+msgid "Proxy pre-buffer (segments)"
+msgstr "Proxy ön arabelleği (segment)"
+
+msgctxt "#30132"
+msgid "Proxy segment cache TTL (seconds)"
+msgstr "Proxy segment önbellek TTL (saniye)"
+
+msgctxt "#30133"
+msgid "Proxy password"
+msgstr "Proxy şifresi"
+
+msgctxt "#30134"
+msgid "Proxy IP allow-list"
+msgstr "Proxy IP izin listesi"
+
+msgctxt "#30135"
+msgid "Proxy public URL"
+msgstr "Proxy genel URL'si"
+
+msgctxt "#30136"
+msgid "Proxy upstream URL"
+msgstr "Proxy yukarı akış URL'si"
+
+msgctxt "#30137"
+msgid "Proxy signing secret"
+msgstr "Proxy imzalama gizli anahtarı"
+
+msgctxt "#30138"
+msgid "Enable DLNA casting"
+msgstr "DLNA yayınlamayı etkinleştir"
+
+msgctxt "#30139"
+msgid "Local IMDB resolution"
+msgstr "Yerel IMDB çözümleme"
+
+msgctxt "#30140"
+msgid "Metadata addon URL (blank = Cinemeta, \"off\" to disable)"
+msgstr "Meta veri eklentisi URL'si (boş = Cinemeta, devre dışı bırakmak için \"off\")"
+
+msgctxt "#30141"
+msgid "Bitmagnet indexer URL"
+msgstr "Bitmagnet dizinleyici URL'si"
+
+msgctxt "#30142"
+msgid "Torznab indexer URL"
+msgstr "Torznab dizinleyici URL'si"
+
+msgctxt "#30143"
+msgid "Torznab API key"
+msgstr "Torznab API anahtarı"
+
+msgctxt "#30144"
+msgid "Web UI location"
+msgstr "Web arayüzü konumu"
+
+msgctxt "#30145"
+msgid "HTTPS port (0 = disabled)"
+msgstr "HTTPS portu (0 = devre dışı)"
+
+msgctxt "#30146"
+msgid "pprof diagnostics address"
+msgstr "pprof tanılama adresi"
+
+msgctxt "#30147"
+msgid "Stremio account auth key (HTTPS auto-cert)"
+msgstr "Stremio hesap yetkilendirme anahtarı (HTTPS otomatik sertifika)"
+
+msgctxt "#30148"
+msgid "Browse catalogs from your installed addons"
+msgstr "Yüklü eklentilerinizin kataloglarına göz atın"
+
+msgctxt "#30149"
+msgid "Search across every installed addon"
+msgstr "Yüklü tüm eklentilerde ara"
+
+msgctxt "#30150"
+msgid "Your saved titles"
+msgstr "Kaydettiğiniz içerikler"
+
+msgctxt "#30151"
+msgid "Manage installed Stremio addons"
+msgstr "Yüklü Stremio eklentilerini yönet"
+
+msgctxt "#30152"
+msgid "Configure Rivulet"
+msgstr "Rivulet'i yapılandır"
+
+msgctxt "#30170"
+msgid "Sync playback progress to your Stremio account"
+msgstr "Oynatma ilerlemesini Stremio hesabınla senkronize et"
+
+msgctxt "#30171"
+msgid "Ask to resume"
+msgstr "Devam etmeyi sor"
+
+msgctxt "#30172"
+msgid "Resume playback?"
+msgstr "Oynatma devam ettirilsin mi?"
+
+msgctxt "#30173"
+msgid "Resume from %s?"
+msgstr "%s konumundan devam edilsin mi?"
+
+msgctxt "#30174"
+msgid "Resume"
+msgstr "Devam Et"
+
+msgctxt "#30175"
+msgid "Start from beginning"
+msgstr "Baştan Başla"
+
+msgctxt "#30160"
+msgid "This stream can only be opened in the Stremio app"
+msgstr "Bu akış yalnızca Stremio uygulamasında açılabilir"
+
+msgctxt "#30180"
+msgid "Play the next episode automatically"
+msgstr "Sonraki bölümü otomatik oynat"
+
+msgctxt "#30181"
+msgid "Auto-play countdown (seconds)"
+msgstr "Otomatik oynatma geri sayımı (saniye)"
+
+msgctxt "#30182"
+msgid "Next episode"
+msgstr "Sonraki bölüm"
+
+msgctxt "#30183"
+msgid "Playing %s in %d s"
+msgstr "%s, %d sn içinde oynatılıyor"
+
+msgctxt "#30184"
+msgid "Updated to version %s"
+msgstr "%s sürümüne güncellendi"
+
+msgctxt "#30185"
+msgid "Loading more sources..."
+msgstr "Daha fazla kaynak yükleniyor..."
+
+msgctxt "#30186"
+msgid "Searching %s..."
+msgstr "%s aranıyor..."
+
+msgctxt "#30187"
+msgid "Checking %s..."
+msgstr "%s kontrol ediliyor..."
+
+msgctxt "#30188"
+msgid "Season %d"
+msgstr "Sezon %d"
+
+msgctxt "#30189"
+msgid "Specials"
+msgstr "Özel bölümler"
+
+msgctxt "#30190"
+msgid "Not logged in"
+msgstr "Giriş yapılmadı"
+
+msgctxt "#30191"
+msgid "This addon is protected and cannot be removed"
+msgstr "Bu eklenti korumalı ve kaldırılamaz"
+
+msgctxt "#30192"
+msgid "Add a Stremio addon by manifest URL"
+msgstr "Manifest URL'siyle Stremio eklentisi ekle"
+
+msgctxt "#30194"
+msgid "Filter"
+msgstr "Filtre"
+
+msgctxt "#30196"
+msgid "Cast & crew"
+msgstr "Oyuncular ve Ekip"
+
+msgctxt "#30197"
+msgid "No cast or crew information"
+msgstr "Oyuncu veya ekip bilgisi bulunamadı"
+
+msgctxt "#30198"
+msgid "All"
+msgstr "Tümü"
+
+msgctxt "#30199"
+msgid "search only"
+msgstr "yalnızca arama"
+
+msgctxt "#30200"
+msgid "%d SOURCE"
+msgstr "%d KAYNAK"
+
+msgctxt "#30201"
+msgid "%d SOURCES"
+msgstr "%d KAYNAKLAR"
+
+msgctxt "#30202"
+msgid "%d ADDON"
+msgstr "%d EKLENTİ"
+
+msgctxt "#30203"
+msgid "%d ADDONS"
+msgstr "%d EKLENTİLER"
+
+msgctxt "#30204"
+msgid "%d SEASON"
+msgstr "%d SEZON"
+
+msgctxt "#30205"
+msgid "%d SEASONS"
+msgstr "%d SEZONLAR"
+
+msgctxt "#30206"
+msgid "%d EPISODE"
+msgstr "%d BÖLÜM"
+
+msgctxt "#30207"
+msgid "%d EPISODES"
+msgstr "%d BÖLÜMLER"
+
+msgctxt "#30208"
+msgid "%d CACHED"
+msgstr "%d ÖNBELLEKTE"
+
+msgctxt "#30209"
+msgid "select"
+msgstr "seç"
+
+msgctxt "#30210"
+msgid "back"
+msgstr "geri"
+
+msgctxt "#30211"
+msgid "exit"
+msgstr "çıkış"
+
+msgctxt "#30212"
+msgid "%d%% WATCHED"
+msgstr "%d%% İZLENDİ"
+
+msgctxt "#30213"
+msgid "Movies"
+msgstr "Filmler"
+
+msgctxt "#30214"
+msgid "Series"
+msgstr "Diziler"
+
+msgctxt "#30215"
+msgid "Anime"
+msgstr "Anime"
+
+msgctxt "#30216"
+msgid "Browse movie catalogs"
+msgstr "Film kataloglarına göz at"
+
+msgctxt "#30217"
+msgid "Browse series and TV catalogs"
+msgstr "Dizi ve TV kataloglarına göz at"
+
+msgctxt "#30218"
+msgid "Browse anime catalogs"
+msgstr "Anime kataloglarına göz at"
+
+msgctxt "#30219"
+msgid "Home screen"
+msgstr "Ana ekran"
+
+msgctxt "#30220"
+msgid "Show Movies"
+msgstr "Filmleri göster"
+
+msgctxt "#30221"
+msgid "Show Series"
+msgstr "Dizileri göster"
+
+msgctxt "#30222"
+msgid "Show Anime"
+msgstr "Anime göster"
+
+msgctxt "#30223"
+msgid "cancel"
+msgstr "iptal"
+
+msgctxt "#30224"
+msgid "cancels"
+msgstr "iptal eder"
+
+msgctxt "#30225"
+msgid "plays now"
+msgstr "şimdi oynatır"
+
+msgctxt "#30227"
+msgid "Other"
+msgstr "Diğer"
+
+msgctxt "#30228"
+msgid "Browse catalogs that aren't film, series or anime"
+msgstr "Film, dizi veya anime olmayan kataloglara göz at"
+
+msgctxt "#30229"
+msgid "Show Other"
+msgstr "Diğer göster"
+
+msgctxt "#30230"
+msgid "Open Rivulet automatically on Kodi startup"
+msgstr "Kodi başlangıcında Rivulet'i otomatik olarak aç"
+
+msgctxt "#30232"
+msgid "Resume, next up, and your library"
+msgstr "Devam et, sıradaki ve kitaplığınız"
+
+msgctxt "#30234"
+msgid "now"
+msgstr "devam"
+
+msgctxt "#30241"
+msgid "Continue"
+msgstr "Devam et"
+
+msgctxt "#30242"
+msgid "NEXT UP"
+msgstr "SIRADAKİ"
+
+msgctxt "#30243"
+msgid "WATCHED"
+msgstr "İZLENDİ"
+
+msgctxt "#30244"
+msgid "Show Continue"
+msgstr "Devam et'i göster"
+
+msgctxt "#30245"
+msgid "Continue watching"
+msgstr "İzlemeye devam et"
+
+msgctxt "#30246"
+msgid "Recently watched"
+msgstr "Son izlenenler"
+
+msgctxt "#30247"
+msgid "Your library"
+msgstr "Kitaplığınız"
+
+msgctxt "#30248"
+msgid "Disable"
+msgstr "Devre Dışı Bırak"
+
+msgctxt "#30249"
+msgid "Enable"
+msgstr "Etkinleştir"
+
+msgctxt "#30250"
+msgid "Remove"
+msgstr "Kaldır"
+
+msgctxt "#30251"
+msgid "Disabled"
+msgstr "Devre Dışı"
+
+msgctxt "#30252"
+msgid "Enabled"
+msgstr "Etkinleştirildi"
+
+msgctxt "#30270"
+msgid "Move up"
+msgstr "Yukarı taşı"
+
+msgctxt "#30271"
+msgid "Move down"
+msgstr "Aşağı taşı"
+
+msgctxt "#30272"
+msgid "Addon no longer installed"
+msgstr "Eklenti artık yüklü değil"
+
+msgctxt "#30293"
+msgid "Add to library"
+msgstr "Kitaplığa ekle"
+
+msgctxt "#30294"
+msgid "Remove from library"
+msgstr "Kitaplıktan kaldır"
+
+msgctxt "#30295"
+msgid "Mark as watched"
+msgstr "İzlendi olarak işaretle"
+
+msgctxt "#30296"
+msgid "Mark as unwatched"
+msgstr "İzlenmedi olarak işaretle"
+
+msgctxt "#30297"
+msgid "Added to library"
+msgstr "Kitaplığa eklendi"
+
+msgctxt "#30298"
+msgid "Removed from library"
+msgstr "Kitaplıktan kaldırıldı"
+
+msgctxt "#30299"
+msgid "Marked as watched"
+msgstr "İzlendi olarak işaretlendi"
+
+msgctxt "#30300"
+msgid "Marked as unwatched"
+msgstr "İzlenmedi olarak işaretlendi"
+
+msgctxt "#30301"
+msgid "Failed to update library"
+msgstr "Kitaplık güncellenemedi"
+
+msgctxt "#30302"
+msgid "Failed to check library status"
+msgstr "Kitaplık durumu kontrol edilemedi"
+
+msgctxt "#30253"
+msgid "Minimum quality"
+msgstr "Minimum kalite"
+
+msgctxt "#30254"
+msgid "Any"
+msgstr "Herhangi"
+
+msgctxt "#30255"
+msgid "480p"
+msgstr "480p"
+
+msgctxt "#30256"
+msgid "720p"
+msgstr "720p"
+
+msgctxt "#30257"
+msgid "1080p"
+msgstr "1080p"
+
+msgctxt "#30258"
+msgid "2160p"
+msgstr "2160p"
+
+msgctxt "#30259"
+msgid "Maximum size (GB, 0 = unlimited)"
+msgstr "Maksimum boyut (GB, 0 = sınırsız)"
+
+msgctxt "#30260"
+msgid "Exclude CAM/TS sources"
+msgstr "CAM/TS kaynaklarını hariç tut"
+
+msgctxt "#30261"
+msgid "Cached only"
+msgstr "Yalnızca önbelleğe alınmış"
+
+msgctxt "#30262"
+msgid "%d source hidden by filters"
+msgstr "Filtreler nedeniyle %d kaynak gizlendi"
+
+msgctxt "#30263"
+msgid "%d sources hidden by filters"
+msgstr "Filtreler nedeniyle %d kaynak gizlendi"
+
+msgctxt "#30264"
+msgid "Filters matched nothing - showing all sources"
+msgstr "Filtrelerle eşleşen kaynak yok, tüm kaynaklar gösteriliyor"
+
+msgctxt "#30313"
+msgid "New Episodes"
+msgstr "Yeni Bölümler"
+
+msgctxt "#30314"
+msgid "Show new episodes under Series"
+msgstr "Yeni Bölümleri Diziler'de Göster"
+
+msgctxt "#30315"
+msgid "%d new episode ready to watch"
+msgstr "%d yeni bölüm izlemeye hazır"
+
+msgctxt "#30316"
+msgid "%d new episodes ready to watch"
+msgstr "%d yeni bölüm izlemeye hazır"
+
+msgctxt "#30317"
+msgid "New episodes"
+msgstr "Yeni bölümler"
+
+msgctxt "#30318"
+msgid "NEW"
+msgstr "YENİ"
+
+msgctxt "#30280"
+msgid "Hide adult content"
+msgstr "Yetişkinlere yönelik içeriği gizle"
+
+
+
+msgctxt "#30335"
+msgid "Installed"
+msgstr "Yüklendi"
+
+msgctxt "#30336"
+msgid "Update available"
+msgstr "Güncelleme mevcut"
+
+msgctxt "#30337"
+msgid "Needs configuration"
+msgstr "Yapılandırma gerekiyor"
+
+msgctxt "#30338"
+msgid "%s is already installed"
+msgstr "%s zaten yüklü"
+
+msgctxt "#30339"
+msgid "No addon catalogs found. Install an addon that publishes one, such as Cinemeta."
+msgstr "Eklenti kataloğu bulunamadı. Cinemeta gibi bir katalog yayınlayan bir eklenti yükleyin."
+
+msgctxt "#30340"
+msgid "Could not load %s's addon catalog"
+msgstr "%s eklentisinin kataloğu yüklenemedi"
+
+msgctxt "#30341"
+msgid "%s needs configuration. Open %s in a browser, configure it, then paste the resulting manifest URL"
+msgstr "%s yapılandırma gerektiriyor. %s adresini bir tarayıcıda açın, yapılandırın, ardından elde edilen manifest URL'sini yapıştırın"
+
+msgctxt "#30342"
+msgid "Install this addon?"
+msgstr "Bu eklenti yüklensin mi?"
+
+msgctxt "#30343"
+msgid "Addon catalogs"
+msgstr "Eklenti katalogları"
+
+msgctxt "#30344"
+msgid "Browse addon catalogs"
+msgstr "Eklenti kataloglarına göz at"
+
+msgctxt "#30345"
+msgid "Install from URL"
+msgstr "URL'den yükle"
+
+msgctxt "#30346"
+msgid "Search addon catalogs"
+msgstr "Eklenti kataloglarında ara"
+
+msgctxt "#30347"
+msgid "Clear search"
+msgstr "Aramayı temizle"
+
+msgctxt "#30348"
+msgid "Showing %d of %d"
+msgstr "Gösteriliyor: %d / %d"
+
+msgctxt "#30349"
+msgid "No addons match your search"
+msgstr "Aramayla eşleşen eklenti yok"
+
+msgctxt "#30350"
+msgid "Add addons"
+msgstr "Eklenti ekle"
+
+msgctxt "#30351"
+msgid "Browse catalogs, or install from a manifest URL"
+msgstr "Kataloglara göz atın veya manifest URL'sinden yükleyin"
+
+msgctxt "#30360"
+msgid "New episodes: %d"
+msgstr "Yeni Bölümler: %d"
+
+msgctxt "#30361"
+msgid "Source slower than playback bitrate; expect buffering"
+msgstr "Kaynak oynatma bit hızından yavaş; arabellekleme beklenebilir"
+
+msgctxt "#30362"
+msgid "Force library mode (Android)"
+msgstr "Kitaplık modunu zorla (Android)"
+
+msgctxt "#30363"
+msgid "Run the streaming server as an in-process library instead of a separate executable. Enable this only if the embedded server fails to start (e.g. on an SELinux-enforcing Android device)."
+msgstr "Akış sunucusunu ayrı bir yürütülebilir dosya yerine işlem içi bir kitaplık olarak çalıştır. Yalnızca gömülü sunucu başlatılamıyorsa etkinleştirin (örneğin SELinux enforcing modundaki bir Android cihazda)."
+
+msgctxt "#30371"
+msgid "Stream4Me bridge"
+msgstr "Stream4Me köprüsü"
+
+msgctxt "#30372"
+msgid "Enable Stream4Me bridge"
+msgstr "Stream4Me köprüsünü etkinleştir"
+
+msgctxt "#30373"
+msgid "Bridge port"
+msgstr "Köprü portu"
+
+msgctxt "#30374"
+msgid "Channels (comma-separated, blank = every active channel)"
+msgstr "Kanallar (virgülle ayrılmış, boş = tüm etkin kanallar)"

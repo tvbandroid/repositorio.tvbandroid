@@ -1,0 +1,306 @@
+"""AddonsWindow: a vertical list of every installed addon - Rivulet's
+add-on manager. Row 0 is a single "Add addons" row that opens a chooser
+for "Browse addon catalogs" (`_open_addon_catalog()`) or "Install from
+URL" (`_install()`); every row after it opens an action menu (disable/
+enable, remove, move up/down) for that addon - removal is refused for
+protected/official addons, disabling is not (it is reversible local
+state, never pushed to Stremio), and moving reorders the list every
+catalog/stream fan-out call site walks in order. Built/run via
+`open_addons()`.
+"""
+import xbmcgui
+
+from lib.ui.dependencies import get_client, get_store
+from lib.ui.uicommon import BaseWindow, open_window
+
+LIST = 30002
+
+#: strings.po id for the removal refusal shown for protected/official
+#: addons.
+_PROTECTED_MESSAGE_STRING_ID = 30191
+
+#: strings.po id for the move refusal shown when a concurrent process
+#: removed the addon while its action menu was open (`move_addon()`
+#: raises `ValueError` for a `transportUrl` that is no longer installed).
+_NOT_INSTALLED_MESSAGE_STRING_ID = 30272
+
+
+def _clean_description(text):
+    """Collapse a manifest description to one line - CR/LF and repeated
+    whitespace folded to single spaces - truncated to ~120 chars, for a
+    row's `Label2`."""
+    text = ' '.join((text or '').split())
+    if len(text) > 120:
+        text = text[:117].rstrip() + '...'
+    return text
+
+
+class AddonsWindow(BaseWindow):
+    """See module docstring. Built/run via `open_addons()`."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.addons = []
+        self.store = None
+
+    def onInit(self):
+        self._reload()
+
+    def _reload(self, focus_transport_url=None):
+        self.store = get_store()
+        self.addons = self.store.get_addons()
+
+        control = self.getControl(LIST)
+        control.reset()
+        items = self._build_items()
+        control.addItems(items)
+        self.setFocusId(LIST)
+        if focus_transport_url is None:
+            return
+        # The static row(s) built by `_build_items()` ("add", ...) sit
+        # ahead of every addon row, so an addon's list position is its
+        # addons-list index plus however many static rows precede it.
+        # Derived from the built item list itself (rather than a literal
+        # +1) so a future second static row can't silently break focus
+        # again - see the move-up/down entries in _open_actions().
+        static_row_count = len(items) - len(self.addons)
+        index = next(
+            (i for i, a in enumerate(self.addons) if a.get('transportUrl') == focus_transport_url),
+            None,
+        )
+        if index is not None:
+            control.selectItem(index + static_row_count)
+
+    def _build_items(self):
+        from lib.ui.compat import L
+        from lib.ui.uicommon import escape_label
+
+        add_item = xbmcgui.ListItem(label=L(30350), label2=L(30351))
+        add_item.setProperty('position', 'add')
+        items = [add_item]
+        for index, descriptor in enumerate(self.addons):
+            manifest = descriptor.get('manifest') or {}
+            flags = descriptor.get('flags') or {}
+            label = '%s  \u00b7  v%s' % (escape_label(manifest.get('name', '?')), manifest.get('version', '?'))
+            if flags.get('disabled'):
+                label += '  \u00b7  ' + L(30251)
+            item = xbmcgui.ListItem(label=label, label2=escape_label(_clean_description(manifest.get('description', ''))))
+            item.setProperty('position', str(index))
+            items.append(item)
+        return items
+
+    def onClick(self, control_id):
+        if control_id != LIST:
+            return
+        focused = self.getControl(LIST).getSelectedItem()
+        if focused is None:
+            return
+        position = focused.getProperty('position')
+        if position == 'add':
+            self._add_addons()
+            return
+        index = int(position)
+        self._open_actions(self.addons[index], index)
+
+    def _guard_mutation(self, mutate):
+        """Run a store mutation that goes through the CAS `update_addons()`
+        path and turn `lib.store.ConcurrentUpdateError` into user
+        feedback instead of an unhandled exception escaping the Kodi
+        click handler.
+
+        Kodi can run `default.py` as separate concurrent OS processes, so
+        two clicks can race to update the same addons file; when the
+        retried read-modify-write in `update_addons()` gives up, this
+        notifies `L(30032)`, reloads the list to reflect whatever ended
+        up persisted, and returns `False` so the caller skips its own
+        success notification. Any other exception (e.g. `_remove`'s
+        protected-addon `ValueError`) is left to propagate untouched.
+        """
+        import xbmc
+
+        from lib.store import ConcurrentUpdateError
+        from lib.ui.compat import L, log, notify
+
+        try:
+            mutate()
+        except ConcurrentUpdateError as exc:
+            log('addonswindow: concurrent update: %s' % exc, xbmc.LOGWARNING)
+            notify(L(30032))
+            self._reload()
+            return False
+        return True
+
+    def _add_addons(self):
+        """Single static row's chooser: two static rows (install-from-
+        URL, addon catalogs) made the window half chrome before every
+        addon the user actually installed. `L(30344)` ("Browse addon
+        catalogs") opens `_open_addon_catalog()`; `L(30345)` ("Install
+        from URL") opens `_install()`. Dismissing the chooser
+        (`dialogs.choose()` returns -1) is a no-op - neither flow runs."""
+        from lib.ui import dialogs
+        from lib.ui.compat import L
+
+        rows = [L(30344), L(30345)]
+        actions = [self._open_addon_catalog, self._install]
+        picked = dialogs.choose(L(30350), rows)
+        if not 0 <= picked < len(actions):
+            return
+        actions[picked]()
+
+    def _install(self):
+        from lib.ui.compat import L, notify
+        from lib.ui.uicommon import fetch_and_validate_addon
+
+        url = xbmcgui.Dialog().input(L(30010))
+        if not url:
+            return
+
+        manifest, transport_url, error_string_id = fetch_and_validate_addon(get_client(), url)
+        if error_string_id is not None:
+            notify(L(error_string_id))
+            return
+
+        from lib.ui.views import _sync_addons_if_logged_in
+
+        if not self._guard_mutation(lambda: self.store.install_addon(transport_url, manifest)):
+            return
+        _sync_addons_if_logged_in(self.store)
+        notify(L(30012))
+        self._reload()
+
+    def _open_addon_catalog(self):
+        """One of `_add_addons()`'s two chooser entries: browse/install
+        addons from other addons' own `addon_catalog` resources instead
+        of typing a manifest URL. `AddonCatalogWindow` may install/update
+        addons while open, so reload once it closes to reflect that."""
+        from lib.ui.addoncatalogwindow import open_addon_catalog
+
+        open_addon_catalog()
+        self._reload()
+
+    def _remove(self, descriptor):
+        import xbmc
+
+        from lib.ui import dialogs
+        from lib.ui.compat import L, notify
+
+        manifest = descriptor.get('manifest') or {}
+        flags = descriptor.get('flags') or {}
+        if flags.get('protected'):
+            notify(L(_PROTECTED_MESSAGE_STRING_ID))
+            return
+
+        if not dialogs.confirm(L(30011), manifest.get('name', '?'), xbmc.getLocalizedString(107), xbmc.getLocalizedString(106)):
+            return
+
+        from lib.ui.views import _sync_addons_if_logged_in
+
+        try:
+            if not self._guard_mutation(lambda: self.store.remove_addon(descriptor.get('transportUrl'))):
+                return
+        except ValueError:
+            notify(L(_PROTECTED_MESSAGE_STRING_ID))
+            return
+
+        _sync_addons_if_logged_in(self.store)
+        notify(L(30013))
+        self._reload()
+
+    def _open_actions(self, descriptor, index):
+        from lib.ui import dialogs
+        from lib.ui.compat import L
+
+        manifest = descriptor.get('manifest') or {}
+        flags = descriptor.get('flags') or {}
+        disabled = bool(flags.get('disabled'))
+        rows = [L(30249) if disabled else L(30248), L(30250)]
+        actions = [self._toggle, self._remove]
+        # Omit rather than show a move entry that would be a no-op at the
+        # boundary it points toward - an inert "Move up" on the first
+        # addon is just noise on a remote-control menu.
+        if index > 0:
+            rows.append(L(30270))
+            actions.append(lambda d: self._move(d, -1))
+        if index < len(self.addons) - 1:
+            rows.append(L(30271))
+            actions.append(lambda d: self._move(d, 1))
+        picked = dialogs.choose(manifest.get('name', '?'), rows)
+        if not 0 <= picked < len(actions):
+            return
+        actions[picked](descriptor)
+
+    def _toggle(self, descriptor):
+        from lib.ui.compat import L, notify
+
+        flags = descriptor.get('flags') or {}
+        disabled = bool(flags.get('disabled'))
+        if not self._guard_mutation(lambda: self.store.set_addon_disabled(descriptor.get('transportUrl'), not disabled)):
+            return
+        # Local presentation state only, deliberately not part of Stremio's
+        # addon-collection schema, so no `_sync_addons_if_logged_in()` push
+        # here - toggling must never cost a network call.
+        notify(L(30252) if disabled else L(30251))
+        self._reload()
+
+    def _move(self, descriptor, delta):
+        """Reorder ``descriptor`` by ``delta`` positions via the CAS
+        `Store.move_addon()` and reload the list keeping focus on it -
+        a reorder tool that loses your place on a remote control is
+        unusable. Pushed to the Stremio account like install/remove
+        (unlike `_toggle`'s local-only `disabled` flag): list order is
+        part of the synced addon-collection shape, not presentation
+        state.
+
+        `dialogs.choose()` blocks while the action menu is open, and Kodi
+        runs `default.py` as concurrent OS processes, so another process
+        can remove this very addon while the menu sits open; `move_addon()`
+        then raises `ValueError` for the now-uninstalled `transportUrl`.
+        Handled exactly like `_remove()`'s protected-addon `ValueError`:
+        notify and return without reloading - nothing here has mutated
+        the in-memory list, so it is still coherent as-is.
+        """
+        from lib.ui.compat import L, notify
+        from lib.ui.views import _sync_addons_if_logged_in
+
+        transport_url = descriptor.get('transportUrl')
+        try:
+            if not self._guard_mutation(lambda: self.store.move_addon(transport_url, delta)):
+                return
+        except ValueError:
+            notify(L(_NOT_INSTALLED_MESSAGE_STRING_ID))
+            return
+        _sync_addons_if_logged_in(self.store)
+        self._reload(focus_transport_url=transport_url)
+
+
+def open_addons():
+    """List every installed addon with install/enable-disable/remove
+    actions. Mirrors
+    `catalogpicker.open_catalog_picker`'s error-handling shape; unlike
+    that picker there is no should-close-caller outcome to report, so
+    this always returns None."""
+    import xbmc
+
+    from lib.ui.compat import L, log, notify
+
+    count = len(get_store().get_addons())
+    log('addonswindow: opening AddonsWindow (%d addons)' % count, xbmc.LOGINFO)
+    win = None
+    try:
+        win = open_window(AddonsWindow, 'AddonsWindow.xml')
+        win.doModal()
+    except Exception as exc:  # a skin/UI failure must surface, not vanish
+        log('addonswindow: window failed to open: %r' % (exc,), xbmc.LOGERROR)
+        notify(L(30032))
+    finally:
+        # A normal return means AddonsWindow already closed itself (its
+        # own onAction calls self.close()) before doModal() returned -
+        # but an exception raised from WITHIN doModal() (onInit(), or a
+        # callback mid-modal) skips that self-close entirely. Close
+        # unconditionally here so no exit path leaves a zombie modal
+        # window behind; closing an already-closed window is a safe no-op.
+        if win is not None:
+            try:
+                win.close()
+            except Exception:
+                pass

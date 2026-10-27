@@ -1,0 +1,10 @@
+{
+  "torrentio": {
+    "enabled": true,
+    "manifest": "https://torrentio.strem.fun/providers=mejortorrent,wolfmax4k|language=spanish/manifest.json"
+  },
+  "peerflix": {
+    "enabled": true,
+    "manifest": "https://addon.peerflix.mov/language=es|qualityfilter=threed,vhs,screener,unknown|sort=seed-desc/manifest.json"
+  }
+}

@@ -1156,6 +1156,28 @@ See the changelog. Enjoy!</news>
     </extension>
 </addon>
 
+<addon id="plugin.video.darkvio" name="[B][COLOR blue]DARK[/COLOR]vio[/B]" version="3.4.6" provider-name="DaRkToWeR">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.module.inputstreamhelper" />
+    <import addon="inputstream.adaptive" />
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="es_ES">DARkvio</summary>
+   <description lang="es_ES">Conecta tus canales de pelis y series de Telegram a través de TMDB. Requiere de Elementum para usar con Torrent. En ajustes conecta tu cuenta de Telegram. Instalar el reproductor en ajustes para usarlo con TMDb Helper para una experiencia más completa. Disfruta de tus pelis y series preferidas con DARKvio.
+   </description>
+   <platform>all</platform>
+   <assets>
+	<icon>icon.png</icon>
+	<fanart>fanart.jpg</fanart>
+    </assets>
+   </extension>
+</addon>
+
 <addon id="plugin.video.discoveryplus" version="1.7.5+matrix.1" name="discovery+" provider-name="Dis90">
 <requires>
   <import addon="xbmc.python" version="3.0.0"/>

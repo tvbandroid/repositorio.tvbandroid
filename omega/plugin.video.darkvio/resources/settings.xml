@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="Telegram">
+        <setting type="action" label="[COLOR blue]Conectar Telegram[/COLOR]" action="RunPlugin(plugin://plugin.video.darkvio/?mode=telegram_login)" option="close" />
+        <setting type="action" label="Desconectar Telegram" action="RunPlugin(plugin://plugin.video.darkvio/?mode=telegram_logout)" option="close" />
+    </category>
+    <category label="Tv Paises">
+        <setting id="country_spain" type="bool" label="[COLOR red]Es[COLOR yellow]pa[COLOR red]ña[/COLOR]" default="true" />
+        <setting id="country_portugal" type="bool" label="Portugal" default="false" />
+        <setting id="country_france" type="bool" label="Francia" default="false" />
+        <setting id="country_italy" type="bool" label="Italia" default="false" />
+        <setting id="country_germany" type="bool" label="Alemania" default="false" />
+        <setting id="country_uk" type="bool" label="Reino Unido" default="false" />
+        <setting id="country_netherlands" type="bool" label="Países Bajos" default="false" />
+        <setting id="country_turkey" type="bool" label="Turquía" default="false" />
+        <setting id="country_romania" type="bool" label="Rumanía" default="false" />
+        <setting id="country_poland" type="bool" label="Polonia" default="false" />
+        <setting id="country_bulgaria" type="bool" label="Bulgaria" default="false" />
+        <setting id="country_russia" type="bool" label="Rusia" default="false" />
+        <setting id="country_balkans" type="bool" label="Balcanes" default="false" />
+        <setting id="country_arabia" type="bool" label="Arabia" default="false" />
+        <setting id="country_albania" type="bool" label="Albania" default="false" />
+    </category>
+    <category label="TMDb Helper">
+	<setting type="action" label="[COLOR orange]Instalar TMDb Helper [/COLOR]" action="RunPlugin(plugin://plugin.video.darkvio/?mode=install_tmdb_helper)" option="close" />
+        <setting type="action" label="Instalar reproductor DARKvio para TMDb Helper" action="RunPlugin(plugin://plugin.video.darkvio/?mode=install_tmdb_player)" option="close" />
+    </category>
+</settings>

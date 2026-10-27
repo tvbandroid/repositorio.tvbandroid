@@ -1,0 +1,12 @@
+{
+  "name": "DARKvio",
+  "plugin": "plugin.video.darkvio",
+  "priority": 100,
+  "is_resolvable": "false",
+  "assert": {
+    "play_movie": ["tmdb"],
+    "play_episode": ["tmdb", "showname", "season", "episode"]
+  },
+  "play_movie": "plugin://plugin.video.darkvio/?mode=tmdb_play_movie&tmdb_id={tmdb}&title={title_url}&year={year}",
+  "play_episode": "plugin://plugin.video.darkvio/?mode=tmdb_play_episode&tmdb_id={tmdb}&showname={showname_url}&season={season}&episode={episode}&title={title_url}"
+}
